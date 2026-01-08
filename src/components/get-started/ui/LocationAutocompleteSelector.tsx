@@ -17,7 +17,8 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Check, ChevronDown } from 'lucide-react';
-import { useLocale, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import { useLocale } from '@/hooks/use-locale';
 import React, { useEffect, useState } from 'react';
 
 interface LocationAutocompleteComboSelectProps {

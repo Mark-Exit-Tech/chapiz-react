@@ -6,7 +6,8 @@ import { ArrowLeft, Smartphone, Tag, Download, ExternalLink } from 'lucide-react
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation, useLocale } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import { useLocale } from '@/hooks/use-locale';
 import { getMobileAppLinks } from '@/lib/actions/admin';
 import { getBreedNameById } from '@/lib/supabase/database/pets';
 

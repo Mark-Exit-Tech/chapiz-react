@@ -1,6 +1,7 @@
 import GetStartedHeader from '@/components/get-started/ui/GetStartedHeader';
 import { Card, CardContent } from '@/components/ui/card';
-import { useLocale, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import { useLocale } from '@/hooks/use-locale';
 import { Controller, useFormContext } from 'react-hook-form';
 import he from 'react-phone-number-input/locale/he';
 import GetStartedInput from './ui/GetStartedInput';

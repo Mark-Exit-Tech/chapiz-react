@@ -1,6 +1,7 @@
 import GetStartedHeader from '@/components/get-started/ui/GetStartedHeader';
 import { Card, CardContent } from '@/components/ui/card';
-import { useTranslation, useLocale } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import { useLocale } from '@/hooks/use-locale';
 import { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import toast from 'react-hot-toast';

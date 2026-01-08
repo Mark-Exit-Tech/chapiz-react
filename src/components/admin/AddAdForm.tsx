@@ -16,7 +16,8 @@ import { Textarea } from '@/components/ui/textarea';
 
 import { createAd } from '@/lib/actions/admin';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation, useLocale } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import { useLocale } from '@/hooks/use-locale';
 import { useState, useEffect } from 'react';
 import { HEBREW_SERVICE_TAGS } from '@/lib/constants/hebrew-service-tags';
 import { getPetTypesForDropdown, getBreedsForDropdown, getAreasForDropdown, getCitiesForDropdown, getAgeRangesForDropdown, getWeightRangesForDropdown } from '@/lib/supabase/database/pets';
