@@ -4,9 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { FileUp, Image as ImageIcon, Video, X, Edit } from 'lucide-react';
-import { supabase } from '@/lib/supabase/client';
-import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
-import { storage } from '@/lib/firebase/client';
+import { uploadAdMedia, deleteAdMedia } from '@/lib/supabase/storage';
 import { useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -31,6 +29,7 @@ export default function MediaUpload({
   const [progress, setProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [editedImageUrl, setEditedImageUrl] = useState<string | null>(null);
 
   const validateFile = (file: File): boolean => {
@@ -62,7 +61,7 @@ export default function MediaUpload({
     if (!validateFile(file)) return;
 
     setIsUploading(true);
-    setProgress(0);
+    setProgress(0); // Supabase storage upload doesn't provide progress events easily in v2 JS client
 
     try {
       // Convert image to WebP if it's an image
@@ -82,46 +81,30 @@ export default function MediaUpload({
         }
       }
 
-      // Create a unique filename
-      const timestamp = Date.now();
-      const fileExtension = fileToUpload.name.split('.').pop();
-      const fileName = `${type}_${timestamp}.${fileExtension}`;
-      
-      // Create storage reference
-      const storageRef = ref(storage, `advertisements/${type}s/${fileName}`);
-      
-      // Upload file with progress tracking
-      const uploadTask = uploadBytesResumable(storageRef, fileToUpload);
-
-      uploadTask.on(
-        'state_changed',
-        (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setProgress(Math.round(progress));
-        },
-        (error) => {
-          console.error('Upload error:', error);
-          toast.error(`Upload failed: ${error.message}`);
-          setIsUploading(false);
-        },
-        async () => {
-          try {
-            // Get download URL
-            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-            onChange(downloadURL);
-            toast.success(`${type} uploaded successfully`);
-            setIsUploading(false);
-          } catch (error: any) {
-            console.error('Error getting download URL:', error);
-            toast.error('Upload completed but failed to get file URL');
-            setIsUploading(false);
+      // Fake progress for UX since Supabase client doesn't expose it easily
+      const interval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 90) {
+            clearInterval(interval);
+            return 90;
           }
-        }
-      );
+          return prev + 10;
+        });
+      }, 500);
+
+      const downloadURL = await uploadAdMedia(fileToUpload, type);
+
+      clearInterval(interval);
+      setProgress(100);
+      onChange(downloadURL);
+      toast.success(`${type} uploaded successfully`);
+      setIsUploading(false);
+
     } catch (error: any) {
       console.error('Upload error:', error);
-      toast.error(`Upload failed: ${error.message}`);
+      toast.error(`Upload failed: ${error.message || 'Unknown error'}`);
       setIsUploading(false);
+      onChange('');
     }
   };
 
@@ -158,30 +141,19 @@ export default function MediaUpload({
     }
 
     try {
-      // Extract the file path from the download URL
-      const url = new URL(value);
-      const pathMatch = url.pathname.match(/\/o\/(.+?)\?/);
-      
-      if (pathMatch) {
-        const filePath = decodeURIComponent(pathMatch[1]);
-        const fileRef = ref(storage, filePath);
-        await deleteObject(fileRef);
-        onChange('');
-        toast.success('File removed successfully');
-      } else {
-        // If URL doesn't match expected pattern, just clear it
-        onChange('');
-      }
+      await deleteAdMedia(value, type);
+      onChange('');
+      toast.success('File removed successfully');
     } catch (error: any) {
       console.error('Error removing file:', error);
-      // Silently clear the value if there's an error
+      // Even if delete fails (e.g. file doesn't exist), clear the UI
       onChange('');
     }
   };
 
   const handleImageError = () => {
     // If image fails to load, clear the value
-    onChange('');
+    // onChange(''); // Optional: maybe don't auto-clear to avoid flickering if temporary
   };
 
   return (
@@ -290,12 +262,15 @@ export default function MediaUpload({
               // Convert data URL to blob
               const response = await fetch(editedDataUrl);
               const blob = await response.blob();
-              
+
               // Create a file from blob (will be converted to WebP in uploadFile)
               const file = new File([blob], 'edited-image.png', { type: 'image/png' });
-              
+
               // Upload the edited image (will be converted to WebP)
+              // But first clear current value so it shows uploading state
+              onChange('');
               await uploadFile(file);
+
               setEditedImageUrl(null);
               setIsEditorOpen(false);
             } catch (error: any) {

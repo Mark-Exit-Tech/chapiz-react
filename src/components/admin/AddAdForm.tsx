@@ -27,7 +27,7 @@ import { getYouTubeEmbedUrl } from '@/lib/utils/youtube';
 
 export default function AddAdForm() {
   const { t } = useTranslation('Admin');
-  const tCommon = useTranslation('common');
+  const { t: tCommon } = useTranslation('common');
   const [isOpen, setIsOpen] = useState(false);
   const locale = useLocale() as 'en' | 'he';
   const [mediaType, setMediaType] = useState<'image' | 'video' | 'youtube'>('image');
@@ -81,7 +81,7 @@ export default function AddAdForm() {
   };
 
   const loadBreeds = async (petType: string) => {
-    const breedList = await getBreedsForDropdown(petType, locale);
+    const breedList = await getBreedsForDropdown(locale);
     setBreeds(breedList);
   };
 

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { getDashboardStats, getRecentActivity } from '@/lib/actions/admin';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
-import Link from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export default function AdminDashboard() {
@@ -267,7 +267,7 @@ export default function AdminDashboard() {
           <div className="mb-3 md:mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <h3 className="text-base md:text-lg font-semibold order-1">{t('userActivity')}</h3>
             <Link
-              href={`/${locale}/admin/users`}
+              to={`/${locale}/admin/users`}
               className="rounded bg-blue-500 px-3 md:px-4 py-2 text-sm md:text-base text-white transition hover:bg-blue-600 w-full sm:w-auto text-center order-2"
             >
               {t('manageUsers')}
@@ -310,7 +310,7 @@ export default function AdminDashboard() {
           <div className="mb-3 md:mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <h3 className="text-base md:text-lg font-semibold order-1">{t('adActivity')}</h3>
             <Link
-              href={`/${locale}/admin/ads`}
+              to={`/${locale}/admin/ads`}
               className="rounded bg-blue-500 px-3 md:px-4 py-2 text-sm md:text-base text-white transition hover:bg-blue-600 w-full sm:w-auto text-center order-2"
             >
               {t('adsManagement.manageAds')}

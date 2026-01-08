@@ -149,7 +149,7 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
   };
 
   const loadBreeds = async (petType: string) => {
-    const breedList = await getBreedsForDropdown(petType, locale);
+    const breedList = await getBreedsForDropdown(locale);
     setBreeds(breedList);
   };
 
@@ -206,7 +206,7 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
         adContent = formData.content;
       }
 
-      await updateAd(ad.id, {
+      const updateResult = await updateAd(ad.id, {
         title: formData.title,
         content: adContent,
         type: adType,
@@ -249,16 +249,12 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
     setError(null);
 
     try {
-      const result = await deleteAd(ad.id);
-      if (result.success) {
-        setIsDeleting(false);
-        if (onDelete) {
-          onDelete();
-        } else {
-          window.location.reload();
-        }
+      await deleteAd(ad.id);
+      setIsDeleting(false);
+      if (onDelete) {
+        onDelete();
       } else {
-        setError(result.error || 'Failed to delete advertisement');
+        window.location.reload();
       }
     } catch (err: any) {
       setError(err.message || 'Failed to delete advertisement');

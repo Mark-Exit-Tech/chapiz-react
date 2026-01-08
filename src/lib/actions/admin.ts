@@ -11,12 +11,12 @@ console.warn('⚠️ Admin actions are using stubs - All functions need Supabase
 // Stub functions that return empty/default values
 export async function getDashboardStats() {
   return {
-    usersCount: 0,
-    userRoles: {},
-    newUsersLast30Days: 0,
-    petsCount: 0,
-    adsCount: 0,
-    couponsCount: 0,
+    users: { total: 0, new: 0, byRole: {} },
+    ads: { total: 0, byStatus: {}, byType: {} },
+    pets: { total: 0, new: 0 },
+    contactSubmissions: { total: 0 },
+    comments: { total: 0 },
+    rating: { average: 0, total: 0 }
   };
 }
 
@@ -95,13 +95,44 @@ export async function getMobileAppLinks() {
 
 export type InstallBannerSettings = {
   isEnabled: boolean;
-  iosAppId: string;
-  androidAppId: string;
-  showAfterSeconds: number;
+  iosAppId?: string;
+  androidAppId?: string;
+  showAfterSeconds?: number;
+  bannerText?: string;
+  logoUrl?: string;
+}
+
+export type ContactInfo = {
+  email: string;
+  phone: string;
+  address: string;
+  whatsapp: string;
+  facebook: string;
+  instagram: string;
+  storeUrl: string;
+}
+
+export type ContactSubmission = {
+  id: string;
+  email: string;
+  subject: string;
+  message: string;
+  createdAt: Date;
+  isRead: boolean;
+}
+
+export type CookieSettings = {
+  analytics: boolean;
+  marketing: boolean;
 }
 
 export async function getInstallBannerSettings(): Promise<InstallBannerSettings> {
   return { isEnabled: false, iosAppId: '', androidAppId: '', showAfterSeconds: 0 };
+}
+
+export async function saveInstallBannerSettings(data: InstallBannerSettings): Promise<{ success: boolean; error?: string }> {
+  console.warn('saveInstallBannerSettings is a stub using Supabase');
+  return { success: true };
 }
 
 // Ads stubs
@@ -116,6 +147,7 @@ export interface Ad {
   status: AdStatus;
   startDate: string | null;
   endDate: string | null;
+  createdAt?: string | Date;
   phone?: string;
   location?: string;
   description?: string;

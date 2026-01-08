@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Menu, X, MessageSquare, Mail, Ticket, LayoutDashboard, AppWindow, Users, Settings, Megaphone, Building2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import Link from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
 interface AdminTopNavProps {
@@ -107,7 +107,7 @@ export default function AdminTopNav({ userEmail, userRole, locale }: AdminTopNav
                                     return (
                                         <Link
                                             key={item.href}
-                                            href={item.href}
+                                            to={item.href}
                                             onClick={() => setMenuOpen(false)}
                                             className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
                                         >
