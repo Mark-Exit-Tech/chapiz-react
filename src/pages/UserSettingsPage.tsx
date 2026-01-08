@@ -70,6 +70,7 @@ const ProfileContent = () => {
       setFormData(prev => ({
         ...prev,
         fullName: fullName,
+        phone: '',
         address: '',
         profileImageURL: avatarUrl,
         language: locale

@@ -8,7 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export default function BottomNavigation() {
   const pathname = usePathname();
-  const { t } = useTranslation('components.Navbar');
+  const { t } = useTranslation('components');
   const { user } = useAuth();
 
   // Don't show bottom navigation on admin routes
@@ -36,25 +36,25 @@ export default function BottomNavigation() {
     {
       href: '/pages/my-pets',
       icon: PawPrint,
-      label: t('bottomNav.myPets') || t('myPets'),
+      label: t('Navbar.bottomNav.myPets'),
       isActive: pathname?.startsWith('/pages/my-pets'),
     },
     {
       href: '/coupons',
       icon: Ticket,
-      label: t('bottomNav.myCoupons') || t('allPromos'),
+      label: t('Navbar.bottomNav.myCoupons'),
       isActive: pathname?.startsWith('/coupons'),
     },
     {
       href: '/vouchers',
       icon: Gift,
-      label: t('bottomNav.giftsAndVouchers') || t('coupons'),
+      label: t('Navbar.bottomNav.giftsAndVouchers'),
       isActive: pathname?.startsWith('/vouchers'),
     },
     {
       href: '/services',
       icon: MapPin,
-      label: t('bottomNav.businessesNearby') || t('services'),
+      label: t('Navbar.bottomNav.businessesNearby'),
       isActive: pathname?.startsWith('/services'),
     },
   ];
@@ -79,8 +79,8 @@ export default function BottomNavigation() {
               key={item.href}
               to={item.href}
               className={`flex flex-col items-center justify-center min-w-0 flex-1 py-2 px-1 rounded-lg transition-all duration-200 ${item.isActive
-                  ? 'text-primary bg-primary/10'
-                  : 'text-gray-600 hover:text-primary hover:bg-primary/5 hover:scale-105 active:scale-95'
+                ? 'text-primary bg-primary/10'
+                : 'text-gray-600 hover:text-primary hover:bg-primary/5 hover:scale-105 active:scale-95'
                 }`}
             >
               <Icon className={`h-6 w-6 mb-1 transition-transform ${item.isActive ? 'text-primary' : ''}`} />
