@@ -60,13 +60,11 @@ export interface PluginRendererProps {
 
 export const PluginRenderer: React.FC<PluginRendererProps> = ({ plugins, props = {} }) => {
   return (
-    <>
+    <React.Fragment>
       {plugins.map((plugin) => {
         const Component = plugin.component;
-        return (
-          <Component key={plugin.id} {...props} />
-        );
+        return React.createElement(Component, { key: plugin.id, ...props });
       })}
-    </>
+    </React.Fragment>
   );
 };
