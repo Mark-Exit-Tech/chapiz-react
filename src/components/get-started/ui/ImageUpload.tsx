@@ -121,11 +121,9 @@ const ImageUpload = ({
         {value ? (
           <div className="relative h-15 w-full rounded-lg">
             {/* Image */}
-            <Image
+            <img
               alt="Uploaded pet image"
               src={value}
-              width={500}
-              height={80}
               className="h-full w-full rounded-lg object-cover"
             />
 
@@ -172,12 +170,10 @@ const ImageUpload = ({
             <span className="w-full text-base font-medium ltr:pl-3 ltr:text-left rtl:pr-3 rtl:text-right">
               {uploading ? 'Uploading...' : label}
             </span>
-            <Image
+            <img
               src={assets.upload_figures}
               alt="figure"
-              width={162.67}
-              height={121.53}
-              className="absolute -top-11 ltr:right-6 rtl:left-6"
+              className="absolute -top-11 ltr:right-6 rtl:left-6 w-40 h-32"
             />
           </Button>
         )}

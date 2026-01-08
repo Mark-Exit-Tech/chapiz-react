@@ -7,13 +7,10 @@ const assets = {
 const AdHeader = () => {
   return (
     <div className="absolute flex w-full items-center justify-center bg-black">
-      <Image
+      <img
         src={assets.advertisment}
         alt="advertisment"
-        width={390}
-        height={80}
         className="object-cover w-full h-auto"
-        priority
       />
     </div>
   );

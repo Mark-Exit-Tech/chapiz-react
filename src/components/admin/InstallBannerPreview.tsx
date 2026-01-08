@@ -89,12 +89,10 @@ export default function InstallBannerPreview({ initialData }: InstallBannerPrevi
               <div className="container mx-auto px-4 py-3 flex items-center gap-3">
                 {settings.logoUrl && (
                   <div className="flex-shrink-0">
-                    <Image
+                    <img
                       src={settings.logoUrl}
                       alt="Logo"
-                      width={40}
-                      height={40}
-                      className="rounded-lg"
+                      className="rounded-lg w-10 h-10"
                     />
                   </div>
                 )}

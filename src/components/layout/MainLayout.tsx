@@ -2,8 +2,8 @@
 
 import { DirectionProvider } from '@radix-ui/react-direction';
 import { Toaster } from 'react-hot-toast';
-import { usePathname } from 'react-router-dom';
 import { useEffect } from 'react';
+import { usePathname } from '@/i18n/routing';
 import { useAuth } from '@/contexts/AuthContext';
 import AdDisplayManager from '@/components/AdDisplayManager';
 import InstallBanner from '@/components/InstallBanner';

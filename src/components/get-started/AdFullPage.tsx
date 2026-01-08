@@ -106,14 +106,10 @@ const AdFullPage = ({
         </motion.div>
         {type === 'image' ? (
           content ? (
-            <Image
+            <img
               className="h-full w-full object-contain"
               src={content}
               alt="advertisement"
-              width={1200}
-              height={800}
-              loading="eager"
-              priority={true}
             />
           ) : null
         ) : type === 'youtube' ? (

@@ -104,23 +104,18 @@ const AuthPage = () => {
         {/* Left Side - Image and Branding */}
         <div className="hidden lg:flex flex-col items-center justify-center space-y-8">
           <div className="relative w-80 h-80">
-            <Image
+            <img
               src="/pets/bear.png"
               alt="Chapiz Logo"
-              fill
-              className="object-contain"
-              priority
+              className="object-contain w-full h-full"
             />
           </div>
           <div className="text-center space-y-4">
             <div className="flex justify-center">
-              <Image
+              <img
                 src="/assets/Facepet.png"
                 alt="Chapiz"
-                width={200}
-                height={80}
                 className="h-16 w-auto object-contain"
-                priority
               />
             </div>
             <p className="text-xl text-gray-600 max-w-md">

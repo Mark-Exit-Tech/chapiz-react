@@ -105,12 +105,10 @@ export default function AdminInstallBanner() {
             <div className="px-3 py-2 flex items-center gap-2">
                 {settings.logoUrl && (
                     <div className="flex-shrink-0">
-                        <Image
+                        <img
                             src={settings.logoUrl}
                             alt="Logo"
-                            width={32}
-                            height={32}
-                            className="rounded-lg"
+                            className="rounded-lg w-8 h-8"
                         />
                     </div>
                 )}
