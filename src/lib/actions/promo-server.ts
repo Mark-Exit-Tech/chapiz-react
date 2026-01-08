@@ -1,9 +1,4 @@
 import { getRandomActiveAd } from './admin';
-
-export async function fetchRandomPromo() {
-  // Using the same function as ads for now
-  return await getRandomActiveAd();
-}
 import { Promo } from '@/types/promo';
 
 /**
@@ -12,8 +7,20 @@ import { Promo } from '@/types/promo';
  */
 export async function fetchRandomPromo(): Promise<Promo | null> {
   try {
-    const promo = await getRandomActivePromo();
-    return promo;
+    // Using the same function as ads for now - this is a stub
+    const ad = await getRandomActiveAd();
+    if (!ad) return null;
+    
+    // Convert Ad to Promo format (stub implementation)
+    return {
+      id: ad.id,
+      title: ad.title,
+      description: ad.content,
+      imageUrl: ad.imageUrl,
+      isActive: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    } as Promo;
   } catch (error) {
     console.error('Error in fetchRandomPromo server action:', error);
     return null;

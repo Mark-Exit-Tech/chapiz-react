@@ -17,6 +17,7 @@ export async function getRandomAdClient(): Promise<Ad | null> {
 
     return {
       id: ad.id,
+      title: ad.title || ad.content || 'Ad',
       type: ad.type,
       content: ad.content,
       duration: ad.duration || 5

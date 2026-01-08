@@ -17,6 +17,8 @@ export interface UserCoupon {
         validFrom: Date;
         validTo: Date;
         imageUrl?: string;
+        businessId?: string;
+        businessIds?: string[];
     };
 }
 
