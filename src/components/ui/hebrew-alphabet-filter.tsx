@@ -4,33 +4,33 @@ import { useState } from 'react';
 import { Button } from './button';
 import { Badge } from './badge';
 import { X } from 'lucide-react';
-import { cn } from '@/src/lib/utils';
-import { HEBREW_LETTERS, getAvailableHebrewLetters } from '@/src/lib/utils/hebrew-sort';
+import { cn } from '@/lib/utils';
+import { HEBREW_LETTERS, getAvailableHebrewLetters } from '@/lib/utils/hebrew-sort';
 
-interface HebrewAlphabetFilterProps {
-  items: Array<{ name: string; [key: string]: any }>;
-  onFilterChange: (filteredItems: Array<{ name: string; [key: string]: any }>) => void;
+interface HebrewAlphabetFilterProps<T extends { name: string }> {
+  items: T[];
+  onFilterChange: (filteredItems: T[]) => void;
   className?: string;
   showAllLetters?: boolean; // Show all Hebrew letters or only available ones
 }
 
-export function HebrewAlphabetFilter({
+export function HebrewAlphabetFilter<T extends { name: string }>({
   items,
   onFilterChange,
   className,
   showAllLetters = false
-}: HebrewAlphabetFilterProps) {
+}: HebrewAlphabetFilterProps<T>) {
   const [selectedLetters, setSelectedLetters] = useState<string[]>([]);
-  
+
   // Get available letters from the items
   const availableLetters = getAvailableHebrewLetters(items, item => item.name);
-  
+
   // Determine which letters to show
   const lettersToShow = showAllLetters ? HEBREW_LETTERS : availableLetters;
-  
+
   const handleLetterClick = (letter: string) => {
     let newSelectedLetters: string[];
-    
+
     if (selectedLetters.includes(letter)) {
       // Remove letter if already selected
       newSelectedLetters = selectedLetters.filter(l => l !== letter);
@@ -38,9 +38,9 @@ export function HebrewAlphabetFilter({
       // Add letter to selection
       newSelectedLetters = [...selectedLetters, letter];
     }
-    
+
     setSelectedLetters(newSelectedLetters);
-    
+
     // Filter items based on selected letters
     if (newSelectedLetters.length === 0) {
       // No filters, show all items
@@ -54,16 +54,16 @@ export function HebrewAlphabetFilter({
       onFilterChange(filtered);
     }
   };
-  
+
   const clearFilters = () => {
     setSelectedLetters([]);
     onFilterChange(items);
   };
-  
+
   if (lettersToShow.length === 0) {
     return null;
   }
-  
+
   return (
     <div className={cn('space-y-3', className)}>
       {/* Filter controls */}
@@ -83,7 +83,7 @@ export function HebrewAlphabetFilter({
           </Button>
         )}
       </div>
-      
+
       {/* Selected letters display */}
       {selectedLetters.length > 0 && (
         <div className="flex flex-wrap gap-1">
@@ -100,13 +100,13 @@ export function HebrewAlphabetFilter({
           ))}
         </div>
       )}
-      
+
       {/* Hebrew alphabet grid */}
       <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-1">
         {lettersToShow.map(letter => {
           const isSelected = selectedLetters.includes(letter);
           const isAvailable = availableLetters.includes(letter);
-          
+
           return (
             <Button
               key={letter}
@@ -126,7 +126,7 @@ export function HebrewAlphabetFilter({
           );
         })}
       </div>
-      
+
       {/* Results count */}
       {selectedLetters && Array.isArray(selectedLetters) && selectedLetters.length > 0 && (
         <div className="text-xs text-gray-500">
@@ -138,56 +138,56 @@ export function HebrewAlphabetFilter({
 }
 
 // Letter range selector component
-interface HebrewLetterRangeSelectorProps {
-  items: Array<{ name: string; [key: string]: any }>;
-  onFilterChange: (filteredItems: Array<{ name: string; [key: string]: any }>) => void;
+interface HebrewLetterRangeSelectorProps<T extends { name: string }> {
+  items: T[];
+  onFilterChange: (filteredItems: T[]) => void;
   className?: string;
 }
 
-export function HebrewLetterRangeSelector({
+export function HebrewLetterRangeSelector<T extends { name: string }>({
   items,
   onFilterChange,
   className
-}: HebrewLetterRangeSelectorProps) {
+}: HebrewLetterRangeSelectorProps<T>) {
   const [startLetter, setStartLetter] = useState<string>('');
   const [endLetter, setEndLetter] = useState<string>('');
-  
+
   const availableLetters = getAvailableHebrewLetters(items, item => item.name);
-  
+
   const handleRangeChange = (start: string, end: string) => {
     setStartLetter(start);
     setEndLetter(end);
-    
+
     if (!start || !end) {
       onFilterChange(items);
       return;
     }
-    
+
     // Get the order of letters in Hebrew alphabet
     const startIndex = HEBREW_LETTERS.indexOf(start);
     const endIndex = HEBREW_LETTERS.indexOf(end);
-    
+
     if (startIndex === -1 || endIndex === -1 || startIndex > endIndex) {
       onFilterChange(items);
       return;
     }
-    
+
     // Filter items within the range
     const rangeLetters = HEBREW_LETTERS.slice(startIndex, endIndex + 1);
     const filtered = items.filter(item => {
       const firstLetter = item.name.charAt(0);
       return rangeLetters.includes(firstLetter);
     });
-    
+
     onFilterChange(filtered);
   };
-  
+
   const clearRange = () => {
     setStartLetter('');
     setEndLetter('');
     onFilterChange(items);
   };
-  
+
   return (
     <div className={cn('space-y-3', className)}>
       <div className="flex items-center justify-between">
@@ -206,7 +206,7 @@ export function HebrewLetterRangeSelector({
           </Button>
         )}
       </div>
-      
+
       <div className="flex items-center gap-2 text-sm">
         <span>מ:</span>
         <select
@@ -219,7 +219,7 @@ export function HebrewLetterRangeSelector({
             <option key={letter} value={letter}>{letter}</option>
           ))}
         </select>
-        
+
         <span>עד:</span>
         <select
           value={endLetter}
@@ -235,7 +235,7 @@ export function HebrewLetterRangeSelector({
             ))}
         </select>
       </div>
-      
+
       {startLetter && endLetter && (
         <div className="text-xs text-gray-500">
           מציג גזעים מ-{startLetter} עד {endLetter}

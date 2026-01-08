@@ -15,6 +15,8 @@ import {
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useLocale } from '@/hooks/use-locale';
+import { deletePet, getBreedNameById } from '@/lib/supabase/database/pets';
 
 interface Pet {
   id: string;
@@ -39,20 +41,24 @@ export default function PetDetailsBottomSheet({
   pet,
   onDeletePet
 }: PetDetailsBottomSheetProps) {
-  const locale = useLocale() as 'en' | 'he';
+  const locale = useLocale();
   const { t } = useTranslation('Pet');
-  const router = useNavigate();
+  const navigate = useNavigate();
 
   if (!pet) return null;
 
   const handleDeletePet = async () => {
     try {
-      await deleteDoc(doc(db, 'pets', pet.id));
-      toast.success(t('messages.petDeleted'));
-      if (onDeletePet) {
-        onDeletePet(pet.id);
+      const success = await deletePet(pet.id);
+      if (success) {
+        toast.success(t('messages.petDeleted'));
+        if (onDeletePet) {
+          onDeletePet(pet.id);
+        }
+        onClose();
+      } else {
+        throw new Error('Failed to delete pet');
       }
-      onClose();
     } catch (error) {
       console.error('Error deleting pet:', error);
       toast.error(t('messages.deleteFailed'));
@@ -61,7 +67,7 @@ export default function PetDetailsBottomSheet({
 
   const handleSharePet = async () => {
     const petShareUrl = `${window.location.origin}/pet/${pet.id}`;
-    
+
     if (navigator.share) {
       try {
         await navigator.share({
@@ -82,7 +88,17 @@ export default function PetDetailsBottomSheet({
     }
   };
 
+  const [breedName, setBreedName] = React.useState<string>('Loading...');
 
+  React.useEffect(() => {
+    const fetchBreed = async () => {
+      if (pet?.breed) {
+        const name = await getBreedNameById(pet.breed, locale);
+        setBreedName(name);
+      }
+    };
+    fetchBreed();
+  }, [pet?.breed, locale]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -141,11 +157,10 @@ export default function PetDetailsBottomSheet({
           {/* Pet Image */}
           {pet.image && pet.image !== '/default-pet.png' && !pet.image.includes('default') ? (
             <div className="relative w-full h-48 rounded-lg overflow-hidden">
-              <Image
+              <img
                 src={pet.image}
                 alt={pet.name}
-                fill
-                className="object-cover"
+                className="w-full h-full object-cover"
                 onError={(e) => {
                   console.log('Image failed to load:', pet.image);
                 }}
@@ -165,44 +180,44 @@ export default function PetDetailsBottomSheet({
             <CardContent className="space-y-3">
               <div className="flex justify-between">
                 <span className="font-medium text-gray-600">Breed:</span>
-                <span>{getBreedNameFromId(pet.breed, locale as 'en' | 'he')}</span>
+                <span>{breedName}</span>
               </div>
-              
+
               {pet.age && (
                 <div className="flex justify-between">
                   <span className="font-medium text-gray-600">Age:</span>
                   <span>{pet.age} years</span>
                 </div>
               )}
-              
+
               {pet.gender && (
                 <div className="flex justify-between">
                   <span className="font-medium text-gray-600">Gender:</span>
                   <span>{pet.gender}</span>
                 </div>
               )}
-              
+
               {pet.description && (
                 <div>
                   <span className="font-medium text-gray-600 block mb-1">Description:</span>
                   <p className="text-sm text-gray-700">{pet.description}</p>
                 </div>
               )}
-              
+
               {pet.age && (
                 <div className="flex justify-between">
                   <span className="font-medium text-gray-600">Age:</span>
                   <span>{pet.age}</span>
                 </div>
               )}
-              
+
               {pet.gender && (
                 <div className="flex justify-between">
                   <span className="font-medium text-gray-600">Gender:</span>
                   <span className="capitalize">{pet.gender}</span>
                 </div>
               )}
-              
+
 
             </CardContent>
           </Card>

@@ -5,7 +5,7 @@ import { Button } from './ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
-import { usePetId } from '@/hooks/use-pet-id';
+import { usePetId, savePetId } from '@/hooks/use-pet-id';
 
 interface TagFoundPageProps {
   petId: string;
@@ -20,7 +20,7 @@ export default function TagFoundPage({ petId }: TagFoundPageProps) {
 
   const handleRegisterPet = async () => {
     setIsProcessing(true);
-    
+
     if (user) {
       // User is logged in, go directly to registration
       navigate(`/pet/${petId}/get-started/register`);
@@ -53,7 +53,7 @@ export default function TagFoundPage({ petId }: TagFoundPageProps) {
       <div className="justify-center p-10 text-center">
         <h1 className="text-primary text-3xl font-bold">{t('title')}</h1>
         <p className="text-base text-gray-500">{t('subtitle')}</p>
-        
+
         {user ? (
           <div className="mt-6 space-y-3">
             <p className="text-green-700 font-medium">{t('welcomeBack', { name: user.user_metadata?.full_name || user.email })}</p>

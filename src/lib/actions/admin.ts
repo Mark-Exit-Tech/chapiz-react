@@ -128,6 +128,7 @@ export interface Ad {
   weight?: string[];
   views: number;
   clicks: number;
+  duration?: number;
 }
 
 export async function updateAd(id: string, data: any) {

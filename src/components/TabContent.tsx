@@ -6,6 +6,7 @@ import { Trash2 } from 'lucide-react';
 import { TabName } from './AnimatedTabs';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useLocale } from '@/hooks/use-locale';
 
 const variants = {
   initial: (direction: number) => ({
@@ -52,16 +53,16 @@ const renderDetails = (
   const filtered = details.filter((d) => d.value.trim() !== '');
   if (filtered.length === 0) return null;
   const isRTL = locale === 'he';
-  
+
   return (
     <Card className="mx-auto mt-4 w-[325px] border-none bg-transparent shadow-none">
       <CardContent className="p-0">
         <div className="space-y-0.5">
           {filtered.map((detail, index) => {
-            const valueClassName = isRTL 
+            const valueClassName = isRTL
               ? 'flex-1 text-lg font-medium text-black break-words text-left ml-2 rtl-desktop-right'
               : 'flex-1 text-lg font-medium text-black break-words text-left ml-2';
-            
+
             return (
               <div key={index} className="flex min-h-[22px] items-start">
                 <span className="w-[76px] text-lg font-light text-gray-400 flex-shrink-0 text-right">
@@ -80,7 +81,7 @@ const renderDetails = (
             );
           })}
         </div>
-        
+
         {/* Delete Pet Button - only show on pet tab */}
         {petId && onDeletePet && (
           <div className="mt-6 pt-4 border-t border-gray-200">

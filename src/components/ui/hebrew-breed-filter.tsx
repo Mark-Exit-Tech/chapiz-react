@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
-import { getLocalizedBreedsForType, type PetType } from '@/src/lib/data/breeds';
+
+import { useTranslation } from 'react-i18next';
+import { useLocale } from '@/hooks/use-locale';
+import { getLocalizedBreedsForType, type PetType } from '@/lib/data/breeds';
 import { HebrewAlphabetFilter, HebrewLetterRangeSelector } from './hebrew-alphabet-filter';
-import { compareHebrew } from '@/src/lib/utils/hebrew-sort';
+import { compareHebrew } from '@/lib/utils/hebrew-sort';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
 import { Badge } from './badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs';
@@ -22,7 +24,7 @@ export function HebrewBreedFilter({
   className,
   showResults = true
 }: HebrewBreedFilterProps) {
-  const { t } = useTranslations('Pet.add.form.breed');
+  const { t } = useTranslation('Pet');
   const locale = useLocale() as 'en' | 'he';
   const [filteredBreeds, setFilteredBreeds] = useState<Array<{ id: string; name: string }>>([]);
   const [activeFilter, setActiveFilter] = useState<'alphabet' | 'range'>('alphabet');
@@ -66,14 +68,14 @@ export function HebrewBreedFilter({
             <TabsTrigger value="alphabet">סינון לפי אות</TabsTrigger>
             <TabsTrigger value="range">סינון לפי טווח</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="alphabet" className="mt-4">
             <HebrewAlphabetFilter
               items={breeds}
               onFilterChange={handleFilterChange}
             />
           </TabsContent>
-          
+
           <TabsContent value="range" className="mt-4">
             <HebrewLetterRangeSelector
               items={breeds}
@@ -94,7 +96,7 @@ export function HebrewBreedFilter({
                 </Badge>
               )}
             </div>
-            
+
             <div className="max-h-60 overflow-y-auto border rounded-md p-2">
               <div className="grid grid-cols-1 gap-1">
                 {displayBreeds.map((breed) => (
@@ -106,7 +108,7 @@ export function HebrewBreedFilter({
                   </div>
                 ))}
               </div>
-              
+
               {displayBreeds.length === 0 && (
                 <div className="text-center text-gray-500 py-4">
                   לא נמצאו גזעים התואמים לסינון
@@ -167,7 +169,7 @@ export function InlineHebrewBreedFilter({
           className={filterType === 'both' ? 'mb-4' : ''}
         />
       )}
-      
+
       {(filterType === 'range' || filterType === 'both') && (
         <HebrewLetterRangeSelector
           items={breeds}

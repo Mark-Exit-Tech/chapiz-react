@@ -4,8 +4,10 @@ import AnimatedTabs, { TabName } from '@/components/AnimatedTabs';
 import PetCard from '@/components/PetCard';
 import TabContent from '@/components/TabContent';
 import { Promo } from '@/types/promo';
+import { Ad } from '@/lib/actions/admin';
 import { motion } from 'framer-motion';
-import { useLocale, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import { useLocale } from '@/hooks/use-locale';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
@@ -17,7 +19,7 @@ import { getBreedNameById } from '@/lib/supabase/database/pets';
 import { getGenders } from '@/lib/hardcoded-data';
 import { breedsData } from '@/lib/data/comprehensive-breeds';
 import AdFullPage from './get-started/AdFullPage';
-import { usePetId } from '@/hooks/use-pet-id';
+import { usePetId, savePetId } from '@/hooks/use-pet-id';
 import { getYouTubeVideoId } from '@/lib/utils/youtube';
 
 const computeAge = (birthDate: string) => {
@@ -40,14 +42,14 @@ export default function PetProfilePage({
   // Place all hook calls at the top level, unconditionally
   const { t } = useTranslation('pages.PetProfilePage');
   const locale = useLocale();
-  const router = useNavigate();
-  const searchParams = useSearchParams();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [showPopup, setShowPopup] = useState(false);
   const [activeTab, setActiveTab] = useState<TabName>('pet');
   const prevTabRef = useRef<TabName>('pet');
-  const { petId: localStoragePetId, savePetId } = usePetId();
+  const { petId: localStoragePetId } = usePetId();
   const [showPromo, setShowPromo] = useState(false);
-  const [promo, setPromo] = useState<Promo | null>(null);
+  const [promo, setPromo] = useState<Ad | null>(null);
   const [isLoadingPromo, setIsLoadingPromo] = useState(false);
   const adShownRef = useRef<boolean>(false); // Track if ad has been shown on this page load
 
@@ -323,7 +325,7 @@ export default function PetProfilePage({
             ? 'youtube'
             : (promo.type || 'image')
         }
-        time={promo.duration || 5}
+        time={5} // Default to 5 seconds as Ad type doesn't have duration
         content={promo.content}
         youtubeUrl={
           (promo.content && (promo.content.includes('youtube.com') || promo.content.includes('youtu.be') || getYouTubeVideoId(promo.content) !== null))

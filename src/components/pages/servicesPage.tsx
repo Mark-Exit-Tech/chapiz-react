@@ -1,7 +1,8 @@
 'use client';
 
 import { Search, X } from 'lucide-react';
-import { useTranslation, useLocale } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import { useLocale } from '@/hooks/use-locale';
 import { useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { Input } from '../ui/input';
@@ -157,7 +158,7 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
             <div className="space-y-4">
               {/* Title and Filter Chips on Same Row */}
               <div className="mb-4 flex flex-row items-center justify-between gap-4">
-                  <h1 className="text-2xl font-bold">{t('title')}</h1>
+                <h1 className="text-2xl font-bold">{t('title')}</h1>
                 <FilterChips
                   chips={filterChips}
                   onChipClick={handleChipClick}

@@ -11,7 +11,8 @@ import { cn } from '@/lib/utils';
 import { getCommentsForAd, submitComment } from '@/lib/actions/admin';
 import { useAuth } from '@/contexts/AuthContext';
 import { addToFavorites, removeFromFavorites, isAdFavorited } from '@/lib/supabase/database/favorites';
-import { useTranslation, useLocale } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import { useLocale } from '@/hooks/use-locale';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { SERVICE_TAGS_TRANSLATIONS } from '@/lib/constants/hebrew-service-tags';
@@ -33,7 +34,7 @@ interface ServiceDetailsPageClientProps {
 
 const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ service }) => {
   const { t } = useTranslation('pages.ServicesPage');
-  const router = useNavigate();
+  const navigate = useNavigate();
   const locale = useLocale();
   const [showCommentForm, setShowCommentForm] = useState(false);
   const [userRating, setUserRating] = useState(0);
@@ -49,7 +50,7 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
-  
+
   const { user } = useAuth();
 
   // Function to translate tags for display
@@ -76,9 +77,9 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
 
   const checkIfFavorited = async () => {
     if (!user || !service?.id) return;
-    
+
     try {
-      const favorited = await isAdFavorited(user, service.id);
+      const favorited = await isAdFavorited(user.id, service.id);
       setIsFavorited(favorited);
     } catch (error) {
       console.error('Error checking if favorited:', error);
@@ -87,7 +88,7 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
 
   const loadComments = async () => {
     if (!service?.id) return;
-    
+
     setIsLoadingComments(true);
     try {
       const commentsData = await getCommentsForAd(service.id);
@@ -108,15 +109,15 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
       alert('Please log in to write a review');
       return;
     }
-    
+
     if (userRating > 0 && service?.id) {
       setIsSubmittingComment(true);
-      
+
       try {
         const result = await submitComment({
           adId: service.id,
           adTitle: service.title,
-          userName: user.displayName || user.email?.split('@')[0] || 'User',
+          userName: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
           userEmail: user.email || '',
           content: commentText.trim() || '',
           rating: userRating
@@ -154,10 +155,10 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
     }
 
     setIsTogglingFavorite(true);
-    
+
     try {
       if (isFavorited) {
-        const result = await removeFromFavorites(user, service.id);
+        const result = await removeFromFavorites(user.id, service.id);
         if (result.success) {
           setIsFavorited(false);
           toast.success('Removed from favorites');
@@ -165,7 +166,7 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
           toast.error('Failed to remove from favorites');
         }
       } else {
-        const result = await addToFavorites(user, service.id, service.title, 'service');
+        const result = await addToFavorites(user.id, service.id, service.title, 'service');
         if (result.success) {
           setIsFavorited(true);
           toast.success('Added to favorites');
@@ -189,7 +190,7 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => router.back()}
+            onClick={() => navigate(-1)}
             className="rounded-full"
           >
             <ArrowLeft size={20} />
@@ -219,7 +220,8 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => router.back()}
+            onClick={() => navigate(-1)}
+
             className="rounded-full mr-[21px]"
           >
             <ArrowLeft size={20} />
@@ -298,12 +300,12 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
                       }
                     }}
                   >
-                    <img 
-                      src="/icons/waze.png" 
-                      alt="Waze" 
-                      width={18} 
-                      height={18} 
-                      className={cn(locale === 'he' ? 'ml-2 order-2' : 'mr-2')} 
+                    <img
+                      src="/icons/waze.png"
+                      alt="Waze"
+                      width={18}
+                      height={18}
+                      className={cn(locale === 'he' ? 'ml-2 order-2' : 'mr-2')}
                     />
                     <span>{t('navigation') || 'Navigation'}</span>
                   </Button>
@@ -396,58 +398,58 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
                     </Button>
                   )}
                 </div>
-          
+
                 {/* Comment Form */}
                 {showCommentForm && (
                   <div className="mb-6 rounded-lg border p-6 bg-gray-50">
-              <h4 className="font-semibold mb-3">הוסף ביקורת חדשה</h4>
-              <div className="space-y-3">
-                <div>
-                  <Label>דירוג</Label>
-                  <div className="flex gap-1 mt-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star
-                        key={star}
-                        size={20}
-                        className={cn(
-                          'cursor-pointer transition-colors',
-                          star <= userRating
-                            ? 'fill-orange-400 text-orange-400'
-                            : 'text-gray-300 hover:text-orange-300'
-                        )}
-                        onClick={() => handleStarClick(star)}
-                      />
-                    ))}
+                    <h4 className="font-semibold mb-3">הוסף ביקורת חדשה</h4>
+                    <div className="space-y-3">
+                      <div>
+                        <Label>דירוג</Label>
+                        <div className="flex gap-1 mt-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
+                              size={20}
+                              className={cn(
+                                'cursor-pointer transition-colors',
+                                star <= userRating
+                                  ? 'fill-orange-400 text-orange-400'
+                                  : 'text-gray-300 hover:text-orange-300'
+                              )}
+                              onClick={() => handleStarClick(star)}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <Label htmlFor="comment">תגובה (אופציונלי)</Label>
+                        <Textarea
+                          id="comment"
+                          value={commentText}
+                          onChange={(e) => setCommentText(e.target.value)}
+                          placeholder="שתף את החוויה שלך... (אופציונלי)"
+                          rows={3}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <Button onClick={handleSubmitComment} size="sm" disabled={isSubmittingComment}>
+                          <Send size={16} className="mr-2" />
+                          {isSubmittingComment ? 'שולח...' : 'שלח'}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowCommentForm(false)}
+                        >
+                          ביטול
+                        </Button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <Label htmlFor="comment">תגובה (אופציונלי)</Label>
-                  <Textarea
-                    id="comment"
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                    placeholder="שתף את החוויה שלך... (אופציונלי)"
-                    rows={3}
-                    className="mt-1"
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button onClick={handleSubmitComment} size="sm" disabled={isSubmittingComment}>
-                    <Send size={16} className="mr-2" />
-                    {isSubmittingComment ? 'שולח...' : 'שלח'}
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => setShowCommentForm(false)}
-                  >
-                    ביטול
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
-          
+                )}
+
                 {isLoadingComments ? (
                   <div className="text-center py-8 text-gray-500">
                     <p>טוען ביקורות...</p>
@@ -527,14 +529,14 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
             }}
             title={t('navigation') || 'Navigation'}
           >
-            <img 
-              src="/icons/waze.png" 
-              alt="Waze" 
-              width={20} 
-              height={20} 
+            <img
+              src="/icons/waze.png"
+              alt="Waze"
+              width={20}
+              height={20}
             />
           </Button>
-          
+
           {service.phone && service.phone.trim() !== '' && service.phone !== 'undefined' && service.phone !== 'null' && (
             <>
               <Separator orientation="vertical" className="w-[1px] bg-gray-300" />
@@ -549,17 +551,16 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
               </Button>
             </>
           )}
-          
+
           <Separator orientation="vertical" className="w-[1px] bg-gray-300" />
-          
+
           <Button
             variant="ghost"
             size="icon"
-            className={`transition-colors focus:outline-none ${
-              isFavorited 
-                ? 'text-orange-500 hover:text-orange-600 focus:text-orange-600' 
-                : 'hover:text-orange-500 focus:text-orange-500'
-            }`}
+            className={`transition-colors focus:outline-none ${isFavorited
+              ? 'text-orange-500 hover:text-orange-600 focus:text-orange-600'
+              : 'hover:text-orange-500 focus:text-orange-500'
+              }`}
             onClick={handleToggleFavorite}
             disabled={isTogglingFavorite}
             title={isFavorited ? t('removeFromFavorites') : t('addToFavorites')}
@@ -572,9 +573,9 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
               <Heart size={20} />
             )}
           </Button>
-          
+
           <Separator orientation="vertical" className="w-[1px] bg-gray-300" />
-          
+
           <Button
             variant="ghost"
             size="icon"
