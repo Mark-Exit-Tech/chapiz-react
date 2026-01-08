@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Mail, CheckCircle } from 'lucide-react';
 
 export default function ResetPasswordSentPage() {
-  const { t } = useTranslation('pages.ResetPasswordSentPage');
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
@@ -29,10 +29,10 @@ export default function ResetPasswordSentPage() {
               </div>
             </div>
             <CardTitle className="text-2xl font-bold text-gray-800">
-              {t('title')}
+              {t('pages.ResetPasswordSentPage.title')}
             </CardTitle>
             <p className="text-sm text-gray-600 mt-2">
-              {t('subtitle')}
+              {t('pages.ResetPasswordSentPage.subtitle')}
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -48,7 +48,7 @@ export default function ResetPasswordSentPage() {
                 onClick={() => navigate('/auth')}
                 className="w-full"
               >
-                {t('backToSignIn')}
+                {t('pages.ResetPasswordSentPage.backToSignIn')}
               </Button>
             </div>
           </CardContent>

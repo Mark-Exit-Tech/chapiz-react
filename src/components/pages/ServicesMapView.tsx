@@ -55,7 +55,7 @@ interface ServiceWithCoordinates extends Service {
 }
 
 const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerContent, mapFloatingControls, initialHighlightedServiceId }) => {
-  const { t } = useTranslation('pages.ServicesPage');
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const locale = useLocale();
   const mapRef = useRef<HTMLDivElement>(null);
@@ -1058,7 +1058,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
                 <div className="text-center">
                   <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
                   <p className="text-sm text-gray-600">
-                    {t('map.loading') || 'Loading map...'}
+                    {t('pages.ServicesPage.map.loading') || 'Loading map...'}
                   </p>
                 </div>
               </div>
@@ -1119,7 +1119,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
                   }
                 }}
               >
-                <p className="text-sm font-semibold text-gray-500 text-center">{services.length} {t('map.servicesFound')}</p>
+                <p className="text-sm font-semibold text-gray-500 text-center">{services.length} {t('pages.ServicesPage.map.servicesFound')}</p>
               </div>
               <div className="flex-1 overflow-y-auto bg-gray-50 p-4 service-cards-scroll">
                 {!isLoading && servicesWithCoords.length > 0 ? (
@@ -1161,7 +1161,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
                               ) : (
                                 <span className="flex items-center gap-1 text-gray-400 font-medium">
                                   <MapPin size={12} />
-                                  {t('map.distanceUnavailable') || 'Distance unavailable'}
+                                  {t('pages.ServicesPage.map.distanceUnavailable') || 'Distance unavailable'}
                                 </span>
                               )}
                               {service.tags && service.tags.length > 0 && (
@@ -1178,7 +1178,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
                   </div>
                 ) : (
                   <div className="text-center py-8 text-gray-500">
-                    {!isLoading && <p>{t('map.noServices')}</p>}
+                    {!isLoading && <p>{t('pages.ServicesPage.map.noServices')}</p>}
                   </div>
                 )}
               </div>
@@ -1194,7 +1194,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
                 <div className="text-center">
                   <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
                   <p className="text-sm text-gray-600">
-                    {t('map.loading') || 'Loading map...'}
+                    {t('pages.ServicesPage.map.loading') || 'Loading map...'}
                   </p>
                 </div>
               </div>

@@ -57,7 +57,7 @@ const convertAdToService = (ad: Ad & { imageUrl?: string }) => {
 };
 
 const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
-  const { t } = useTranslation('pages.ServicesPage');
+  const { t } = useTranslation();
   const locale = useLocale();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -132,12 +132,12 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
   const filterChips: FilterChip[] = [
     {
       id: 'all',
-      label: t('filters.all'),
+      label: t('pages.ServicesPage.filters.all'),
       active: filterType === 'all'
     },
     {
       id: 'favorites',
-      label: t('filters.favorites'),
+      label: t('pages.ServicesPage.filters.favorites'),
       active: filterType === 'favorites'
     }
   ];
@@ -158,7 +158,7 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
             <div className="space-y-4">
               {/* Title and Filter Chips on Same Row */}
               <div className="mb-4 flex flex-row items-center justify-between gap-4">
-                <h1 className="text-2xl font-bold">{t('title')}</h1>
+                <h1 className="text-2xl font-bold">{t('pages.ServicesPage.title')}</h1>
                 <FilterChips
                   chips={filterChips}
                   onChipClick={handleChipClick}
@@ -173,7 +173,7 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
                     tags={availableTags}
                     selectedTags={selectedTags}
                     onTagsChange={setSelectedTags}
-                    placeholder={isLoadingTags ? t('loading') || 'Loading...' : t('filterByProfession')}
+                    placeholder={isLoadingTags ? t('pages.ServicesPage.loading') || 'Loading...' : t('pages.ServicesPage.filterByProfession')}
                     clearAllText="נקה הכל"
                     searchTagsPlaceholder="חפש תגיות..."
                     tagsSelectedText="{count} tag selected"
@@ -191,7 +191,7 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
                     size={16}
                   />
                   <Input
-                    placeholder={t('searchPlaceholder')}
+                    placeholder={t('pages.ServicesPage.searchPlaceholder')}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="w-full rounded-lg p-2 ltr:pl-10 rtl:pr-10 border-none focus-visible:ring-0"
@@ -209,7 +209,7 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
                     className="flex items-center gap-2 border-orange-500 text-orange-500 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-600"
                   >
                     <X className="h-4 w-4" />
-                    {t('removeFilter') || 'Remove Filter'}
+                    {t('pages.ServicesPage.removeFilter') || 'Remove Filter'}
                   </Button>
                 </div>
               )}

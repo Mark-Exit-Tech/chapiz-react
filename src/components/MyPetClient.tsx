@@ -27,7 +27,7 @@ interface MyPetClientProps {
 }
 
 const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
-  const { t } = useTranslation('pages.MyPetsPage');
+  const { t } = useTranslation();
   const locale = useLocale() as 'en' | 'he';
   const { user, loading } = useAuth();
   const navigate = useNavigate();
@@ -174,7 +174,7 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
     <div className="mx-auto max-w-7xl w-full px-4 md:px-6">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{t('title')}</h1>
+        <h1 className="text-2xl font-bold">{t('pages.MyPetsPage.title')}</h1>
         {filteredPets.length > 0 && (
           <div className="flex items-center gap-2">
             <Button
@@ -185,7 +185,7 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
               <EditIcon
                 className={cn('h-4 w-4', isEditMode ? '' : 'text-gray-400')}
               />
-              <span className="text-sm">{t('edit')}</span>
+              <span className="text-sm">{t('pages.MyPetsPage.edit')}</span>
             </Button>
           </div>
         )}
@@ -201,15 +201,15 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
       {petsLoading ? (
         <div className="flex items-center justify-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          <span className="ml-2 text-gray-600">{t('loadingPets')}</span>
+          <span className="ml-2 text-gray-600">{t('pages.MyPetsPage.loadingPets')}</span>
         </div>
       ) : filteredPets.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            {t('noPetsYet')}
+            {t('pages.MyPetsPage.noPetsYet')}
           </h3>
           <p className="text-gray-500 mb-6 max-w-sm">
-            {t('scanToAddPet')}
+            {t('pages.MyPetsPage.scanToAddPet')}
           </p>
         </div>
       ) : (

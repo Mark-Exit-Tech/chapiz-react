@@ -22,7 +22,7 @@ interface EmailVerificationPageProps {
 }
 
 const EmailVerificationPage = ({ email, password, fullName, address, phone, onBack }: EmailVerificationPageProps) => {
-  const { t } = useTranslation('pages.EmailVerification');
+  const { t } = useTranslation();
   const { user, verifyCodeAndCreateAccount, sendVerificationCode, getStoredOTPCode } = useAuth();
   const navigate = useNavigate();
   
@@ -117,10 +117,10 @@ const EmailVerificationPage = ({ email, password, fullName, address, phone, onBa
               <Mail className="w-8 h-8 text-primary" />
             </div>
             <CardTitle className="text-2xl font-bold text-gray-900">
-              {t('title')}
+              {t('pages.EmailVerification.title')}
             </CardTitle>
             <p className="text-gray-600">
-              {t('subtitle')}
+              {t('pages.EmailVerification.subtitle')}
             </p>
             <p className="font-medium text-primary">{email}</p>
           </CardHeader>
@@ -129,11 +129,11 @@ const EmailVerificationPage = ({ email, password, fullName, address, phone, onBa
             <form onSubmit={handleVerifyCode} className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">
-                  {t('verificationCode')}
+                  {t('pages.EmailVerification.verificationCode')}
                 </label>
                 <Input
                   type="text"
-                  placeholder={t('verificationCodePlaceholder')}
+                  placeholder={t('pages.EmailVerification.verificationCodePlaceholder')}
                   value={verificationCode}
                   onChange={(e) => setVerificationCode(e.target.value)}
                   maxLength={6}
@@ -150,17 +150,17 @@ const EmailVerificationPage = ({ email, password, fullName, address, phone, onBa
                 {loading ? (
                   <div className="flex items-center space-x-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>{t('verifying')}</span>
+                    <span>{t('pages.EmailVerification.verifying')}</span>
                   </div>
                 ) : (
-                  t('verifyButton')
+                  t('pages.EmailVerification.verifyButton')
                 )}
               </Button>
             </form>
 
             <div className="text-center space-y-4">
               <p className="text-sm text-gray-600">
-                {t('didntReceive')}
+                {t('pages.EmailVerification.didntReceive')}
               </p>
               
               <Button
@@ -172,12 +172,12 @@ const EmailVerificationPage = ({ email, password, fullName, address, phone, onBa
                 {resendLoading ? (
                   <div className="flex items-center space-x-2">
                     <RefreshCw className="w-4 h-4 animate-spin" />
-                    <span>{t('sending')}</span>
+                    <span>{t('pages.EmailVerification.sending')}</span>
                   </div>
                 ) : countdown > 0 ? (
-                  `${t('resendIn')} ${countdown}s`
+                  `${t('pages.EmailVerification.resendIn')} ${countdown}s`
                 ) : (
-                  t('resendButton')
+                  t('pages.EmailVerification.resendButton')
                 )}
               </Button>
 
@@ -188,7 +188,7 @@ const EmailVerificationPage = ({ email, password, fullName, address, phone, onBa
                   className="w-full text-gray-600 hover:text-gray-900"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  {t('backToSignUp')}
+                  {t('pages.EmailVerification.backToSignUp')}
                 </Button>
               )}
             </div>

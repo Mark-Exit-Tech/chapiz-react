@@ -14,7 +14,7 @@ import toast from 'react-hot-toast';
 import LocaleSwitcher from '@/components/LocaleSwitcher';
 
 const AuthPage = () => {
-  const { t } = useTranslation('pages.AuthPage');
+  const { t } = useTranslation();
   const { signIn, signUp, signInWithGoogle, sendVerificationCode, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   
@@ -55,18 +55,18 @@ const AuthPage = () => {
       if (isSignUp) {
         // Sign up and directly sign in (email verification disabled)
         await signUp(formData.email, formData.password, formData.fullName);
-        toast.success(t('accountCreatedSuccess'));
+        toast.success(t('pages.AuthPage.accountCreatedSuccess'));
         await signIn(formData.email, formData.password);
-        toast.success(t('signInSuccess'));
+        toast.success(t('pages.AuthPage.signInSuccess'));
         navigate('/pages/my-pets');
       } else {
         await signIn(formData.email, formData.password);
-        toast.success(t('signInSuccess'));
+        toast.success(t('pages.AuthPage.signInSuccess'));
         navigate('/pages/my-pets');
       }
     } catch (error: any) {
       console.error('Auth error:', error);
-      toast.error(error.message || t('authError'));
+      toast.error(error.message || t('pages.AuthPage.authError'));
     } finally {
       setFormLoading(false);
     }
@@ -76,11 +76,11 @@ const AuthPage = () => {
     setFormLoading(true);
     try {
       await signInWithGoogle();
-      toast.success(t('signInSuccessGoogle'));
+      toast.success(t('pages.AuthPage.signInSuccessGoogle'));
       navigate('/pages/my-pets');
     } catch (error: any) {
       console.error('Google auth error:', error);
-      toast.error(error.message || t('authErrorGoogle'));
+      toast.error(error.message || t('pages.AuthPage.authErrorGoogle'));
     } finally {
       setFormLoading(false);
     }
@@ -119,7 +119,7 @@ const AuthPage = () => {
               />
             </div>
             <p className="text-xl text-gray-600 max-w-md">
-              {t('tagline')}
+              {t('pages.AuthPage.tagline')}
             </p>
           </div>
         </div>
@@ -133,12 +133,12 @@ const AuthPage = () => {
             </div>
             <CardHeader className="space-y-2 text-center pb-8">
               <CardTitle className="text-2xl font-bold text-gray-900">
-                {isSignUp ? t('createAccount') : t('welcomeBack')}
+                {isSignUp ? t('pages.AuthPage.createAccount') : t('pages.AuthPage.welcomeBack')}
               </CardTitle>
               <p className="text-gray-600">
                 {isSignUp 
-                  ? t('joinFacePet') 
-                  : t('signInToAccount')
+                  ? t('pages.AuthPage.joinFacePet') 
+                  : t('pages.AuthPage.signInToAccount')
                 }
               </p>
             </CardHeader>
@@ -169,7 +169,7 @@ const AuthPage = () => {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                {t('signInWithGoogle')}
+                {t('pages.AuthPage.signInWithGoogle')}
               </Button>
 
               <div className="relative">
@@ -177,7 +177,7 @@ const AuthPage = () => {
                   <Separator className="w-full" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-2 text-gray-500">{t('or')}</span>
+                  <span className="bg-white px-2 text-gray-500">{t('pages.AuthPage.or')}</span>
                 </div>
               </div>
 
@@ -186,13 +186,13 @@ const AuthPage = () => {
                 {isSignUp && (
                   <>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">{t('fullName')}</label>
+                      <label className="text-sm font-medium text-gray-700">{t('pages.AuthPage.fullName')}</label>
                       <div className="relative">
                         <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <Input
                           name="fullName"
                           type="text"
-                          placeholder={t('fullNamePlaceholder')}
+                          placeholder={t('pages.AuthPage.fullNamePlaceholder')}
                           value={formData.fullName}
                           onChange={handleInputChange}
                           required={isSignUp}
@@ -202,13 +202,13 @@ const AuthPage = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">{t('address')}</label>
+                      <label className="text-sm font-medium text-gray-700">{t('pages.AuthPage.address')}</label>
                       <div className="relative">
                         <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <Input
                           name="address"
                           type="text"
-                          placeholder={t('addressPlaceholder')}
+                          placeholder={t('pages.AuthPage.addressPlaceholder')}
                           value={formData.address}
                           onChange={handleInputChange}
                           required={isSignUp}
@@ -218,13 +218,13 @@ const AuthPage = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">{t('phone')}</label>
+                      <label className="text-sm font-medium text-gray-700">{t('pages.AuthPage.phone')}</label>
                       <div className="relative">
                         <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <Input
                           name="phone"
                           type="tel"
-                          placeholder={t('phonePlaceholder')}
+                          placeholder={t('pages.AuthPage.phonePlaceholder')}
                           value={formData.phone}
                           onChange={handleInputChange}
                           required={isSignUp}
@@ -236,13 +236,13 @@ const AuthPage = () => {
                 )}
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">{t('email')}</label>
+                  <label className="text-sm font-medium text-gray-700">{t('pages.AuthPage.email')}</label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                     <Input
                       name="email"
                       type="email"
-                      placeholder={t('emailPlaceholder')}
+                      placeholder={t('pages.AuthPage.emailPlaceholder')}
                       value={formData.email}
                       onChange={handleInputChange}
                       required
@@ -252,13 +252,13 @@ const AuthPage = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">{t('password')}</label>
+                  <label className="text-sm font-medium text-gray-700">{t('pages.AuthPage.password')}</label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                     <Input
                       name="password"
                       type={showPassword ? 'text' : 'password'}
-                      placeholder={t('passwordPlaceholder')}
+                      placeholder={t('pages.AuthPage.passwordPlaceholder')}
                       value={formData.password}
                       onChange={handleInputChange}
                       required
@@ -282,10 +282,10 @@ const AuthPage = () => {
                   {formLoading ? (
                     <div className="flex items-center space-x-2">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>{t('loading')}</span>
+                      <span>{t('pages.AuthPage.loading')}</span>
                     </div>
                   ) : (
-                    isSignUp ? t('signUpButton') : t('signInButton')
+                    isSignUp ? t('pages.AuthPage.signUpButton') : t('pages.AuthPage.signInButton')
                   )}
                 </Button>
 
@@ -296,7 +296,7 @@ const AuthPage = () => {
                       onClick={() => navigate('/auth/forgot')}
                       className="text-sm text-gray-600 hover:text-primary underline"
                     >
-                      {t('forgotPassword')}
+                      {t('pages.AuthPage.forgotPassword')}
                     </button>
                   </div>
                 )}
@@ -305,12 +305,12 @@ const AuthPage = () => {
               {/* Toggle Sign In/Sign Up */}
               <div className="text-center">
                 <p className="text-sm text-gray-600">
-                  {isSignUp ? t('haveAccount') : t('noAccount')}
+                  {isSignUp ? t('pages.AuthPage.haveAccount') : t('pages.AuthPage.noAccount')}
                   <button
                     onClick={() => setIsSignUp(!isSignUp)}
                     className="ml-1 text-primary hover:underline font-medium"
                   >
-                    {isSignUp ? t('signInLink') : t('signUpLink')}
+                    {isSignUp ? t('pages.AuthPage.signInLink') : t('pages.AuthPage.signUpLink')}
                   </button>
                 </p>
               </div>

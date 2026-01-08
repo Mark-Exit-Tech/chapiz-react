@@ -7,6 +7,9 @@ import {
   Menu,
   CircleUserRound,
   PawPrint,
+  Ticket,
+  Gift,
+  MapPin,
 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -164,6 +167,24 @@ const Navbar = () => {
                           <Link to="/pages/my-pets" className="flex items-center">
                             <PawPrint className="mr-2 h-4 w-4" />
                             <span>{t('components.Navbar.myPets')}</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/coupons" className="flex items-center">
+                            <Ticket className="mr-2 h-4 w-4" />
+                            <span>{t('components.Navbar.allPromos')}</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/vouchers" className="flex items-center">
+                            <Gift className="mr-2 h-4 w-4" />
+                            <span>{t('components.Navbar.coupons')}</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/services" className="flex items-center">
+                            <MapPin className="mr-2 h-4 w-4" />
+                            <span>{t('components.Navbar.services')}</span>
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />

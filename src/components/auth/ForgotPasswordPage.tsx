@@ -12,7 +12,7 @@ import { supabase } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
 
 export default function ForgotPasswordPage() {
-  const { t } = useTranslation('pages.ForgotPasswordPage');
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -21,7 +21,7 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
     
     if (!email) {
-      toast.error(t('errors.emailRequired'));
+      toast.error(t('pages.ForgotPasswordPage.errors.emailRequired'));
       return;
     }
 
@@ -34,16 +34,16 @@ export default function ForgotPasswordPage() {
 
       if (error) throw error;
 
-      toast.success(t('messages.resetLinkSent'));
+      toast.success(t('pages.ForgotPasswordPage.messages.resetLinkSent'));
       navigate('/auth/reset-password-sent');
     } catch (error: any) {
       console.error('Password reset error:', error);
       if (error.message?.includes('User not found')) {
-        toast.error(t('errors.userNotFound'));
+        toast.error(t('pages.ForgotPasswordPage.errors.userNotFound'));
       } else if (error.code === 'auth/invalid-email') {
-        toast.error(t('errors.invalidEmail'));
+        toast.error(t('pages.ForgotPasswordPage.errors.invalidEmail'));
       } else {
-        toast.error(t('errors.generalError'));
+        toast.error(t('pages.ForgotPasswordPage.errors.generalError'));
       }
     } finally {
       setIsLoading(false);
@@ -56,17 +56,17 @@ export default function ForgotPasswordPage() {
         <Card className="shadow-lg">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold text-gray-800 rtl:text-right">
-              {t('title')}
+              {t('pages.ForgotPasswordPage.title')}
             </CardTitle>
             <p className="text-sm text-gray-600 mt-2 rtl:text-right">
-              {t('subtitle')}
+              {t('pages.ForgotPasswordPage.subtitle')}
             </p>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium text-gray-700 rtl:text-right">
-                  {t('form.email')}
+                  {t('pages.ForgotPasswordPage.form.email')}
                 </Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 rtl:left-auto rtl:right-3" />
@@ -75,7 +75,7 @@ export default function ForgotPasswordPage() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder={t('form.emailPlaceholder')}
+                    placeholder={t('pages.ForgotPasswordPage.form.emailPlaceholder')}
                     required
                     className="pl-10 rtl:pl-3 rtl:pr-10 rtl:text-right"
                   />
@@ -87,7 +87,7 @@ export default function ForgotPasswordPage() {
                 disabled={isLoading}
                 className="w-full"
               >
-                {isLoading ? t('sending') : t('sendResetLink')}
+                {isLoading ? t('pages.ForgotPasswordPage.sending') : t('pages.ForgotPasswordPage.sendResetLink')}
               </Button>
             </form>
 
@@ -97,7 +97,7 @@ export default function ForgotPasswordPage() {
                 onClick={() => navigate('/auth')}
                 className="text-sm rtl:text-right"
               >
-                {t('backToSignIn')}
+                {t('pages.ForgotPasswordPage.backToSignIn')}
               </Button>
             </div>
           </CardContent>
