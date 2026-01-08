@@ -36,7 +36,7 @@ const EMOJIS = ['😀', '😂', '❤️', '👍', '👎', '🔥', '⭐', '✅', 
 
 export default function ImageEditor({ imageUrl, isOpen, onClose, onSave }: ImageEditorProps) {
   const { t } = useTranslation('pages.Admin.imageEditor');
-  const commonT = useTranslation('common');
+  const { t: commonT } = useTranslation('common');
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);

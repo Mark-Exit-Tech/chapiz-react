@@ -30,7 +30,7 @@ import {
 } from '@/components/ui/select';
 import { AdStatus, AdType, deleteAd, updateAd, Ad } from '@/lib/actions/admin';
 import { MoreHorizontal } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+
 import { useTranslation } from 'react-i18next';
 import { useLocale } from '@/hooks/use-locale';
 import { useState, useEffect } from 'react';
@@ -100,7 +100,7 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
     weight: ad.weight || []
   });
 
-  const router = useNavigate();
+
 
   useEffect(() => {
     if (isEditOpen) {
