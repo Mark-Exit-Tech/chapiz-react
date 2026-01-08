@@ -1,0 +1,115 @@
+'use server';
+
+export interface ServerSession {
+  user: {
+    email: string;
+    role: 'user' | 'admin' | 'super_admin';
+    fullName: string;
+    emailVerified: boolean;
+    isRestricted: boolean;
+  };
+}
+
+// In-memory user management (you can replace this with your preferred storage)
+const userRoles: Record<string, 'user' | 'admin' | 'super_admin'> = {
+  // Add admin emails here
+  'admin@facepet.com': 'super_admin',
+  // Add more admin emails as needed
+};
+
+const userRestrictions: Record<string, boolean> = {
+  // Add restricted user emails here
+  // 'banned@example.com': true,
+};
+
+/**
+ * Get user role for server-side checks
+ * Since we're using client-side Firebase auth, this is mainly for admin routes
+ */
+export async function auth(): Promise<ServerSession | null> {
+  // Since we're using client-side Firebase authentication,
+  // server-side auth checks should be minimal
+  // Most authentication should be handled on the client side
+  return null;
+}
+
+/**
+ * Check if user has admin privileges
+ */
+export async function isAdmin(): Promise<boolean> {
+  const session = await auth();
+  return !!(session?.user?.role === 'admin' || session?.user?.role === 'super_admin');
+}
+
+/**
+ * Check if user has super admin privileges
+ */
+export async function isSuperAdmin(): Promise<boolean> {
+  const session = await auth();
+  return !!(session?.user?.role === 'super_admin');
+}
+
+/**
+ * Check if user is restricted from signing in
+ */
+export async function isUserRestricted(email: string): Promise<boolean> {
+  return userRestrictions[email] || false;
+}
+
+/**
+ * Set user role
+ */
+export async function setUserRole(email: string, role: 'user' | 'admin' | 'super_admin'): Promise<void> {
+  userRoles[email] = role;
+}
+
+/**
+ * Remove user role (defaults to 'user')
+ */
+export async function removeUserRole(email: string): Promise<void> {
+  delete userRoles[email];
+}
+
+/**
+ * Restrict user from signing in
+ */
+export async function restrictUser(email: string): Promise<void> {
+  userRestrictions[email] = true;
+}
+
+/**
+ * Unrestrict user
+ */
+export async function unrestrictUser(email: string): Promise<void> {
+  delete userRestrictions[email];
+}
+
+/**
+ * Get all users with their roles and restrictions
+ */
+export async function getAllUsers(): Promise<Array<{ email: string; role: string; isRestricted: boolean }>> {
+  const allEmails = new Set([
+    ...Object.keys(userRoles),
+    ...Object.keys(userRestrictions)
+  ]);
+
+  return Array.from(allEmails).map(email => ({
+    email,
+    role: userRoles[email] || 'user',
+    isRestricted: userRestrictions[email] || false
+  }));
+}
+
+/**
+ * Send password reset email using Firebase
+ */
+export async function sendPasswordReset(email: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    // Firebase handles password reset automatically
+    // This is just a placeholder - the actual password reset should be done
+    // through Firebase client-side authentication
+    return { success: true, error: 'Use Firebase client-side password reset' };
+  } catch (error) {
+    return { success: false, error: 'Failed to send password reset' };
+  }
+}

@@ -1,0 +1,1680 @@
+{
+  "Pet": {
+    "add": {
+      "title": "הוספת חיית מחמד חדשה",
+      "subtitle": "בוא נכיר את החבר החדש שלך",
+      "steps": {
+        "type": {
+          "title": "בחירת סוג חיית מחמד",
+          "description": "איזה סוג חיית מחמד אתה מוסיף?"
+        },
+        "breed": {
+          "title": "בחירת גזע",
+          "description": "בחר את הגזע הספציפי"
+        },
+        "name": {
+          "title": "שם חיית המחמד",
+          "description": "תן שם מיוחד לחיית המחמד שלך"
+        },
+        "photo": {
+          "title": "הוספת תמונה (אופציונלי)",
+          "description": "העלה תמונה חמודה של חיית המחמד שלך (אופציונלי)"
+        },
+        "complete": {
+          "title": "הושלם!",
+          "description": "חיית המחמד שלך מוכנה להצטרף למשפחה!"
+        }
+      },
+      "form": {
+        "petType": {
+          "title": "סוג חיית מחמד",
+          "description": "בחר את הסוג המתאים",
+          "options": {
+            "dog": "כלב",
+            "cat": "חתול",
+            "other": "אחר"
+          }
+        },
+        "breed": {
+          "title": "גזע",
+          "placeholder": "בחר גזע",
+          "description": "בחר את הגזע של חיית המחמד שלך",
+          "searchPlaceholder": "חפש גזעים...",
+          "noBreedFound": "לא נמצא גזע."
+        },
+        "name": {
+          "title": "שם",
+          "placeholder": "הכנס את שם חיית המחמד שלך",
+          "description": "איך קוראים לחיית המחמד שלך?"
+        },
+        "photo": {
+          "title": "תמונה",
+          "upload": "העלאת תמונה",
+          "dropzone": "גרור ושחרר תמונה או לחץ להעלאה",
+          "requirements": "PNG, JPG או GIF (מקסימום 5MB)",
+          "preview": "תצוגה מקדימה של חיית המחמד"
+        }
+      },
+      "types": {
+        "cat": "חתול",
+        "dog": "כלב",
+        "other": "אחר"
+      },
+      "welcome": "ברוכים הבאים ל-Chapiz!",
+      "login": "התחברות",
+      "breed": {
+        "title": "{pet} גזעים",
+        "placeholder": "בחר גזע"
+      },
+      "name": {
+        "title": "איך קוראים לחיית המחמד שלך?",
+        "description": "בחר שם מיוחד ל{pet} שלך",
+        "label": "שם חיית מחמד",
+        "placeholder": "הכנס את שם חיית המחמד שלך"
+      },
+      "photo": {
+        "title": "הוסף תמונה של {name}",
+        "description": "העלה תמונה חמודה של חיית המחמד שלך (אופציונלי)",
+        "uploadPrompt": "לחץ להעלאת תמונה (אופציונלי)",
+        "uploading": "מעלה...",
+        "uploadComplete": "התמונה הועלתה בהצלחה!",
+        "uploadFailed": "העלאת התמונה נכשלה"
+      },
+      "complete": {
+        "title": "מזל טוב!",
+        "description": "{name} הוא כעת חלק ממשפחת החיות שלך!",
+        "points": "+10 נקודות הרווחת!"
+      },
+      "navigation": {
+        "next": "הבא",
+        "previous": "הקודם",
+        "complete": "סיום",
+        "adding": "מוסיף..."
+      },
+      "success": {
+        "imageUploaded": "התמונה הועלתה בהצלחה!",
+        "petAdded": "חיית המחמד נוספה בהצלחה!"
+      },
+      "errors": {
+        "loginRequired": "נדרשת התחברות להוספת חיית מחמד",
+        "nameRequired": "נא להזין שם לחיית המחמד",
+        "imageRequired": "נא להעלות תמונה",
+        "uploadFailed": "העלאת התמונה נכשלה",
+        "addPetFailed": "הוספת חיית המחמד נכשלה",
+        "photoSize": "גודל התמונה חייב להיות פחות מ-5MB",
+        "photoType": "נא לבחור קובץ תמונה חוקי"
+      }
+    },
+    "edit": {
+      "title": "עריכת חיית מחמד",
+      "subtitle": "עדכון פרטי חיית המחמד",
+      "form": {
+        "name": "שם חיית מחמד",
+        "type": "סוג חיית מחמד",
+        "selectType": "בחר סוג",
+        "breed": "גזע",
+        "selectBreed": "בחר גזע",
+        "currentPhoto": "תמונה נוכחית",
+        "changePhoto": "שנה תמונה",
+        "uploadPhoto": "העלה תמונה",
+        "uploadPrompt": "לחץ להעלאה או גרור ושחרר",
+        "imageRequirements": "PNG, JPG או GIF (מקסימום 10MB)",
+        "description": "תיאור",
+        "descriptionPlaceholder": "תאר את חיית המחמד שלך...",
+        "age": "גיל",
+        "agePlaceholder": "הזן גיל",
+        "birthDate": "תאריך לידה",
+        "gender": "מין",
+        "selectGender": "בחר מין",
+        "genderMale": "זכר",
+        "genderFemale": "נקבה",
+        "weight": "משקל",
+        "weightPlaceholder": "הזן משקל בקילוגרם",
+        "notes": "הערות",
+        "notesPlaceholder": "הזן הערות או מידע מיוחד",
+        "updating": "מעדכן...",
+        "save": "שמור שינויים"
+      },
+      "delete": "מחק",
+      "deleteSuccess": "החיה נמחקה בהצלחה",
+      "deleteError": "שגיאה במחיקת החיה",
+      "deleteConfirm": {
+        "title": "מחק חיה",
+        "message": "האם אתה בטוח שברצונך למחוק את החיה הזו? פעולה זו לא ניתנת לביטול.",
+        "cancel": "בטל",
+        "delete": "מחק",
+        "deleting": "מוחק..."
+      },
+      "success": "חיית המחמד עודכנה בהצלחה!",
+      "error": "שגיאה בעדכון חיית המחמד"
+    },
+    "nfcTag": {
+      "title": "חיבור תג NFC",
+      "subtitle": "יצירת פרופיל חיית מחמד לשיתוף",
+      "backButton": "חזרה",
+      "howToAttach": "איך לחבר תג NFC:",
+      "steps": {
+        "prepareTag": {
+          "title": "הכנת תג NFC",
+          "description": "ודא שתג ה-NFC שלך מוכן ובהישג יד"
+        },
+        "enableNfc": {
+          "title": "הפעלת NFC בטלפון",
+          "description": "הפעל NFC בהגדרות הטלפון שלך"
+        }
+      },
+      "downloadApp": {
+        "title": "הורד את אפליקציית Chapiz",
+        "description": "כדי לצפות בפרופיל של {petName} וליצור קשר עם הבעלים, הורד את אפליקציית Chapiz:",
+        "button": "הורד אפליקציה"
+      }
+    }
+  },
+  "Admin": {
+    "brand": "פייספט",
+    "dashboard": "לוח בקרה של מנהל",
+    "welcome": "ברוכים הבאים ללוח הבקרה של המנהל",
+    "loading": "טוען...",
+    "unauthorized": "גישה לא מורשית",
+    "common": {
+      "cancel": "ביטול"
+    },
+    "unauthorizedMessage": "אין לך הרשאה לגשת לדף זה.",
+    "goBack": "חזור",
+    "navigation": {
+      "dashboard": "לוח בקרה",
+      "manageAds": "נהל פרסומות",
+      "manageComments": "נהל ביקורות",
+      "contactSubmissions": "פניות קשר",
+      "settings": "הגדרות",
+      "manageUsers": "נהל משתמשים",
+      "addUser": "הוסף משתמש",
+      "manageCoupons": "נהל שוברים",
+      "managePromos": "נהל קופונים",
+      "manageBusinesses": "נהל עסקים"
+    },
+    "stats": {
+      "totalAds": "סה\"כ פרסומות",
+      "advertisements": "פרסומות",
+      "contactForms": "טפסי קשר",
+      "submissions": "פניות",
+      "totalUsers": "סה\"כ משתמשים",
+      "users": "משתמשים",
+      "newUsers": "משתמשים חדשים",
+      "thisWeek": "השבוע",
+      "totalPets": "סה\"כ חיות מחמד",
+      "pets": "חיות מחמד",
+      "newPets": "חיות מחמד חדשות",
+      "totalComments": "סה\"כ תגובות",
+      "comments": "תגובות",
+      "averageRating": "דירוג ממוצע",
+      "rating": "דירוג"
+    },
+    "adsManagement": {
+      "title": "ניהול פרסומות",
+      "description": "צרו, ערכו ונהלו פרסומות המוצגות בפלטפורמה.",
+      "manageAds": "נהל פרסומות",
+      "searchPlaceholder": "חפש לפי כותרת...",
+      "addNewAd": "הוסף פרסומת חדשה",
+      "addNewAdvertisement": "הוסף פרסומת חדשה",
+      "common": {
+        "cancel": "ביטול"
+      },
+      "tabs": {
+        "advertisements": "פרסומות",
+        "promo": "קופון",
+        "filters": "מסננים",
+        "businesses": "עסקים"
+      },
+      "table": {
+        "title": "כותרת",
+        "type": "סוג",
+        "status": "סטטוס",
+        "tags": "תגיות",
+        "image": "תמונה",
+        "created": "נוצר",
+        "actions": "פעולות",
+        "noAds": "לא נמצאו פרסומות."
+      },
+      "status": {
+        "active": "פעיל",
+        "scheduled": "מתוכנן",
+        "draft": "טיוטה",
+        "inactive": "לא פעיל"
+      },
+      "pagination": {
+        "perPage": "לעמוד",
+        "5PerPage": "5 לעמוד",
+        "10PerPage": "10 לעמוד",
+        "20PerPage": "20 לעמוד",
+        "50PerPage": "50 לעמוד"
+      }
+    },
+    "userManagement": "ניהול משתמשים",
+    "manageUsersDescription": "נהל חשבונות משתמשים, תפקידים והרשאות.",
+    "manageUsers": "נהל משתמשים",
+    "usersManagement": {
+      "title": "ניהול משתמשים",
+      "searchPlaceholder": "חפש לפי אימייל...",
+      "table": {
+        "name": "שם",
+        "email": "אימייל",
+        "phone": "טלפון",
+        "role": "תפקיד",
+        "joined": "הצטרף",
+        "points": "נקודות",
+        "status": "סטטוס",
+        "actions": "פעולות",
+        "noUsers": "לא נמצאו משתמשים.",
+        "active": "פעיל",
+        "restricted": "מוגבל"
+      },
+      "roles": {
+        "super_admin": "מנהל על",
+        "admin": "מנהל",
+        "user": "משתמש"
+      },
+      "pagination": {
+        "perPage": "לעמוד",
+        "5PerPage": "5 לעמוד",
+        "10PerPage": "10 לעמוד",
+        "20PerPage": "20 לעמוד",
+        "50PerPage": "50 לעמוד"
+      }
+    },
+    "commentsManagement": "ניהול תגובות",
+    "manageCommentsDescription": "נהל ובדוק תגובות משתמשים בפלטפורמה.",
+    "commentsManagementPage": {
+      "title": "נהל ביקורות",
+      "description": "סקור ונהל תגובות וביקורות משתמשים",
+      "searchPlaceholder": "חפש לפי תוכן, שם משתמש או אימייל...",
+      "filters": {
+        "all": "הכל",
+        "approvedOnly": "מאושרות בלבד"
+      },
+      "table": {
+        "user": "משתמש",
+        "content": "תוכן",
+        "rating": "דירוג",
+        "adService": "פרסומת/שירות",
+        "status": "סטטוס",
+        "created": "נוצר",
+        "actions": "פעולות",
+        "noComments": "לא נמצאו תגובות.",
+        "noRating": "אין דירוג",
+        "generalComment": "תגובה כללית",
+        "approved": "מאושר",
+        "pending": "ממתין"
+      }
+    },
+    "commentActions": {
+      "actions": "פעולות",
+      "delete": "מחק ביקורת",
+      "deleteComment": "מחק ביקורת",
+      "deleteTitle": "מחק ביקורת",
+      "deleteMessage": "האם אתה בטוח שברצונך למחוק את הביקורת הזו? פעולה זו לא ניתנת לביטול.",
+      "comment": "ביקורת:",
+      "cancel": "ביטול",
+      "deleting": "מוחק...",
+      "deleteCommentButton": "מחק ביקורת"
+    },
+    "contactManagement": "פניות קשר",
+    "manageContactDescription": "צפה והגב לפניות מטופסי הקשר.",
+    "settingsManagement": "הגדרות",
+    "manageSettingsDescription": "הגדר הגדרות והעדפות הפלטפורמה.",
+    "settings": {
+      "title": "הגדרות",
+      "description": "נהל את פרטי הקשר והגדרות האפליקציה",
+      "contactInformation": "פרטי קשר",
+      "emailAddress": "כתובת אימייל",
+      "phoneNumber": "מספר טלפון",
+      "address": "כתובת",
+      "website": "אתר אינטרנט",
+      "socialMedia": "רשתות חברתיות",
+      "facebook": "פייסבוק",
+      "instagram": "אינסטגרם",
+      "twitter": "טוויטר",
+      "whatsapp": "ווטסאפ",
+      "saveSuccess": "פרטי הקשר נשמרו בהצלחה!",
+      "saveChanges": "שמור שינויים",
+      "saving": "שומר...",
+      "emailPlaceholder": "contact@example.com",
+      "phonePlaceholder": "+972-50-123-4567",
+      "addressPlaceholder": "רחוב הרצל 123, תל אביב",
+      "websitePlaceholder": "https://www.example.com",
+      "facebookPlaceholder": "https://facebook.com/yourpage",
+      "instagramPlaceholder": "https://instagram.com/yourpage",
+      "twitterPlaceholder": "https://twitter.com/yourpage",
+      "whatsappPlaceholder": "+972-50-123-4567",
+      "mobileAppLinks": "קישורי אפליקציה ניידת",
+      "androidAppStoreUrl": "קישור חנות אפליקציות אנדרואיד",
+      "iosAppStoreUrl": "קישור חנות אפליקציות iOS",
+      "storeLink": "קישור חנות",
+      "storeUrl": "כתובת חנות",
+      "storeDescription": "קישור זה יופיע בתפריט הנפתח של עריכת חיית המחמד כדי שמשתמשים יוכלו לגשת לחנות שלך",
+      "androidPlaceholder": "http://android.theholylabs.com/",
+      "iosPlaceholder": "http://ios.theholylabs.com/",
+      "storePlaceholder": "https://www.youtube.com/"
+    },
+    "contactSubmissions": {
+      "title": "פניות קשר",
+      "subtitle": "צפה ונהל פניות מטופסי הקשר של המשתמשים",
+      "searchPlaceholder": "חפש לפי שם, אימייל, נושא או הודעה...",
+      "searchPlaceholderShort": "חפש לפי שם, אימייל או הודעה...",
+      "filters": {
+        "all": "הכל",
+        "unreadOnly": "לא נקרא בלבד"
+      },
+      "table": {
+        "contactInfo": "פרטי קשר",
+        "message": "הודעה",
+        "status": "סטטוס",
+        "submitted": "נשלח",
+        "actions": "פעולות",
+        "noSubmissions": "לא נמצאו פניות קשר.",
+        "read": "נקרא",
+        "unread": "לא נקרא"
+      },
+      "actions": {
+        "openMenu": "פתח תפריט",
+        "actions": "פעולות",
+        "viewDetails": "הצג פרטים",
+        "markAsRead": "סמן כנקרא",
+        "markAsUnread": "סמן כלא נקרא",
+        "deleteSubmission": "מחק פנייה"
+      },
+      "viewDialog": {
+        "title": "פרטי פניית קשר",
+        "description": "פרטים מלאים של פניית הקשר",
+        "name": "שם",
+        "email": "אימייל",
+        "phone": "טלפון",
+        "message": "הודעה",
+        "submitted": "נשלח",
+        "status": "סטטוס",
+        "close": "סגור",
+        "markAsRead": "סמן כנקרא"
+      },
+      "deleteDialog": {
+        "title": "מחק פניית קשר",
+        "description": "האם אתה בטוח שברצונך למחוק את פניית הקשר הזו? פעולה זו לא ניתנת לביטול.",
+        "from": "מאת:",
+        "cancel": "ביטול",
+        "deleteSubmission": "מחק פנייה",
+        "deleting": "מוחק..."
+      },
+      "errors": {
+        "deleteFailed": "נכשל במחיקת הפנייה",
+        "updateStatusFailed": "נכשל בעדכון סטטוס הקריאה"
+      },
+      "pagination": {
+        "perPage": "לעמוד",
+        "5PerPage": "5 לעמוד",
+        "10PerPage": "10 לעמוד",
+        "20PerPage": "20 לעמוד",
+        "50PerPage": "50 לעמוד"
+      }
+    },
+    "recentActivity": "פעילות אחרונה",
+    "userActivity": "פעילות משתמשים",
+    "petActivity": "פעילות חיות מחמד",
+    "adActivity": "פעילות פרסומות",
+    "noActivity": "אין פעילות אחרונה",
+    "userActions": {
+      "actions": "פעולות",
+      "confirmDeletion": "אישור מחיקה",
+      "deleteUserMessage": "האם אתה בטוח שברצונך למחוק את המשתמש הזה? פעולה זו לא ניתנת לביטול.",
+      "cancel": "ביטול",
+      "deleteUser": "מחק משתמש",
+      "editUser": "ערוך משתמש",
+      "viewUser": "הצג משתמש",
+      "deleting": "מוחק...",
+      "deleteSuccess": "המשתמש נמחק בהצלחה",
+      "deleteError": "נכשל במחיקת המשתמש",
+      "selectRole": "בחר תפקיד",
+      "enterPhone": "הזן מספר טלפון",
+      "enterAddress": "הזן כתובת",
+      "enterRestrictionReason": "הזן סיבת הגבלה",
+      "restricted": "מוגבל",
+      "active": "פעיל",
+      "savingChanges": "שומר שינויים...",
+      "saveChanges": "שמור שינויים",
+      "updateRoleError": "נכשל בעדכון התפקיד",
+      "deleteUserError": "נכשל במחיקת המשתמש",
+      "restrictUserError": "נכשל בהגבלת המשתמש",
+      "unrestrictUserError": "נכשל בהסרת הגבלת המשתמש",
+      "updateRestrictionError": "נכשל בעדכון סטטוס ההגבלה",
+      "updateUserInfoError": "נכשל בעדכון פרטי המשתמש",
+      "saveChangesError": "נכשל בשמירת השינויים",
+      "editUserDescription": "נהל תפקיד משתמש, הגבלות ופרטי קשר",
+      "userRole": "תפקיד משתמש",
+      "phoneNumber": "מספר טלפון",
+      "address": "כתובת",
+      "accountStatus": "סטטוס חשבון",
+      "restrictionReason": "סיבת הגבלה",
+      "addPoints": "הוסף נקודות",
+      "addPointsDescription": "הוסף נקודות לחשבון המשתמש הזה. פעולה זו תירשם בהיסטוריית העסקאות.",
+      "pointsAmount": "כמות נקודות",
+      "description": "תיאור",
+      "optional": "אופציונלי",
+      "pointsDescriptionPlaceholder": "למשל, תגמול על הפניה, נקודות בונוס וכו'.",
+      "addingPoints": "מוסיף נקודות...",
+      "addPointsError": "נכשל בהוספת נקודות",
+      "invalidPointsAmount": "אנא הזן כמות נקודות תקינה הגדולה מ-0",
+      "roles": {
+        "user": "משתמש",
+        "admin": "מנהל",
+        "super_admin": "מנהל על"
+      }
+    },
+    "petsManagement": {
+      "title": "נהל חיות מחמד",
+      "searchPlaceholder": "חפש לפי שם, סוג, גזע או בעלים...",
+      "table": {
+        "name": "שם",
+        "type": "סוג",
+        "breed": "גזע",
+        "gender": "מין",
+        "weight": "משקל",
+        "image": "תמונה",
+        "ownerName": "שם בעלים",
+        "created": "נוצר",
+        "actions": "פעולות",
+        "noPets": "לא נמצאו חיות מחמד."
+      }
+    },
+    "couponsManagement": {
+      "title": "ניהול שוברים",
+      "description": "צור, ערוך ונהל שוברים ללקוחות שלך.",
+      "addNewCoupon": "הוסף שובר חדש",
+      "name": "שם השובר",
+      "namePlaceholder": "הזן שם שובר",
+      "description": "תיאור",
+      "descriptionPlaceholder": "הזן תיאור שובר",
+      "price": "מחיר",
+      "pricePlaceholder": "0.00",
+      "points": "נקודות",
+      "pointsPlaceholder": "הזן ערך נקודות",
+      "image": "תמונה",
+      "validFrom": "תקף מ",
+      "validTo": "תקף עד",
+      "validPeriod": "תקופת תוקף",
+      "status": "סטטוס",
+      "createdAt": "נוצר ב",
+      "business": "עסק",
+      "businessPlaceholder": "בחר עסק (אופציונלי)",
+      "noBusiness": "ללא עסק (שובר כללי)",
+      "noCoupons": "לא נמצאו שוברים.",
+      "createCoupon": "צור שובר",
+      "edit": "ערוך",
+      "delete": "מחק",
+      "confirmDelete": "האם אתה בטוח שברצונך למחוק את השובר \"{name}\"?",
+      "activate": "הפעל",
+      "deactivate": "השבת",
+      "preview": "תצוגה מקדימה",
+      "purchaseLimit": "מגבלת רכישה",
+      "purchaseLimitPlaceholder": "השאר ריק ללא הגבלה",
+      "purchaseLimitHelp": "מספר פעמים מקסימלי שכל משתמש יכול לרכוש שובר זה (השאר ריק ללא הגבלה)",
+      "unlimited": "ללא הגבלה",
+      "purchaseLimitReached": "הגעת למגבלת הרכישה עבור שובר זה"
+    },
+    "promoManagement": {
+      "title": "ניהול קופונים",
+      "description": "צור, ערוך ונהל קמפיינים קופוניים.",
+      "addNewPromo": "הוסף קופון חדש",
+      "name": "שם הקופון",
+      "namePlaceholder": "הזן שם קופון",
+      "description": "תיאור",
+      "descriptionPlaceholder": "הזן תיאור קופון",
+      "image": "תמונה",
+      "business": "עסק",
+      "businessPlaceholder": "בחר עסק",
+      "filter": "מסנן",
+      "filterPlaceholder": "בחר מסנן",
+      "filterByFilter": "סנן לפי מסנן",
+      "selectFilter": "בחר מסנן...",
+      "allPromos": "כל הקופונים",
+      "clearFilter": "נקה מסנן",
+      "unknownFilter": "מסנן לא ידוע",
+      "noPromosForFilter": "לא נמצאו קופונים למסנן שנבחר",
+      "mediaTypeLabel": "סוג מדיה",
+      "mediaTypes": {
+        "image": "תמונה",
+        "youtube": "סרטון YouTube"
+      },
+      "youtubeUrlLabel": "כתובת URL של YouTube",
+      "youtubeUrlPlaceholder": "https://www.youtube.com/watch?v=...",
+      "youtubeUrlHelp": "הזן כתובת URL של סרטון YouTube (לדוגמה, https://www.youtube.com/watch?v=dQw4w9WgXcQ)",
+      "youtubePreviewTitle": "תצוגה מקדימה של סרטון YouTube",
+      "unknownBusiness": "עסק לא ידוע",
+      "unknownAudience": "קהל יעד לא ידוע",
+      "startDate": "תאריך התחלה",
+      "endDate": "תאריך סיום",
+      "status": "סטטוס",
+      "createdAt": "נוצר ב",
+      "noPromos": "לא נמצאו קופונים.",
+      "createPromo": "צור קופון",
+      "creating": "יוצר...",
+      "edit": "ערוך",
+      "delete": "מחק",
+      "confirmDelete": "האם אתה בטוח שברצונך למחוק את הקופון \"{name}\"?",
+      "activate": "הפעל",
+      "deactivate": "השבת"
+    },
+    "audienceManagement": {
+      "title": "ניהול קהל יעד",
+      "description": "צור ונהל קהלי יעד לקמפיינים שלך.",
+      "addNewAudience": "הוסף קהל יעד חדש",
+      "name": "שם קהל היעד",
+      "namePlaceholder": "הזן שם קהל יעד",
+      "description": "תיאור",
+      "descriptionPlaceholder": "הזן תיאור קהל יעד",
+      "targetCriteria": "קריטריוני יעד",
+      "targetCriteriaPlaceholder": "הוסף קריטריון יעד",
+      "add": "הוסף",
+      "createAudience": "צור קהל יעד",
+      "creating": "יוצר...",
+      "status": "סטטוס",
+      "createdAt": "נוצר ב",
+      "noAudiences": "לא נמצאו קהלי יעד.",
+      "edit": "ערוך",
+      "delete": "מחק",
+      "activate": "הפעל",
+      "deactivate": "השבת"
+    },
+    "filterManagement": {
+      "title": "ניהול מסננים",
+      "description": "צור ונהל מסננים מקהלי יעד כדי לסנן עסקים.",
+      "addNewFilter": "הוסף מסנן חדש",
+      "name": "שם המסנן",
+      "namePlaceholder": "הזן שם מסנן",
+      "audiences": "קהלי יעד",
+      "audiencesPlaceholder": "בחר קהלי יעד...",
+      "status": "סטטוס",
+      "createdAt": "נוצר ב",
+      "noFilters": "לא נמצאו מסננים.",
+      "edit": "ערוך",
+      "delete": "מחק",
+      "activate": "הפעל",
+      "deactivate": "השבת",
+      "createFilter": "צור מסנן",
+      "creating": "יוצר...",
+      "editFilter": "ערוך מסנן",
+      "update": "עדכן",
+      "updating": "מעדכן..."
+    },
+    "businessManagement": {
+      "title": "ניהול עסקים",
+      "description": "נהל שותפים עסקיים ואת המידע שלהם.",
+      "addNewBusiness": "הוסף עסק חדש",
+      "name": "שם העסק",
+      "namePlaceholder": "הזן שם עסק",
+      "selectFilter": "בחר מסנן...",
+      "allBusinesses": "כל העסקים",
+      "clearFilter": "נקה מסנן",
+      "showingResults": "מציג",
+      "of": "מתוך",
+      "businesses": "עסקים",
+      "noBusinessesMatchingFilter": "לא נמצאו עסקים התואמים למסנן שנבחר",
+      "description": "תיאור",
+      "descriptionPlaceholder": "הזן תיאור עסק",
+      "image": "תמונה",
+      "category": "קטגוריה",
+      "rating": "דירוג",
+      "ratingPlaceholder": "הזן דירוג (1-5)",
+      "filters": "מסננים",
+      "noFiltersAvailable": "אין מסננים זמינים",
+      "status": "סטטוס",
+      "createdAt": "נוצר ב",
+      "noBusinesses": "לא נמצאו עסקים.",
+      "edit": "ערוך",
+      "delete": "מחק",
+      "activate": "הפעל",
+      "deactivate": "השבת",
+      "contactInfo": "פרטי קשר",
+      "emailPlaceholder": "business@example.com",
+      "phonePlaceholder": "+972-XXX-XXX-XXXX",
+      "addressPlaceholder": "הזן כתובת עסק",
+      "createBusiness": "צור עסק",
+      "creating": "יוצר...",
+      "tags": "תגיות",
+      "selectAll": "בחר הכל",
+      "deselectAll": "בטל בחירת הכל",
+      "selectedCount": "{count} נבחרו",
+      "bulkActions": "פעולות מרובות",
+      "bulkDelete": "מחק נבחרים",
+      "bulkAssignTags": "הקצה תגיות",
+      "bulkToggleStatus": "החלף סטטוס",
+      "confirmBulkDelete": "האם אתה בטוח שברצונך למחוק {count} עסקים? פעולה זו לא ניתנת לביטול.",
+      "bulkDeleteSuccess": "{count} עסקים נמחקו בהצלחה",
+      "bulkDeleteError": "נכשל במחיקת עסקים",
+      "bulkEditTitle": "ערוך {count} עסקים",
+      "bulkEditDescription": "החל שינויים על כל העסקים הנבחרים",
+      "addTags": "הוסף תגיות",
+      "removeTags": "הסר תגיות",
+      "selectedToAdd": "תגיות להוספה",
+      "selectedToRemove": "תגיות להסרה",
+      "applyChanges": "החל שינויים",
+      "applying": "מחיל...",
+      "bulkUpdateSuccess": "{count} עסקים עודכנו בהצלחה",
+      "bulkUpdateError": "נכשל בעדכון עסקים"
+    },
+    "userPetsPage": {
+      "backToUsers": "חזור למשתמשים",
+      "title": "חיות המחמד של המשתמש",
+      "description": "חיות מחמד בבעלות",
+      "petsFound": "חיית מחמד נמצאה",
+      "petsFoundPlural": "חיות מחמד נמצאו",
+      "noPetsTitle": "לא נמצאו חיות מחמד",
+      "noPetsDescription": "למשתמש הזה עדיין לא נרשמו חיות מחמד."
+    },
+    "petActions": {
+      "actions": "פעולות",
+      "view": "הצג חיית מחמד",
+      "edit": "ערוך",
+      "delete": "מחק",
+      "confirmDelete": "האם אתה בטוח שברצונך למחוק את חיית המחמד הזו?",
+      "deleting": "מוחק...",
+      "deleteSuccess": "חיית המחמד נמחקה בהצלחה",
+      "deleteError": "נכשל במחיקת חיית המחמד",
+      "cancel": "ביטול"
+    },
+    "adActions": {
+      "actions": "פעולות",
+      "view": "הצג פרסומת",
+      "edit": "ערוך",
+      "delete": "מחק",
+      "approve": "אשר",
+      "reject": "דחה",
+      "confirmDelete": "האם אתה בטוח שברצונך למחוק את הפרסומת הזו?",
+      "deleting": "מוחק...",
+      "deleteSuccess": "הפרסומת נמחקה בהצלחה",
+      "deleteError": "נכשל במחיקת הפרסומת",
+      "approving": "מאשר...",
+      "approveSuccess": "הפרסומת אושרה בהצלחה",
+      "approveError": "נכשל באישור הפרסומת",
+      "rejecting": "דוחה...",
+      "rejectSuccess": "הפרסומת נדחתה בהצלחה",
+      "rejectError": "נכשל בדחיית הפרסומת",
+      "cancel": "ביטול",
+      "confirmDeletion": "אישור מחיקה",
+      "deleteMessage": "האם אתה בטוח שברצונך למחוק את הפרסומת הזו? פעולה זו לא ניתנת לביטול.",
+      "title": "כותרת",
+      "description": "תיאור",
+      "phoneNumber": "מספר טלפון",
+      "location": "מיקום",
+      "tags": "תגיות",
+      "content": "תוכן",
+      "addTag": "הוסף",
+      "addTagPlaceholder": "הוסף תגית ולחץ Enter",
+      "descriptionPlaceholder": "הזן תיאור שירות...",
+      "phonePlaceholder": "+972-XX-XXX-XXXX",
+      "locationPlaceholder": "עיר, מדינה",
+      "area": "אזור",
+      "areaPlaceholder": "הזן אזור",
+      "city": "עיר",
+      "cityPlaceholder": "הזן עיר",
+      "petType": "סוג החייה",
+      "petTypePlaceholder": "בחר סוג החייה",
+      "breed": "גזע",
+      "breedPlaceholder": "בחר גזע",
+      "ageRange": "טווח גילאים",
+      "ageRangePlaceholder": "למשל, 1-3 שנים",
+      "weight": "משקל",
+      "weightPlaceholder": "למשל, 5 ק\"ג",
+      "updating": "מעדכן...",
+      "updateAd": "עדכן פרסומת",
+      "deleteAd": "מחק פרסומת",
+      "noTags": "אין תגיות",
+      "moreTags": "עוד",
+      "mediaType": "סוג מדיה",
+      "image": "תמונה",
+      "video": "וידאו",
+      "youtube": "יוטיוב",
+      "youtubeUrl": "כתובת יוטיוב",
+      "youtubeUrlHelp": "הזן כתובת וידאו יוטיוב"
+    },
+    "forms": {
+      "addUser": {
+        "title": "הוסף משתמש חדש",
+        "fullName": "שם מלא",
+        "email": "אימייל",
+        "emailPlaceholder": "הכנס כתובת אימייל",
+        "phone": "טלפון",
+        "password": "סיסמה",
+        "passwordPlaceholder": "הכנס סיסמה",
+        "role": "תפקיד",
+        "rolePlaceholder": "בחר תפקיד",
+        "selectRole": "בחר תפקיד",
+        "submit": "הוסף משתמש",
+        "createUser": "צור משתמש",
+        "creating": "יוצר...",
+        "success": "המשתמש נוצר בהצלחה",
+        "error": "נכשל ביצירת המשתמש"
+      },
+      "addAd": {
+        "title": "כותרת",
+        "content": "תוכן",
+        "description": "תיאור",
+        "descriptionPlaceholder": "הזן תיאור שירות...",
+        "phoneNumber": "מספר טלפון",
+        "phonePlaceholder": "+972-XX-XXX-XXXX",
+        "location": "מיקום",
+        "locationPlaceholder": "עיר, מדינה",
+        "area": "אזור",
+        "areaPlaceholder": "הזן אזור",
+        "city": "עיר",
+        "cityPlaceholder": "הזן עיר",
+        "petType": "סוג החייה",
+        "petTypePlaceholder": "בחר סוג החייה",
+        "breed": "גזע",
+        "breedPlaceholder": "בחר גזע",
+        "ageRange": "טווח גילאים",
+        "ageRangePlaceholder": "למשל, 1-3 שנים",
+        "weight": "משקל",
+        "weightPlaceholder": "למשל, 5 ק\"ג",
+        "createAd": "צור פרסומת",
+        "creating": "יוצר...",
+        "createError": "נכשל ביצירת הפרסומת. אנא נסה שוב.",
+        "mediaType": "סוג מדיה",
+        "image": "תמונה",
+        "video": "וידאו",
+        "youtube": "יוטיוב",
+        "youtubeUrl": "כתובת יוטיוב",
+        "youtubeUrlHelp": "הזן כתובת וידאו יוטיוב"
+      }
+    },
+    "roles": {
+      "admin": "מנהל",
+      "super_admin": "מנהל על",
+      "user": "משתמש"
+    },
+    "status": {
+      "active": "פעיל",
+      "inactive": "לא פעיל",
+      "pending": "ממתין",
+      "approved": "אושר",
+      "rejected": "נדחה"
+    },
+    "dialogs": {
+      "addType": {
+        "title": "הוסף סוג חיית מחמד חדש",
+        "description": "הוסף סוג חיית מחמד חדש למערכת. זה יהיה זמין לרישום חיות מחמד.",
+        "typeName": "שם הסוג",
+        "typeNamePlaceholder": "לדוגמה: כלב, חתול, ציפור",
+        "cancel": "ביטול",
+        "add": "הוסף סוג",
+        "adding": "מוסיף..."
+      },
+      "addBreed": {
+        "title": "הוסף גזע חדש",
+        "description": "הוסף גזע חדש לסוג חיית מחמד ספציפי. זה יהיה זמין לרישום חיות מחמד.",
+        "petType": "סוג חיית מחמד",
+        "petTypePlaceholder": "בחר סוג חיית מחמד",
+        "breedName": "שם הגזע",
+        "breedNamePlaceholder": "לדוגמה: לברדור רטריבר",
+        "cancel": "ביטול",
+        "add": "הוסף גזע",
+        "adding": "מוסיף..."
+      },
+      "editBusiness": {
+        "title": "ערוך עסק",
+        "cancel": "ביטול",
+        "update": "עדכן עסק",
+        "updating": "מעדכן...",
+        "tags": "תגיות",
+        "selectedTags": "תגיות נבחרות ({count}):",
+        "contactInformation": "פרטי קשר",
+        "email": "אימייל",
+        "phone": "טלפון",
+        "address": "כתובת",
+        "emailPlaceholder": "business@example.com",
+        "phonePlaceholder": "+972-XXX-XXX-XXXX",
+        "addressPlaceholder": "הזן כתובת עסק",
+        "enterBusinessName": "הזן שם עסק",
+        "enterBusinessDescription": "הזן תיאור עסק",
+        "enterRating": "הזן דירוג (1-5)"
+      },
+      "editCoupon": {
+        "title": "ערוך שובר",
+        "cancel": "ביטול",
+        "update": "עדכן שובר",
+        "updating": "מעדכן..."
+      },
+      "editPromo": {
+        "title": "ערוך קופון",
+        "cancel": "ביטול",
+        "update": "עדכן קופון",
+        "updating": "מעדכן...",
+        "loading": "טוען..."
+      },
+      "editAudience": {
+        "title": "ערוך קהל יעד",
+        "cancel": "ביטול",
+        "update": "עדכן קהל יעד",
+        "updating": "מעדכן...",
+        "targetCriteria": "קריטריוני יעד",
+        "addCriteria": "הוסף",
+        "addCriteriaPlaceholder": "הוסף קריטריון יעד",
+        "enterAudienceName": "הזן שם קהל יעד",
+        "enterAudienceDescription": "הזן תיאור קהל יעד"
+      }
+    },
+    "uploading": "מעלה...",
+    "mediaUpload": {
+      "editImage": "ערוך תמונה",
+      "clickToUploadImage": "לחץ להעלאת תמונה",
+      "clickToUploadVideo": "לחץ להעלאת וידאו",
+      "replaceImage": "החלף תמונה",
+      "replaceVideo": "החלף וידאו",
+      "uploading": "מעלה...",
+      "fileFormats": {
+        "image": "JPG, PNG או GIF עד 20MB",
+        "video": "MP4, WebM או MOV עד 100MB"
+      }
+    },
+    "imageEditor": {
+      "title": "ערוך תמונה",
+      "applyCrop": "החל חיתוך",
+      "clear": "נקה"
+    }
+  },
+  "common": {
+    "cancel": "ביטול",
+    "save": "שמור",
+    "saving": "שומר...",
+    "creating": "יוצר...",
+    "serviceTags": "תגי שירות (לחץ להוספה):",
+    "selectedTags": "תגיות נבחרות:",
+    "add": "הוסף",
+    "update": "עדכן",
+    "select": "בחר והזז"
+  },
+  "pages": {
+    "WelcomePage": {
+      "upperTitle": "כל מה שחיית המחמד שלך צריכה",
+      "lowerTitle": "במקום אחד.",
+      "buttonLabel": "התחילו הרשמה",
+      "signInText": "יש לכם כבר משתמש?",
+      "signInLink": "התחברות",
+      "signOutText": "רוצים להחליף משתמש?",
+      "signOutLink": "התנתקות"
+    },
+    "TooFastPage": {
+      "title": "ווף... תאט קצת!",
+      "subtitle": "נראה שהיית קצת יותר מדי מהיר אז עשינו עצירה זמנית על ההתרגשות שלך. תרגע קצת ונסה שוב בקרוב."
+    },
+    "PetNotFoundPage": {
+      "title": "אופס... החיה לא נמצאה!",
+      "subtitle": "לא הצלחנו למצוא את חיית המחמד שחיפשת. אנא נסה שוב או צור קשר עם התמיכה."
+    },
+    "TagFound": {
+      "title": "תג נמצא!",
+      "subtitle": "תג חיית המחמד הזה זוהה. הרשם את חיית המחמד שלך כדי להתחיל.",
+      "welcomeBack": "ברוך שובך, {name}!",
+      "needAccount": "אתה צריך חשבון כדי לרשום את חיית המחמד הזו.",
+      "registerPet": "רשום חיית מחמד",
+      "createAccountAndRegister": "צור חשבון ורשום חיית מחמד",
+      "alreadyHaveAccount": "כבר יש לך חשבון? התחבר",
+      "processing": "מעבד...",
+      "goBack": "חזור"
+    },
+    "TermsAndConditionsPage": {
+      "title": "תנאי השימוש",
+      "subtitle": "יופיעו פה!"
+    },
+    "MyPetsPage": {
+      "title": "החיות שלי",
+      "searchPlaceholder": "חפש חיות...",
+      "noResults": "לא נמצאו חיות.",
+      "edit": "ערוך",
+      "noPetsYet": "עדיין אין חיות",
+      "addFirstPet": "התחילו בהוספת חיית המחמד הראשונה שלכם כדי לשמור עליה ולחבר אותה!",
+      "scanToAddPet": "סרוק תג NFC כדי להוסיף את חיית המחמד הראשונה שלך!",
+      "managePetsDescription": "נהלו את החיות שלכם ושמרו עליהן בטוחות עם Chapiz",
+      "welcomeBack": "ברוכים השבים!",
+      "loadingPets": "טוען חיות...",
+      "notifications": "התראות",
+      "noNotifications": "אין התראות חדשות",
+      "shareWithFriends": "שתף עם חברים",
+      "shareDescription": "שתף וקבל 10 נקודות עבור כל חבר שמצטרף!"
+    },
+    "AddPetPage": {
+      "back": "חזור",
+      "title": "הוסף חיית מחמד חדשה",
+      "subtitle": "צרו פרופיל דיגיטלי לחיית המחמד שלכם כדי לשמור עליה בטוחה ומחוברת.",
+      "cardTitle": "בואו נתחיל!",
+      "cardDescription": "נעזור לכם ליצור פרופיל מלא לחיית המחמד שלכם בכמה שלבים פשוטים.",
+      "feature1Title": "פרופיל דיגיטלי לחיית מחמד",
+      "feature1Description": "צרו פרופיל מקיף עם תמונות, מידע רפואי ופרטי קשר.",
+      "feature2Title": "אינטגרציה עם שבב NFC",
+      "feature2Description": "קשרו את הפרופיל של חיית המחמד לשבב NFC לזיהוי מיידי.",
+      "feature3Title": "קשר חירום",
+      "feature3Description": "וודאו שחיית המחמד שלכם תוחזר במהירות אם היא תלך לאיבוד.",
+      "addPetButton": "הוסף את חיית המחמד שלי",
+      "creating": "יוצר...",
+      "redirecting": "מפנה לרישום חיית מחמד..."
+    },
+    "MyGiftsPage": {
+      "title": "המתנות שלי",
+      "searchPlaceholder": "חפש מתנות...",
+      "noResults": "לא נמצאו מתנות."
+    },
+    "ServicesPage": {
+      "title": "שירותים ואנשי מקצוע",
+      "searchPlaceholder": "חפש שירותים",
+      "noResults": "לא נמצאו שירותים ואנשי מקצוע.",
+      "removeFilter": "הסר מסנן",
+      "filterByProfession": "סינון לפי מקצוע",
+      "loading": "טוען...",
+      "filters": {
+        "all": "הכל",
+        "favorites": "מועדפים"
+      },
+      "tagsFilter": {
+        "placeholder": "סנן לפי תגיות...",
+        "clearAll": "נקה הכל",
+        "searchTags": "חפש תגיות...",
+        "tagsSelected": "תגית {count} נבחרה",
+        "tagsSelectedPlural": "{count} תגיות נבחרו",
+        "selected": "נבחר",
+        "noTagsFound": "לא נמצאו תגיות."
+      },
+      "map": {
+        "listView": "רשימה",
+        "mapView": "מפה",
+        "findNearby": "מצא שירותים קרובים",
+        "locationPermission": "אפשר גישה למיקום כדי לראות את השירותים הקרובים ביותר",
+        "useMyLocation": "השתמש במיקום שלי",
+        "locationDenied": "גישה למיקום נדחתה. מציג את כל השירותים.",
+        "closestServices": "השירותים הקרובים ביותר:",
+        "allServices": "כל השירותים",
+        "servicesFound": "שירותים נמצאו",
+        "noServices": "לא נמצאו שירותים",
+        "loading": "טוען מפה...",
+        "cancel": "ביטול",
+        "distanceUnavailable": "מרחק לא זמין",
+        "km": "ק\"מ",
+        "kmAway": "ק\"מ מכאן"
+      },
+      "addToFavorites": "הוסף למועדפים",
+      "removeFromFavorites": "הסר ממועדפים",
+      "coupons": "השוברים שלי",
+      "navigation": "ניווט",
+      "call": "התקשר"
+    },
+    "PromosPage": {
+      "title": "קופונים",
+      "back": "חזור",
+      "noPromos": "אין קופונים זמינים",
+      "noPromosDescription": "לעסק זה אין קופונים פעילים כרגע.",
+      "startDate": "תאריך התחלה",
+      "endDate": "תאריך סיום",
+      "view": "צפה",
+      "use": "השתמש",
+      "using": "משתמש...",
+      "used": "שומש",
+      "promoUsed": "הקופון שומש!",
+      "gotPrize": "הקופון מומש",
+      "couponUsedSuccess": "הקופון שלך מומש בהצלחה",
+      "viewCoupon": "צפייה בקופון",
+      "qrCodeDescription": "סרוק את קוד ה-QR כדי לצפות בקופון זה",
+      "businessLocations": "מיקומי עסקים",
+      "storeLocation": "מיקום החנות",
+      "loadingMap": "טוען מפה...",
+      "copyLink": "העתק קישור",
+      "linkCopied": "הקישור הועתק ללוח!",
+      "share": "שתף",
+      "shared": "נשתף בהצלחה!",
+      "allPromos": "קופונים",
+      "allPromosDescription": "עיינו בכל הקופונים הזמינים",
+      "noPromosAllDescription": "אין קופונים פעילים זמינים כרגע.",
+      "available": "זמינים",
+      "history": "היסטוריה",
+      "noHistory": "אין היסטוריה",
+      "noHistoryDescription": "עדיין לא השתמשת בקופונים.",
+      "usedOn": "שומש ב",
+      "showAllCoupons": "הצג את כל הקופונים",
+      "showQRCode": "מימוש קופון",
+      "business": "עסק",
+      "businesses": "עסקים",
+      "confirmUse": "אישור שימוש בקופון",
+      "confirmUseMessage": "האם אתה בטוח שברצונך להשתמש בקופון זה? פעולה זו לא ניתנת לביטול.",
+      "cancel": "ביטול",
+      "confirm": "אישור",
+      "importantInfo": "מידע חשוב",
+      "couponUsageInfo": "קופון זה ניתן לשימוש רק בחנות המציעה את הקופון הזה",
+      "oneTimeUse": "קופון זה תקף לשימוש חד-פעמי בלבד",
+      "showMap": "איפה ניתן לממש?",
+      "mapFor": "מפה עבור",
+      "acceptedAt": "תקף ב",
+      "viewFullPage": "צפה בדף המלא"
+    },
+    "ConfirmationPage": {
+      "title": "אימות דוא\"ל",
+      "subtitle": "אנא הזן את הקוד בן 6 הספרות ששלחנו לכתובת הדוא\"ל שלך",
+      "form": {
+        "resendText": "לא קיבלת את הקוד?",
+        "resendLink": "שלח מחדש"
+      }
+    },
+    "SignUpPage": {
+      "title": "הרשמה",
+      "form": {
+        "FullName": "שם מלא",
+        "PhoneNumber": "מספר טלפון",
+        "EmailAddress": "כתובת מייל",
+        "Password": "סיסמה (8 תווים לפחות)",
+        "ConfirmPassword": "אישור סיסמה",
+        "TermsAcceptPrefix": "אני מאשר/ת את",
+        "TermsLink": "תנאי השימוש"
+      },
+      "errors": {
+        "FullName": "שם מלא הוא שדה חובה",
+        "PhoneNumber": "מספר טלפון הוא שדה חובה",
+        "EmailAddress": "כתובת מייל לא תקינה",
+        "Password": "הסיסמה חייבת להיות באורך של 8 תווים לפחות",
+        "ConfirmPassword": "אישור סיסמה הוא שדה חובה",
+        "TermsAccept": "עליך לאשר את תנאי השימוש",
+        "PasswordMatch": "הסיסמאות אינן תואמות",
+        "CurrentPasswordRequired": "הסיסמה הנוכחית היא שדה חובה"
+      }
+    },
+    "UserSettingsPage": {
+      "back": "חזור",
+      "title": "הגדרות משתמש",
+      "subtitle": "נהלו את הפרופיל וההעדפות שלכם",
+      "profileImage": "תמונת פרופיל",
+      "uploadImage": "העלה תמונה",
+      "imageRequirements": "JPG, PNG או GIF. גודל מקסימלי 5MB.",
+      "personalInfo": "מידע אישי",
+      "fullName": "שם מלא",
+      "fullNamePlaceholder": "הזינו את השם המלא שלכם",
+      "phoneNumber": "מספר טלפון",
+      "phonePlaceholder": "הזינו את מספר הטלפון שלכם",
+      "emailAddress": "כתובת מייל",
+      "emailPlaceholder": "הזינו את המייל שלכם",
+      "emailNote": "לא ניתן לשנות כתובת מייל",
+      "privacySettings": "הגדרות פרטיות",
+      "acceptCookies": "קבל עוגיות",
+      "acceptCookiesDescription": "אפשר עוגיות לשיפור החוויה שלכם",
+      "freeCouponPrice": "מחיר חינם למתנות והשוברים שלי",
+      "freeCouponPriceDescription": "הפעל כדי להפוך את כל המתנות והשוברים שלי לחינם (ללא נקודות נדרשות)",
+      "languageSettings": "הגדרות שפה",
+      "preferredLanguage": "שפה מועדפת",
+      "selectLanguage": "בחרו שפה",
+      "languageDescription": "בחרו את השפה המועדפת שלכם לממשק",
+      "mobileApp": {
+        "title": "אפליקציה ניידת",
+        "description": "הורידו את האפליקציה הניידת שלנו לחוויה הטובה ביותר בטלפון שלכם",
+        "android": "הורדה לאנדרואיד",
+        "ios": "הורדה לאייפון",
+        "note": "האפליקציה תזהה אוטומטית את המכשיר שלכם ותציג את אפשרות ההורדה המתאימה"
+      },
+      "deleteAccount": {
+        "button": "מחק חשבון",
+        "deleting": "מוחק...",
+        "confirmTitle": "מחיקת חשבון",
+        "confirmMessage": "האם אתה בטוח שברצונך למחוק את החשבון שלך? פעולה זו לא ניתנת לביטול.",
+        "cancel": "ביטול",
+        "confirm": "מחק חשבון"
+      },
+      "saveChanges": "שמור שינויים",
+      "saving": "שומר...",
+      "loading": "טוען...",
+      "uploading": "מעלה...",
+      "address": "כתובת",
+      "addressPlaceholder": "הזן את הכתובת שלך",
+      "form": {
+        "FullName": "שם מלא",
+        "PhoneNumber": "מספר טלפון",
+        "EmailAddress": "כתובת מייל",
+        "CurrentPassword": "סיסמה נוכחית",
+        "NewPassword": "סיסמה חדשה",
+        "ConfirmPassword": "אישור סיסמה"
+      },
+      "errors": {
+        "FullName": "שם מלא הוא שדה חובה",
+        "PhoneNumber": "מספר טלפון הוא שדה חובה",
+        "EmailAddress": "כתובת מייל לא תקינה",
+        "Password": "הסיסמה חייבת להיות באורך של 8 תווים לפחות",
+        "PasswordMatch": "הסיסמאות אינן תואמות",
+        "CurrentPasswordRequired": "הסיסמה הנוכחית היא שדה חובה"
+      }
+    },
+    "SignInPage": {
+      "title": "התחברות",
+      "form": {
+        "EmailAddress": "כתובת מייל",
+        "Password": "סיסמה"
+      },
+      "forgotPassword": "שכחת סיסמה?"
+    },
+    "ForgotPasswordPage": {
+      "title": "שכחת סיסמה",
+      "subtitle": "הזן את כתובת הדוא\"ל שלך לקבלת קישור לאיפוס הסיסמה.",
+      "sending": "שולח...",
+      "sendResetLink": "שלח קישור איפוס",
+      "backToSignIn": "חזור להתחברות",
+      "form": {
+        "email": "כתובת דוא\"ל",
+        "emailPlaceholder": "הזן את כתובת הדוא\"ל שלך",
+        "resendText": "עדייו לא קיבלת את הקוד?",
+        "resendLink": "שלח מחדש"
+      },
+      "errors": {
+        "emailRequired": "אנא הזן את כתובת הדוא\"ל שלך",
+        "userNotFound": "לא נמצא חשבון עם כתובת דוא\"ל זו",
+        "invalidEmail": "אנא הזן כתובת דוא\"ל תקינה",
+        "generalError": "אירעה שגיאה. אנא נסה שוב."
+      },
+      "messages": {
+        "resetLinkSent": "קישור לאיפוס הסיסמה נשלח לדוא\"ל שלך"
+      }
+    },
+    "ResetPasswordPage": {
+      "title": "איפוס סיסמה",
+      "subtitle": "הזן את הסיסמה החדשה שלך כדי לאפס את החשבון שלך.",
+      "form": {
+        "password": "סיסמה חדשה",
+        "confirmPassword": "אישור סיסמה"
+      },
+      "errors": {
+        "Password": "הסיסמה חייבת להיות באורך של 8 תווים לפחות",
+        "PasswordMatch": "הסיסמאות אינן תואמות"
+      }
+    },
+    "ResetPasswordSentPage": {
+      "title": "איפוס סיסמה נשלח",
+      "subtitle": "שלחנו לך אימייל עם קישור לאיפוס הסיסמה. אנא בדוק את תיבת הדואר שלך.",
+      "backToSignIn": "חזור להתחברות"
+    },
+    "PetDetailsPage": {
+      "title": "פרטי חיית המחמד",
+      "form": {
+        "UploadImageTitle": "העלה תמונה",
+        "PetName": "שם חיית המחמד",
+        "Type": "סוג",
+        "Breed": "גזע",
+        "Gender": "מין",
+        "BirthDate": "תאריך לידה",
+        "weight": "משקל (קילוגרם)",
+        "Notes": "הערות/ רגישויות/ סוג מזון",
+        "selectTypeFirst": "אנא בחר סוג חיית מחמד תחילה"
+      }
+    },
+    "OwnerDetailsPage": {
+      "title": "פרטי הבעלים",
+      "form": {
+        "FullName": "שם מלא",
+        "PhoneNumber": "מספר טלפון",
+        "EmailAddress": "כתובת מייל",
+        "HomeAddress": "כתובת מגורים",
+        "selectOnMap": "בחר במפה",
+        "selectAddressOnMap": "בחר כתובת במפה"
+      }
+    },
+    "VetDetailsPage": {
+      "title": "פרטי הוטרינריה",
+      "searchLabel": "חפש מרפאה וטרינרית קיימת",
+      "vetSelected": "מרפאה וטרינרית נבחרה. השדות למטה כעת לקריאה בלבד.",
+      "orLabel": "או",
+      "searchPlaceholder": "חפש מרפאה וטרינרית...",
+      "existing": "קיים",
+      "selected": "נבחר",
+      "noResults": "לא נמצאו מרפאות וטרינריות. תוכל להוסיף חדשה למטה.",
+      "form": {
+        "VeterinaryName": "שם הוטרינריה",
+        "PhoneNumber": "מספר טלפון",
+        "EmailAddress": "כתובת מייל",
+        "VeterinaryAddress": "כתובת הוטרינריה"
+      }
+    },
+    "DonePage": {
+      "title": "היפ, הופ, הוראיי!",
+      "subtitle": "עכשיו אתה יכול לסרוק את התליון כדי לראות איך זה עובד.",
+      "backToMyPets": "חיות שלי"
+    },
+    "PetProfilePage": {
+      "title": "פרופיל חיית מחמד",
+      "subtitle": "פרופיל חיית מחמד",
+      "tabs": {
+        "pet": "חיית מחמד",
+        "owner": "בעלים",
+        "vet": "וטרינר"
+      },
+      "labels": {
+        "name": "שם",
+        "breed": "גזע",
+        "gender": "מגדר",
+        "age": "גיל",
+        "ageText": "שנים",
+        "weight": "משקל",
+        "notes": "הערות",
+        "contact": "טלפון",
+        "email": "אימייל",
+        "address": "כתובת",
+        "private": "פרטי",
+        "type": "סוג",
+        "phone": "טלפון",
+        "owner": "בעלים",
+        "contactDetails": "פרטי התקשרות",
+        "veterinaryName": "שם הוטרינר",
+        "veterinaryClinic": "מרפאה וטרינרית",
+        "shop": "חנות פייספט",
+        "notSpecified": "לא צוין"
+      },
+      "sections": {
+        "basicInformation": "מידע בסיסי",
+        "description": "תיאור",
+        "timeline": "ציר זמן",
+        "share": "שתף פרופיל חיית מחמד",
+        "createYourOwn": "צור את שלך",
+        "veterinaryInformation": "מידע וטרינרי"
+      },
+      "actions": {
+        "editPet": "ערוך חיית מחמד",
+        "attachTag": "חבר תג",
+        "deletePet": "מחק חיית מחמד",
+        "deleting": "מוחק...",
+        "copyLink": "העתק קישור",
+        "share": "שתף",
+        "createProfile": "צור פרופיל"
+      },
+      "messages": {
+        "profileCreated": "הפרופיל נוצר",
+        "lastUpdated": "עודכן לאחרונה",
+        "shareDescription": "שתף פרופיל זה עם אחרים",
+        "shareText": "הכירו את הפרופיל של {name}! {url}",
+        "deleteConfirm": "הסר לצמיתות את הפרופיל של {petName}",
+        "petDeleted": "חיית המחמד נמחקה בהצלחה",
+        "deleteFailed": "מחיקת חיית המחמד נכשלה",
+        "linkCopied": "הקישור הועתק ללוח!",
+        "copyFailed": "העתקת הקישור נכשלה",
+        "publicView": "תצוגה ציבורית",
+        "createProfileDescription": "צרו פרופיל דיגיטלי לחיית המחמד שלכם כדי לשמור עליה בטוחה ומחוברת.",
+        "addVet": "הוסף וטרינר",
+        "editVet": "ערוך",
+        "vetInfoPrivate": "מידע הוטרינר מוגדר כפרטי",
+        "noVetData": "אין מידע וטרינרי זמין",
+        "editVetInfo": "ערוך מידע וטרינרי",
+        "addVetInfo": "הוסף מידע וטרינרי",
+        "shopPlaceholder": "בקרוב"
+      },
+      "popup": {
+        "title": "",
+        "text": "",
+        "buttonLabel": ""
+      }
+    },
+    "HomePage": {
+      "upperTitle": "התג החכם שמחזיר את חיות המחמד שלנו הביתה",
+      "lowerTitle": "כשסטייל וטכנולוגיה נפגשים",
+      "buttonLabel": "התחילו עכשיו",
+      "signOutText": "כבר מחוברים?",
+      "signOutLink": "התנתקות",
+      "signInText": "כבר יש לכם חשבון?",
+      "signInLink": "התחברות",
+      "brand": "פייספט",
+      "menuButton": "פתחו את התפריט הראשי",
+      "loading": "טוען...",
+      "allPetsTitle": "דמויות החיות שלנו",
+      "allPetsDescription": "פגשו את כל דמויות החיות החמודות שלנו"
+    },
+    "AuthPage": {
+      "brand": "פייספט",
+      "welcomeBack": "ברוכים הבאים!",
+      "createAccount": "צרו את החשבון שלכם",
+      "signInToAccount": "התחברות לחשבון Chapiz שלך",
+      "joinFacePet": "הצטרפו ל-Chapiz והגנו על החיות שלכם",
+      "tagline": "כשסטייל וטכנולוגיה נפגשים",
+      "fullName": "שם מלא",
+      "fullNamePlaceholder": "הזינו את השם המלא שלכם",
+      "email": "אימייל",
+      "emailPlaceholder": "הזינו את האימייל שלכם",
+      "password": "סיסמה",
+      "passwordPlaceholder": "הזינו את הסיסמה שלכם",
+      "signInButton": "התחברות",
+      "signUpButton": "צרו חשבון",
+      "or": "או המשיכו עם אימייל",
+      "signInWithGoogle": "המשיכו עם Google",
+      "noAccount": "אין לכם חשבון?",
+      "haveAccount": "כבר יש לכם חשבון?",
+      "signUpLink": "הירשמו",
+      "signInLink": "התחברו",
+      "forgotPassword": "שכחתי סיסמה",
+      "signInSuccess": "התחברתם בהצלחה!",
+      "signUpSuccess": "החשבון נוצר בהצלחה!",
+      "signInSuccessGoogle": "התחברתם עם Google בהצלחה!",
+      "authError": "האימות נכשל",
+      "authErrorGoogle": "אימות Google נכשל",
+      "verificationCodeSent": "קוד האימות נשלח! אנא בדקו את האימייל שלכם.",
+      "loading": "טוען...",
+      "address": "כתובת",
+      "addressPlaceholder": "הזינו את הכתובת שלכם",
+      "phone": "מספר טלפון",
+      "phonePlaceholder": "הזינו את מספר הטלפון שלכם"
+    },
+    "EmailVerification": {
+      "title": "אמתו את האימייל שלכם",
+      "subtitle": "שלחנו קוד אימות לכתובת",
+      "verificationCode": "קוד אימות",
+      "verificationCodePlaceholder": "הזינו קוד בן 6 ספרות",
+      "verifyButton": "אמתו אימייל",
+      "verifying": "מאמתים...",
+      "didntReceive": "לא קיבלתם את הקוד?",
+      "resendButton": "שלחו קוד שוב",
+      "resendIn": "שלחו שוב בעוד",
+      "sending": "שולחים...",
+      "backToSignUp": "חזרה להרשמה"
+    },
+    "GoogleSignupBottomSheet": {
+      "title": "השלימו את הפרופיל שלכם",
+      "description": "אנא ספקו את השם המלא, מספר הטלפון והכתובת שלכם כדי להשלים את הגדרת החשבון",
+      "form": {
+        "nameLabel": "שם מלא",
+        "namePlaceholder": "הזינו את השם המלא שלכם",
+        "phoneLabel": "מספר טלפון",
+        "phonePlaceholder": "הזינו את מספר הטלפון שלכם",
+        "countryCodeNote": "קוד המדינה כלול אוטומטית - פשוט הזינו את המספר שלכם",
+        "addressLabel": "כתובת",
+        "addressPlaceholder": "רחוב הרצל 123, תל אביב, ישראל",
+        "requiredFieldsNotice": "כל השדות נדרשים",
+        "requiredFieldsDescription": "אנא מלאו את כל המידע למטה כדי להשלים את הגדרת הפרופיל שלכם."
+      },
+      "buttons": {
+        "save": "שמור מידע",
+        "saving": "שומר..."
+      },
+      "success": "הפרופיל הושלם בהצלחה!",
+      "errors": {
+        "nameRequired": "אנא הזינו את השם המלא שלכם",
+        "phoneRequired": "אנא הזינו מספר טלפון",
+        "addressRequired": "אנא הזינו את הכתובת שלכם",
+        "phoneInvalid": "אנא הזינו מספר טלפון תקין",
+        "saveFailed": "שמירת המידע נכשלה. אנא נסו שוב."
+      }
+    },
+    "ContactPage": {
+      "title": "צרו קשר",
+      "heroTitle": "בואו נתחבר",
+      "heroDescription": "יש לכם שאלות על Chapiz? אנחנו כאן לעזור! שלחו לנו הודעה ונחזור אליכם בהקדם האפשרי.",
+      "formTitle": "שלחו לנו הודעה",
+      "formDescription": "מלאו את הטופס למטה ונחזור אליכם תוך 24 שעות.",
+      "form": {
+        "name": "שם",
+        "namePlaceholder": "השם המלא שלכם",
+        "email": "אימייל",
+        "emailPlaceholder": "your@email.com",
+        "phone": "טלפון",
+        "phonePlaceholder": "מספר הטלפון שלכם",
+        "subject": "נושא",
+        "subjectPlaceholder": "על מה זה?",
+        "message": "הודעה",
+        "messagePlaceholder": "כאן ניתן לכתוב את פרטי הפנייה",
+        "sendButton": "שלח הודעה",
+        "sending": "שולח...",
+        "successMessage": "ההודעה נשלחה בהצלחה! נחזור אליכם בקרוב."
+      },
+      "contactInfo": {
+        "title": "פרטי יצירת קשר",
+        "email": "אימייל",
+        "emailResponse": "נחזור תוך 24 שעות",
+        "phone": "טלפון",
+        "phoneHours": "ב'-ו' 9:00-18:00 שעון ישראל",
+        "address": "כתובת",
+        "followUs": "עקבו אחרינו"
+      },
+      "faq": {
+        "title": "שאלות נפוצות",
+        "question1": "איך Chapiz עובד?",
+        "answer1": "Chapiz משתמש בטכנולוגיית NFC לאחסון מידע על חיית המחמד שלכם על שבב שניתן לסריקה בכל סמארטפון.",
+        "question2": "האם הנתונים של חיית המחמד שלי בטוחים?",
+        "answer2": "כן, אנחנו משתמשים בהצפנה ובקרות פרטיות להגנה על המידע של חיית המחמד שלכם.",
+        "question3": "מה קורה אם חיית המחמד שלי הולכת לאיבוד?",
+        "answer3": "כל מי שמוצא את חיית המחמד שלכם יכול לסרוק את שבב ה-NFC כדי לגשת לפרטי הקשר שלכם ולעזור לכם להתאחד."
+      }
+    },
+    "PrivacyPage": {
+      "title": "מדיניות פרטיות",
+      "heroDescription": "הפרטיות שלכם ובטיחות חיית המחמד שלכם הם העדיפויות העליונות שלנו.",
+      "lastUpdated": "עודכן לאחרונה"
+    },
+    "TermsPage": {
+      "title": "תנאי שימוש",
+      "heroDescription": "אנא קראו את התנאים האלה בעיון לפני השימוש בשירותי Chapiz.",
+      "lastUpdated": "עודכן לאחרונה"
+    },
+    "Admin": {
+      "uploading": "מעלה",
+      "mediaUpload": {
+        "editImage": "ערוך תמונה",
+        "replaceImage": "החלף תמונה",
+        "replaceVideo": "החלף וידאו",
+        "uploading": "מעלה...",
+        "clickToUploadImage": "לחץ להעלאת תמונה",
+        "clickToUploadVideo": "לחץ להעלאת וידאו",
+        "fileFormats": {
+          "image": "PNG, JPG עד 20MB",
+          "video": "MP4 עד 100MB"
+        }
+      },
+      "imageEditor": {
+        "title": "ערוך תמונה",
+        "applyCrop": "החל חיתוך",
+        "clear": "נקה"
+      }
+    }
+  },
+  "errors": {
+    "petDetails": {
+      "imageRequired": "תמונה נדרשת",
+      "nameRequired": "שם חיית המחמד נדרש",
+      "typeRequired": "סוג חיית המחמד נדרש",
+      "breedRequired": "גזע נדרש",
+      "genderRequired": "מין נדרש",
+      "invalidBreed": "גזע לא תקין נבחר",
+      "invalidGender": "מין לא תקין נבחר"
+    },
+    "ownerDetails": {
+      "fullNameRequired": "שם מלא נדרש",
+      "phoneRequired": "מספר טלפון נדרש",
+      "invalidEmail": "כתובת דוא\"ל לא תקינה",
+      "homeAddressRequired": "כתובת מגורים נדרשת"
+    }
+  },
+  "components": {
+    "CookieConsent": {
+      "title": "אנו משתמשים בעוגיות כדי לשפר את החוויה שלך",
+      "description": "אנו משתמשים בעוגיות כדי לשפר את חוויית הגלישה שלך, לספק תוכן מותאם אישית ולנתח את התנועה שלנו. בלחיצה על 'קבל הכל', אתה מסכים לשימוש שלנו בעוגיות. אתה יכול גם לבחור לדחות עוגיות לא חיוניות.",
+      "accept": "קבל",
+      "reject": "דחה",
+      "acceptAll": "קבל הכל",
+      "rejectAll": "דחה הכל",
+      "accepting": "מקבל...",
+      "rejecting": "דוחה...",
+      "privacyNote": "תוכל לשנות את העדפות העוגיות שלך בכל עת בהגדרות החשבון שלך."
+    },
+    "searchbar": {
+      "search": "חיפוש...",
+      "noResult": "אף תוצאה לא נמצאה"
+    },
+    "Navbar": {
+      "about": "קצת עלינו",
+      "contact": "טופס יצירת קשר",
+      "myPets": "החיות שלי",
+      "profile": "פרופיל",
+      "myFavorites": "המעודפים שלי",
+      "services": "שירותים ואנשי מקצוע",
+      "signOut": "התנתקות",
+      "signIn": "התחברות",
+      "signUp": "הרשמה",
+      "adminPanel": "לוח בקרה",
+      "store": "חנות פייספט",
+      "chapizStore": "חנות צ'אפיז",
+      "coupons": "השוברים שלי",
+      "allPromos": "קופונים",
+      "bottomNav": {
+        "myPets": "החיות שלי",
+        "giftsAndVouchers": "מתנות ושוברים",
+        "myCoupons": "הקופונים שלי",
+        "businessesNearby": "חיפוש עסקים"
+      }
+    },
+    "UserCoupons": {
+      "title": "השוברים שלי",
+      "description": "עיינו וקנו בשוברים באמצעות הנקודות שלכם!",
+      "myPoints": "הנקודות שלי",
+      "pointsDescription": "השתמשו בנקודות שלכם כדי לקנות שוברים!",
+      "shareAndEarn": "שתפו והרוויחו נקודות",
+      "shareDescription": "שתפו את האפליקציה וקבלו 20 נקודות!",
+      "shareButton": "שתפו את האפליקציה",
+      "shop": "חנות",
+      "myCoupons": "השוברים שלי",
+      "history": "היסטוריה",
+      "availableCoupons": "שוברים זמינים",
+      "noCoupons": "אין שוברים זמינים כרגע",
+      "myPurchasedCoupons": "השוברים שקניתי",
+      "noPurchasedCoupons": "עדיין לא קניתם שוברים",
+      "visitShop": "בקרו בלשונית החנות כדי לעיין בשוברים הזמינים!",
+      "couponHistory": "היסטוריית שוברים",
+      "noHistory": "אין עדיין היסטוריית שוברים",
+      "historyDescription": "כל השוברים שקניתם (פעיל, משומש ופג תוקף) יופיע כאן",
+      "available": "זמינים",
+      "usedOn": "שומש ב",
+      "price": "מחיר",
+      "pointsRequired": "נקודות נדרשות",
+      "pointsUsed": "נקודות שהושתמשו",
+      "validUntil": "תקף עד",
+      "purchase": "קנה",
+      "purchased": "נרכש",
+      "insufficientPoints": "נקודות לא מספיקות",
+      "expired": "פג תוקף",
+      "used": "שומש",
+      "active": "פעיל",
+      "status": "סטטוס",
+      "loading": "טוען שוברים...",
+      "failedToLoad": "נכשל בטעינת שוברים",
+      "pleaseSignIn": "אנא התחברו כדי לקנות שוברים",
+      "pleaseSignInShare": "אנא התחברו כדי לשתף",
+      "sharedSuccessfully": "שותף בהצלחה!",
+      "linkCopied": "הקישור הועתק ללוח!",
+      "failedToShare": "נכשל בשיתוף",
+      "purchaseSuccess": "נרכש בהצלחה {name}!",
+      "failedToPurchase": "נכשל ברכישת שוברים",
+      "couponCode": "קוד שובר",
+      "goToStore": "עבור לחנות",
+      "view": "צפייה בשובר",
+      "showQR": "מימוש השובר",
+      "useCoupon": "השתמש בשובר",
+      "codeCopied": "קוד השובר הועתק ללוח!",
+      "failedToCopy": "נכשל בהעתקת הקוד",
+      "getFree": "קבל חינם",
+      "free": "חינם",
+      "codeCopiedForStore": "הקוד הועתק! מעביר לחנות...",
+      "noBusinessesFound": "לא נמצאו עסקים עבור שובר זה",
+      "acceptedAt": "תקף ב",
+      "couponMarkedAsUsed": "השובר סומן כמשומש והועבר להיסטוריה",
+      "failedToMarkAsUsed": "נכשל בסימון השובר כמשומש",
+      "points": "נקודות",
+      "shareText": "בדקו את Chapiz! הצטרפו אליי וקבלו עסקאות מדהימות על שירותי חיות מחמד: {url}",
+      "back": "חזור",
+      "validFrom": "תקף מ",
+      "qrCodeDescription": "סרקו את קוד ה-QR הזה כדי לצפות בשובר",
+      "acceptedAt": "תקף ב",
+      "storeLocation": "מיקום החנות",
+      "loadingMap": "טוען מפה...",
+      "share": "שתף",
+      "shareShopTitle": "בדקו את החנות שלנו!",
+      "shareShopText": "בדקו את החנות שלנו עם הקישור המיוחד הזה!",
+      "use": "השתמש",
+      "showMap": "איפה ניתן לממש?",
+      "mapFor": "מפה עבור",
+      "noBusinessLocation": "אין מיקום עסק זמין עבור שובר זה",
+      "shareShopTitle": "בדקו את החנות שלנו!",
+      "shareShopText": "בדקו את החנות שלנו עם הקישור המיוחד הזה!"
+    },
+    "Footer": {
+      "usefulLinks": "קישורים שימושיים",
+      "services": "שירותים",
+      "privacyPolicy": "מדיניות פרטיות",
+      "termsOfService": "תנאי שימוש",
+      "contact": "צור קשר",
+      "madeWithLove": "נוצר באהבה לחיות המחמד"
+    },
+    "ProductHighlights": {
+      "headline": "תהיו בטוחים שתמצאו את חיית המחמד שלכם",
+      "subheading": "הטאג החכם שלנו מבטיח שחיית המחמד שלכם תימצא במהירות. אלפי בעלי חיות מחמד כבר סומכים עלינו.",
+      "recoveredPets": "חיות מחמד שנמצאו",
+      "activeUsers": "משתמשים פעילים כעת",
+      "chipsDeployed": "טאגים שנקנו"
+    },
+    "ConfirmProfileChanges": {
+      "title": "אשר שינוים",
+      "description": "האם אתה בטוח שאתה רוצה לעדכן את הפרופיל שלך עם הפרטים החדשים?",
+      "cancelButton": "ביטול",
+      "confirmButton": "אישור"
+    },
+    "ShareButton": {
+      "title": "Share Your Pet!",
+      "text": "בדוק את אפליקציית Chapiz לחיות!",
+      "linkCopied": "הלינק הועתק בהצלחה!"
+    },
+    "InviteFriendsCard": {
+      "shareTitle": "הצטרף ל-Chapiz",
+      "shareText": "בדוק את אפליקציית Chapiz לחיות!",
+      "serviceTags": "תגי שירות (לחץ להוספה):",
+      "selectedTags": "תגים נבחרים:",
+      "linkCopied": "הלינק הועתק ללוח!",
+      "shareError": "משהו השתבש"
+    },
+    "EarningNotification": {
+      "title": "🎉 נקודות הרווחת!",
+      "registration": "עבור הרשמה",
+      "phoneSetup": "עבור הגדרת טלפון",
+      "addPet": "עבור הוספת חיית מחמד",
+      "share": "עבור שיתוף האפליקציה",
+      "points": "נקודות",
+      "earned": "הרווחת"
+    },
+    "PointsExplenationPopup": {
+      "phases": {
+        "share": {
+          "title": "שתף והרווח",
+          "text": "שתף את האפליקציה עם חברים וקבל 5 נקודות עבור כל חבר שמצטרף!"
+        },
+        "earn": {
+          "title": "הרווח נקודות",
+          "text": "השלם פעולות כמו הרשמה, הוספת חיות מחמד והגדרת טלפון כדי להרווח נקודות!"
+        },
+        "benefits": {
+          "title": "קבל פרסים",
+          "text": "השתמש בנקודות שלך כדי לקבל פרסים ולפתוח תכונות מיוחדות באפליקציה!"
+        }
+      },
+      "understood": "הבנתי!"
+    },
+    "GoBackButton": {
+      "buttonLabel": "חזור אחורה"
+    },
+    "AddressMapSelector": {
+      "searchPlaceholder": "חפש כתובת...",
+      "instructions": "לחץ על המפה או חפש כדי לבחור את הכתובת שלך",
+      "markerTitle": "מיקום נבחר",
+      "selectedAddress": "כתובת נבחרת",
+      "noAddressSelected": "לא נבחרה כתובת",
+      "confirmAddress": "אשר כתובת",
+      "cancel": "ביטול",
+      "errors": {
+        "geocodeFailed": "לא ניתן למצוא את הכתובת. אנא נסה מונח חיפוש אחר."
+      }
+    }
+  },
+  "installBanner": {
+    "iosInstructionsPart1": "הקש על",
+    "iosInstructionsPart2": "ואז \"הוסף למסך הבית\"",
+    "desktopInstructions": "לחץ על סמל ההתקנה בשורת הכתובת של הדפדפן, או השתמש בתפריט הדפדפן",
+    "desktopInstructionsShort": "לחץ על סמל ההתקנה בשורת הכתובת של הדפדפן",
+    "installButton": "התקן"
+  }
+}

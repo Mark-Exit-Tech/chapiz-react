@@ -1,0 +1,135 @@
+'use client';
+
+import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { deletePet } from '@/lib/actions/admin';
+import { MoreHorizontal, Eye } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+
+export default function PetActions({
+  petId,
+  petName
+}: {
+  petId: string;
+  petName: string;
+}) {
+  const t = useTranslation('Admin.petActions');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const router = useNavigate();
+
+  const handleDelete = async () => {
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const result = await deletePet(petId);
+
+      if (!result.success) {
+        setError(result.error || 'Failed to delete pet');
+      } else {
+        setIsDeleting(false);
+        router.refresh();
+      }
+    } catch (err) {
+      setError('Failed to delete pet');
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="relative">
+      {/* Dropdown Menu */}
+      <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+            <MoreHorizontal className="h-4 w-4" />
+            <span className="sr-only">Open menu</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
+          <DropdownMenuItem
+            onClick={() => {
+              setIsDropdownOpen(false);
+              window.open(`/pet/${petId}`, '_blank');
+            }}
+            className="cursor-pointer"
+          >
+            <Eye className="mr-2 h-4 w-4" />
+            {t('view')}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              setIsDropdownOpen(false);
+              setIsDeleting(true);
+            }}
+            className="text-red-600 hover:text-red-700 focus:text-red-700"
+          >
+            {t('delete')}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={isDeleting}
+        onOpenChange={(open) => {
+          if (!open) {
+            setError(null);
+          }
+          setIsDeleting(open);
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t('delete')}</DialogTitle>
+            <DialogDescription>
+              {t('confirmDelete')} "{petName}"? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+
+          {error && (
+            <div className="mb-4 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
+              {error}
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleting(false)}>
+              {t('cancel')}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? t('deleting') : t('delete')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
