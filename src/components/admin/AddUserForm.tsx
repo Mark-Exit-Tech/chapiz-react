@@ -64,13 +64,13 @@ export default function AddUserForm() {
     setSuccessMessage(null);
 
     try {
-      const result = await sendUserInvitationByAdmin(
-        formData.fullName,
-        formData.email,
-        formData.phone,
-        formData.role,
-        formData.language
-      );
+      const result = await sendUserInvitationByAdmin({
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        role: formData.role,
+        language: formData.language
+      });
 
       if (!result.success) {
         setError(result.error || t('forms.addUser.error'));

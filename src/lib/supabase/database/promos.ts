@@ -31,10 +31,10 @@ export async function purchasePromo(userId: string, promoId: string): Promise<{ 
 /**
  * Mark promo as used (placeholder - implement based on actual schema)
  */
-export async function markPromoAsUsed(userId: string, promoId: string): Promise<boolean> {
+export async function markPromoAsUsed(userId: string, promoId: string): Promise<{ success: boolean; error?: string }> {
     // TODO: Implement with actual Supabase schema
     console.warn('markPromoAsUsed not yet fully implemented');
-    return false;
+    return { success: false, error: 'Not yet implemented' };
 }
 
 /**

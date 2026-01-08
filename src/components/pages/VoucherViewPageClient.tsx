@@ -103,7 +103,7 @@ export default function VoucherViewPageClient({ userCoupon }: VoucherViewPageCli
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => router.back()}
+          onClick={() => navigate(-1)}
           className="mb-6"
         >
           {locale === 'he' ? (

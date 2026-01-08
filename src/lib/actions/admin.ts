@@ -166,6 +166,15 @@ export async function getMobileAppLinks() {
   };
 }
 
+export async function getInstallBannerSettings(): Promise<InstallBannerSettings> {
+  return { isEnabled: false, iosAppId: '', androidAppId: '', showAfterSeconds: 0, bannerText: '', logoUrl: '' };
+}
+
+export async function saveInstallBannerSettings(settings: InstallBannerSettings): Promise<{ success: boolean; error?: string }> {
+  console.warn('saveInstallBannerSettings stub');
+  return { success: true, error: undefined };
+}
+
 export async function updateAd(id: string, data: any) {
   return { success: true, error: undefined };
 }
