@@ -13,7 +13,7 @@ import toast from 'react-hot-toast';
 
 export default function ForgotPasswordPage() {
   const { t } = useTranslation('pages.ForgotPasswordPage');
-  const router = useNavigate();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 

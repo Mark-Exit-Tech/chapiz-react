@@ -18,7 +18,7 @@ interface DeletionVerificationPageProps {
 
 const DeletionVerificationPage = ({ email, userName, onBack, onVerified }: DeletionVerificationPageProps) => {
   const { getStoredDeletionOTPCode, clearDeletionOTPCode } = useAuth();
-  const router = useNavigate();
+  const navigate = useNavigate();
   
   const [verificationCode, setVerificationCode] = useState('');
   const [loading, setLoading] = useState(false);

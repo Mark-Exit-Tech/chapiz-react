@@ -12,14 +12,14 @@ interface AuthGuardProps {
 
 const AuthGuard = ({ children, redirectTo = '/auth' }: AuthGuardProps) => {
   const { user, loading } = useAuth();
-  const router = useNavigate();
+  const navigate = useNavigate();
   const { t } = useTranslation('pages.HomePage');
 
   useEffect(() => {
     if (!loading && !user) {
       navigate(redirectTo);
     }
-  }, [user, loading, router, redirectTo]);
+  }, [user, loading, navigate, redirectTo]);
 
   // Show loading while checking auth
   if (loading) {

@@ -33,7 +33,7 @@ interface CouponViewPageClientProps {
 
 export default function CouponViewPageClient({ coupon, business, businesses = [] }: CouponViewPageClientProps) {
   const { t } = useTranslation('pages.PromosPage');
-  const router = useNavigate();
+  const navigate = useNavigate();
   const locale = useLocale();
   const { user } = useAuth();
   const [isUsingCoupon, setIsUsingCoupon] = useState(false);

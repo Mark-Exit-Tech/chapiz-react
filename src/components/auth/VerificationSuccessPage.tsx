@@ -9,7 +9,7 @@ import React from 'react';
 
 const VerificationSuccessPage = () => {
   const { t } = useTranslation('pages.VerificationSuccessPage');
-  const router = useNavigate();
+  const navigate = useNavigate();
 
   return (
     <div className="flex h-full grow flex-col items-center justify-center p-4">

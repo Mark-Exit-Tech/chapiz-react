@@ -24,7 +24,7 @@ declare global {
 
 export default function MapCard({ businesses = [], contactInfo, title }: MapCardProps) {
   const { t } = useTranslation('pages.PromosPage');
-  const router = useNavigate();
+  const navigate = useNavigate();
   const locale = useLocale();
   const googleMapsApiKey = 'AIzaSyAjx6NIRePitcFdZjH2kE0z-zSAy8etaUE';
   const [mapLoaded, setMapLoaded] = useState(false);

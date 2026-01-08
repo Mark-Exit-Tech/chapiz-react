@@ -16,7 +16,7 @@ import LocaleSwitcher from '@/components/LocaleSwitcher';
 const AuthPage = () => {
   const { t } = useTranslation('pages.AuthPage');
   const { signIn, signUp, signInWithGoogle, sendVerificationCode, user, loading: authLoading } = useAuth();
-  const router = useNavigate();
+  const navigate = useNavigate();
   
   // Debug logging
   console.log('AuthPage rendered:', { user, authLoading });
@@ -27,7 +27,7 @@ const AuthPage = () => {
       console.log('User already authenticated, redirecting to dashboard');
       navigate('/pages/my-pets');
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, navigate]);
   
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);

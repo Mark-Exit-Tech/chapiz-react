@@ -28,7 +28,7 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
   console.log('Image URL length:', image?.length);
   console.log('Image URL starts with http:', image?.startsWith('http'));
   console.log('Image URL starts with https:', image?.startsWith('https'));
-  const router = useNavigate();
+  const navigate = useNavigate();
   const direction = useDirection();
 
   // Fixed dimensions for consistent layout.

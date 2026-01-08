@@ -8,7 +8,7 @@ import { ArrowLeft, Mail, CheckCircle } from 'lucide-react';
 
 export default function ResetPasswordSentPage() {
   const { t } = useTranslation('pages.ResetPasswordSentPage');
-  const router = useNavigate();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -18,7 +18,7 @@ export default function ResetPasswordSentPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => router.back()}
+              onClick={() => navigate(-1)}
               className="absolute left-0 top-1/2 -translate-y-1/2"
             >
               <ArrowLeft className="h-4 w-4" />

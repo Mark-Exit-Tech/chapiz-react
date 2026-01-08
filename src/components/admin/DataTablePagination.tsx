@@ -22,7 +22,7 @@ export function DataTablePagination({
   baseUrl,
   searchParams
 }: DataTablePaginationProps) {
-  const router = useNavigate();
+  const navigate = useNavigate();
 
   const canGoPrevious = currentPage > 1;
   const canGoNext = currentPage < totalPages;
