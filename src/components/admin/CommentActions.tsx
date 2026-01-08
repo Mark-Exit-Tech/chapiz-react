@@ -49,7 +49,7 @@ export default function CommentActions({
         setError(result.error || 'Failed to delete comment');
       } else {
         setIsDeleting(false);
-        router.refresh();
+        window.location.reload();
       }
     } catch (err) {
       setError('Failed to delete comment');

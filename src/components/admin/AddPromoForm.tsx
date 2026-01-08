@@ -116,7 +116,7 @@ export default function AddPromoForm() {
       setIsOpen(false);
 
       // Refresh the page to show the new promo
-      router.refresh();
+      window.location.reload();
     } catch (err: any) {
       setError(err.message || 'Failed to create promo. Please try again.');
       console.error(err);
@@ -169,17 +169,17 @@ export default function AddPromoForm() {
             />
           </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="imageUrl">{t('promoManagement.image')}</Label>
-              <MediaUpload
-                type="image"
-                value={formData.imageUrl}
-                onChange={(filePath) => {
-                  setFormData((prev) => ({ ...prev, imageUrl: filePath }));
-                }}
-                className="w-1/5"
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="imageUrl">{t('promoManagement.image')}</Label>
+            <MediaUpload
+              type="image"
+              value={formData.imageUrl}
+              onChange={(filePath) => {
+                setFormData((prev) => ({ ...prev, imageUrl: filePath }));
+              }}
+              className="w-1/5"
+            />
+          </div>
 
           <div className="space-y-2">
             <Label>{t('promoManagement.business') || 'Businesses (Optional)'}</Label>

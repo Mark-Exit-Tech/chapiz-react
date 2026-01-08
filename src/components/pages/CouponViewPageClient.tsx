@@ -56,7 +56,7 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
   useEffect(() => {
     const checkUsed = async () => {
       if (user) {
-        const used = await isPromoUsed(user.uid, coupon.id);
+        const used = await isPromoUsed(user.id, coupon.id);
         setIsUsed(used);
       }
     };
@@ -84,7 +84,7 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
     setIsUsingCoupon(true);
 
     try {
-      const result = await markPromoAsUsed(user.uid, coupon.id);
+      const result = await markPromoAsUsed(user.id, coupon.id);
 
       if (result.success) {
         setIsUsed(true);
@@ -142,7 +142,7 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => router.back()}
+          onClick={() => navigate(-1)}
           className="mb-6"
         >
           {locale === 'he' ? (

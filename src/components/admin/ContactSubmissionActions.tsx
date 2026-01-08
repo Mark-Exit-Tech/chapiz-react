@@ -53,7 +53,7 @@ export default function ContactSubmissionActions({
         setError(result.error || t('contactSubmissions.errors.deleteFailed'));
       } else {
         setIsDeleting(false);
-        router.refresh();
+        window.location.reload();
       }
     } catch (err) {
       setError(t('contactSubmissions.errors.deleteFailed'));
@@ -73,7 +73,7 @@ export default function ContactSubmissionActions({
       if (!result.success) {
         setError(result.error || t('contactSubmissions.errors.updateStatusFailed'));
       } else {
-        router.refresh();
+        window.location.reload();
       }
     } catch (err) {
       setError(t('contactSubmissions.errors.updateStatusFailed'));
@@ -198,11 +198,10 @@ export default function ContactSubmissionActions({
                 <label className="text-sm font-medium text-gray-700">{t('contactSubmissions.viewDialog.status')}</label>
                 <p className="text-sm">
                   <span
-                    className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                      submission.isRead
+                    className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${submission.isRead
                         ? 'bg-green-100 text-green-800'
                         : 'bg-orange-100 text-orange-800'
-                    }`}
+                      }`}
                   >
                     {submission.isRead ? t('contactSubmissions.table.read') : t('contactSubmissions.table.unread')}
                   </span>

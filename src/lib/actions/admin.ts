@@ -28,6 +28,7 @@ export type ContactSubmission = {
   phone: string;
   message: string;
   createdAt: Date;
+  isRead?: boolean;
 }
 
 export type InstallBannerSettings = {
@@ -163,24 +164,6 @@ export async function getMobileAppLinks() {
     iosAppUrl: 'https://apps.apple.com/app/facepet',
     androidAppUrl: 'https://play.google.com/store/apps/details?id=com.facepet'
   };
-}
-
-export type InstallBannerSettings = {
-  isEnabled: boolean;
-  iosAppId: string;
-  androidAppId: string;
-  showAfterSeconds: number;
-  bannerText: string;
-  logoUrl: string;
-}
-
-export async function getInstallBannerSettings(): Promise<InstallBannerSettings> {
-  return { isEnabled: false, iosAppId: '', androidAppId: '', showAfterSeconds: 0, bannerText: '', logoUrl: '' };
-}
-
-export async function saveInstallBannerSettings(settings: InstallBannerSettings) {
-  console.warn('saveInstallBannerSettings stub');
-  return { success: true, error: undefined };
 }
 
 export async function updateAd(id: string, data: any) {

@@ -98,7 +98,7 @@ export default function AddUserForm() {
       }
 
       // Refresh the page
-      router.refresh();
+      window.location.reload();
     } catch (err: any) {
       // Handle unexpected errors
       console.error('Unexpected error in form submission:', err);

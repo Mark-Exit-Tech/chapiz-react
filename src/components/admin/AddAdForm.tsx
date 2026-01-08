@@ -144,7 +144,7 @@ export default function AddAdForm() {
       // Determine ad type and content based on media type
       let adType: 'image' | 'video' = 'image';
       let adContent = formData.content;
-      
+
       if (mediaType === 'youtube') {
         // For YouTube, store the YouTube URL in content and set type to video
         adType = 'video';
@@ -198,7 +198,7 @@ export default function AddAdForm() {
       setIsOpen(false);
 
       // Refresh the page to show the new ad
-      router.refresh();
+      window.location.reload();
     } catch (err: any) {
       setError(
         err.message || t('forms.addAd.createError')
@@ -307,16 +307,16 @@ export default function AddAdForm() {
               )}
             </div>
           ) : (
-          <div className="space-y-2">
-            <Label htmlFor="content">{t('forms.addAd.content')}</Label>
-            <MediaUpload
+            <div className="space-y-2">
+              <Label htmlFor="content">{t('forms.addAd.content')}</Label>
+              <MediaUpload
                 type={mediaType}
-              value={formData.content}
-              onChange={(filePath) => {
-                setFormData((prev) => ({ ...prev, content: filePath }));
-              }}
-            />
-          </div>
+                value={formData.content}
+                onChange={(filePath) => {
+                  setFormData((prev) => ({ ...prev, content: filePath }));
+                }}
+              />
+            </div>
           )}
 
           <div className="space-y-2">
@@ -408,8 +408,8 @@ export default function AddAdForm() {
 
             <div className="space-y-2">
               <Label htmlFor="breed">{t('forms.addAd.breed')}</Label>
-              <Select 
-                value={formData.breed} 
+              <Select
+                value={formData.breed}
                 onValueChange={(value) => {
                   setFormData((prev) => ({ ...prev, breed: value }));
                 }}
@@ -457,7 +457,7 @@ export default function AddAdForm() {
 
           <div className="space-y-2">
             <Label htmlFor="tags">{t('adActions.tags')}</Label>
-            
+
             {/* Predefined Hebrew Service Tags */}
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-600">{tCommon('serviceTags')}</Label>
@@ -468,11 +468,10 @@ export default function AddAdForm() {
                     type="button"
                     onClick={() => addPredefinedTag(tag)}
                     disabled={formData.tags.includes(tag)}
-                    className={`px-3 py-1 rounded-full text-sm border transition-colors ${
-                      formData.tags.includes(tag)
+                    className={`px-3 py-1 rounded-full text-sm border transition-colors ${formData.tags.includes(tag)
                         ? 'bg-primary text-primary-foreground border-primary'
                         : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
-                    }`}
+                      }`}
                   >
                     {tag}
                   </button>
@@ -480,7 +479,7 @@ export default function AddAdForm() {
               </div>
             </div>
 
-            
+
             {/* Selected Tags */}
             {formData.tags.length > 0 && (
               <div className="space-y-2">

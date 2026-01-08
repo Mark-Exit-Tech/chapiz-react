@@ -48,7 +48,7 @@ export default function PetActions({
         setError(result.error || 'Failed to delete pet');
       } else {
         setIsDeleting(false);
-        router.refresh();
+        window.location.reload();
       }
     } catch (err) {
       setError('Failed to delete pet');
