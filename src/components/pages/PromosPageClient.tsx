@@ -35,7 +35,7 @@ interface PromosPageClientProps {
 
 export default function PromosPageClient({ promos, business, businesses = [] }: PromosPageClientProps) {
   const { t } = useTranslation('pages.PromosPage');
-  const router = useNavigate();
+  const navigate = useNavigate();
   const locale = useLocale();
   const { user } = useAuth();
   const [usedPromoIds, setUsedPromoIds] = useState<Set<string>>(new Set());
@@ -97,7 +97,7 @@ export default function PromosPageClient({ promos, business, businesses = [] }: 
 
     const handleFocus = () => {
       if (!isMounted) return;
-      
+
       // Debounce to prevent rapid-fire requests on iOS
       if (debounceTimer) clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
@@ -204,12 +204,10 @@ export default function PromosPageClient({ promos, business, businesses = [] }: 
       {promo.youtubeUrl ? (
         <div className="relative w-full h-48">
           {getYouTubeThumbnailUrl(promo.youtubeUrl) ? (
-            <Image
+            <img
               src={getYouTubeThumbnailUrl(promo.youtubeUrl) || ''}
               alt={promo.name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="w-full h-full object-cover"
             />
           ) : (
             <div className="w-full h-full bg-gray-200 flex items-center justify-center">
@@ -235,12 +233,10 @@ export default function PromosPageClient({ promos, business, businesses = [] }: 
         </div>
       ) : promo.imageUrl && (
         <div className="relative w-full h-48">
-          <Image
+          <img
             src={promo.imageUrl}
             alt={promo.name}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="w-full h-full object-cover"
           />
           {/* Date Overlay */}
           {promo.endDate && (
@@ -316,12 +312,10 @@ export default function PromosPageClient({ promos, business, businesses = [] }: 
       {userPromo.promo.youtubeUrl ? (
         <div className="relative w-full h-48">
           {getYouTubeThumbnailUrl(userPromo.promo.youtubeUrl) ? (
-            <Image
+            <img
               src={getYouTubeThumbnailUrl(userPromo.promo.youtubeUrl) || ''}
               alt={userPromo.promo.name}
-              fill
-              className="object-cover grayscale"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="w-full h-full object-cover grayscale"
             />
           ) : (
             <div className="w-full h-full bg-gray-200 flex items-center justify-center grayscale">
@@ -338,12 +332,10 @@ export default function PromosPageClient({ promos, business, businesses = [] }: 
         </div>
       ) : userPromo.promo.imageUrl && (
         <div className="relative w-full h-48">
-          <Image
+          <img
             src={userPromo.promo.imageUrl}
             alt={userPromo.promo.name}
-            fill
-            className="object-cover grayscale"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="w-full h-full object-cover grayscale"
           />
         </div>
       )}
@@ -411,7 +403,7 @@ export default function PromosPageClient({ promos, business, businesses = [] }: 
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => router.back()}
+              onClick={() => navigate(-1)}
               className="mb-4"
             >
               {locale === 'he' ? (
@@ -427,12 +419,10 @@ export default function PromosPageClient({ promos, business, businesses = [] }: 
             <div className="flex items-center gap-4">
               {business?.imageUrl && (
                 <div className="relative w-16 h-16 rounded-lg overflow-hidden shrink-0">
-                  <Image
+                  <img
                     src={business.imageUrl}
                     alt={business.name}
-                    fill
-                    className="object-cover"
-                    sizes="64px"
+                    className="w-full h-full object-cover"
                   />
                 </div>
               )}
@@ -581,12 +571,10 @@ export default function PromosPageClient({ promos, business, businesses = [] }: 
                   </div>
                 ) : selectedPromo.imageUrl && (
                   <div className="relative w-full h-64 rounded-lg overflow-hidden">
-                    <Image
+                    <img
                       src={selectedPromo.imageUrl}
                       alt={selectedPromo.name}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 800px"
+                      className="w-full h-full object-cover"
                     />
                   </div>
                 )}
@@ -683,4 +671,3 @@ export default function PromosPageClient({ promos, business, businesses = [] }: 
     </div>
   );
 }
-

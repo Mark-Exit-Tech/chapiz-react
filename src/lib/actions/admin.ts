@@ -129,6 +129,7 @@ export interface Ad {
   views: number;
   clicks: number;
   duration?: number;
+  imageUrl?: string;
 }
 
 export async function updateAd(id: string, data: any) {

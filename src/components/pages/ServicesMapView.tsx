@@ -56,7 +56,7 @@ interface ServiceWithCoordinates extends Service {
 
 const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerContent, mapFloatingControls, initialHighlightedServiceId }) => {
   const { t } = useTranslation('pages.ServicesPage');
-  const router = useNavigate();
+  const navigate = useNavigate();
   const locale = useLocale();
   const mapRef = useRef<HTMLDivElement>(null);
   const googleMapsApiKey = 'AIzaSyAjx6NIRePitcFdZjH2kE0z-zSAy8etaUE';

@@ -1,7 +1,9 @@
 
-import { Link as RouterLink, useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate as RRDUseNavigate, useLocation, Navigate } from 'react-router-dom';
 
 export const Link = RouterLink;
+export const useNavigate = RRDUseNavigate;
+
 export const useRouter = () => {
     const navigate = useNavigate();
     const location = useLocation();

@@ -59,7 +59,7 @@ const convertAdToService = (ad: Ad & { imageUrl?: string }) => {
 const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
   const { t } = useTranslation('pages.ServicesPage');
   const locale = useLocale();
-  const router = useNavigate();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [search, setSearch] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -90,8 +90,8 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
 
         // Load user favorites if logged in
         if (user) {
-          const favorites = await getUserFavorites(user);
-          setFavoriteAdIds(favorites.map(fav => fav.adId));
+          const favorites = await getUserFavorites(user.id);
+          setFavoriteAdIds(favorites);
         }
       } catch (error) {
         console.error('Error loading data:', error);

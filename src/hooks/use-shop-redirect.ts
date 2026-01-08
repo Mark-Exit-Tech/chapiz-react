@@ -1,8 +1,8 @@
 // Stub hook for shop redirect
 export function useShopRedirect() {
   return {
-    redirectToShop: () => {
-      console.log('Shop redirect not implemented');
+    redirectToShop: (url?: string, code?: string, ...args: any[]) => {
+      console.log('Shop redirect not implemented', url, code);
     },
     getShopUrl: () => {
       return '';

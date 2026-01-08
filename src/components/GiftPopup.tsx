@@ -4,7 +4,7 @@ import confetti from 'canvas-confetti';
 import { motion } from 'framer-motion';
 import { Gift, Loader2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useNavigate } from '../i18n/routing';
+import { useRouter } from '../i18n/routing';
 import { Button } from './ui/button';
 
 /**
@@ -32,7 +32,7 @@ const GiftPopup: React.FC<GiftPopupProps> = ({
   text,
   buttonText
 }) => {
-  const router = useNavigate();
+  const router = useRouter();
   const [isLoading, SetIsLoading] = useState(false);
   // Fire confetti on mount.
   useEffect(() => {
@@ -52,7 +52,7 @@ const GiftPopup: React.FC<GiftPopupProps> = ({
 
   const handleButtonClick = () => {
     SetIsLoading(true);
-    navigate('/pages/my-gifts'); // Adjust path to your gifts page.
+    router.push('/pages/my-gifts'); // Adjust path to your gifts page.
   };
 
   return (

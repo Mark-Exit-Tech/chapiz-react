@@ -20,7 +20,7 @@ interface VoucherViewPageClientProps {
 
 export default function VoucherViewPageClient({ userCoupon }: VoucherViewPageClientProps) {
   const { t } = useTranslation('components.UserCoupons');
-  const router = useNavigate();
+  const navigate = useNavigate();
   const locale = useLocale();
   const coupon = userCoupon.coupon;
   const { redirectToShop } = useShopRedirect();
