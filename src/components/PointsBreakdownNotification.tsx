@@ -27,7 +27,7 @@ const PointsBreakdownNotification: React.FC<PointsBreakdownNotificationProps> = 
   onClaimPrize
 }) => {
   const router = useNavigate();
-  const t = useTranslation('components.PointsBreakdownNotification');
+  const { t } = useTranslation('components.PointsBreakdownNotification');
   const iconSectionWidth = 100; // width reserved for the icon
 
   const handleClaimPrize = (e: React.MouseEvent) => {
@@ -36,7 +36,7 @@ const PointsBreakdownNotification: React.FC<PointsBreakdownNotificationProps> = 
       onClaimPrize();
     }
     // Navigate to gifts page
-    navigate('/pages/my-gifts');
+    router('/pages/my-gifts');
   };
 
   return (

@@ -5,6 +5,7 @@ export interface Ad {
   content: string;
   imageUrl?: string;
   duration?: number;
+  type?: string;
 }
 
 export function useRandomAd() {

@@ -1,8 +1,8 @@
 [
-  {"id": 1, "name": "Mixed Breed", "type": "dog"},
-  {"id": 2, "name": "Labrador Retriever", "type": "dog"},
-  {"id": 3, "name": "Golden Retriever", "type": "dog"},
-  {"id": 175, "name": "Mixed Breed", "type": "cat"},
-  {"id": 176, "name": "Persian", "type": "cat"},
-  {"id": 177, "name": "Siamese", "type": "cat"}
+  {"id": 1, "name": "Mixed Breed", "type": "dog", "en": "Mixed Breed", "he": "מעורב"},
+  {"id": 2, "name": "Labrador Retriever", "type": "dog", "en": "Labrador Retriever", "he": "לברדור רטריבר"},
+  {"id": 3, "name": "Golden Retriever", "type": "dog", "en": "Golden Retriever", "he": "גולדן רטריבר"},
+  {"id": 175, "name": "Mixed Breed", "type": "cat", "en": "Mixed Breed", "he": "מעורב"},
+  {"id": 176, "name": "Persian", "type": "cat", "en": "Persian", "he": "פרסי"},
+  {"id": 177, "name": "Siamese", "type": "cat", "en": "Siamese", "he": "סיאמי"}
 ]

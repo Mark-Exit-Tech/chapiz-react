@@ -69,9 +69,9 @@ export function validateCoordinates(lat: unknown, lng: unknown): ValidationResul
     if (!result.success) {
       return {
         valid: false,
-        error: result.error.errors[0]?.message || 'Invalid coordinates',
+        error: result.error.issues[0]?.message || 'Invalid coordinates',
         details: {
-          field: result.error.errors[0]?.path[0] as string,
+          field: result.error.issues[0]?.path[0] as string,
         },
       };
     }

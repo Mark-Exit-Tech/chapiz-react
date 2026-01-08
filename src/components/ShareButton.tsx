@@ -8,7 +8,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 
 const ShareMenu = () => {
-  const t = useTranslation('components.ShareButton');
+  const { t } = useTranslation('components.ShareButton');
   const [menuOpen, setMenuOpen] = useState(false);
 
   // For the "copy link" option.

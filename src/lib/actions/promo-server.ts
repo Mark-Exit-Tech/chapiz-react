@@ -1,4 +1,9 @@
-import { getRandomActivePromo } from './admin';
+import { getRandomActiveAd } from './admin';
+
+export async function fetchRandomPromo() {
+  // Using the same function as ads for now
+  return await getRandomActiveAd();
+}
 import { Promo } from '@/types/promo';
 
 /**
