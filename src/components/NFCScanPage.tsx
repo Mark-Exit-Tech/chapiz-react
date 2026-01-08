@@ -57,9 +57,9 @@ export default function NFCScanPage({ pet }: NFCScanPageProps) {
   // Platform detection function
   const detectPlatform = () => {
     if (typeof window === 'undefined') return 'web';
-    
+
     const userAgent = window.navigator.userAgent.toLowerCase();
-    
+
     if (/android/.test(userAgent)) {
       return 'android';
     } else if (/iphone|ipad|ipod/.test(userAgent)) {
@@ -79,7 +79,7 @@ export default function NFCScanPage({ pet }: NFCScanPageProps) {
         console.error('Error loading mobile app links:', error);
       }
     };
-    
+
     loadMobileAppLinks();
   }, []);
 
@@ -113,7 +113,7 @@ export default function NFCScanPage({ pet }: NFCScanPageProps) {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => router.back()}
+              onClick={() => router(-1)}
               className="p-2"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -155,7 +155,7 @@ export default function NFCScanPage({ pet }: NFCScanPageProps) {
                 </div>
                 <div>
                   <h2 className="text-xl font-bold">{pet.name}</h2>
-                  <p className="text-gray-600">{getBreedNameFromId(pet.breed || pet.breedName, locale as 'en' | 'he')}</p>
+                  <p className="text-gray-600">{getBreedNameById(pet.breedName, locale as 'en' | 'he')}</p>
                 </div>
               </CardTitle>
             </CardHeader>
@@ -208,7 +208,7 @@ export default function NFCScanPage({ pet }: NFCScanPageProps) {
               <p className="text-gray-600 mb-4">
                 {t('downloadApp.description', { petName: pet.name })}
               </p>
-              
+
               {!mobileAppLinks.androidAppUrl && !mobileAppLinks.iosAppUrl ? (
                 <div className="text-center py-4">
                   <p className="text-gray-500 mb-2">Mobile app download links are not configured yet.</p>

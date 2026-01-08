@@ -60,7 +60,7 @@ export default function InstallBannerPreview({ initialData }: InstallBannerPrevi
     }
   };
 
-  if (!settings || !settings.enabled) {
+  if (!settings || !settings.isEnabled) {
     return (
       <Card>
         <CardHeader>

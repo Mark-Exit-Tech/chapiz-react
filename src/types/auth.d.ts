@@ -6,3 +6,11 @@ interface AuthCredentials {
 }
 
 type UserRole = 'user' | 'admin' | 'super_admin';
+
+// Extend Firebase User type with custom properties
+declare module 'firebase/auth' {
+  interface User {
+    uid?: string;
+    displayName?: string;
+  }
+}

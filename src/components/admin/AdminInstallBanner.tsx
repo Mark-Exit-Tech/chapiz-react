@@ -46,7 +46,7 @@ export default function AdminInstallBanner() {
 
         // Load settings
         getInstallBannerSettings().then((data) => {
-            if (data && data.enabled) {
+            if (data && data.isEnabled) {
                 setSettings(data);
                 // Show banner if settings are enabled
                 setIsVisible(true);

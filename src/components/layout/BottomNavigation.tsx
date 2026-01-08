@@ -75,9 +75,9 @@ export default function BottomNavigation() {
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
-            <Link
+            <RouterLink
               key={item.href}
-              href={item.href}
+              to={item.href}
               className={`flex flex-col items-center justify-center min-w-0 flex-1 py-2 px-1 rounded-lg transition-all duration-200 ${item.isActive
                   ? 'text-primary bg-primary/10'
                   : 'text-gray-600 hover:text-primary hover:bg-primary/5 hover:scale-105 active:scale-95'
@@ -87,7 +87,7 @@ export default function BottomNavigation() {
               <span className={`text-[10px] font-medium text-center leading-tight ${item.isActive ? 'text-primary' : 'text-gray-600'}`}>
                 {item.label}
               </span>
-            </Link>
+            </RouterLink>
           );
         })}
       </nav>

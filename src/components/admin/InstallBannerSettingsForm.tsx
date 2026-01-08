@@ -26,7 +26,7 @@ export default function InstallBannerSettingsForm({ initialData }: InstallBanner
   const [success, setSuccess] = useState(false);
 
   const [formData, setFormData] = useState({
-    enabled: false,
+    isEnabled: false,
     bannerText: 'Add this website to your home screen for quick access!',
     logoUrl: ''
   });
@@ -34,7 +34,7 @@ export default function InstallBannerSettingsForm({ initialData }: InstallBanner
   useEffect(() => {
     if (initialData) {
       setFormData({
-        enabled: initialData.enabled || false,
+        isEnabled: initialData.isEnabled || false,
         bannerText: initialData.bannerText || 'Add this website to your home screen for quick access!',
         logoUrl: initialData.logoUrl || ''
       });
@@ -52,7 +52,7 @@ export default function InstallBannerSettingsForm({ initialData }: InstallBanner
   const handleSwitchChange = (checked: boolean) => {
     setFormData(prev => ({
       ...prev,
-      enabled: checked
+      isEnabled: checked
     }));
   };
 
@@ -64,7 +64,10 @@ export default function InstallBannerSettingsForm({ initialData }: InstallBanner
 
     try {
       const result = await saveInstallBannerSettings({
-        enabled: formData.enabled,
+        isEnabled: formData.isEnabled,
+        iosAppId: '',
+        androidAppId: '',
+        showAfterSeconds: 0,
         bannerText: formData.bannerText,
         logoUrl: formData.logoUrl
       });
