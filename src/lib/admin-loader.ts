@@ -4,35 +4,22 @@
  * Admin pages are typically only used by a small percentage of users
  */
 
-import dynamic from 'next/dynamic';
+import { lazy } from 'react';
+
+// Loading component
+const LoadingComponent = () => (
+  <div className="flex items-center justify-center min-h-screen">Loading...</div>
+);
 
 // Lazy load admin components with loading fallback
-export const AdminPetsPage = dynamic(() => import('@/components/admin/AdminPetsPage'), {
-  loading: () => <div className="flex items-center justify-center min-h-screen">Loading...</div>,
-  ssr: true,
-});
+export const AdminPetsPage = lazy(() => import('../components/admin/AdminPetsPage'));
 
-export const AdminUsersPage = dynamic(() => import('@/components/admin/AdminUsersPage'), {
-  loading: () => <div className="flex items-center justify-center min-h-screen">Loading...</div>,
-  ssr: true,
-});
+export const AdminUsersPage = lazy(() => import('../components/admin/AdminUsersPage'));
 
-export const AdminBusinessesPage = dynamic(() => import('@/components/admin/AdminBusinessesPage'), {
-  loading: () => <div className="flex items-center justify-center min-h-screen">Loading...</div>,
-  ssr: true,
-});
+export const AdminBusinessesPage = lazy(() => import('../components/admin/AdminBusinessesPage'));
 
-export const AdsPageWithTabs = dynamic(() => import('@/components/admin/AdsPageWithTabs'), {
-  loading: () => <div className="flex items-center justify-center min-h-screen">Loading...</div>,
-  ssr: true,
-});
+export const AdsPageWithTabs = lazy(() => import('../components/admin/AdsPageWithTabs'));
 
-export const AdminCouponsPage = dynamic(() => import('@/components/admin/AdminCouponsPage'), {
-  loading: () => <div className="flex items-center justify-center min-h-screen">Loading...</div>,
-  ssr: true,
-});
+export const AdminCouponsPage = lazy(() => import('../components/admin/AdminCouponsPage'));
 
-export const ContactSubmissionsPage = dynamic(() => import('@/components/admin/ContactSubmissionsPage'), {
-  loading: () => <div className="flex items-center justify-center min-h-screen">Loading...</div>,
-  ssr: true,
-});
+export const ContactSubmissionsPage = lazy(() => import('../components/admin/ContactSubmissionsPage'));

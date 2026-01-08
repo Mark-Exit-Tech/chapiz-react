@@ -2,6 +2,9 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AuthProvider } from './contexts/AuthContext';
 import HomePage from './pages/HomePage';
+import ContactPage from './pages/ContactPage';
+import PrivacyPage from './pages/PrivacyPage';
+import TermsPage from './pages/TermsPage';
 
 function App() {
   const { i18n } = useTranslation();
@@ -18,6 +21,9 @@ function App() {
 
           {/* Locale-based routes */}
           <Route path="/:locale" element={<HomePage />} />
+          <Route path="/:locale/contact" element={<ContactPage />} />
+          <Route path="/:locale/privacy" element={<PrivacyPage />} />
+          <Route path="/:locale/terms" element={<TermsPage />} />
           <Route path="/:locale/*" element={<HomePage />} />
         </Routes>
       </AuthProvider>

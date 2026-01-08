@@ -4,6 +4,8 @@
  * Each plugin handles specific functionality (hero, features, etc)
  */
 
+import React from 'react';
+
 export interface PagePlugin {
   id: string;
   name: string;
@@ -56,7 +58,7 @@ export interface PluginRendererProps {
   props?: Record<string, any>;
 }
 
-export const PluginRenderer = ({ plugins, props = {} }: PluginRendererProps) => {
+export const PluginRenderer: React.FC<PluginRendererProps> = ({ plugins, props = {} }) => {
   return (
     <>
       {plugins.map((plugin) => {
