@@ -1,9 +1,3 @@
-/**
- * Page Plugin System
- * Breaks large pages into composable plugins to reduce page file size
- * Each plugin handles specific functionality (hero, features, etc)
- */
-
 import React from 'react';
 
 export interface PagePlugin {
@@ -19,9 +13,6 @@ export interface PagePluginConfig {
   layout?: 'vertical' | 'horizontal';
 }
 
-/**
- * Plugin Registry
- */
 export class PluginRegistry {
   private plugins: Map<string, PagePlugin> = new Map();
 
@@ -50,21 +41,20 @@ export class PluginRegistry {
   }
 }
 
-/**
- * Page Plugin Renderer
- */
 export interface PluginRendererProps {
   plugins: PagePlugin[];
   props?: Record<string, any>;
 }
 
-export const PluginRenderer: React.FC<PluginRendererProps> = ({ plugins, props = {} }) => {
-  return (
-    <React.Fragment>
-      {plugins.map((plugin) => {
-        const Component = plugin.component;
-        return React.createElement(Component, { key: plugin.id, ...props });
-      })}
-    </React.Fragment>
+export function PluginRenderer({ plugins, props = {} }: PluginRendererProps) {
+  return React.createElement(
+    React.Fragment,
+    null,
+    plugins.map((plugin) => {
+      return React.createElement(plugin.component, {
+        key: plugin.id,
+        ...props
+      });
+    })
   );
-};
+}
