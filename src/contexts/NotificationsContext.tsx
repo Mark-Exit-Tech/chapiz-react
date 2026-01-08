@@ -10,6 +10,7 @@ interface NotificationsContextType {
   unreadCount: number;
   markAsRead: (id: string) => void;
   markAllAsRead: () => void;
+  deleteNotification: (id: string) => void;
 }
 
 const NotificationsContext = createContext<NotificationsContextType | undefined>(undefined);
@@ -20,6 +21,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
     unreadCount: 0,
     markAsRead: (id: string) => { },
     markAllAsRead: () => { },
+    deleteNotification: (id: string) => { },
   };
 
   return (

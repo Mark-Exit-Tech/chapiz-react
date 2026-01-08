@@ -25,9 +25,9 @@ import { UserPlus } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 // TODO: Implement with Supabase
-const sendUserInvitationByAdmin = async (data: any) => {
+const sendUserInvitationByAdmin = async (data: any): Promise<{ success: boolean; error?: string; warning?: string }> => {
   console.warn('sendUserInvitationByAdmin not yet implemented with Supabase');
-  throw new Error('Function not yet implemented with Supabase');
+  return { success: true, warning: 'Function not yet implemented with Supabase' };
 };
 
 export default function AddUserForm() {

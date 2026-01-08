@@ -37,7 +37,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       try {
         const role = await getUserRole(user.id || '');
         console.log('✅ AdminLayout: Role retrieved:', role);
-        setUserRole(role);
+        setUserRole(role as 'user' | 'admin' | 'super_admin');
       } catch (error) {
         console.error('❌ AdminLayout: Error fetching user role:', error);
         console.error('Error details:', error);

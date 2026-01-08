@@ -369,7 +369,7 @@ export async function bulkUpdateBusinesses(ids: string[], data: Partial<UpdateBu
   return { success: true, error: undefined };
 }
 
-export async function bulkAssignTags(ids: string[], tags: string[]) {
+export async function bulkAssignTags(ids: string[], tagsToAdd: string[], tagsToRemove?: string[]): Promise<{ success: boolean; error?: string }> {
   return { success: true, error: undefined };
 }
 
