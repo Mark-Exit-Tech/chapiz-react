@@ -25,13 +25,12 @@ const PetCard = React.memo(({ pet }: PetCardProps) => {
       <Card className="relative flex w-full flex-col overflow-hidden rounded-3xl border-none shadow-md">
         <CardContent className="relative p-0">
           {pet.imageUrl && pet.imageUrl !== '/default-pet.png' && !pet.imageUrl.includes('default') ? (
-            <Image
+            <img
               src={pet.imageUrl}
               alt={pet.name}
               width={704}
               height={448}
               className="h-full w-full object-cover"
-              priority
             />
           ) : (
             <div className="flex h-[448px] w-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">

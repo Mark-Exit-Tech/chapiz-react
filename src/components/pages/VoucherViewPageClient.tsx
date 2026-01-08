@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, ShoppingCart, Share2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useLocale } from 'react-i18next';
+import { useLocale } from '@/hooks/use-locale';
 import { UserCoupon } from '@/lib/supabase/database/coupons';
 import Navbar from '@/components/layout/Navbar';
 import { Card, CardContent } from '@/components/ui/card';
@@ -19,7 +19,7 @@ interface VoucherViewPageClientProps {
 }
 
 export default function VoucherViewPageClient({ userCoupon }: VoucherViewPageClientProps) {
-  const t = useTranslation('components.UserCoupons');
+  const { t } = useTranslation('components.UserCoupons');
   const router = useNavigate();
   const locale = useLocale();
   const coupon = userCoupon.coupon;

@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import React from 'react';
 
 const VerificationSuccessPage = () => {
-  const t = useTranslation('pages.VerificationSuccessPage');
+  const { t } = useTranslation('pages.VerificationSuccessPage');
   const router = useNavigate();
 
   return (

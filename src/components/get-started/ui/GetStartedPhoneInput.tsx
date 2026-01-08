@@ -95,7 +95,7 @@ const CountrySelect = ({
   options: countryList,
   onChange
 }: CountrySelectProps) => {
-  const t = useTranslation('components.searchbar');
+  const { t } = useTranslation('components.searchbar');
 
   return (
     <Popover>

@@ -30,7 +30,7 @@ export default function CommentActions({
   commentId: string;
   content: string;
 }) {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);

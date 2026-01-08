@@ -26,7 +26,7 @@ import EditPromoDialog from './EditPromoDialog';
 import { getYouTubeThumbnailUrl } from '@/lib/utils/youtube';
 
 export default function PromosTable() {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const router = useNavigate();
   const [promos, setPromos] = useState<Promo[]>([]);
   const [businesses, setBusinesses] = useState<Business[]>([]);

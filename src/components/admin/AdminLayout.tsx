@@ -16,7 +16,7 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const { user, loading } = useAuth();
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
 
   // Get locale from URL or default to 'en'
   const locale = typeof window !== 'undefined'

@@ -29,7 +29,7 @@ export default function BulkEditBusinessDialog({
     selectedCount,
     onApply
 }: BulkEditBusinessDialogProps) {
-    const t = useTranslation('Admin');
+    const { t } = useTranslation('Admin');
     const [tagsToAdd, setTagsToAdd] = useState<string[]>([]);
     const [tagsToRemove, setTagsToRemove] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);

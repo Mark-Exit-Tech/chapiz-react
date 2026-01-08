@@ -13,7 +13,7 @@ interface AdminTopNavProps {
 }
 
 export default function AdminTopNav({ userEmail, userRole, locale }: AdminTopNavProps) {
-    const t = useTranslation('Admin');
+    const { t } = useTranslation('Admin');
     const [menuOpen, setMenuOpen] = useState(false);
 
     const navItems = [

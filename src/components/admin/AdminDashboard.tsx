@@ -8,7 +8,7 @@ import Link from 'react-router-dom';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export default function AdminDashboard() {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
 
   // Get locale from URL or default to 'en'
   const locale = typeof window !== 'undefined'

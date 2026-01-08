@@ -22,7 +22,7 @@ interface EmailVerificationPageProps {
 }
 
 const EmailVerificationPage = ({ email, password, fullName, address, phone, onBack }: EmailVerificationPageProps) => {
-  const t = useTranslation('pages.EmailVerification');
+  const { t } = useTranslation('pages.EmailVerification');
   const { user, verifyCodeAndCreateAccount, sendVerificationCode, getStoredOTPCode } = useAuth();
   const router = useNavigate();
   

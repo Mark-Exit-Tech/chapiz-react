@@ -5,7 +5,7 @@ import AddPromoForm from '@/components/admin/AddPromoForm';
 import PromosTable from '@/components/admin/PromosTable';
 
 export default function PromosPage() {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
 
   return (
     <div className="p-4 md:p-6 space-y-6">

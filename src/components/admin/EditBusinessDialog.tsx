@@ -26,7 +26,7 @@ interface EditBusinessDialogProps {
 }
 
 export default function EditBusinessDialog({ business, isOpen, onClose, onSuccess }: EditBusinessDialogProps) {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const [formData, setFormData] = useState({
     name: '',
     description: '',

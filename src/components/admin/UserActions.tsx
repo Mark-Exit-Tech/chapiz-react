@@ -50,7 +50,7 @@ export default function UserActions({
   phoneNumber?: string;
   userAddress?: string;
 }) {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [newRole, setNewRole] = useState(currentRole);

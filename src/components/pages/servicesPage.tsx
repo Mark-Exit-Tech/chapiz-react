@@ -56,7 +56,7 @@ const convertAdToService = (ad: Ad & { imageUrl?: string }) => {
 };
 
 const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
-  const t = useTranslation('pages.ServicesPage');
+  const { t } = useTranslation('pages.ServicesPage');
   const locale = useLocale();
   const router = useNavigate();
   const { user } = useAuth();

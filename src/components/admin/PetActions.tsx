@@ -29,7 +29,7 @@ export default function PetActions({
   petId: string;
   petName: string;
 }) {
-  const t = useTranslation('Admin.petActions');
+  const { t } = useTranslation('Admin.petActions');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);

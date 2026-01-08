@@ -40,7 +40,7 @@ export default function PetDetailsBottomSheet({
   onDeletePet
 }: PetDetailsBottomSheetProps) {
   const locale = useLocale() as 'en' | 'he';
-  const t = useTranslation('Pet');
+  const { t } = useTranslation('Pet');
   const router = useNavigate();
 
   if (!pet) return null;

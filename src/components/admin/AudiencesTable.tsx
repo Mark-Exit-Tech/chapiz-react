@@ -25,7 +25,7 @@ import { useNavigate } from 'react-router-dom';
 import EditAudienceDialog from './EditAudienceDialog';
 
 export default function AudiencesTable() {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const router = useNavigate();
   const [audiences, setAudiences] = useState<Audience[]>([]);
   const [loading, setLoading] = useState(true);

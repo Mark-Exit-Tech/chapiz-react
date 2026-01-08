@@ -22,7 +22,7 @@ import { BusinessMultiselect } from '@/components/ui/business-multiselect';
 import { Business } from '@/types/promo';
 
 export default function AddCouponForm() {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const commonT = useTranslation('common');
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({

@@ -28,7 +28,7 @@ const GoogleSignupBottomSheet: React.FC<GoogleSignupBottomSheetProps> = ({
   onClose,
   onComplete
 }) => {
-  const t = useTranslation('pages.GoogleSignupBottomSheet');
+  const { t } = useTranslation('pages.GoogleSignupBottomSheet');
   const { user } = useAuth();
   const [name, setName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -41,24 +41,26 @@ const GoogleSignupBottomSheet: React.FC<GoogleSignupBottomSheetProps> = ({
 
   // Fetch name from Google account when component mounts
   useEffect(() => {
-    if (user?.displayName) {
-      setName(user.displayName);
+    if (user?.user_metadata?.full_name) {
+      setName(user.user_metadata.full_name);
+    } else if (user?.user_metadata?.name) {
+      setName(user.user_metadata.name);
     }
   }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!user) {
       toast.error('User not authenticated');
       return;
     }
-    
+
     if (!name.trim()) {
       toast.error(t('errors.nameRequired'));
       return;
     }
-    
+
     if (!phoneNumber.trim()) {
       toast.error(t('errors.phoneRequired'));
       return;
@@ -104,7 +106,7 @@ const GoogleSignupBottomSheet: React.FC<GoogleSignupBottomSheetProps> = ({
       }
 
       // Save name, phone number, address, and coordinates to Supabase
-      const result = await updateUserByUid(user.uid, {
+      const result = await updateUserByUid(user.id, {
         displayName: name.trim(),
         phone: phoneNumber.trim(),
         address: address.trim(),
@@ -176,7 +178,7 @@ const GoogleSignupBottomSheet: React.FC<GoogleSignupBottomSheetProps> = ({
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/50 z-50"
           />
-          
+
           {/* Bottom Sheet */}
           <motion.div
             initial={{ y: '100%' }}

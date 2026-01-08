@@ -25,7 +25,7 @@ interface EditFilterDialogProps {
 }
 
 export default function EditFilterDialog({ filter, isOpen, onClose, onSuccess }: EditFilterDialogProps) {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const [formData, setFormData] = useState({
     name: '',
     audienceIds: [] as string[]

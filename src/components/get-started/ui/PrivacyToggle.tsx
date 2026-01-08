@@ -22,7 +22,7 @@ const PrivacyToggle: React.FC<PrivacyToggleProps> = ({
   onChange,
   className
 }) => {
-  const t = useTranslation('components.PrivacyToggle');
+  const { t } = useTranslation('components.PrivacyToggle');
 
   return (
     <div className={cn('flex items-center space-x-2 rtl:space-x-reverse', className)}>

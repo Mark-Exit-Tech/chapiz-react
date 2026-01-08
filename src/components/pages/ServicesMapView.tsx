@@ -21,7 +21,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getCommentsForAd, submitComment } from '@/lib/actions/admin';
 import { addToFavorites, removeFromFavorites, isAdFavorited } from '@/lib/supabase/database/favorites';
 import { useNavigate } from 'react-router-dom';
-import { useLocale } from 'react-i18next';
+import { useLocale } from '@/hooks/use-locale';
 import { SERVICE_TAGS_TRANSLATIONS } from '@/lib/constants/hebrew-service-tags';
 
 interface Service {
@@ -55,7 +55,7 @@ interface ServiceWithCoordinates extends Service {
 }
 
 const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerContent, mapFloatingControls, initialHighlightedServiceId }) => {
-  const t = useTranslation('pages.ServicesPage');
+  const { t } = useTranslation('pages.ServicesPage');
   const router = useNavigate();
   const locale = useLocale();
   const mapRef = useRef<HTMLDivElement>(null);

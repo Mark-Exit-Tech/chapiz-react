@@ -24,7 +24,7 @@ interface EditAudienceDialogProps {
 }
 
 export default function EditAudienceDialog({ audience, isOpen, onClose, onSuccess }: EditAudienceDialogProps) {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const [formData, setFormData] = useState({
     name: ''
   });

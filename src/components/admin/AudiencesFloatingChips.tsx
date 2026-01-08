@@ -8,7 +8,7 @@ import EditAudienceDialog from './EditAudienceDialog';
 
 
 export default function AudiencesFloatingChips() {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const [audiences, setAudiences] = useState<Audience[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

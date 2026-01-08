@@ -54,7 +54,7 @@ export function BreedSelect({
   hasError = false,
   disabled = false
 }: BreedSelectProps) {
-  const t = useTranslations('Pet.add.form.breed');
+  const { t } = useTranslations('Pet.add.form.breed');
   const locale = useLocale() as 'en' | 'he';
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');

@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export default function BottomNavigation() {
   const pathname = usePathname();
-  const t = useTranslation('components.Navbar');
+  const { t } = useTranslation('components.Navbar');
   const { user } = useAuth();
 
   // Don't show bottom navigation on admin routes

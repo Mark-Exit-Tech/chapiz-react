@@ -13,7 +13,7 @@ interface InstallBannerPreviewProps {
 }
 
 export default function InstallBannerPreview({ initialData }: InstallBannerPreviewProps) {
-  const t = useTranslation('installBanner');
+  const { t } = useTranslation('installBanner');
   const [settings, setSettings] = useState<InstallBannerSettings | null>(initialData || null);
   const [isIOS, setIsIOS] = useState(false);
   const [isAndroid, setIsAndroid] = useState(false);

@@ -5,7 +5,7 @@ import AddBusinessForm from '@/components/admin/AddBusinessForm';
 import BusinessesTable from '@/components/admin/BusinessesTable';
 
 export default function BusinessesPage() {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
 
   return (
     <div className="p-4 md:p-6 space-y-6">

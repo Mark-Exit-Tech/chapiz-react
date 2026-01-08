@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, Tag, CheckCircle2, History, MapPin, QrCode, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useLocale } from 'react-i18next';
+import { useLocale } from '@/hooks/use-locale';
 import { Promo, Business } from '@/types/promo';
 import Navbar from '@/components/layout/Navbar';
 import { Card, CardContent } from '@/components/ui/card';
@@ -34,7 +34,7 @@ interface PromosPageClientProps {
 }
 
 export default function PromosPageClient({ promos, business, businesses = [] }: PromosPageClientProps) {
-  const t = useTranslation('pages.PromosPage');
+  const { t } = useTranslation('pages.PromosPage');
   const router = useNavigate();
   const locale = useLocale();
   const { user } = useAuth();

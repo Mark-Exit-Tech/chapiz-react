@@ -12,7 +12,7 @@ import { supabase } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
 
 export default function ForgotPasswordPage() {
-  const t = useTranslation('pages.ForgotPasswordPage');
+  const { t } = useTranslation('pages.ForgotPasswordPage');
   const router = useNavigate();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);

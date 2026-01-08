@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, CheckCircle2, Share2, Trophy, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useLocale } from 'react-i18next';
+import { useLocale } from '@/hooks/use-locale';
 import { Promo, Business } from '@/types/promo';
 import Navbar from '@/components/layout/Navbar';
 import { Card, CardContent } from '@/components/ui/card';
@@ -32,7 +32,7 @@ interface CouponViewPageClientProps {
 }
 
 export default function CouponViewPageClient({ coupon, business, businesses = [] }: CouponViewPageClientProps) {
-  const t = useTranslation('pages.PromosPage');
+  const { t } = useTranslation('pages.PromosPage');
   const router = useNavigate();
   const locale = useLocale();
   const { user } = useAuth();

@@ -33,7 +33,7 @@ export default function ContactSubmissionActions({
   isRead: boolean;
   submission: ContactSubmission;
 }) {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isViewing, setIsViewing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);

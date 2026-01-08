@@ -24,7 +24,7 @@ export function LimitSelector({
   translationPath = 'adsManagement'
 }: LimitSelectorProps) {
   const router = useNavigate();
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
 
   const handleLimitChange = (value: string) => {
     const params = new URLSearchParams();

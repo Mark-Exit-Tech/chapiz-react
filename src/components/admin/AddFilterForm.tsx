@@ -20,7 +20,7 @@ import { useState, useEffect } from 'react';
 import { Audience } from '@/types/promo';
 
 export default function AddFilterForm() {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',

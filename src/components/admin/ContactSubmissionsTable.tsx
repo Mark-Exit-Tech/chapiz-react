@@ -38,7 +38,7 @@ export default function ContactSubmissionsTable({
   searchParams
 }: ContactSubmissionsTableProps) {
   const router = useNavigate();
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const [search, setSearch] = useState(searchParams.search);
 
   const formatDate = (date: Date | string | null | undefined) => {

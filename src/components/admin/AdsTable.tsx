@@ -23,7 +23,7 @@ import { Ad, getAllAds, AdStatus } from '@/lib/actions/admin';
 import AdActions from './AdActions';
 
 export default function AdsTable() {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const [ads, setAds] = useState<Ad[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

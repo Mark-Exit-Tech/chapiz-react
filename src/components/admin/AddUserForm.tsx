@@ -31,7 +31,7 @@ const sendUserInvitationByAdmin = async (data: any) => {
 };
 
 export default function AddUserForm() {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({

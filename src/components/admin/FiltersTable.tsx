@@ -24,7 +24,7 @@ import { getFilters, updateFilter, deleteFilter, getAudiences } from '@/lib/acti
 import EditFilterDialog from './EditFilterDialog';
 
 export default function FiltersTable() {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const [filters, setFilters] = useState<Filter[]>([]);
   const [audiences, setAudiences] = useState<Audience[]>([]);
   const [loading, setLoading] = useState(true);

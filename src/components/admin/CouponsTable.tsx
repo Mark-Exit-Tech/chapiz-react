@@ -32,7 +32,7 @@ import {
 } from '@/components/ui/dialog';
 
 export default function CouponsTable() {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const router = useNavigate();
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [businesses, setBusinesses] = useState<Business[]>([]);

@@ -44,7 +44,7 @@ interface AdActionsProps {
 }
 
 export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const tCommon = useTranslation('common');
   const locale = useLocale() as 'en' | 'he';
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -192,7 +192,7 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
       // Determine ad type and content based on media type
       let adType: 'image' | 'video' = 'image';
       let adContent = formData.content;
-      
+
       if (mediaType === 'youtube') {
         // For YouTube, store the YouTube URL in content and set type to video
         adType = 'video';
@@ -228,7 +228,7 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
       if (onUpdate) {
         onUpdate();
       } else {
-      router.refresh();
+        router.refresh();
       }
     } catch (err: any) {
       setError(err.message || 'Failed to update advertisement');
@@ -250,11 +250,11 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
     try {
       const result = await deleteAd(ad.id);
       if (result.success) {
-      setIsDeleting(false);
+        setIsDeleting(false);
         if (onDelete) {
           onDelete();
         } else {
-      router.refresh();
+          router.refresh();
         }
       } else {
         setError(result.error || 'Failed to delete advertisement');
@@ -372,7 +372,7 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
                   placeholder={t('adActions.phonePlaceholder')}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="location">{t('adActions.location')}</Label>
                 <Input
@@ -406,20 +406,14 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
 
               <div className="space-y-2">
                 <Label htmlFor="city">{t('adActions.city')}</Label>
-                <Select value={formData.city} onValueChange={(value) => {
-                  setFormData((prev) => ({ ...prev, city: value }));
-                }}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('adActions.cityPlaceholder')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {cities.map((city) => (
-                      <SelectItem key={city.value} value={city.value}>
-                        {city.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <SimpleMultiselect
+                  options={cities}
+                  selectedValues={formData.city}
+                  onSelectionChange={(values) => {
+                    setFormData((prev) => ({ ...prev, city: values }));
+                  }}
+                  placeholder={t('adActions.cityPlaceholder')}
+                />
               </div>
             </div>
 
@@ -444,8 +438,8 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
 
               <div className="space-y-2">
                 <Label htmlFor="breed">{t('adActions.breed')}</Label>
-                <Select 
-                  value={formData.breed} 
+                <Select
+                  value={formData.breed}
                   onValueChange={(value) => {
                     setFormData((prev) => ({ ...prev, breed: value }));
                   }}
@@ -493,7 +487,7 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
 
             <div className="space-y-2">
               <Label htmlFor="tags">{t('adActions.tags')}</Label>
-              
+
               {/* Predefined Hebrew Service Tags */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-gray-600">{tCommon('serviceTags')}</Label>
@@ -504,18 +498,17 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
                       type="button"
                       onClick={() => addPredefinedTag(tag)}
                       disabled={formData.tags.includes(tag)}
-                      className={`px-3 py-1 rounded-full text-sm border transition-colors ${
-                        formData.tags.includes(tag)
+                      className={`px-3 py-1 rounded-full text-sm border transition-colors ${formData.tags.includes(tag)
                           ? 'bg-primary text-primary-foreground border-primary'
                           : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
-                      }`}
+                        }`}
                     >
                       {tag}
                     </button>
                   ))}
                 </div>
               </div>
-              
+
               {/* Selected Tags */}
               {formData.tags.length > 0 && (
                 <div className="space-y-2">
@@ -598,16 +591,16 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
                 )}
               </div>
             ) : (
-            <div className="space-y-2">
-              <Label htmlFor="content">{t('adActions.content')}</Label>
-              <MediaUpload
+              <div className="space-y-2">
+                <Label htmlFor="content">{t('adActions.content')}</Label>
+                <MediaUpload
                   type={mediaType}
-                value={formData.content}
-                onChange={(filePath) => {
-                  setFormData((prev) => ({ ...prev, content: filePath }));
-                }}
-              />
-            </div>
+                  value={formData.content}
+                  onChange={(filePath) => {
+                    setFormData((prev) => ({ ...prev, content: filePath }));
+                  }}
+                />
+              </div>
             )}
 
 

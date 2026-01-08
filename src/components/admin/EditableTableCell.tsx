@@ -9,7 +9,7 @@ import { updatePetField } from '@/lib/actions/admin';
 import { getBreedsForDropdown, getGendersForDropdown, getPetTypesForDropdown } from '@/lib/supabase/database/pets';
 import { getPetTypes, getBreeds, getGenders } from '@/lib/hardcoded-data';
 import toast from 'react-hot-toast';
-import { useLocale } from 'react-i18next';
+import { useLocale } from '@/hooks/use-locale';
 
 interface EditableTableCellProps {
   value: string;

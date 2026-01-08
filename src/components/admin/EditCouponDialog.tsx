@@ -27,7 +27,7 @@ interface EditCouponDialogProps {
 }
 
 export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }: EditCouponDialogProps) {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const [formData, setFormData] = useState({
     name: '',
     description: '',

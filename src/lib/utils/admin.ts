@@ -1,5 +1,6 @@
-// TEMPORARY STUB - Supabase implementation needed
 // TODO: Rewrite for Supabase
+
+export type UserRole = 'user' | 'admin' | 'super_admin';
 
 export async function getAdminUsers() {
   return [];

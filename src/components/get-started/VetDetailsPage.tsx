@@ -16,7 +16,7 @@ const VetDetailsPage = () => {
     formState: { errors },
     setValue
   } = useFormContext();
-  const t = useTranslation('pages.VetDetailsPage');
+  const { t } = useTranslation('pages.VetDetailsPage');
   const locale = useLocale();
   const [isGeocodingVet, setIsGeocodingVet] = useState(false);
 

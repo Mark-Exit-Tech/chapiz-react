@@ -35,7 +35,7 @@ const COLORS = ['#FF3B30', '#FF9500', '#FFCC00', '#34C759', '#007AFF', '#5856D6'
 const EMOJIS = ['😀', '😂', '❤️', '👍', '👎', '🔥', '⭐', '✅', '❌', '💯'];
 
 export default function ImageEditor({ imageUrl, isOpen, onClose, onSave }: ImageEditorProps) {
-  const t = useTranslation('pages.Admin.imageEditor');
+  const { t } = useTranslation('pages.Admin.imageEditor');
   const commonT = useTranslation('common');
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const overlayCanvasRef = useRef<HTMLCanvasElement>(null);

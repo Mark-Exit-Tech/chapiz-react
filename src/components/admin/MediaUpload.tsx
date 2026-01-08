@@ -24,7 +24,7 @@ export default function MediaUpload({
   onChange,
   className = ''
 }: MediaUploadProps) {
-  const t = useTranslation('pages.Admin.mediaUpload');
+  const { t } = useTranslation('pages.Admin.mediaUpload');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [progress, setProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);

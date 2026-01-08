@@ -93,6 +93,17 @@ export async function getMobileAppLinks() {
   };
 }
 
+export type InstallBannerSettings = {
+  isEnabled: boolean;
+  iosAppId: string;
+  androidAppId: string;
+  showAfterSeconds: number;
+}
+
+export async function getInstallBannerSettings(): Promise<InstallBannerSettings> {
+  return { isEnabled: false, iosAppId: '', androidAppId: '', showAfterSeconds: 0 };
+}
+
 // Ads stubs
 export type AdStatus = 'active' | 'inactive' | 'pending';
 export type AdType = 'image' | 'video';

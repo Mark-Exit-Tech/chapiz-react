@@ -38,7 +38,7 @@ export default function PetProfilePage({
   vet?: any;
 }) {
   // Place all hook calls at the top level, unconditionally
-  const t = useTranslation('pages.PetProfilePage');
+  const { t } = useTranslation('pages.PetProfilePage');
   const locale = useLocale();
   const router = useNavigate();
   const searchParams = useSearchParams();

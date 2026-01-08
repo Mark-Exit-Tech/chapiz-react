@@ -13,7 +13,7 @@ interface InviteFriendsCardProps {
 }
 
 const InviteFriendsCard: React.FC<InviteFriendsCardProps> = ({ onClose, onShareSuccess }) => {
-  const t = useTranslation('components.InviteFriendsCard');
+  const { t } = useTranslation('components.InviteFriendsCard');
   const [shared, setShared] = useState(false);
   const iconSectionWidth = 100; // width reserved for the icon
 

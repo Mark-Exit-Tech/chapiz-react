@@ -46,7 +46,7 @@ const LocationAutocompleteComboSelect: React.FC<
   onChange,
   onBlur
 }) => {
-  const t = useTranslation('components.searchbar');
+  const { t } = useTranslation('components.searchbar');
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [predictions, setPredictions] = useState<Array<{ description: string; place_id: string }>>([]);

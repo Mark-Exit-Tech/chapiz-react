@@ -25,7 +25,7 @@ import { SimpleMultiselect } from '@/components/ui/simple-multiselect';
 import { getYouTubeEmbedUrl } from '@/lib/utils/youtube';
 
 export default function AddAdForm() {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const tCommon = useTranslation('common');
   const [isOpen, setIsOpen] = useState(false);
   const locale = useLocale() as 'en' | 'he';

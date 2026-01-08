@@ -32,7 +32,7 @@ interface ServiceDetailsPageClientProps {
 }
 
 const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ service }) => {
-  const t = useTranslation('pages.ServicesPage');
+  const { t } = useTranslation('pages.ServicesPage');
   const router = useNavigate();
   const locale = useLocale();
   const [showCommentForm, setShowCommentForm] = useState(false);

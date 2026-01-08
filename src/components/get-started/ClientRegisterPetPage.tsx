@@ -30,7 +30,7 @@ export default function ClientRegisterPetPage({
 }) {
   const router = useNavigate();
   const locale = useLocale() as 'en' | 'he';
-  const t = useTranslation('');
+  const { t } = useTranslation('');
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const { petId: localStoragePetId, clearPetId } = usePetId();

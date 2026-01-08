@@ -42,7 +42,7 @@ import {
 } from '@/components/ui/select';
 
 export default function BusinessesTable() {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [savedFilters, setSavedFilters] = useState<FilterType[]>([]);
   const [loading, setLoading] = useState(true);

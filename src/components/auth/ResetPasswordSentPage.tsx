@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Mail, CheckCircle } from 'lucide-react';
 
 export default function ResetPasswordSentPage() {
-  const t = useTranslation('pages.ResetPasswordSentPage');
+  const { t } = useTranslation('pages.ResetPasswordSentPage');
   const router = useNavigate();
 
   return (

@@ -20,7 +20,7 @@ interface InstallBannerSettingsFormProps {
 
 export default function InstallBannerSettingsForm({ initialData }: InstallBannerSettingsFormProps) {
   const router = useNavigate();
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);

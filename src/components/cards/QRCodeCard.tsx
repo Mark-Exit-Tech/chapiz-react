@@ -13,7 +13,7 @@ interface QRCodeCardProps {
 }
 
 export default function QRCodeCard({ url, title, description }: QRCodeCardProps) {
-  const t = useTranslation('pages.PromosPage');
+  const { t } = useTranslation('pages.PromosPage');
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {

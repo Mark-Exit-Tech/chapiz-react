@@ -46,7 +46,7 @@ interface PetsPageClientProps {
 }
 
 export default function PetsPageClient({ pets, searchParams, hideOwnerColumn = false }: PetsPageClientProps) {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const [petsData, setPetsData] = useState(pets);
 
   // Parse query parameters

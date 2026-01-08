@@ -22,7 +22,7 @@ export function HebrewBreedFilter({
   className,
   showResults = true
 }: HebrewBreedFilterProps) {
-  const t = useTranslations('Pet.add.form.breed');
+  const { t } = useTranslations('Pet.add.form.breed');
   const locale = useLocale() as 'en' | 'he';
   const [filteredBreeds, setFilteredBreeds] = useState<Array<{ id: string; name: string }>>([]);
   const [activeFilter, setActiveFilter] = useState<'alphabet' | 'range'>('alphabet');

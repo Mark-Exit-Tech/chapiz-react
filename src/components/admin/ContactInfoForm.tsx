@@ -17,7 +17,7 @@ interface ContactInfoFormProps {
 
 export default function ContactInfoForm({ initialData }: ContactInfoFormProps) {
   const router = useNavigate();
-  const t = useTranslation('Admin.settings');
+  const { t } = useTranslation('Admin.settings');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);

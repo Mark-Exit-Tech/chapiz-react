@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { useLocale } from 'react-i18next';
+import { useLocale } from '@/hooks/use-locale';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin } from 'lucide-react';
 import { Business } from '@/types/promo';
@@ -23,7 +23,7 @@ declare global {
 }
 
 export default function MapCard({ businesses = [], contactInfo, title }: MapCardProps) {
-  const t = useTranslation('pages.PromosPage');
+  const { t } = useTranslation('pages.PromosPage');
   const router = useNavigate();
   const locale = useLocale();
   const googleMapsApiKey = 'AIzaSyAjx6NIRePitcFdZjH2kE0z-zSAy8etaUE';

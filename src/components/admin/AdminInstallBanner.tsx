@@ -8,7 +8,7 @@ import { getInstallBannerSettings, InstallBannerSettings } from '@/lib/actions/a
 import { useTranslation } from 'react-i18next';
 
 export default function AdminInstallBanner() {
-    const t = useTranslation('installBanner');
+    const { t } = useTranslation('installBanner');
     const [settings, setSettings] = useState<InstallBannerSettings | null>(null);
     const [isVisible, setIsVisible] = useState(false);
     const [isIOS, setIsIOS] = useState(false);

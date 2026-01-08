@@ -29,7 +29,7 @@ interface NFCScanPageProps {
 }
 
 export default function NFCScanPage({ pet }: NFCScanPageProps) {
-  const t = useTranslation('Pet.nfcTag');
+  const { t } = useTranslation('Pet.nfcTag');
   const locale = useLocale();
   const [mobileAppLinks, setMobileAppLinks] = useState({
     androidAppUrl: '',

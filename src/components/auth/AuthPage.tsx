@@ -14,7 +14,7 @@ import toast from 'react-hot-toast';
 import LocaleSwitcher from '@/components/LocaleSwitcher';
 
 const AuthPage = () => {
-  const t = useTranslation('pages.AuthPage');
+  const { t } = useTranslation('pages.AuthPage');
   const { signIn, signUp, signInWithGoogle, sendVerificationCode, user, loading: authLoading } = useAuth();
   const router = useNavigate();
   

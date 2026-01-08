@@ -2,16 +2,16 @@
 
 import { LayoutDashboard, AppWindow, Users, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import Link from 'react-router-dom';
-import { usePathname } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 interface AdminBottomNavProps {
     locale: string;
 }
 
 export default function AdminBottomNav({ locale }: AdminBottomNavProps) {
-    const t = useTranslation('Admin');
-    const pathname = usePathname();
+    const { t } = useTranslation('Admin');
+    const location = useLocation();
+    const pathname = location.pathname;
 
     const navItems = [
         {
@@ -51,10 +51,10 @@ export default function AdminBottomNav({ locale }: AdminBottomNavProps) {
                     return (
                         <Link
                             key={item.href}
-                            href={item.href}
+                            to={item.href}
                             className={`flex flex-col items-center justify-center min-w-0 flex-1 py-2 px-1 rounded-lg transition-colors ${item.isActive
-                                    ? 'text-primary bg-primary/5'
-                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                ? 'text-primary bg-primary/5'
+                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                                 }`}
                         >
                             <Icon className={`h-6 w-6 mb-1 ${item.isActive ? 'text-primary' : ''}`} />
@@ -67,5 +67,8 @@ export default function AdminBottomNav({ locale }: AdminBottomNavProps) {
                 })}
             </nav>
         </div>
+    );
+            </nav >
+        </div >
     );
 }

@@ -28,7 +28,7 @@ import {
 } from '@/components/ui/select';
 
 export default function AddBusinessForm() {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',

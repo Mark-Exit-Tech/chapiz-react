@@ -5,7 +5,7 @@ import AddCouponForm from '@/components/admin/AddCouponForm';
 import CouponsTable from '@/components/admin/CouponsTable';
 
 export default function CouponsPage() {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
 
   return (
     <div className="p-4 md:p-6 space-y-6">

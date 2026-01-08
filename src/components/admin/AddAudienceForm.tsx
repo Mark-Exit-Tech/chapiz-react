@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 
 export default function AddAudienceForm() {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: ''

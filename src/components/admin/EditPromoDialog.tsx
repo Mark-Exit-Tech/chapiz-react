@@ -27,7 +27,7 @@ interface EditPromoDialogProps {
 }
 
 export default function EditPromoDialog({ promo, isOpen, onClose, onSuccess }: EditPromoDialogProps) {
-  const t = useTranslation('Admin');
+  const { t } = useTranslation('Admin');
   const [formData, setFormData] = useState({
     name: '',
     description: '',

@@ -11,7 +11,7 @@ import { Button } from './ui/button';
 import { Separator } from './ui/separator';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { useLocale } from 'react-i18next';
+import { useLocale } from '@/hooks/use-locale';
 import { getBreedNameById } from '@/lib/supabase/database/pets';
 import { supabase } from '@/lib/supabase/client';
 
@@ -27,7 +27,7 @@ interface MyPetClientProps {
 }
 
 const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
-  const t = useTranslation('pages.MyPetsPage');
+  const { t } = useTranslation('pages.MyPetsPage');
   const locale = useLocale() as 'en' | 'he';
   const { user, loading } = useAuth();
   const router = useNavigate();

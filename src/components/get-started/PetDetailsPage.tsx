@@ -24,7 +24,7 @@ const PetDetailsPage: React.FC<PetDetailsPageProps> = () => {
     setValue,
     formState: { errors }
   } = useFormContext();
-  const t = useTranslation('pages.PetDetailsPage');
+  const { t } = useTranslation('pages.PetDetailsPage');
   const locale = useLocale() as 'en' | 'he';
   const [genders, setGenders] = useState<{ value: string; label: string }[]>([]);
   const [petTypes, setPetTypes] = useState<{ value: string; label: string }[]>([]);

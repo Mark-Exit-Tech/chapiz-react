@@ -19,7 +19,7 @@ const EarningNotification: React.FC<EarningNotificationProps> = ({
   action,
   isVisible
 }) => {
-  const t = useTranslation('components.EarningNotification');
+  const { t } = useTranslation('components.EarningNotification');
   const iconSectionWidth = 100;
 
   if (!isVisible) return null;

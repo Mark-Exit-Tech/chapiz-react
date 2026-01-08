@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 import { FacebookShareButton, WhatsappShareButton } from 'react-share';
 
 const MenuShareMenu = () => {
-  const t = useTranslation('components.ShareButton');
+  const { t } = useTranslation('components.ShareButton');
   const [menuOpen, setMenuOpen] = useState(false);
 
   // Get the current page URL and title safely
