@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { AppWindow, LayoutDashboard, Users, Loader2, ShieldX, MessageSquare, Settings, Mail, Ticket, Megaphone, Building2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import Link from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getUserRole, type UserRole } from '@/lib/utils/admin';
 import AdminTopNav from './AdminTopNav';
@@ -73,12 +73,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             {t('unauthorizedMessage')}
           </p>
           <div className="space-y-3">
-            <RouterLink to=href={`/${locale}`}>
+            <Link to={`/${locale}`}>
               <Button className="w-full">
                 {t('goBack')}
               </Button>
             </Link>
-            <RouterLink to=href={`/${locale}/signin`}>
+            <Link to={`/${locale}/signin`}>
               <Button variant="outline" className="w-full">
                 Sign In
               </Button>
@@ -107,7 +107,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <ul className="space-y-2">
             <li>
               <Link
-                href={`/${locale}/admin`}
+                to={`/${locale}/admin`}
                 className="flex gap-3 rounded p-2 transition hover:bg-white hover:shadow-xs"
               >
                 <LayoutDashboard className="h-6 w-6" />
@@ -116,7 +116,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </li>
             <li>
               <Link
-                href={`/${locale}/admin/ads`}
+                to={`/${locale}/admin/ads`}
                 className="flex gap-3 rounded p-2 transition hover:bg-white hover:shadow-xs"
               >
                 <AppWindow className="h-6 w-6" />
@@ -125,7 +125,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </li>
             <li>
               <Link
-                href={`/${locale}/admin/coupons`}
+                to={`/${locale}/admin/coupons`}
                 className="flex gap-3 rounded p-2 transition hover:bg-white hover:shadow-xs"
               >
                 <Megaphone className="h-6 w-6" />
@@ -134,7 +134,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </li>
             <li>
               <Link
-                href={`/${locale}/admin/vouchers`}
+                to={`/${locale}/admin/vouchers`}
                 className="flex gap-3 rounded p-2 transition hover:bg-white hover:shadow-xs"
               >
                 <Ticket className="h-6 w-6" />
@@ -143,7 +143,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </li>
             <li>
               <Link
-                href={`/${locale}/admin/businesses`}
+                to={`/${locale}/admin/businesses`}
                 className="flex gap-3 rounded p-2 transition hover:bg-white hover:shadow-xs"
               >
                 <Building2 className="h-6 w-6" />
@@ -152,7 +152,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </li>
             <li>
               <Link
-                href={`/${locale}/admin/comments`}
+                to={`/${locale}/admin/comments`}
                 className="flex gap-3 rounded p-2 transition hover:bg-white hover:shadow-xs"
               >
                 <MessageSquare className="h-6 w-6" />
@@ -161,7 +161,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </li>
             <li>
               <Link
-                href={`/${locale}/admin/contact-submissions`}
+                to={`/${locale}/admin/contact-submissions`}
                 className="flex gap-3 rounded p-2 transition hover:bg-white hover:shadow-xs"
               >
                 <Mail className="h-6 w-6" />
@@ -170,7 +170,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </li>
             <li>
               <Link
-                href={`/${locale}/admin/settings`}
+                to={`/${locale}/admin/settings`}
                 className="flex gap-3 rounded p-2 transition hover:bg-white hover:shadow-xs"
               >
                 <Settings className="h-6 w-6" />
@@ -179,7 +179,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </li>
             <li>
               <Link
-                href={`/${locale}/admin/users`}
+                to={`/${locale}/admin/users`}
                 className="flex gap-3 rounded p-2 transition hover:bg-white hover:shadow-xs"
               >
                 <Users className="h-6 w-6" />

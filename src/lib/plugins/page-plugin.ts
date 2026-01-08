@@ -25,7 +25,7 @@ export interface PagePluginConfig {
 export class PluginRegistry {
   private plugins: Map<string, PagePlugin> = new Map();
 
-  register(plugin: PagePlugin) {
+  register(plugin: PagePlugin): void {
     this.plugins.set(plugin.id, plugin);
   }
 
@@ -39,12 +39,12 @@ export class PluginRegistry {
       .sort((a, b) => a.order - b.order);
   }
 
-  enable(id: string) {
+  enable(id: string): void {
     const plugin = this.plugins.get(id);
     if (plugin) plugin.enabled = true;
   }
 
-  disable(id: string) {
+  disable(id: string): void {
     const plugin = this.plugins.get(id);
     if (plugin) plugin.enabled = false;
   }
