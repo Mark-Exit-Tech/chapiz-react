@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { Trash2 } from 'lucide-react';
 import { TabName } from './AnimatedTabs';
 import toast from 'react-hot-toast';
-import { useTranslation, useLocale } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
 const variants = {
   initial: (direction: number) => ({
@@ -16,7 +16,7 @@ const variants = {
     x: '0%',
     opacity: 1,
     transition: {
-      type: 'spring',
+      type: 'spring' as const,
       bounce: 0.2,
       duration: 0.8
     }
@@ -25,7 +25,7 @@ const variants = {
     x: direction > 0 ? '-40%' : '40%',
     opacity: 0,
     transition: {
-      type: 'spring',
+      type: 'spring' as const,
       bounce: 0.2,
       duration: 0.8
     }
@@ -94,7 +94,7 @@ const renderDetails = (
 
 // Delete Pet Button Component
 const DeletePetButton = ({ petId, onDelete }: { petId: string; onDelete: (petId: string) => void }) => {
-  const t = useTranslation('Pet');
+  const { t } = useTranslation('Pet');
   const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {

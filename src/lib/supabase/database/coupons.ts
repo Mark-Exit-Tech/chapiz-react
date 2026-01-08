@@ -6,6 +6,18 @@ export interface UserCoupon {
     coupon_id: string;
     status: string;
     created_at: string;
+    purchasedAt: Date;
+    usedAt?: Date;
+    coupon: {
+        id: string;
+        name: string;
+        description: string;
+        price: number;
+        points: number;
+        validFrom: Date;
+        validTo: Date;
+        imageUrl?: string;
+    };
 }
 
 /**
@@ -29,10 +41,10 @@ export async function getActiveUserCoupons(userId: string): Promise<UserCoupon[]
 /**
  * Get coupon history (placeholder - implement based on actual schema)
  */
-export async function getCouponHistory(userId: string): Promise<UserCoupon[]> {
+export async function getCouponHistory(userId: string): Promise<{ success: boolean; coupons?: UserCoupon[] }> {
     // TODO: Implement with actual Supabase schema
     console.warn('getCouponHistory not yet fully implemented');
-    return [];
+    return { success: true, coupons: [] };
 }
 
 /**

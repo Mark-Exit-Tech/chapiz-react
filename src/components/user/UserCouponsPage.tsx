@@ -231,7 +231,7 @@ export default function UserCouponsPage() {
         // Fetch user settings to check freeCouponPrice
         const userResult = await getUserFromFirestore(user.id);
         if (userResult.success && userResult.user) {
-          setFreeCouponPrice(userResult.user.freeCouponPrice || false);
+          setFreeCouponPrice(false);
         }
 
         // Fetch all purchased coupons for history (active + inactive)
@@ -298,7 +298,7 @@ export default function UserCouponsPage() {
     // Generate shop URL with userid, coupon, and callback
     // Using a default coupon code 'sale990' as shown in the example
     // You may want to make this configurable or use a different default
-    const generatedShopUrl = getShopUrl(shopUrl, 'sale990');
+    const generatedShopUrl = getShopUrl();
     
     if (!generatedShopUrl) {
       toast.error('Failed to generate shop URL');
@@ -361,7 +361,7 @@ export default function UserCouponsPage() {
       }
 
       // Purchase the coupon (with 0 points if free)
-      const purchaseResult = await purchaseCoupon(user.id, coupon, pointsNeeded);
+      const purchaseResult = await purchaseCoupon(user.id, coupon.id, pointsNeeded);
       
       if (!purchaseResult.success) {
         // Refund points if purchase failed and points were deducted

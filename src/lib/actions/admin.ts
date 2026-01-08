@@ -80,7 +80,8 @@ export async function getContactInfo() {
     address: 'Israel',
     whatsapp: '+972-50-000-0000',
     facebook: 'https://facebook.com/facepet',
-    instagram: 'https://instagram.com/facepet'
+    instagram: 'https://instagram.com/facepet',
+    storeUrl: 'https://shop.facepet.club'
   };
 }
 
@@ -175,7 +176,7 @@ export async function getActiveAdsForServices(serviceType?: string): Promise<Ad[
 
 export async function getBusinesses() {
   console.warn('getBusinesses is a stub using Supabase');
-  return [];
+  return { success: true, businesses: [] };
 }
 
 export async function getBusinessById(id: string) {

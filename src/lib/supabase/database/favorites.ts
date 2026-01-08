@@ -3,19 +3,19 @@ import { supabase } from '../client';
 /**
  * Add to favorites (placeholder - implement based on actual schema)
  */
-export async function addToFavorites(userId: string, serviceId: string): Promise<boolean> {
+export async function addToFavorites(userId: string, serviceId: string, serviceName?: string, serviceType?: string): Promise<{ success: boolean; error?: string }> {
     // TODO: Implement with actual Supabase schema
     console.warn('addToFavorites not yet fully implemented');
-    return false;
+    return { success: true };
 }
 
 /**
  * Remove from favorites (placeholder - implement based on actual schema)
  */
-export async function removeFromFavorites(userId: string, serviceId: string): Promise<boolean> {
+export async function removeFromFavorites(userId: string, serviceId: string): Promise<{ success: boolean; error?: string }> {
     // TODO: Implement with actual Supabase schema
     console.warn('removeFromFavorites not yet fully implemented');
-    return false;
+    return { success: true };
 }
 
 /**

@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { BreedSelect } from './ui/breed-select';
 import { getBreedsForType, getLocalizedBreedsForType, type PetType } from '@/lib/data/breeds';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTranslation, useLocale } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
 interface PetFormData {
   name: string;
@@ -30,8 +30,12 @@ interface UploadProgress {
 }
 
 export default function AddNewPetForm() {
-  const t = useTranslation('Pet.add');
-  const locale = useLocale() as 'en' | 'he';
+  const { t } = useTranslation('Pet.add');
+  
+  // Get locale from URL or default to 'en'
+  const locale = (typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en') as 'en' | 'he';
   
   const PET_TYPES = [
     { id: 'cat', name: t('types.cat'), emoji: '🐱', icon: '🐱' },
@@ -97,18 +101,18 @@ export default function AddNewPetForm() {
     setUploadProgress({ progress: 0, status: 'uploading' });
 
     try {
-      const result = await uploadPetImage(file, user);
+      const result = await uploadPetImage(file, user.id);
       
-      if (result.success && result.downloadURL) {
+      if (result) {
         setFormData(prev => ({
           ...prev,
-          imageUrl: result.downloadURL || ''
+          imageUrl: result || ''
         }));
         setUploadProgress({ progress: 100, status: 'completed' });
         toast.success(t('success.imageUploaded'));
       } else {
         setUploadProgress({ progress: 0, status: 'error' });
-        toast.error(result.error || t('errors.uploadFailed'));
+        toast.error(t('errors.uploadFailed'));
       }
     } catch (error) {
       console.error('Upload error:', error);

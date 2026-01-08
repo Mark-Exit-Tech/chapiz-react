@@ -157,8 +157,8 @@ export default function SettingsPage() {
 
       // Test storage connection
       const storageTest = await testStorageConnection();
-      if (!storageTest.success) {
-        toast.error(`Storage connection failed: ${storageTest.error}`);
+      if (!storageTest) {
+        toast.error(`Storage connection failed`);
         return;
       }
 
@@ -168,30 +168,30 @@ export default function SettingsPage() {
 
       try {
         // Use the new simple upload function
-        const result = await uploadProfileImage(file, user);
+        const result = await uploadProfileImage(file, user.id);
 
-        if (result.success) {
-          setUploadProgress({ progress: 100, status: 'completed', downloadURL: result.downloadURL });
+        if (result) {
+          setUploadProgress({ progress: 100, status: 'completed', downloadURL: result });
         } else {
-          setUploadProgress({ progress: 0, status: 'error', error: result.error });
+          setUploadProgress({ progress: 0, status: 'error', error: 'Upload failed' });
         }
 
-        if (result.success && result.downloadURL) {
+        if (result) {
           setFormData(prev => ({
             ...prev,
-            profileImageURL: result.downloadURL
+            profileImageURL: result
           }));
 
           // Update user profile in database
           if (dbUser?.uid) {
             await updateUserByUid(dbUser.uid, {
-              profileImage: result.downloadURL
+              profileImage: result
             });
           }
 
           toast.success('Profile image uploaded successfully!');
         } else {
-          toast.error(result.error || 'Failed to upload image');
+          toast.error('Failed to upload image');
         }
       } catch (error: any) {
         console.error('Upload error:', error);
@@ -210,7 +210,7 @@ export default function SettingsPage() {
     try {
       console.log('Language change requested:', newLanguage);
       console.log('Current locale:', locale);
-      console.log('Current pathname:', pathname);
+      console.log('Current pathname:', window.location.pathname);
 
       setFormData(prev => ({
         ...prev,
@@ -327,7 +327,7 @@ export default function SettingsPage() {
               profileImageURL: avatarUrl,
               acceptCookies: userResult.user.accept_cookies || false,
               language: locale,
-              freeCouponPrice: userResult.user.freeCouponPrice || false
+              freeCouponPrice: false
             }));
           }
         }
@@ -450,7 +450,7 @@ export default function SettingsPage() {
             {/* Save Button */}
             <div className="flex justify-end md:justify-start">
               <Button
-                onClick={handleSave}
+                onClick={() => handleSave()}
                 disabled={saving}
                 className="bg-primary hover:bg-primary/90 text-white px-8"
               >

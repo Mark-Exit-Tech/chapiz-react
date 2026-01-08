@@ -12,10 +12,10 @@ interface TagFoundPageProps {
 }
 
 export default function TagFoundPage({ petId }: TagFoundPageProps) {
-  const t = useTranslation('pages.TagFound');
+  const { t } = useTranslation('pages.TagFound');
   const { user, loading: authLoading } = useAuth();
-  const { savePetId } = usePetId();
-  const router = useNavigate();
+  const { petId: savedPetId, loading } = usePetId();
+  const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleRegisterPet = async () => {
@@ -56,7 +56,7 @@ export default function TagFoundPage({ petId }: TagFoundPageProps) {
         
         {user ? (
           <div className="mt-6 space-y-3">
-            <p className="text-green-700 font-medium">{t('welcomeBack', { name: user.displayName || user.email })}</p>
+            <p className="text-green-700 font-medium">{t('welcomeBack', { name: user.user_metadata?.full_name || user.email })}</p>
             <Button
               onClick={handleRegisterPet}
               disabled={isProcessing}
