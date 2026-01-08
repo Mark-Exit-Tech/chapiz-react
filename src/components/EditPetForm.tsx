@@ -12,7 +12,7 @@ import { Upload, Loader2, CheckCircle, XCircle, Save, ArrowLeft, Trash2 } from '
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { getBreedsForDropdown, getGendersForDropdown, getPetTypesForDropdown } from '@/lib/supabase/database/pets';
-import { useTranslation, useLocale } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 // Image removed;
 import GetStartedDatePicker from './get-started/ui/GetStartedDatePicker';
@@ -58,9 +58,9 @@ interface UploadProgress {
 
 export default function EditPetForm({ pet }: EditPetFormProps) {
   const { user } = useAuth();
-  const router = useNavigate();
-  const t = useTranslation('Pet.edit');
-  const locale = useLocale() as 'en' | 'he';
+  const navigate = useNavigate();
+  const { t, i18n } = useTranslation(['Pet']);
+  const locale = (i18n.language || 'en') as 'en' | 'he';
   const [formData, setFormData] = useState<PetFormData>({
     name: pet.name || '',
     type: pet.type || '',
@@ -91,11 +91,11 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
       try {
         setIsLoadingDropdowns(true);
         const [breedsData, gendersData, typesData] = await Promise.all([
-          getBreedsForDropdown(undefined, locale),
+          getBreedsForDropdown(locale),
           getGendersForDropdown(locale),
           getPetTypesForDropdown(locale)
         ]);
-        
+
         setBreeds(breedsData);
         setGenders(gendersData);
         setPetTypes(typesData);
@@ -117,7 +117,7 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
         const localizedBreeds = getLocalizedBreedsForType(formData.type as 'dog' | 'cat' | 'other', locale);
         const matchingBreed = localizedBreeds.find(
           breed => breed.name.toLowerCase() === formData.breed.toLowerCase() ||
-                   breed.name === formData.breed
+            breed.name === formData.breed
         );
         if (matchingBreed) {
           setBreedId(matchingBreed.id);
@@ -177,19 +177,14 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
     setUploadProgress({ progress: 0, status: 'uploading' });
 
     try {
-      const result = await uploadPetImage(file, user);
-      
-      if (result.success && result.downloadURL) {
-        setFormData(prev => ({
-          ...prev,
-          imageUrl: result.downloadURL || ''
-        }));
-        setUploadProgress({ progress: 100, status: 'completed' });
-        toast.success('Image uploaded successfully');
-      } else {
-        setUploadProgress({ progress: 0, status: 'error' });
-        toast.error(result.error || 'Upload failed');
-      }
+      const downloadURL = await uploadPetImage(file, pet.id);
+
+      setFormData(prev => ({
+        ...prev,
+        imageUrl: downloadURL
+      }));
+      setUploadProgress({ progress: 100, status: 'completed' });
+      toast.success('Image uploaded successfully');
     } catch (error) {
       console.error('Upload error:', error);
       setUploadProgress({ progress: 0, status: 'error' });
@@ -213,15 +208,15 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
       });
 
       if (response.ok) {
-        toast.success(t('deleteSuccess'));
+        toast.success(t('edit.deleteSuccess'));
         navigate('/pages/my-pets');
       } else {
         const errorData = await response.json();
-        toast.error(errorData.message || t('deleteError'));
+        toast.error(errorData.message || t('edit.deleteError'));
       }
     } catch (error) {
       console.error('Delete pet error:', error);
-      toast.error(t('deleteError'));
+      toast.error(t('edit.deleteError'));
     } finally {
       setIsDeleting(false);
       setShowDeleteConfirm(false);
@@ -251,12 +246,12 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
       console.log('Original pet name:', pet.name);
       console.log('Form data name:', formData.name);
       console.log('Pet data name being sent:', petData.name);
-      
+
       const updateResult = await updatePetInFirestore(pet.id, petData);
       console.log('Update result:', updateResult);
-      
+
       if (updateResult.success) {
-        toast.success(t('success'));
+        toast.success(t('edit.success'));
         // Force refresh the page to ensure updated data is displayed
         window.location.href = '/pages/my-pets';
       } else {
@@ -264,7 +259,7 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
       }
     } catch (error) {
       console.error('Error updating pet:', error);
-      toast.error(t('error'));
+      toast.error(t('edit.error'));
       setUploadProgress({ progress: 0, status: 'error' });
     } finally {
       setIsSubmitting(false);
@@ -286,13 +281,13 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => router.back()}
+                onClick={() => navigate(-1)}
                 className="absolute left-0 top-1/2 -translate-y-1/2"
               >
                 <ArrowLeft className="h-4 w-4" />
               </Button>
               <CardTitle className="text-2xl font-bold text-gray-800">
-                {t('title')}
+                {t('edit.title')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -386,14 +381,13 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                 {formData.imageUrl && (
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-gray-700">
-{t('form.currentPhoto')}
+                      {t('form.currentPhoto')}
                     </Label>
                     <div className="relative w-32 h-32 mx-auto">
-                      <Image
+                      <img
                         src={formData.imageUrl}
                         alt={formData.name}
-                        fill
-                        className="object-cover rounded-lg"
+                        className="w-full h-full object-cover rounded-lg"
                       />
                     </div>
                   </div>
@@ -402,7 +396,7 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                 {/* Image Upload */}
                 <div className="space-y-2">
                   <Label htmlFor="image" className="text-sm font-medium text-gray-700">
-{formData.imageUrl ? t('form.changePhoto') : t('form.uploadPhoto')}
+                    {formData.imageUrl ? t('form.changePhoto') : t('form.uploadPhoto')}
                   </Label>
                   <div className="flex items-center justify-center w-full">
                     <label

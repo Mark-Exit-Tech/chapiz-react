@@ -27,7 +27,7 @@ const AddressMapSelector: React.FC<AddressMapSelectorProps> = ({
   initialCoordinates,
   onClose
 }) => {
-  const t = useTranslation('components.AddressMapSelector');
+  const { t } = useTranslation('components', { keyPrefix: 'AddressMapSelector' });
   const mapRef = useRef<HTMLDivElement>(null);
   const googleMapsApiKey = 'AIzaSyAjx6NIRePitcFdZjH2kE0z-zSAy8etaUE';
   const [map, setMap] = useState<any>(null);
