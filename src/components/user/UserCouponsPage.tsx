@@ -25,8 +25,12 @@ import toast from 'react-hot-toast';
 
 export default function UserCouponsPage() {
   const { t } = useTranslation('components.UserCoupons');
-  const locale = useLocale();
-  const router = useNavigate();
+  
+  // Get locale from URL or default to 'en'
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [couponHistory, setCouponHistory] = useState<UserCoupon[]>([]); // All purchased coupons (active + inactive)
