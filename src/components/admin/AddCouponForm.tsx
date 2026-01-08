@@ -121,7 +121,7 @@ export default function AddCouponForm() {
         validTo: new Date(formData.validTo),
         businessIds: formData.businessIds.length > 0 ? formData.businessIds : undefined,
         purchaseLimit: purchaseLimit
-      }, 'admin'); // TODO: Get actual user ID
+      }); // TODO: Get actual user ID
 
       console.log('Create coupon result:', result);
 

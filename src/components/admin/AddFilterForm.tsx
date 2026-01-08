@@ -85,7 +85,7 @@ export default function AddFilterForm() {
       const result = await createFilter({
         name: formData.name,
         audienceIds: formData.audienceIds
-      }, 'admin'); // TODO: Get actual user ID
+      }); // TODO: Get actual user ID
 
       console.log('Create filter result:', result);
 

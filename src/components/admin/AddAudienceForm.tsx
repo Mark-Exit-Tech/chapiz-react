@@ -50,7 +50,7 @@ export default function AddAudienceForm() {
         name: formData.name,
         description: '',
         targetCriteria: []
-      }, 'admin'); // TODO: Get actual user ID
+      }); // TODO: Get actual user ID
 
       console.log('Create audience result:', result);
 

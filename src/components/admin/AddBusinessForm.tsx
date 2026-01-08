@@ -107,7 +107,7 @@ export default function AddBusinessForm() {
         contactInfo: formData.contactInfo,
         tags: formData.tags,
         rating: formData.rating ? Number(formData.rating) : undefined
-      }, 'admin'); // TODO: Get actual user ID
+      }); // TODO: Get actual user ID
 
       console.log('Create business result:', result);
 

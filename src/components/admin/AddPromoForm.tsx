@@ -98,7 +98,7 @@ export default function AddPromoForm() {
         businessIds: formData.businessIds.length > 0 ? formData.businessIds : undefined,
         startDate: formData.startDate ? new Date(formData.startDate) : undefined,
         endDate: formData.endDate ? new Date(formData.endDate) : undefined
-      }, 'admin'); // TODO: Get actual user ID
+      }); // TODO: Get actual user ID
 
       if (!result.success) {
         throw new Error(result.error || 'Failed to create promo');
