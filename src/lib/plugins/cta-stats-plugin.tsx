@@ -5,14 +5,13 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useTranslation, useLocale } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import CountUp from 'react-countup';
 
 export const StatsPlugin = () => {
-  const t = useTranslation('pages.HomePage');
-  const locale = useLocale();
+  const { t } = useTranslation('pages.HomePage');
 
   const stats = [
     { key: 'users', value: 5000 },
@@ -49,8 +48,8 @@ export const StatsPlugin = () => {
 };
 
 export const CTAPlugin = () => {
-  const t = useTranslation('pages.HomePage');
-  const router = useNavigate();
+  const { t } = useTranslation('pages.HomePage');
+  const navigate = useNavigate();
 
   return (
     <section className="py-20 px-4">

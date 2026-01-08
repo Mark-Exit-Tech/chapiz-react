@@ -1,7 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Gift } from 'lucide-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -14,8 +13,8 @@ interface PrizeClaimNotificationProps {
 const PrizeClaimNotification: React.FC<PrizeClaimNotificationProps> = ({ 
   onClaim
 }) => {
-  const router = useNavigate();
-  const t = useTranslation('components.PrizeClaimNotification');
+  const navigate = useNavigate();
+  const { t } = useTranslation('components.PrizeClaimNotification');
 
   const handleClaim = (e: React.MouseEvent) => {
     e.stopPropagation();

@@ -5,10 +5,9 @@
 
 'use client';
 
-import { motion, useScroll, useTransform } from 'motion/react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
-// Image removed;
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
@@ -97,8 +96,8 @@ const petCharacters = [
 ];
 
 export const HeroPlugin = () => {
-  const t = useTranslation('pages.HomePage');
-  const router = useNavigate();
+  const { t } = useTranslation('pages.HomePage');
+  const navigate = useNavigate();
   const { user, loading } = useAuth();
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 500], [0, 150]);
@@ -121,13 +120,12 @@ export const HeroPlugin = () => {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: pet.id * 0.1 }}
         >
-          <Image
+          <img
             src={pet.src}
             alt={pet.alt}
             width={pet.size}
             height={pet.size}
-            priority={false}
-            quality={75}
+            className="object-contain"
           />
         </motion.div>
       ))}

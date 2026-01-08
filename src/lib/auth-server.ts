@@ -1,5 +1,3 @@
-'use server';
-
 export interface ServerSession {
   user: {
     email: string;
@@ -24,10 +22,10 @@ const userRestrictions: Record<string, boolean> = {
 
 /**
  * Get user role for server-side checks
- * Since we're using client-side Firebase auth, this is mainly for admin routes
+ * Using Supabase authentication
  */
 export async function auth(): Promise<ServerSession | null> {
-  // Since we're using client-side Firebase authentication,
+  // Using client-side Supabase authentication,
   // server-side auth checks should be minimal
   // Most authentication should be handled on the client side
   return null;
@@ -101,14 +99,13 @@ export async function getAllUsers(): Promise<Array<{ email: string; role: string
 }
 
 /**
- * Send password reset email using Firebase
+ * Send password reset email using Supabase
  */
 export async function sendPasswordReset(email: string): Promise<{ success: boolean; error?: string }> {
   try {
-    // Firebase handles password reset automatically
-    // This is just a placeholder - the actual password reset should be done
-    // through Firebase client-side authentication
-    return { success: true, error: 'Use Firebase client-side password reset' };
+    // Supabase handles password reset automatically
+    // This should be done through Supabase client-side authentication
+    return { success: true, error: 'Use Supabase client-side password reset' };
   } catch (error) {
     return { success: false, error: 'Failed to send password reset' };
   }

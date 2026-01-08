@@ -14,7 +14,7 @@ import { Button } from './ui/button';
 const PointsExplenationPopup: React.FC<{ onClose: () => void }> = ({
   onClose
 }) => {
-  const t = useTranslation('components.PointsExplenationPopup');
+  const { t } = useTranslation('components.PointsExplenationPopup');
   
   useEffect(() => {
     document.body.style.overflow = 'hidden';

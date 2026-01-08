@@ -32,7 +32,7 @@ const features = [
 ];
 
 export const FeaturesPlugin = () => {
-  const t = useTranslation('pages.HomePage');
+  const { t } = useTranslation('pages.HomePage');
 
   return (
     <section className="py-20 px-4">

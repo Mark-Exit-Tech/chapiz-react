@@ -9,7 +9,6 @@ import {
   DrawerHeader,
   DrawerTitle
 } from '@/components/ui/drawer';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@radix-ui/react-separator';
@@ -20,7 +19,7 @@ import { cn } from '../lib/utils';
 import { getCommentsForAd, submitComment } from '@/lib/actions/admin';
 import { useAuth } from '@/contexts/AuthContext';
 import { addToFavorites, removeFromFavorites, isAdFavorited } from '@/lib/supabase/database/favorites';
-import { useTranslation, useLocale } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { SERVICE_TAGS_TRANSLATIONS } from '@/lib/constants/hebrew-service-tags';
@@ -49,9 +48,13 @@ interface ServiceCardProps {
 }
 
 const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
-  const t = useTranslation('pages.ServicesPage');
-  const router = useNavigate();
-  const locale = useLocale();
+  const { t } = useTranslation('pages.ServicesPage');
+  const navigate = useNavigate();
+  
+  // Get locale from URL or default to 'en'
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
   const [open, setOpen] = useState(false);
   const [activeSnapPoint, setActiveSnapPoint] = useState<number | string | null>(1);
 

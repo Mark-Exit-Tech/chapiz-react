@@ -33,7 +33,7 @@ export function ConfirmProfileChanges({
 }: ConfirmProfileChangesProps) {
   const [open, setOpen] = React.useState(false);
   const isDesktop = useMediaQuery('(min-width: 768px)');
-  const t = useTranslation('components.ConfirmProfileChanges');
+  const { t } = useTranslation('components.ConfirmProfileChanges');
 
   const handleConfirm = () => {
     onConfirm();

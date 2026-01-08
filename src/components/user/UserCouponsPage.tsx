@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslation, useLocale } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,11 +20,11 @@ import { getUserFromFirestore } from '@/lib/supabase/database/users';
 import { addPointsToCategory, getUserPoints, deductPointsFromCategory } from '@/lib/supabase/database/points';
 import { purchaseCoupon, getActiveUserCoupons, getCouponHistory, markCouponAsUsed, UserCoupon } from '@/lib/supabase/database/coupons';
 import { useShopRedirect } from '@/hooks/use-shop-redirect';
-import { User } from 'firebase/auth';
+import { User } from '@supabase/supabase-js';
 import toast from 'react-hot-toast';
 
 export default function UserCouponsPage() {
-  const t = useTranslation('components.UserCoupons');
+  const { t } = useTranslation('components.UserCoupons');
   const locale = useLocale();
   const router = useNavigate();
   const { user } = useAuth();

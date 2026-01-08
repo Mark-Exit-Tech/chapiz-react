@@ -13,12 +13,8 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import { useNavigate } from 'react-router-dom';
-import { doc, deleteDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase/config';
 import toast from 'react-hot-toast';
-// Image removed;
-import { getBreedNameFromId } from '@/lib/firebase/breed-utils';
-import { useLocale, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
 interface Pet {
   id: string;

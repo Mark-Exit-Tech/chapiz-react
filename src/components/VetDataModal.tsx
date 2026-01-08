@@ -39,8 +39,8 @@ export default function VetDataModal({
   initialData, 
   isEditing = false 
 }: VetDataModalProps) {
-  const t = useTranslation('pages.PetProfilePage');
-  const commonT = useTranslation('common');
+  const { t } = useTranslation('pages.PetProfilePage');
+  const { t: commonT } = useTranslation('common');
   const [isLoading, setIsLoading] = useState(false);
   
   const {

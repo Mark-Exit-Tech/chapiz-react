@@ -1,4 +1,4 @@
-// TEMPORARY STUB - Firebase removed
+// TEMPORARY STUB - Supabase implementation needed
 // TODO: Rewrite for Supabase
 
 'use client';

@@ -1,5 +1,3 @@
-'use server';
-
 import { getRandomActivePromo } from './admin';
 import { Promo } from '@/types/promo';
 

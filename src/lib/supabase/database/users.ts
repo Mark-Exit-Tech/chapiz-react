@@ -37,8 +37,8 @@ export async function getUserByEmail(email: string): Promise<User | null> {
     return data;
 }
 
-// Get user by Firebase UID
-export async function getUserByFirebaseUid(uid: string): Promise<User | null> {
+// Get user by Supabase UID
+export async function getUserBySupabaseUid(uid: string): Promise<User | null> {
     const { data, error } = await supabase
         .from('users')
         .select('*')
@@ -132,7 +132,7 @@ export async function deleteUser(id: string): Promise<boolean> {
     return true;
 }
 
-// Update user by UID (compatible with old Firebase function)
+// Update user by UID (compatible with old function)
 export async function updateUserByUid(uid: string, updates: {
     displayName?: string;
     phone?: string;
@@ -180,15 +180,15 @@ export async function updateUserByUid(uid: string, updates: {
     }
 }
 
-// Get user by UID (compatible with old Firebase function)
+// Get user by UID (compatible with old function)
 export async function getUserByUid(uid: string): Promise<User | null> {
-    return getUserByFirebaseUid(uid);
+    return getUserBySupabaseUid(uid);
 }
 
-// Get user from Firestore (compatible wrapper with result format)
+// Get user from Supabase (compatible wrapper with result format)
 export async function getUserFromFirestore(uid: string): Promise<{ success: boolean; user?: User; error?: string }> {
     try {
-        const user = await getUserByFirebaseUid(uid);
+        const user = await getUserBySupabaseUid(uid);
         if (user) {
             return { success: true, user };
         }

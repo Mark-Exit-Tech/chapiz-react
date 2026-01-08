@@ -1,7 +1,4 @@
-'use server';
-
 // TEMPORARY STUB FILE
-// Firebase has been completely removed
 // All admin functions need to be rewritten to use Supabase
 // This file exists only to prevent build errors
 
@@ -9,7 +6,7 @@ import { CreateCouponData, UpdateCouponData } from '@/types/coupon';
 import { CreateAudienceData, CreateBusinessData, CreatePromoData, UpdateAudienceData, UpdateBusinessData, UpdatePromoData, CreateFilterData, UpdateFilterData } from '@/types/promo';
 import { createServerClient } from '@/lib/supabase/server';
 
-console.warn('⚠️ Admin actions are using stubs - Firebase has been removed. Please rewrite for Supabase.');
+console.warn('⚠️ Admin actions are using stubs - All functions need Supabase implementation.');
 
 // Stub functions that return empty/default values
 export async function getDashboardStats() {

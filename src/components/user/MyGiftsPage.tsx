@@ -17,7 +17,7 @@ interface MyGiftsPageProps {
 }
 
 const MyGiftsPage: React.FC<MyGiftsPageProps> = ({ pets }) => {
-  const t = useTranslation('pages.MyGiftsPage');
+  const { t } = useTranslation('pages.MyGiftsPage');
 
   return (
     <div>

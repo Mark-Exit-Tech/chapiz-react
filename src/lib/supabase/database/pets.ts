@@ -217,7 +217,7 @@ export async function getAllPetsWithDetails() {
     return data;
 }
 
-// Helper functions for dropdown data (compatible with old Firebase functions)
+// Helper functions for dropdown data (compatible with old functions)
 export async function getBreedsForDropdown(locale: string = 'en'): Promise<Array<{ value: string; label: string }>> {
     const breeds = await getAllBreeds();
     return breeds.map(breed => ({
@@ -242,7 +242,7 @@ export async function getPetTypesForDropdown(locale: string = 'en'): Promise<Arr
     }));
 }
 
-// Get breed name by ID (compatible with old Firebase function)
+// Get breed name by ID (compatible with old function)
 export async function getBreedNameById(breedId: number | string, locale: string = 'en'): Promise<string> {
     const breeds = await getAllBreeds();
     const breed = breeds.find(b => b.id === Number(breedId));
@@ -281,7 +281,7 @@ export async function getWeightRangesForDropdown(locale: string = 'en'): Promise
     ];
 }
 
-// Compatible wrapper for updatePet (matches Firebase function signature)
+// Compatible wrapper for updatePet (matches old function signature)
 export async function updatePetInFirestore(id: string, updates: any): Promise<{ success: boolean; error?: string }> {
     try {
         const result = await updatePet(id, updates);
@@ -298,7 +298,7 @@ export async function updatePetInFirestore(id: string, updates: any): Promise<{ 
     }
 }
 
-// Compatible wrapper for createPet (matches Firebase function signature)
+// Compatible wrapper for createPet (matches old function signature)
 export async function createPetInFirestore(petData: any): Promise<{ success: boolean; petId?: string; error?: string }> {
     try {
         const result = await createPet(petData);

@@ -1,7 +1,7 @@
 'use client';
 
-import { useNavigate, usePathname } from 'react-router-dom';
-import { useTranslation, useLocale } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '../ui/button';
@@ -19,10 +19,13 @@ import LocationAutocompleteComboSelect from '../get-started/ui/LocationAutocompl
 import DeletionVerificationPage from '../auth/DeletionVerificationPage';
 
 export default function SettingsPage() {
-  const router = useNavigate();
-  const pathname = usePathname();
-  const t = useTranslation('pages.UserSettingsPage');
-  const locale = useLocale();
+  const navigate = useNavigate();
+  const { t } = useTranslation('pages.UserSettingsPage');
+  
+  // Get locale from URL or default to 'en'
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
   const { user, dbUser, loading: authLoading, sendDeletionVerificationCode, signOut } = useAuth();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -53,7 +56,7 @@ export default function SettingsPage() {
     if (!authLoading && !user) {
       navigate('/auth');
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, navigate]);
 
 
   // Initialize form data when user loads
@@ -375,7 +378,7 @@ export default function SettingsPage() {
 
     setDeletingAccount(true);
     try {
-      // Firebase dependency removed. TODO: Implement Supabase deletion logic.
+      // TODO: Implement Supabase deletion logic.
       console.warn('Account deletion temporarily unavailable during migration.');
       toast.error('Account deletion is temporarily unavailable. Please contact support.');
       setDeletingAccount(false);
@@ -383,58 +386,15 @@ export default function SettingsPage() {
       return;
 
       /*
-      // Delete user data from Firestore collections
-      const { deleteDoc, doc, collection, query, where, getDocs } = await import('firebase/firestore');
-      const { db } = await import('@/lib/firebase/config');
-
+      // TODO: Delete user data from Supabase collections
       // Delete user document
-      await deleteDoc(doc(db, 'users', user.uid));
-
-      // Delete user's pets
-      const petsQuery = query(collection(db, 'pets'), where('userEmail', '==', user.email));
-      const petsSnapshot = await getDocs(petsQuery);
-
-      for (const petDoc of petsSnapshot.docs) {
-        await deleteDoc(petDoc.ref);
-      }
-
-      // Delete user's owners
-      const ownersQuery = query(collection(db, 'owners'), where('email', '==', user.email));
-      const ownersSnapshot = await getDocs(ownersQuery);
-
-      for (const ownerDoc of ownersSnapshot.docs) {
-        await deleteDoc(ownerDoc.ref);
-      }
-
-      // Delete user's ads if any
-      const adsQuery = query(collection(db, 'ads'), where('userEmail', '==', user.email));
-      const adsSnapshot = await getDocs(adsQuery);
-
-      for (const adDoc of adsSnapshot.docs) {
-        await deleteDoc(adDoc.ref);
-      }
-
-      // Delete user's favorites if any
-      const favoritesQuery = query(collection(db, 'favorites'), where('userEmail', '==', user.email));
-      const favoritesSnapshot = await getDocs(favoritesQuery);
-
-      for (const favoriteDoc of favoritesSnapshot.docs) {
-        await deleteDoc(favoriteDoc.ref);
-      }
-
-      // Delete user's comments if any
-      const commentsQuery = query(collection(db, 'comments'), where('userEmail', '==', user.email));
-      const commentsSnapshot = await getDocs(commentsQuery);
-
-      for (const commentDoc of commentsSnapshot.docs) {
-        await deleteDoc(commentDoc.ref);
-      }
-
+      // Delete user's pets, owners, ads, favorites, comments etc.
+      
       toast.success('Account data deleted successfully');
-
-      // Sign out user instead of deleting Firebase Auth user
+      
+      // Sign out user
       await signOut();
-
+      
       // Redirect to landing page
       window.location.href = '/';
       */

@@ -1,6 +1,6 @@
 // Supabase clients
 export { supabase, getCurrentUser, getSession } from './client';
-export { createServerClient, createServerClientWithAuth } from './server';
+export { createServerClient, createClientWithAuth } from './server';
 
 // Database operations
 export * from './database/users';

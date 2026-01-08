@@ -1,0 +1,8 @@
+[
+  {"id": 1, "name": "Mixed Breed", "type": "dog"},
+  {"id": 2, "name": "Labrador Retriever", "type": "dog"},
+  {"id": 3, "name": "Golden Retriever", "type": "dog"},
+  {"id": 175, "name": "Mixed Breed", "type": "cat"},
+  {"id": 176, "name": "Persian", "type": "cat"},
+  {"id": 177, "name": "Siamese", "type": "cat"}
+]
