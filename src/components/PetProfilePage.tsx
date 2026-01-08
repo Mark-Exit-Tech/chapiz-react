@@ -50,12 +50,12 @@ export default function PetProfilePage({
   const [promo, setPromo] = useState<Promo | null>(null);
   const [isLoadingPromo, setIsLoadingPromo] = useState(false);
   const adShownRef = useRef<boolean>(false); // Track if ad has been shown on this page load
-  
+
   // Get data from URL parameters if available (passed from My Pets page)
   const displayName = searchParams.get('displayName');
   const displayBreed = searchParams.get('displayBreed');
   const displayImage = searchParams.get('displayImage');
-  
+
   // Save petId to localStorage when pet profile page loads (for ad tracking)
   useEffect(() => {
     if (pet?.id && pet.id !== localStoragePetId) {
@@ -63,13 +63,13 @@ export default function PetProfilePage({
       console.log('[PetProfilePage] Saved petId to localStorage:', pet.id);
     }
   }, [pet?.id, localStoragePetId, savePetId]);
-  
+
   // Load and show ad when pet profile page loads (mandatory ad - only once)
   useEffect(() => {
     const loadAd = async () => {
       // Only show ad if pet exists and we haven't shown an ad yet on this page load
       const hasPet = localStoragePetId || pet?.id;
-      
+
       if (hasPet && !adShownRef.current && !showPromo && !isLoadingPromo && !promo) {
         setIsLoadingPromo(true);
         try {
@@ -102,7 +102,7 @@ export default function PetProfilePage({
     setPromo(null);
     // Don't reset adShownRef - we want to show ad only once per page load
   };
-  
+
 
   // Determine available tabs (exclude Vet if no vet data)
   const availableTabs: TabName[] = ['pet', 'owner'];
@@ -117,9 +117,9 @@ export default function PetProfilePage({
 
   // Memoized values
   const petCardData = useMemo(
-    () => ({ 
-      name: displayName || pet.name, 
-      imageUrl: displayImage || pet.imageUrl 
+    () => ({
+      name: displayName || pet.name,
+      imageUrl: displayImage || pet.imageUrl
     }),
     [displayName, pet.name, displayImage, pet.imageUrl]
   );
@@ -144,8 +144,8 @@ export default function PetProfilePage({
     // If still not found, check English labels for Hebrew locale
     if (!gender && locale === 'he') {
       const englishGenders = getGenders('en');
-      const englishGender = englishGenders.find(g => 
-        g.value.toLowerCase() === normalizedValue || 
+      const englishGender = englishGenders.find(g =>
+        g.value.toLowerCase() === normalizedValue ||
         g.label.toLowerCase() === normalizedValue
       );
       if (englishGender) {
@@ -163,18 +163,18 @@ export default function PetProfilePage({
       console.log('PetProfilePage - using breed from URL:', displayBreed);
       return displayBreed;
     }
-    
-    console.log('PetProfilePage - pet data:', { 
-      breedId: pet.breedId, 
-      breedName: pet.breedName, 
+
+    console.log('PetProfilePage - pet data:', {
+      breedId: pet.breedId,
+      breedName: pet.breedName,
       breed: pet.breed,
-      locale 
+      locale
     });
-    
+
     // Get breed name with proper translation (exact same logic as MyPetClient)
     let breedDisplay = pet.breedName || pet.breed || 'Unknown Breed';
     console.log('PetProfilePage - initial breedDisplay:', breedDisplay);
-    
+
     if (pet.breedId) {
       // Look up breed from breedsData
       const breed = breedsData.find(b => b.id === Number(pet.breedId));
@@ -184,8 +184,8 @@ export default function PetProfilePage({
       console.log('PetProfilePage - breed from ID:', breedDisplay);
     } else if (breedDisplay && breedDisplay !== 'Unknown Breed') {
       // Try to find the breed in comprehensive data and translate it
-      const breed = breedsData.find(b => 
-        b.en.toLowerCase() === breedDisplay.toLowerCase() || 
+      const breed = breedsData.find(b =>
+        b.en.toLowerCase() === breedDisplay.toLowerCase() ||
         b.he === breedDisplay
       );
       console.log('PetProfilePage - breed found in data:', breed);
@@ -193,7 +193,7 @@ export default function PetProfilePage({
         breedDisplay = locale === 'he' ? breed.he : breed.en;
       }
     }
-    
+
     console.log('PetProfilePage - final breedDisplay:', breedDisplay);
     return breedDisplay;
   };
@@ -227,65 +227,65 @@ export default function PetProfilePage({
 
   const ownerInfo = owner
     ? [
-        {
-          // Owner name is always public
-          label: t('labels.name'),
-          value: owner.fullName || owner.displayName || ''
-        },
-        {
-          label: t('labels.contact'),
-          value: owner.isPhonePrivate
-            ? t('labels.private')
-            : owner.phoneNumber || owner.phone || '',
-          link: owner.isPhonePrivate
-            ? undefined
-            : owner.phoneNumber || owner.phone
+      {
+        // Owner name is always public
+        label: t('labels.name'),
+        value: owner.fullName || owner.displayName || ''
+      },
+      {
+        label: t('labels.contact'),
+        value: owner.isPhonePrivate
+          ? t('labels.private')
+          : owner.phoneNumber || owner.phone || '',
+        link: owner.isPhonePrivate
+          ? undefined
+          : owner.phoneNumber || owner.phone
             ? `https://wa.me/${(owner.phoneNumber || owner.phone || '').replace(/[^0-9]/g, '')}`
             : undefined
-        },
-        {
-          label: t('labels.email'),
-          value: owner.isEmailPrivate
-            ? t('labels.private')
-            : owner.email || '',
-          link: owner.isEmailPrivate
-            ? undefined
-            : owner.email
+      },
+      {
+        label: t('labels.email'),
+        value: owner.isEmailPrivate
+          ? t('labels.private')
+          : owner.email || '',
+        link: owner.isEmailPrivate
+          ? undefined
+          : owner.email
             ? `mailto:${owner.email}`
             : undefined
-        },
-        {
-          label: t('labels.address'),
-          value: owner.isAddressPrivate
-            ? t('labels.private')
-            : owner.homeAddress || ''
-        }
-      ]
+      },
+      {
+        label: t('labels.address'),
+        value: owner.isAddressPrivate
+          ? t('labels.private')
+          : owner.homeAddress || ''
+      }
+    ]
     : [];
 
   const vetInfo = vet
     ? [
-        {
-          label: t('labels.name'),
-          value: vet.isNamePrivate ? t('labels.private') : vet.name
-        },
-        {
-          label: t('labels.contact'),
-          value: vet.isPhonePrivate
-            ? t('labels.private')
-            : vet.phoneNumber
-        },
-        {
-          label: t('labels.email'),
-          value: vet.isEmailPrivate ? t('labels.private') : vet.email
-        },
-        {
-          label: t('labels.address'),
-          value: vet.isAddressPrivate
-            ? t('labels.private')
-            : vet.address
-        }
-      ]
+      {
+        label: t('labels.name'),
+        value: vet.isNamePrivate ? t('labels.private') : vet.name
+      },
+      {
+        label: t('labels.contact'),
+        value: vet.isPhonePrivate
+          ? t('labels.private')
+          : vet.phoneNumber
+      },
+      {
+        label: t('labels.email'),
+        value: vet.isEmailPrivate ? t('labels.private') : vet.email
+      },
+      {
+        label: t('labels.address'),
+        value: vet.isAddressPrivate
+          ? t('labels.private')
+          : vet.address
+      }
+    ]
     : [];
 
   // Effect hooks
@@ -339,7 +339,7 @@ export default function PetProfilePage({
   return (
     <>
       <Navbar />
-      
+
       {/* Mobile View */}
       <div className="md:hidden">
         <div className="relative overflow-hidden">
@@ -348,7 +348,7 @@ export default function PetProfilePage({
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => router.back()}
+              onClick={() => navigate(-1)}
               className="bg-white/90 hover:bg-white shadow-md"
             >
               {locale === 'he' ? (
@@ -399,7 +399,7 @@ export default function PetProfilePage({
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => router.back()}
+              onClick={() => navigate(-1)}
             >
               {locale === 'he' ? (
                 <ArrowLeft className="h-4 w-4" />

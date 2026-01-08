@@ -2,8 +2,9 @@
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { Check, ChevronsUpDown, Filter, Clock, Star } from 'lucide-react';
-import { useTranslations, useLocale } from 'next-intl';
-import { cn } from '@/src/lib/utils';
+import { useTranslation } from 'react-i18next';
+import { useLocale } from '@/hooks/use-locale';
+import { cn } from '@/lib/utils';
 import { Button } from './button';
 import {
   Command,
@@ -19,17 +20,17 @@ import {
   PopoverTrigger,
 } from './popover';
 import { Badge } from './badge';
-import { getLocalizedBreedsForType, type PetType } from '@/src/lib/data/breeds';
+import { getLocalizedBreedsForType, type PetType } from '@/lib/data/breeds';
 import { HebrewAlphabetFilter, HebrewLetterRangeSelector } from './hebrew-alphabet-filter';
-import { sortHebrewStrings, compareHebrew } from '@/src/lib/utils/hebrew-sort';
-import { 
-  fuzzySearch, 
-  getSuggestions, 
-  RecentSelectionsManager, 
+import { sortHebrewStrings, compareHebrew } from '@/lib/utils/hebrew-sort';
+import {
+  fuzzySearch,
+  getSuggestions,
+  RecentSelectionsManager,
   debounce,
   type AutocompleteItem,
-  type AutocompleteMatch 
-} from '@/src/lib/utils/autocomplete';
+  type AutocompleteMatch
+} from '@/lib/utils/autocomplete';
 
 interface BreedSelectProps {
   petType: PetType;
@@ -54,7 +55,7 @@ export function BreedSelect({
   hasError = false,
   disabled = false
 }: BreedSelectProps) {
-  const { t } = useTranslations('Pet.add.form.breed');
+  const { t } = useTranslation('Pet');
   const locale = useLocale() as 'en' | 'he';
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
@@ -64,8 +65,8 @@ export function BreedSelect({
   const [recentSelections, setRecentSelections] = useState<string[]>([]);
 
   // Initialize recent selections manager
-  const recentManager = useMemo(() => 
-    new RecentSelectionsManager(`breed-recent-${petType}-${locale}`, 5), 
+  const recentManager = useMemo(() =>
+    new RecentSelectionsManager(`breed-recent-${petType}-${locale}`, 5),
     [petType, locale]
   );
 
@@ -87,17 +88,17 @@ export function BreedSelect({
       return [];
     }
   }, [petType, locale]);
-  
+
   // Use Hebrew filtered breeds if Hebrew filter is active, otherwise use all breeds
   const breedsToFilter = hebrewFilteredBreeds.length > 0 ? hebrewFilteredBreeds : breeds;
-  
+
   // Convert breeds to autocomplete items
-  const autocompleteItems: AutocompleteItem[] = useMemo(() => 
+  const autocompleteItems: AutocompleteItem[] = useMemo(() =>
     breedsToFilter.map(breed => ({
       id: breed.id,
       name: breed.name,
       ...breed
-    })), 
+    })),
     [breedsToFilter]
   );
 
@@ -108,16 +109,16 @@ export function BreedSelect({
         console.log('No autocomplete items available');
         return;
       }
-      
+
       console.log(`Searching for: "${query}" in ${autocompleteItems.length} items`);
-      
+
       // Show all breeds when search is empty, limit when searching
       const matches = getSuggestions(query, autocompleteItems, recentSelections, {
         limit: query.trim() ? 15 : autocompleteItems.length, // Show all when empty
         includeRecent: true,
         minScore: query.trim() ? 0 : 0  // Allow all matches, let scoring handle relevance
       });
-      
+
       console.log(`Found ${matches.length} matches`);
       setAutocompleteMatches(matches);
     }, 100), // Reduced debounce time for more responsive search
@@ -271,7 +272,7 @@ export function BreedSelect({
                 </Button>
               )}
             </div>
-            
+
             {locale === 'he' && showHebrewFilter && (
               <div className="p-3 border-b bg-gray-50">
                 <HebrewAlphabetFilter
@@ -289,10 +290,10 @@ export function BreedSelect({
                 />
               </div>
             )}
-            
+
             <CommandList>
               <CommandEmpty>{t('noBreedFound')}</CommandEmpty>
-              
+
               {/* Recent selections group */}
               {recentSelections.length > 0 && !searchValue.trim() && (
                 <CommandGroup heading={
@@ -327,9 +328,9 @@ export function BreedSelect({
                         />
                         <div className="flex-1 flex items-center gap-2">
                           <Star className="h-3 w-3 text-yellow-500" />
-                          <span 
-                            dangerouslySetInnerHTML={{ 
-                              __html: breed.highlightedName || breed.name 
+                          <span
+                            dangerouslySetInnerHTML={{
+                              __html: breed.highlightedName || breed.name
                             }}
                           />
                         </div>
@@ -340,7 +341,7 @@ export function BreedSelect({
                     ))}
                 </CommandGroup>
               )}
-              
+
               {/* All breeds group */}
               <CommandGroup heading={
                 searchValue.trim() ? (
@@ -385,10 +386,10 @@ export function BreedSelect({
                         {breed.isRecent && !searchValue.trim() && (
                           <Star className="h-3 w-3 text-yellow-500" />
                         )}
-                        <span 
+                        <span
                           className="flex-1"
-                          dangerouslySetInnerHTML={{ 
-                            __html: breed.highlightedName || breed.name 
+                          dangerouslySetInnerHTML={{
+                            __html: breed.highlightedName || breed.name
                           }}
                         />
                       </div>

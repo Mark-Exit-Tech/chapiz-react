@@ -68,7 +68,4 @@ export default function AdminBottomNav({ locale }: AdminBottomNavProps) {
             </nav>
         </div>
     );
-            </nav >
-        </div >
-    );
 }

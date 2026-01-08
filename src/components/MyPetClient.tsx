@@ -30,7 +30,7 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
   const { t } = useTranslation('pages.MyPetsPage');
   const locale = useLocale() as 'en' | 'he';
   const { user, loading } = useAuth();
-  const router = useNavigate();
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [isEditMode, setIsEditMode] = useState(false);
   const [pets, setPets] = useState(initialPets);
@@ -67,7 +67,7 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
               try {
                 // Use the same function that works for the details page
                 const result = await getPetWithConsolidatedOwner(petDoc.id);
-                
+
                 if (result.success && result.pet) {
                   console.log('Pet data from consolidated method:', result.pet);
                   // Get breed name with proper translation
@@ -85,8 +85,8 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
                     } else {
                       // Try to find the breed in comprehensive data and translate it
                       const { breedsData } = await import('@/lib/data/comprehensive-breeds');
-                      const breed = breedsData.find(b => 
-                        b.en.toLowerCase() === breedDisplay.toLowerCase() || 
+                      const breed = breedsData.find(b =>
+                        b.en.toLowerCase() === breedDisplay.toLowerCase() ||
                         b.he === breedDisplay
                       );
                       if (breed) {
@@ -94,7 +94,7 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
                       }
                     }
                   }
-                  
+
                   return {
                     id: result.pet.id,
                     name: result.pet.name || 'Unknown Pet',
@@ -151,7 +151,7 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
     };
 
     fetchPets();
-  }, [user?.uid, user?.email, loading]);
+  }, [user?.id, user?.email, loading]);
 
   const filteredPets = pets.filter((pet) =>
     pet.name.toLowerCase().includes(search.toLowerCase())

@@ -5,6 +5,7 @@ import PetDetailsPage from '@/components/get-started/PetDetailsPage';
 import VetDetailsPage from '@/components/get-started/VetDetailsPage';
 import GetStartedFloatingActionButton from '@/components/get-started/ui/GetStartedFloatingActionButton';
 import GetStartedProgressDots from '@/components/get-started/ui/GetStartedProgressDots';
+import { useLocale } from '@/hooks/use-locale';
 import { useNavigate } from 'react-router-dom';
 import { usePetId } from '@/hooks/use-pet-id';
 import { useParams } from 'react-router-dom';
@@ -13,7 +14,7 @@ import { getUserFromFirestore } from '@/lib/supabase/database/users';
 import { useAuth } from '@/contexts/AuthContext';
 import { getPetRegisterSchemas } from '@/utils/validation/petRegister';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useLocale, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
@@ -28,7 +29,7 @@ export default function ClientRegisterPetPage({
   breeds: { id: number; labels: { en: string; he: string } }[];
   userDetails: { fullName: string; phone: string; email: string };
 }) {
-  const router = useNavigate();
+  const navigate = useNavigate();
   const locale = useLocale() as 'en' | 'he';
   const { t } = useTranslation('');
   const { user } = useAuth();
@@ -74,7 +75,7 @@ export default function ClientRegisterPetPage({
       weight: '', // Add weight field
       notes: '',
       // Use authenticated user data if available, otherwise use userDetails
-      ownerFullName: user?.displayName || userDetails.fullName || '',
+      ownerFullName: user?.user_metadata?.full_name || user?.user_metadata?.name || userDetails.fullName || '',
       ownerPhoneNumber: userDetails.phone || '',
       ownerEmailAddress: user?.email || userDetails.email || '',
       ownerHomeAddress: '',
@@ -103,7 +104,7 @@ export default function ClientRegisterPetPage({
     const fetchUserDetails = async () => {
       if (user && isHydrated) {
         try {
-          const userResult = await getUserFromFirestore(user.uid);
+          const userResult = await getUserFromFirestore(user.id);
           if (userResult.success && userResult.user) {
             // Format phone number to include country code if it doesn't have one
             let phoneNumber = userResult.user.phone || userDetails.phone || '';
@@ -115,24 +116,24 @@ export default function ClientRegisterPetPage({
                 phoneNumber = '+972' + phoneNumber;
               }
             }
-            
+
             const updatedData = {
-              ownerFullName: user.displayName || userResult.user.displayName || userDetails.fullName || '',
+              ownerFullName: user.user_metadata?.full_name || user.user_metadata?.name || userResult.user.display_name || userResult.user.full_name || userDetails.fullName || '',
               ownerEmailAddress: user.email || userResult.user.email || userDetails.email || '',
               ownerPhoneNumber: phoneNumber,
               ownerHomeAddress: userResult.user.address || '' // Fetch address from user profile
             };
-            
+
             console.log('Fetched user data for form:', {
               originalPhone: userResult.user.phone,
               formattedPhone: phoneNumber,
               address: userResult.user.address,
               allFields: Object.keys(userResult.user)
             });
-            
+
             // Update form data
             setFormData(prev => ({ ...prev, ...updatedData }));
-            
+
             // Reset form with updated data
             methods.reset(prev => ({ ...prev, ...updatedData }));
           }
@@ -140,11 +141,11 @@ export default function ClientRegisterPetPage({
           console.error('Error fetching user details:', error);
           // Fallback to userDetails if Firestore fetch fails
           const updatedData = {
-            ownerFullName: user.displayName || userDetails.fullName || '',
+            ownerFullName: user.user_metadata?.full_name || user.user_metadata?.name || userDetails.fullName || '',
             ownerEmailAddress: user.email || userDetails.email || '',
             ownerPhoneNumber: userDetails.phone || ''
           };
-          
+
           setFormData(prev => ({ ...prev, ...updatedData }));
           methods.reset(prev => ({ ...prev, ...updatedData }));
         }
@@ -170,7 +171,7 @@ export default function ClientRegisterPetPage({
         id: petId,
         ...allFormData,
         user_email: user.email,
-        owner_id: user.uid
+        owner_id: user.id
       } as any);
 
       if (result.success) {

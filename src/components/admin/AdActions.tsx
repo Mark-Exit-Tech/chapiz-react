@@ -31,7 +31,8 @@ import {
 import { AdStatus, AdType, deleteAd, updateAd, Ad } from '@/lib/actions/admin';
 import { MoreHorizontal } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation, useLocale } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import { useLocale } from '@/hooks/use-locale';
 import { useState, useEffect } from 'react';
 import { HEBREW_SERVICE_TAGS } from '@/lib/constants/hebrew-service-tags';
 import { getPetTypesForDropdown, getBreedsForDropdown, getAreasForDropdown, getCitiesForDropdown, getAgeRangesForDropdown, getWeightRangesForDropdown } from '@/lib/supabase/database/pets';
@@ -45,7 +46,7 @@ interface AdActionsProps {
 
 export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
   const { t } = useTranslation('Admin');
-  const tCommon = useTranslation('common');
+  const { t: tCommon } = useTranslation('common');
   const locale = useLocale() as 'en' | 'he';
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -228,7 +229,7 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
       if (onUpdate) {
         onUpdate();
       } else {
-        router.refresh();
+        window.location.reload();
       }
     } catch (err: any) {
       setError(err.message || 'Failed to update advertisement');
@@ -254,7 +255,7 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
         if (onDelete) {
           onDelete();
         } else {
-          router.refresh();
+          window.location.reload();
         }
       } else {
         setError(result.error || 'Failed to delete advertisement');
@@ -499,8 +500,8 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
                       onClick={() => addPredefinedTag(tag)}
                       disabled={formData.tags.includes(tag)}
                       className={`px-3 py-1 rounded-full text-sm border transition-colors ${formData.tags.includes(tag)
-                          ? 'bg-primary text-primary-foreground border-primary'
-                          : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+                        ? 'bg-primary text-primary-foreground border-primary'
+                        : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
                         }`}
                     >
                       {tag}
