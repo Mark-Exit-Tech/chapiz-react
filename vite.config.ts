@@ -19,7 +19,7 @@ export default defineConfig({
     },
   },
   // Environment variable prefix
-  envPrefix: 'VITE_',
+  envPrefix: ['VITE_', 'NEXT_PUBLIC_'],
   // Build optimizations
   build: {
     target: 'es2015',
