@@ -19,10 +19,10 @@ interface EditableTableCellProps {
   onUpdate?: (petId: string, field: 'type' | 'breed' | 'gender' | 'weight', newValue: string) => void;
 }
 
-export default function EditableTableCell({ 
-  value, 
-  field, 
-  petId, 
+export default function EditableTableCell({
+  value,
+  field,
+  petId,
   className = '',
   onUpdate
 }: EditableTableCellProps) {
@@ -43,19 +43,19 @@ export default function EditableTableCell({
     setIsLoading(true);
     try {
       let data: { value: string; label: string }[] = [];
-      
+
       switch (field) {
         case 'type':
           data = await getPetTypesForDropdown(locale);
           break;
         case 'breed':
-          data = await getBreedsForDropdown(undefined, locale);
+          data = await getBreedsForDropdown(locale);
           break;
         case 'gender':
           data = await getGendersForDropdown(locale);
           break;
       }
-      
+
       setOptions(data);
     } catch (error) {
       console.error('Error fetching options:', error);
@@ -68,10 +68,10 @@ export default function EditableTableCell({
   // Get the translated label for the current value
   const getTranslatedLabel = (value: string): string => {
     if (field === 'weight') return value;
-    
+
     try {
       let data: { value: string; label: string }[] = [];
-      
+
       switch (field) {
         case 'type':
           data = getPetTypes(locale);
@@ -83,7 +83,7 @@ export default function EditableTableCell({
           data = getGenders(locale);
           break;
       }
-      
+
       const option = data.find(opt => opt.value === value);
       return option ? option.label : value;
     } catch (error) {
@@ -120,7 +120,7 @@ export default function EditableTableCell({
 
   if (!isEditing) {
     return (
-      <div 
+      <div
         className={`cursor-pointer hover:bg-gray-50 p-2 rounded ${className}`}
         onClick={() => setIsEditing(true)}
       >
@@ -162,7 +162,7 @@ export default function EditableTableCell({
           </SelectContent>
         </Select>
       )}
-      
+
       <Button
         size="sm"
         variant="ghost"
@@ -172,7 +172,7 @@ export default function EditableTableCell({
       >
         <Check className="h-4 w-4 text-green-600" />
       </Button>
-      
+
       <Button
         size="sm"
         variant="ghost"

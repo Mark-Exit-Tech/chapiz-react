@@ -113,7 +113,7 @@ const GetStartedDatePicker = ({
                 : undefined
             }
             components={{
-              Caption: ({ displayMonth }) => (
+              MonthCaption: ({ calendarMonth }) => (
                 <div className="flex items-center justify-between gap-2 px-2 py-1">
                   {/* Month Dropdown */}
                   <div className="w-1/2">
@@ -121,7 +121,7 @@ const GetStartedDatePicker = ({
                       value={
                         parsedDate
                           ? parsedDate.getMonth().toString()
-                          : displayMonth.getMonth().toString()
+                          : calendarMonth.date.getMonth().toString()
                       }
                       onValueChange={handleMonthChange}
                     >
@@ -132,7 +132,7 @@ const GetStartedDatePicker = ({
                               0,
                               parsedDate
                                 ? parsedDate.getMonth()
-                                : displayMonth.getMonth()
+                                : calendarMonth.date.getMonth()
                             ),
                             'M'
                           )}
@@ -154,7 +154,7 @@ const GetStartedDatePicker = ({
                       value={
                         parsedDate
                           ? parsedDate.getFullYear().toString()
-                          : displayMonth.getFullYear().toString()
+                          : calendarMonth.date.getFullYear().toString()
                       }
                       onValueChange={handleYearChange}
                     >
@@ -162,7 +162,7 @@ const GetStartedDatePicker = ({
                         <SelectValue>
                           {parsedDate
                             ? parsedDate.getFullYear().toString()
-                            : displayMonth.getFullYear().toString()}
+                            : calendarMonth.date.getFullYear().toString()}
                         </SelectValue>
                       </SelectTrigger>
                       <SelectContent>

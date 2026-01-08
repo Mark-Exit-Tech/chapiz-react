@@ -30,7 +30,7 @@ const PetDetailsPage: React.FC<PetDetailsPageProps> = () => {
   const [genders, setGenders] = useState<{ value: string; label: string }[]>([]);
   const [petTypes, setPetTypes] = useState<{ value: string; label: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // Watch the pet type to filter breeds
   const selectedPetType = watch('type');
 
@@ -51,7 +51,7 @@ const PetDetailsPage: React.FC<PetDetailsPageProps> = () => {
           getGendersForDropdown(locale),
           getPetTypesForDropdown(locale)
         ]);
-        
+
         setGenders(gendersData);
         setPetTypes(typesData);
       } catch (error) {
@@ -88,7 +88,7 @@ const PetDetailsPage: React.FC<PetDetailsPageProps> = () => {
               value={field.value} // Controlled value
               onFileChange={field.onChange} // Controlled onChange
               required={false}
-              error={errors.imageUrl?.message}
+              error={errors.imageUrl?.message as string}
             />
           )}
         />

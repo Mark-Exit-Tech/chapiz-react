@@ -177,14 +177,18 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
     setUploadProgress({ progress: 0, status: 'uploading' });
 
     try {
-      const downloadURL = await uploadPetImage(file, pet.id);
+      const result = await uploadPetImage(file, pet.id);
 
-      setFormData(prev => ({
-        ...prev,
-        imageUrl: downloadURL
-      }));
-      setUploadProgress({ progress: 100, status: 'completed' });
-      toast.success('Image uploaded successfully');
+      if (result.success && result.downloadURL) {
+        setFormData(prev => ({
+          ...prev,
+          imageUrl: result.downloadURL!
+        }));
+        setUploadProgress({ progress: 100, status: 'completed' });
+        toast.success('Image uploaded successfully');
+      } else {
+        throw new Error(result.error || 'Upload failed');
+      }
     } catch (error) {
       console.error('Upload error:', error);
       setUploadProgress({ progress: 0, status: 'error' });

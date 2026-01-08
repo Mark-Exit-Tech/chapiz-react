@@ -6,6 +6,15 @@ export function useShopRedirect() {
     },
     getShopUrl: () => {
       return '';
-    }
+    },
+    getShopUrlWithUniqueCallback: (url: string, code?: string) => {
+      console.log('getShopUrlWithUniqueCallback not implemented', url, code);
+      return {
+        shopUrl: url,
+        callbackToken: 'dummy-token',
+        callbackUrl: 'https://example.com/callback'
+      };
+    },
+    isAuthenticated: true // Set to true for development/example purposes
   };
 }

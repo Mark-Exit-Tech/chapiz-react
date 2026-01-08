@@ -3,10 +3,10 @@ import { supabase } from './client';
 /**
  * Upload a pet image to Supabase Storage
  */
-export async function uploadPetImage(file: File, petId: string): Promise<string> {
+export async function uploadPetImage(file: File, userId: string): Promise<{ success: boolean; downloadURL?: string; error?: string }> {
     try {
         const fileExt = file.name.split('.').pop();
-        const fileName = `${petId}-${Date.now()}.${fileExt}`;
+        const fileName = `${userId}-${Date.now()}.${fileExt}`;
         const filePath = `pets/${fileName}`;
 
         const { data, error } = await supabase.storage
@@ -18,7 +18,7 @@ export async function uploadPetImage(file: File, petId: string): Promise<string>
 
         if (error) {
             console.error('Error uploading pet image:', error);
-            throw error;
+            return { success: false, error: error.message };
         }
 
         // Get public URL
@@ -26,10 +26,13 @@ export async function uploadPetImage(file: File, petId: string): Promise<string>
             .from('pet-images')
             .getPublicUrl(filePath);
 
-        return publicUrl;
+        return { success: true, downloadURL: publicUrl };
     } catch (error) {
         console.error('Error in uploadPetImage:', error);
-        throw error;
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error'
+        };
     }
 }
 

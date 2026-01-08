@@ -99,16 +99,16 @@ export default function AddNewPetForm() {
     try {
       const result = await uploadPetImage(file, user.id);
 
-      if (result) {
+      if (result.success && result.downloadURL) {
         setFormData(prev => ({
           ...prev,
-          imageUrl: result || ''
+          imageUrl: result.downloadURL || ''
         }));
         setUploadProgress({ progress: 100, status: 'completed' });
         toast.success(t('success.imageUploaded'));
       } else {
         setUploadProgress({ progress: 0, status: 'error' });
-        toast.error(t('errors.uploadFailed'));
+        toast.error(result.error || t('errors.uploadFailed'));
       }
     } catch (error) {
       console.error('Upload error:', error);
