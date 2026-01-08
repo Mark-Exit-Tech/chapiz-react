@@ -15,7 +15,7 @@ const AnimatedTabs = ({
   onTabChange,
   showVetTab
 }: AnimatedTabsProps) => {
-  const t = useTranslation('pages.PetProfilePage');
+  const { t } = useTranslation('pages.PetProfilePage');
 
   // Build the tabs array. Only include the Vet tab if showVetTab is true.
   const baseTabs = [
@@ -58,11 +58,10 @@ const AnimatedTabs = ({
         <button
           key={tab.id}
           onClick={() => onTabChange(tab.id as TabName)}
-          className={`relative rounded-full px-3 py-1.5 text-lg font-normal transition focus-visible:outline-2 ${
-            activeTab === tab.id
+          className={`relative rounded-full px-3 py-1.5 text-lg font-normal transition focus-visible:outline-2 ${activeTab === tab.id
               ? 'text-black'
               : 'text-gray-500 hover:text-black'
-          }`}
+            }`}
           style={{ WebkitTapHighlightColor: 'transparent' }}
         >
           {activeTab === tab.id && (

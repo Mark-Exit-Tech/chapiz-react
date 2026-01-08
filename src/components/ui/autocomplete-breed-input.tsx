@@ -2,19 +2,19 @@
 
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { Check, X, Clock, Star, Search } from 'lucide-react';
-import { useTranslations, useLocale } from 'next-intl';
-import { cn } from '@/src/lib/utils';
+import { useTranslation } from 'react-i18next';
+import { cn } from '@/lib/utils';
 import { Badge } from './badge';
 import { Button } from './button';
-import { getLocalizedBreedsForType, type PetType } from '@/src/lib/data/breeds';
-import { compareHebrew } from '@/src/lib/utils/hebrew-sort';
-import { 
-  getSuggestions, 
-  RecentSelectionsManager, 
+import { getLocalizedBreedsForType, type PetType } from '@/lib/data/breeds';
+import { compareHebrew } from '@/lib/utils/hebrew-sort';
+import {
+  getSuggestions,
+  RecentSelectionsManager,
   debounce,
   type AutocompleteItem,
-  type AutocompleteMatch 
-} from '@/src/lib/utils/autocomplete';
+  type AutocompleteMatch
+} from '@/lib/utils/autocomplete';
 
 interface AutocompleteBreedInputProps {
   petType: PetType;
@@ -43,8 +43,8 @@ export function AutocompleteBreedInput({
   allowCustomInput = false,
   maxSuggestions = 8
 }: AutocompleteBreedInputProps) {
-  const t = useTranslations('Pet.add.form.breed');
-  const locale = useLocale() as 'en' | 'he';
+  const { t, i18n } = useTranslation('Pet', { keyPrefix: 'add.form.breed' });
+  const locale = (i18n.language || 'en') as 'en' | 'he';
   const [inputValue, setInputValue] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -54,8 +54,8 @@ export function AutocompleteBreedInput({
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
   // Initialize recent selections manager
-  const recentManager = useMemo(() => 
-    new RecentSelectionsManager(`breed-autocomplete-${petType}-${locale}`, 5), 
+  const recentManager = useMemo(() =>
+    new RecentSelectionsManager(`breed-autocomplete-${petType}-${locale}`, 5),
     [petType, locale]
   );
 
@@ -79,12 +79,12 @@ export function AutocompleteBreedInput({
   }, [petType, locale]);
 
   // Convert breeds to autocomplete items
-  const autocompleteItems: AutocompleteItem[] = useMemo(() => 
+  const autocompleteItems: AutocompleteItem[] = useMemo(() =>
     breeds.map(breed => ({
       id: breed.id,
       name: breed.name,
       ...breed
-    })), 
+    })),
     [breeds]
   );
 
@@ -135,13 +135,13 @@ export function AutocompleteBreedInput({
   const handleInputChange = (newValue: string) => {
     setInputValue(newValue);
     setShowSuggestions(true);
-    
+
     if (allowCustomInput) {
       // For custom input, update value immediately
       onValueChange(newValue);
     } else {
       // For breed selection, only update if it matches a breed
-      const matchingBreed = breeds.find(breed => 
+      const matchingBreed = breeds.find(breed =>
         breed.name.toLowerCase() === newValue.toLowerCase()
       );
       onValueChange(matchingBreed?.id || '');
@@ -170,13 +170,13 @@ export function AutocompleteBreedInput({
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setSelectedIndex(prev => 
+        setSelectedIndex(prev =>
           prev < autocompleteMatches.length - 1 ? prev + 1 : 0
         );
         break;
       case 'ArrowUp':
         e.preventDefault();
-        setSelectedIndex(prev => 
+        setSelectedIndex(prev =>
           prev > 0 ? prev - 1 : autocompleteMatches.length - 1
         );
         break;
@@ -242,7 +242,7 @@ export function AutocompleteBreedInput({
           {required && '*'}
         </label>
       )}
-      
+
       <div className="relative">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -285,7 +285,7 @@ export function AutocompleteBreedInput({
             {autocompleteMatches.map((match, index) => {
               const isRecent = recentSelections.includes(match.item.id);
               const isSelected = index === selectedIndex;
-              
+
               return (
                 <div
                   key={match.item.id}
@@ -302,8 +302,8 @@ export function AutocompleteBreedInput({
                     )}
                     <span
                       className="flex-1"
-                      dangerouslySetInnerHTML={{ 
-                        __html: match.highlightedName || match.item.name 
+                      dangerouslySetInnerHTML={{
+                        __html: match.highlightedName || match.item.name
                       }}
                     />
                   </div>
@@ -325,11 +325,11 @@ export function AutocompleteBreedInput({
           </div>
         )}
       </div>
-      
+
       {/* Helper text */}
       {showSuggestions && inputValue && autocompleteMatches.length === 0 && (
         <div className="text-xs text-gray-500 mt-1">
-          {allowCustomInput 
+          {allowCustomInput
             ? (locale === 'he' ? 'לחץ Enter להוספת גזע חדש' : 'Press Enter to add custom breed')
             : (locale === 'he' ? 'לא נמצאו גזעים התואמים' : 'No matching breeds found')
           }

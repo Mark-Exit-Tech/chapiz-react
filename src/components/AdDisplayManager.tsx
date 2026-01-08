@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useClickTracker } from '@/hooks/useClickTracker';
+import { useClickTracker } from '../hooks/useClickTracker';
 import { usePetId } from '@/hooks/use-pet-id';
 import { fetchRandomAd } from '@/lib/actions/ads-server';
 import AdFullPage from './get-started/AdFullPage';

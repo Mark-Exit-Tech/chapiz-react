@@ -17,5 +17,5 @@ interface EditPetPageProps {
 }
 
 export default function EditPetPage({ pet }: EditPetPageProps) {
-  return <EditPetForm pet={pet} />;
+  return <EditPetForm pet={{ ...pet, breedName: pet.breed }} />;
 }
