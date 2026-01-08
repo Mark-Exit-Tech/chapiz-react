@@ -118,14 +118,14 @@ export default function InstallBannerSettingsForm({ initialData }: InstallBanner
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="enabled">Enable Install Banner</Label>
+                <Label htmlFor="isEnabled">Enable Install Banner</Label>
                 <p className="text-sm text-gray-500">
                   Show the banner to mobile users prompting them to add the site to their home screen
                 </p>
               </div>
               <Switch
-                id="enabled"
-                checked={formData.enabled}
+                id="isEnabled"
+                checked={formData.isEnabled}
                 onCheckedChange={handleSwitchChange}
               />
             </div>
@@ -139,7 +139,7 @@ export default function InstallBannerSettingsForm({ initialData }: InstallBanner
                 onChange={handleChange}
                 placeholder="Enter the text to display in the install banner..."
                 rows={3}
-                disabled={!formData.enabled}
+                disabled={!formData.isEnabled}
               />
               <p className="text-xs text-gray-500">
                 This text will be shown to users on mobile devices

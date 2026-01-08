@@ -10,7 +10,7 @@ export async function fetchRandomPromo(): Promise<Promo | null> {
     // Using the same function as ads for now - this is a stub
     const ad = await getRandomActiveAd();
     if (!ad) return null;
-    
+
     // Convert Ad to Promo format (stub implementation)
     return {
       id: ad.id,
@@ -19,8 +19,10 @@ export async function fetchRandomPromo(): Promise<Promo | null> {
       imageUrl: ad.imageUrl,
       isActive: true,
       createdAt: new Date(),
-      updatedAt: new Date()
-    } as Promo;
+      updatedAt: new Date(),
+      name: ad.title,
+      createdBy: 'system'
+    } as unknown as Promo;
   } catch (error) {
     console.error('Error in fetchRandomPromo server action:', error);
     return null;

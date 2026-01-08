@@ -8,6 +8,73 @@ import { createServerClient } from '@/lib/supabase/server';
 
 console.warn('⚠️ Admin actions are using stubs - All functions need Supabase implementation.');
 
+// Type Definitions
+export type ContactInfo = {
+  email: string;
+  phone: string;
+  address: string;
+  whatsapp: string;
+  facebook: string;
+  instagram: string;
+  storeUrl: string;
+  androidAppUrl: string;
+  iosAppUrl: string;
+}
+
+export type ContactSubmission = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  createdAt: Date;
+}
+
+export type InstallBannerSettings = {
+  isEnabled: boolean;
+  iosAppId: string;
+  androidAppId: string;
+  showAfterSeconds: number;
+  bannerText: string;
+  logoUrl: string;
+}
+
+export type CookieSettings = {
+  analyticsEnabled: boolean;
+  marketingEnabled: boolean;
+  necessaryCookiesEnabled: boolean;
+  cookieBannerText: string;
+  cookiePolicyUrl: string;
+}
+
+export type AdStatus = 'active' | 'inactive' | 'pending' | 'scheduled';
+export type AdType = 'image' | 'video';
+
+export interface Ad {
+  id: string;
+  title: string;
+  content: string;
+  type: AdType;
+  status: AdStatus;
+  startDate: string | null;
+  endDate: string | null;
+  phone?: string;
+  location?: string;
+  description?: string;
+  tags?: string[];
+  area?: string;
+  city?: string[];
+  petType?: string;
+  breed?: string;
+  ageRange?: string[];
+  weight?: string[];
+  views: number;
+  clicks: number;
+  duration?: number;
+  imageUrl?: string;
+  createdAt?: string;
+}
+
 // Stub functions that return empty/default values
 export async function getDashboardStats() {
   return {
@@ -116,35 +183,6 @@ export async function saveInstallBannerSettings(settings: InstallBannerSettings)
   return { success: true, error: undefined };
 }
 
-// Ads stubs
-export type AdStatus = 'active' | 'inactive' | 'pending' | 'scheduled';
-export type AdType = 'image' | 'video';
-
-export interface Ad {
-  id: string;
-  title: string;
-  content: string;
-  type: AdType;
-  status: AdStatus;
-  startDate: string | null;
-  endDate: string | null;
-  phone?: string;
-  location?: string;
-  description?: string;
-  tags?: string[];
-  area?: string;
-  city?: string[];
-  petType?: string;
-  breed?: string;
-  ageRange?: string[];
-  weight?: string[];
-  views: number;
-  clicks: number;
-  duration?: number;
-  imageUrl?: string;
-  createdAt?: string;
-}
-
 export async function updateAd(id: string, data: any) {
   return { success: true, error: undefined };
 }
@@ -165,7 +203,8 @@ export async function getCoupons() {
   console.warn('getCoupons is a stub using Supabase');
   return {
     success: true,
-    coupons: []
+    coupons: [],
+    error: undefined
   };
 }
 
@@ -173,7 +212,8 @@ export async function getCouponById(id: string) {
   console.warn('getCouponById is a stub using Supabase');
   return {
     success: true,
-    coupon: null
+    coupon: null,
+    error: undefined
   };
 }
 
@@ -202,7 +242,7 @@ export async function getActiveAdsForServices(serviceType?: string): Promise<Ad[
 
 export async function getBusinesses() {
   console.warn('getBusinesses is a stub using Supabase');
-  return { success: true, businesses: [] }; // Changed from [] to {success, businesses}
+  return { success: true, businesses: [], error: undefined };
 }
 
 export async function getBusinessById(id: string) {
@@ -212,7 +252,7 @@ export async function getBusinessById(id: string) {
 
 export async function getPromos() {
   console.warn('getPromos is a stub using Supabase');
-  return { success: true, promos: [] };
+  return { success: true, promos: [], error: undefined };
 }
 
 export async function getPromoById(id: string) {
@@ -314,7 +354,7 @@ export async function getAllAds(page?: number, limit?: number) {
 
 export async function getFilters() {
   console.warn('getFilters is a stub using Supabase');
-  return { success: true, filters: [], audiences: [] };
+  return { success: true, filters: [], audiences: [], error: undefined };
 }
 
 export async function createFilter(data: CreateFilterData) {
@@ -377,27 +417,21 @@ export async function deleteAudience(id: string) {
 
 export async function getAudiences() {
   console.warn('getAudiences is a stub using Supabase');
-  return { success: true, audiences: [] };
+  return { success: true, audiences: [], error: undefined };
 }
 
 export async function updatePetField(id: string, field: string, value: any) {
   return { success: true, error: undefined };
 }
 
-export async function deletePet(id: string) {
+export async function deletePet(id: string): Promise<{ success: boolean; error?: string }> {
   return { success: true, error: undefined };
 }
 
-export async function saveCookieSettings(data: any) {
+export async function saveCookieSettings(data: CookieSettings): Promise<{ success: boolean; error?: string }> {
   return { success: true, error: undefined };
-}
-
-export type CookieSettings = {
-  analytics: boolean;
-  marketing: boolean;
-  functional: boolean;
 }
 
 export async function getCookieSettings(): Promise<CookieSettings> {
-  return { analytics: false, marketing: false, functional: false };
+  return { analyticsEnabled: false, marketingEnabled: false, necessaryCookiesEnabled: true, cookieBannerText: '', cookiePolicyUrl: '/privacy' };
 }

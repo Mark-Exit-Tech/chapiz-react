@@ -66,7 +66,6 @@ export default function CookieSettingsForm({ initialData }: CookieSettingsFormPr
 
     try {
       const cookieSettings = {
-        cookiesEnabled: formData.cookiesEnabled,
         analyticsEnabled: formData.analyticsEnabled,
         marketingEnabled: formData.marketingEnabled,
         necessaryCookiesEnabled: formData.necessaryCookiesEnabled,
