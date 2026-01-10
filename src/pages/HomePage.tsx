@@ -3,11 +3,13 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import CountUp from 'react-countup';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState, useEffect, lazy, Suspense } from 'react';
 import Footer from '@/components/layout/Footer';
 import OptimizedImage from '@/components/OptimizedImage';
+
+// Lazy load CountUp - used only in whileInView section (below the fold)
+const CountUp = lazy(() => import('react-countup').then(m => ({ default: m.default })));
 
 // Lazy load CookieConsent - not critical for initial render
 const CookieConsent = lazy(() => import('@/components/CookieConsent'));
@@ -437,9 +439,15 @@ const ProductHighlights = () => {
 
         {/* Statistics */}
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-          <StatItem end={2651} label={t('components.ProductHighlights.recoveredPets')} duration={2.5} />
-          <StatItem end={122} label={t('components.ProductHighlights.activeUsers')} duration={2.5} />
-          <StatItem end={24981} label={t('components.ProductHighlights.chipsDeployed')} duration={2.5} />
+          <Suspense fallback={<div className="text-4xl font-extrabold text-primary">0</div>}>
+            <StatItem end={2651} label={t('components.ProductHighlights.recoveredPets')} duration={2.5} />
+          </Suspense>
+          <Suspense fallback={<div className="text-4xl font-extrabold text-primary">0</div>}>
+            <StatItem end={122} label={t('components.ProductHighlights.activeUsers')} duration={2.5} />
+          </Suspense>
+          <Suspense fallback={<div className="text-4xl font-extrabold text-primary">0</div>}>
+            <StatItem end={24981} label={t('components.ProductHighlights.chipsDeployed')} duration={2.5} />
+          </Suspense>
         </div>
       </motion.div>
     </section>

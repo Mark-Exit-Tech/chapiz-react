@@ -23,20 +23,3 @@ declare module '@supabase/supabase-js' {
     };
   }
 }
-
-// Extend Firebase User type with custom properties
-declare module 'firebase/auth' {
-  interface User {
-    uid?: string;
-    displayName?: string;
-    id?: string;
-    email?: string;
-    user_metadata?: {
-      name?: string;
-      phone?: string;
-      full_name?: string;
-      picture?: string;
-      [key: string]: any;
-    };
-  }
-}
