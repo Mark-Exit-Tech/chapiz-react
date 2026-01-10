@@ -672,7 +672,13 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
 
     if (newMarkers.length > 0) {
       const bounds = new window.google.maps.LatLngBounds();
-      newMarkers.forEach(marker => bounds.extend(marker.position));
+      newMarkers.forEach(marker => {
+        if (marker.position) {
+          // AdvancedMarkerElement.position is already a LatLng or LatLngLiteral
+          const pos = marker.position;
+          bounds.extend(pos);
+        }
+      });
       if (userLocation) {
         bounds.extend(new window.google.maps.LatLng(userLocation.lat, userLocation.lng));
       }
