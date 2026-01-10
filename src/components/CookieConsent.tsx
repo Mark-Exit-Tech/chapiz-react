@@ -12,20 +12,26 @@ interface CookieConsentProps {
 export default function CookieConsent({ onAccept, onReject }: CookieConsentProps) {
   const { t } = useTranslation();
   const [showConsent, setShowConsent] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
-    // Check if user has already made a choice
-    if (typeof window !== 'undefined') {
-      try {
-        const hasConsent = localStorage.getItem('cookieConsent');
-        if (!hasConsent) {
+    // Defer cookie consent check to not block initial render
+    const timer = requestIdleCallback(() => {
+      if (typeof window !== 'undefined') {
+        try {
+          const hasConsent = localStorage.getItem('cookieConsent');
+          if (!hasConsent) {
+            setShowConsent(true);
+          }
+        } catch (error) {
+          console.error('Error accessing localStorage:', error);
           setShowConsent(true);
         }
-      } catch (error) {
-        console.error('Error accessing localStorage:', error);
-        setShowConsent(true);
       }
-    }
+      setIsInitializing(false);
+    });
+
+    return () => cancelIdleCallback(timer);
   }, []);
 
   const handleAccept = () => {

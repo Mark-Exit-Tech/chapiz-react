@@ -5,18 +5,21 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import CountUp from 'react-countup';
 import { useAuth } from '@/contexts/AuthContext';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import Footer from '@/components/layout/Footer';
-import CookieConsent from '@/components/CookieConsent';
+import OptimizedImage from '@/components/OptimizedImage';
 
-// Pet images - using public paths
+// Lazy load CookieConsent - not critical for initial render
+const CookieConsent = lazy(() => import('@/components/CookieConsent'));
+
+// Pet images - base paths without extension (for optimized image delivery)
 const petImages = {
-  bear: '/pets/bear.png',
-  bunny: '/pets/bunny.png',
-  dino: '/pets/dino.png',
-  duck: '/pets/duck.png',
-  penguin: '/pets/penguin.png',
-  pig: '/pets/pig.png'
+  bear: '/pets/bear',
+  bunny: '/pets/bunny',
+  dino: '/pets/dino',
+  duck: '/pets/duck',
+  penguin: '/pets/penguin',
+  pig: '/pets/pig'
 };
 
 const petCharacters = [
@@ -130,11 +133,13 @@ export default function HomePage() {
       {/* Always show the public landing page */}
       <PublicLandingPage t={t} navigate={navigate} />
 
-      {/* Cookie Consent */}
-      <CookieConsent
-        onAccept={handleCookieAccept}
-        onReject={handleCookieReject}
-      />
+      {/* Cookie Consent - Lazy loaded, not blocking initial render */}
+      <Suspense fallback={null}>
+        <CookieConsent
+          onAccept={handleCookieAccept}
+          onReject={handleCookieReject}
+        />
+      </Suspense>
     </div>
   );
 }
@@ -340,19 +345,15 @@ const AnimatedPetAroundText = ({ pet, index }: AnimatedPetProps) => {
   };
 
   return (
-    <motion.img
-      src={pet.src}
-      alt={pet.alt}
-      width={responsiveSize}
-      height={responsiveSize}
-      className="object-cover cursor-pointer"
+    <motion.div
       style={{
         position: 'absolute',
         top: hasFallen ? `${floorPosition}px` : `calc(50% + ${baseY}px)`,
         left: `calc(50% + ${baseX}px)`,
         transform: 'translate(-50%, -50%)',
         willChange: 'transform',
-        zIndex: 1
+        zIndex: 1,
+        cursor: 'pointer'
       }}
       animate={hasFallen ? { y: 0, x: 0, rotate: 0, scale: 1 } : (isFalling ? fallingPath : floatingPath)}
       transition={
@@ -375,15 +376,22 @@ const AnimatedPetAroundText = ({ pet, index }: AnimatedPetProps) => {
           }
       }
       onTap={handleTap}
-      onClick={handleTap}
-    />
+    >
+      <OptimizedImage
+        src={pet.src}
+        alt={pet.alt}
+        width={responsiveSize}
+        height={responsiveSize}
+        className="object-cover"
+      />
+    </motion.div>
   );
 };
 
 // Simple animated pet component for mobile
 const AnimatedPetSimple = ({ pet, size }: { pet: Pet; size: number }) => {
   return (
-    <img
+    <OptimizedImage
       src={pet.src}
       alt={pet.alt}
       width={size}

@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '../ui/button';
+import OptimizedImage from '@/components/OptimizedImage';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -65,9 +66,11 @@ const Navbar = () => {
         <div className="flex h-14 sm:h-16 items-center justify-between flex-nowrap">
           {/* Brand / Logo */}
           <Link to="/" className="flex-shrink-0 flex items-center">
-            <img
-              src="/assets/Facepet.png"
+            <OptimizedImage
+              src="/assets/Facepet"
               alt="Chapiz"
+              width={128}
+              height={64}
               className="h-8 sm:h-10 w-auto object-contain"
             />
           </Link>

@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Mail, Lock, User, Eye, EyeOff, MapPin, Phone } from 'lucide-react';
 import toast from 'react-hot-toast';
-// Image removed;
+import OptimizedImage from '@/components/OptimizedImage';
 import LocaleSwitcher from '@/components/LocaleSwitcher';
 
 const AuthPage = () => {
@@ -104,17 +104,21 @@ const AuthPage = () => {
         {/* Left Side - Image and Branding */}
         <div className="hidden lg:flex flex-col items-center justify-center space-y-8">
           <div className="relative w-80 h-80">
-            <img
-              src="/pets/bear.png"
+            <OptimizedImage
+              src="/pets/bear"
               alt="Chapiz Logo"
+              width={320}
+              height={320}
               className="object-contain w-full h-full"
             />
           </div>
           <div className="text-center space-y-4">
             <div className="flex justify-center">
-              <img
-                src="/assets/Facepet.png"
+              <OptimizedImage
+                src="/assets/Facepet"
                 alt="Chapiz"
+                width={128}
+                height={64}
                 className="h-16 w-auto object-contain"
               />
             </div>
