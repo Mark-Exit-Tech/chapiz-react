@@ -25,12 +25,34 @@ export default defineConfig({
     target: 'es2015',
     outDir: 'dist',
     sourcemap: false,
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['framer-motion', 'lucide-react'],
+        manualChunks: (id) => {
+          // React ecosystem
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/react-router-dom')) {
+            return 'react-vendor';
+          }
+          // UI libraries
+          if (id.includes('node_modules/framer-motion') || id.includes('node_modules/@radix-ui')) {
+            return 'ui-vendor';
+          }
+          // Heavy form & validation
+          if (id.includes('node_modules/react-hook-form') || id.includes('node_modules/@hookform')) {
+            return 'forms-vendor';
+          }
+          // Firebase/Auth
+          if (id.includes('node_modules/@supabase')) {
+            return 'auth-vendor';
+          }
+          // Icons
+          if (id.includes('node_modules/lucide-react') || id.includes('node_modules/@icons-pack')) {
+            return 'icons-vendor';
+          }
         },
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash][extname]',
       },
     },
     // Optimize for iOS
@@ -44,6 +66,6 @@ export default defineConfig({
   },
   // Optimize dependencies
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom'],
+    include: ['react', 'react-dom', 'react-router-dom', 'react-i18next'],
   },
 })

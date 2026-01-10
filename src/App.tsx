@@ -1,17 +1,27 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AuthProvider } from './contexts/AuthContext';
 import HomePage from './pages/HomePage';
-import AuthPage from './pages/AuthPage';
-import ContactPage from './pages/ContactPage';
-import MyPetsPage from './pages/MyPetsPage';
-import CouponsPage from './pages/CouponsPage';
-import VouchersPage from './pages/VouchersPage';
-import UserSettingsPage from './pages/UserSettingsPage';
-import AdminPage from './pages/AdminPage';
-import PrivacyPage from './pages/PrivacyPage';
-import TermsPage from './pages/TermsPage';
-import ServicesPage from './pages/ServicesPage';
+
+// Lazy load pages - reduces initial bundle size
+const AuthPage = lazy(() => import('./pages/AuthPage'));
+const ContactPage = lazy(() => import('./pages/ContactPage'));
+const MyPetsPage = lazy(() => import('./pages/MyPetsPage'));
+const CouponsPage = lazy(() => import('./pages/CouponsPage'));
+const VouchersPage = lazy(() => import('./pages/VouchersPage'));
+const UserSettingsPage = lazy(() => import('./pages/UserSettingsPage'));
+const AdminPage = lazy(() => import('./pages/AdminPage'));
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
+const TermsPage = lazy(() => import('./pages/TermsPage'));
+const ServicesPage = lazy(() => import('./pages/ServicesPage'));
+
+// Loading component
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+  </div>
+);
 
 function App() {
   const { i18n } = useTranslation();
@@ -41,16 +51,16 @@ function App() {
 
           {/* Locale-based routes */}
           <Route path="/:locale" element={<HomePage />} />
-          <Route path="/:locale/auth" element={<AuthPage />} />
-          <Route path="/:locale/contact" element={<ContactPage />} />
-          <Route path="/:locale/my-pets" element={<MyPetsPage />} />
-          <Route path="/:locale/coupons" element={<CouponsPage />} />
-          <Route path="/:locale/vouchers" element={<VouchersPage />} />
-          <Route path="/:locale/user/settings" element={<UserSettingsPage />} />
-          <Route path="/:locale/admin" element={<AdminPage />} />
-          <Route path="/:locale/services" element={<ServicesPage />} />
-          <Route path="/:locale/privacy" element={<PrivacyPage />} />
-          <Route path="/:locale/terms" element={<TermsPage />} />
+          <Route path="/:locale/auth" element={<Suspense fallback={<PageLoader />}><AuthPage /></Suspense>} />
+          <Route path="/:locale/contact" element={<Suspense fallback={<PageLoader />}><ContactPage /></Suspense>} />
+          <Route path="/:locale/my-pets" element={<Suspense fallback={<PageLoader />}><MyPetsPage /></Suspense>} />
+          <Route path="/:locale/coupons" element={<Suspense fallback={<PageLoader />}><CouponsPage /></Suspense>} />
+          <Route path="/:locale/vouchers" element={<Suspense fallback={<PageLoader />}><VouchersPage /></Suspense>} />
+          <Route path="/:locale/user/settings" element={<Suspense fallback={<PageLoader />}><UserSettingsPage /></Suspense>} />
+          <Route path="/:locale/admin" element={<Suspense fallback={<PageLoader />}><AdminPage /></Suspense>} />
+          <Route path="/:locale/services" element={<Suspense fallback={<PageLoader />}><ServicesPage /></Suspense>} />
+          <Route path="/:locale/privacy" element={<Suspense fallback={<PageLoader />}><PrivacyPage /></Suspense>} />
+          <Route path="/:locale/terms" element={<Suspense fallback={<PageLoader />}><TermsPage /></Suspense>} />
           <Route path="/:locale/*" element={<HomePage />} />
         </Routes>
       </AuthProvider>
