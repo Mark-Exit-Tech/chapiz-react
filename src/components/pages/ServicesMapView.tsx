@@ -672,7 +672,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
 
     if (newMarkers.length > 0) {
       const bounds = new window.google.maps.LatLngBounds();
-      newMarkers.forEach(marker => bounds.extend(marker.getPosition()));
+      newMarkers.forEach(marker => bounds.extend(marker.position));
       if (userLocation) {
         bounds.extend(new window.google.maps.LatLng(userLocation.lat, userLocation.lng));
       }
@@ -770,7 +770,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
       }
 
       script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,marker&callback=initServicesMap`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,marker&loading=async&callback=initServicesMap`;
       script.async = true;
       script.defer = true;
       script.setAttribute('data-services-map', 'true');

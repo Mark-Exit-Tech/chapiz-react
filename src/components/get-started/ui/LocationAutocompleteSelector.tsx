@@ -133,7 +133,7 @@ const LocationAutocompleteComboSelect: React.FC<
     // Create new script if none exists or if we removed the bad one
     if (!document.querySelector('script[data-facepet-google]')) {
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&language=${locale}`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async&language=${locale}`;
       script.async = true;
       script.defer = true;
       script.setAttribute('data-facepet-google', 'true');
