@@ -1,0 +1,96 @@
+'use client';
+
+import { Gift, Ticket, PawPrint, MapPin, Mail, LogIn } from 'lucide-react';
+import { Link as RouterLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { usePathname } from '@/i18n/routing';
+import { useAuth } from '@/contexts/AuthContext';
+
+export default function BottomNavigation() {
+  const pathname = usePathname();
+  const { t } = useTranslation('components');
+  const { user } = useAuth();
+
+  // Don't show bottom navigation on admin routes
+  const isAdminRoute = pathname?.startsWith('/admin');
+  if (isAdminRoute) {
+    return null;
+  }
+
+  // Don't show bottom navigation on detail pages
+  // Check if pathname matches detail page patterns: /services/[id], /coupons/[id], /vouchers/[id], /pet/[id], /promos/[id]
+  // The usePathname from next-intl returns pathname without locale prefix
+  const isDetailPage = pathname && (
+    (pathname.startsWith('/services/') && pathname !== '/services') || // /services/[id] but not /services
+    (pathname.startsWith('/coupons/') && pathname !== '/coupons') || // /coupons/[id] but not /coupons
+    (pathname.startsWith('/vouchers/') && pathname !== '/vouchers') || // /vouchers/[id] but not /vouchers
+    (pathname.startsWith('/pet/') && pathname !== '/pet') || // /pet/[id] but not /pet
+    (pathname.startsWith('/promos/') && pathname !== '/promos') // /promos/[id] but not /promos
+  );
+  if (isDetailPage) {
+    return null;
+  }
+
+  // Navigation items for logged-in users
+  const loggedInNavItems = [
+    {
+      href: '/pages/my-pets',
+      icon: PawPrint,
+      label: t('Navbar.bottomNav.myPets'),
+      isActive: pathname?.startsWith('/pages/my-pets'),
+    },
+    {
+      href: '/coupons',
+      icon: Ticket,
+      label: t('Navbar.bottomNav.myCoupons'),
+      isActive: pathname?.startsWith('/coupons'),
+    },
+    {
+      href: '/vouchers',
+      icon: Gift,
+      label: t('Navbar.bottomNav.giftsAndVouchers'),
+      isActive: pathname?.startsWith('/vouchers'),
+    },
+    {
+      href: '/services',
+      icon: MapPin,
+      label: t('Navbar.bottomNav.businessesNearby'),
+      isActive: pathname?.startsWith('/services'),
+    },
+  ];
+
+  // Don't show bottom navigation for non-logged-in users
+  if (!user) {
+    return null;
+  }
+
+  const navItems = loggedInNavItems;
+
+  return (
+    <div
+      className="fixed bottom-0 left-0 right-0 z-[10001] bg-white border-t-2 border-gray-300 shadow-lg md:hidden"
+      style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 0.5rem)' }}
+    >
+      <nav className="flex items-center justify-around px-1 pt-2 pb-1">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <RouterLink
+              key={item.href}
+              to={item.href}
+              className={`flex flex-col items-center justify-center min-w-0 flex-1 py-2 px-1 rounded-lg transition-all duration-200 ${item.isActive
+                ? 'text-primary bg-primary/10'
+                : 'text-gray-600 hover:text-primary hover:bg-primary/5 hover:scale-105 active:scale-95'
+                }`}
+            >
+              <Icon className={`h-6 w-6 mb-1 transition-transform ${item.isActive ? 'text-primary' : ''}`} />
+              <span className={`text-[10px] font-medium text-center leading-tight ${item.isActive ? 'text-primary' : 'text-gray-600'}`}>
+                {item.label}
+              </span>
+            </RouterLink>
+          );
+        })}
+      </nav>
+    </div>
+  );
+}

@@ -1,0 +1,589 @@
+@import 'tailwindcss';
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+  
+  /* Reset all margins and padding */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
+  
+  main {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Prevent browser translation overlays */
+  [translate="no"] {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+
+  /* Hide browser translation icons and overlays */
+  .goog-te-banner-frame,
+  .goog-te-gadget-icon,
+  .goog-te-gadget-simple,
+  .goog-te-combo,
+  .goog-te-gadget,
+  .goog-te-menu-value,
+  .goog-te-menu-value span,
+  .goog-te-menu-value:before,
+  .goog-te-menu-value:after,
+  [class*="goog-te"],
+  [id*="goog-te"],
+  .skiptranslate,
+  .notranslate {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  /* Prevent translation overlay on specific elements */
+  button[translate="no"],
+  input[translate="no"],
+  select[translate="no"] {
+    position: relative !important;
+    z-index: 9999 !important;
+  }
+}
+
+@layer utilities {
+  .all-\[unset\] {
+    all: unset;
+  }
+  
+  /* Adjust layout when install banner is visible */
+  body.install-banner-visible #main-content {
+    padding-top: calc(4rem + 3.5rem); /* navbar height + banner height */
+  }
+  
+  @media (max-width: 640px) {
+    body.install-banner-visible #main-content {
+      padding-top: calc(4rem + 3.5rem); /* navbar + banner on mobile */
+    }
+  }
+}
+
+@layer base {
+  :root {
+    --background: 218, 29%, 95%;
+    --foreground: 222.2, 47.4%, 11.2%;
+
+    --muted: 235, 12%, 84%;
+    --muted-foreground: 215.4, 16.3%, 46.9%;
+
+    --popover: 0, 0%, 100%;
+    --popover-foreground: 222.2, 47.4%, 11.2%;
+
+    --border: 214.3, 31.8%, 91.4%;
+    --input: 214.3, 31.8%, 91.4%;
+
+    --card: 0, 0%, 100%;
+    --card-foreground: 222.2, 47.4%, 11.2%;
+
+    --primary: 10, 100%, 63%;
+    --primary-foreground: 210, 40%, 98%;
+
+    --secondary: 10, 100%, 63%;
+    --secondary-background: 358, 100%, 95%;
+    --secondary-foreground: 0, 0%, 100%;
+
+    --accent: 0, 0%, 100%;
+    --accent-foreground: 222.2, 47.4%, 11.2%;
+
+    --destructive: 0, 100%, 50%;
+    --destructive-foreground: 210, 40%, 98%;
+
+    --ring: 215, 20.2%, 65.1%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 224, 71%, 4%;
+    --foreground: 213, 31%, 91%;
+
+    --muted: 223, 47%, 11%;
+    --muted-foreground: 215.4, 16.3%, 56.9%;
+
+    --accent: 216, 34%, 17%;
+    --accent-foreground: 210, 40%, 98%;
+
+    --popover: 224, 71%, 4%;
+    --popover-foreground: 215, 20.2%, 65.1%;
+
+    --border: 216, 34%, 17%;
+    --input: 216, 34%, 17%;
+
+    --card: 224, 71%, 4%;
+    --card-foreground: 213, 31%, 91%;
+
+    --primary: 210, 40%, 98%;
+    --primary-foreground: 222.2, 47.4%, 1.2%;
+
+    --secondary: 222.2, 47.4%, 11.2%;
+    --secondary-foreground: 210, 40%, 98%;
+
+    --destructive: 0, 63%, 31%;
+    --destructive-foreground: 210, 40%, 98%;
+
+    --ring: 216, 34%, 17%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+  }
+
+  /* Remove background for non-authenticated users */
+  body.no-background {
+    background: transparent !important;
+  }
+}
+
+/* Phone input styles */
+.phone-input .PhoneInputCountrySelect {
+  display: flex !important;
+  align-items: center !important;
+  min-width: 80px !important;
+  padding: 8px 12px !important;
+  border-right: 1px solid #d1d5db !important;
+  background: #f9fafb !important;
+}
+
+.phone-input .PhoneInputCountrySelect select {
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  cursor: pointer !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #374151 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+.phone-input .PhoneInputCountryIcon {
+  display: block !important;
+  width: 20px !important;
+  height: 15px !important;
+  margin-right: 6px !important;
+}
+
+.phone-input .PhoneInputCountrySelectArrow {
+  opacity: 1 !important;
+  color: #6b7280 !important;
+  margin-left: 4px !important;
+  font-size: 12px !important;
+}
+
+.phone-input .PhoneInputInput {
+  flex: 1 !important;
+  border: none !important;
+  outline: none !important;
+  padding: 8px 12px !important;
+  background: white !important;
+  font-size: 16px !important;
+}
+
+.phone-input .PhoneInput {
+  display: flex !important;
+  align-items: center !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 6px !important;
+  background: white !important;
+  overflow: hidden !important;
+}
+
+.phone-input .PhoneInput:focus-within {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 1px #3b82f6 !important;
+}
+
+/* RTL support for phone input */
+[dir="rtl"] .phone-input .PhoneInputCountrySelect {
+  border-right: none !important;
+  border-left: 1px solid #d1d5db !important;
+}
+
+[dir="rtl"] .phone-input .PhoneInputCountryIcon {
+  margin-right: 0 !important;
+  margin-left: 6px !important;
+}
+
+[dir="rtl"] .phone-input .PhoneInputCountrySelectArrow {
+  margin-left: 0 !important;
+  margin-right: 4px !important;
+}
+
+[dir="rtl"] .phone-input .PhoneInputCountrySelect select {
+  text-align: right !important;
+}
+
+/* RTL desktop text alignment for pet details */
+@media (min-width: 768px) {
+  .rtl-desktop-right {
+    text-align: right !important;
+    margin-right: 0.5rem !important;
+    margin-left: 0 !important;
+  }
+}
+
+
+@theme {
+  --color-border: hsl(214.3, 31.8%, 91.4%);
+  --color-input: hsl(214.3, 31.8%, 91.4%);
+  --color-ring: hsl(215, 20.2%, 65.1%);
+  --color-background: hsl(218, 29%, 95%);
+  --color-foreground: hsl(222.2, 47.4%, 11.2%);
+  --color-primary: hsl(10, 100%, 63%);
+  --color-primary-foreground: hsl(210, 40%, 98%);
+  --color-secondary: hsl(10, 100%, 63%);
+  --color-secondary-background: hsl(358, 100%, 95%);
+  --color-secondary-foreground: hsl(0, 0%, 100%);
+  --color-destructive: hsl(0, 100%, 50%);
+  --color-destructive-foreground: hsl(210, 40%, 98%);
+  --color-muted: hsl(235, 12%, 84%);
+  --color-muted-foreground: hsl(215.4, 16.3%, 46.9%);
+  --color-accent: hsl(0, 0%, 100%);
+  --color-accent-foreground: hsl(222.2, 47.4%, 11.2%);
+  --color-popover: hsl(0, 0%, 100%);
+  --color-popover-foreground: hsl(222.2, 47.4%, 11.2%);
+  --color-card: hsl(0, 0%, 100%);
+  --color-card-foreground: hsl(222.2, 47.4%, 11.2%);
+  
+  --radius: 0.5rem;
+  
+  --font-family-rubik: Rubik, sans-serif;
+  
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-floating: floating 6s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+  --animate-slide-in-right: slide-in-right 0.3s ease-out;
+  --animate-fade-in: fade-in 0.3s ease-out;
+}
+
+@keyframes accordion-down {
+  from { height: 0; }
+  to { height: var(--radix-accordion-content-height); }
+}
+
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height); }
+  to { height: 0; }
+}
+
+@keyframes floating {
+  0% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(2px) rotate(-5deg); }
+  50% { transform: translateY(0px) rotate(5deg); }
+  75% { transform: translateY(2px) rotate(-5deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+@keyframes slide-in-right {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+  
+  /* Reset all margins and padding */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
+  
+  main {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Prevent browser translation overlays */
+  [translate="no"] {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+
+  /* Hide browser translation icons and overlays */
+  .goog-te-banner-frame,
+  .goog-te-gadget-icon,
+  .goog-te-gadget-simple,
+  .goog-te-combo,
+  .goog-te-gadget,
+  .goog-te-menu-value,
+  .goog-te-menu-value span,
+  .goog-te-menu-value:before,
+  .goog-te-menu-value:after,
+  [class*="goog-te"],
+  [id*="goog-te"],
+  .skiptranslate,
+  .notranslate {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  /* Prevent translation overlay on specific elements */
+  button[translate="no"],
+  input[translate="no"],
+  select[translate="no"] {
+    position: relative !important;
+    z-index: 9999 !important;
+  }
+}
+
+@layer utilities {
+  .all-\[unset\] {
+    all: unset;
+  }
+  
+  /* Adjust layout when install banner is visible */
+  body.install-banner-visible #main-content {
+    padding-top: calc(4rem + 3.5rem); /* navbar height + banner height */
+  }
+  
+  @media (max-width: 640px) {
+    body.install-banner-visible #main-content {
+      padding-top: calc(4rem + 3.5rem); /* navbar + banner on mobile */
+    }
+  }
+}
+
+@layer base {
+  :root {
+    --background: 218, 29%, 95%;
+    --foreground: 222.2, 47.4%, 11.2%;
+
+    --muted: 235, 12%, 84%;
+    --muted-foreground: 215.4, 16.3%, 46.9%;
+
+    --popover: 0, 0%, 100%;
+    --popover-foreground: 222.2, 47.4%, 11.2%;
+
+    --border: 214.3, 31.8%, 91.4%;
+    --input: 214.3, 31.8%, 91.4%;
+
+    --card: 0, 0%, 100%;
+    --card-foreground: 222.2, 47.4%, 11.2%;
+
+    --primary: 10, 100%, 63%;
+    --primary-foreground: 210, 40%, 98%;
+
+    --secondary: 10, 100%, 63%;
+    --secondary-background: 358, 100%, 95%;
+    --secondary-foreground: 0, 0%, 100%;
+
+    --accent: 0, 0%, 100%;
+    --accent-foreground: 222.2, 47.4%, 11.2%;
+
+    --destructive: 0, 100%, 50%;
+    --destructive-foreground: 210, 40%, 98%;
+
+    --ring: 215, 20.2%, 65.1%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 224, 71%, 4%;
+    --foreground: 213, 31%, 91%;
+
+    --muted: 223, 47%, 11%;
+    --muted-foreground: 215.4, 16.3%, 56.9%;
+
+    --accent: 216, 34%, 17%;
+    --accent-foreground: 210, 40%, 98%;
+
+    --popover: 224, 71%, 4%;
+    --popover-foreground: 215, 20.2%, 65.1%;
+
+    --border: 216, 34%, 17%;
+    --input: 216, 34%, 17%;
+
+    --card: 224, 71%, 4%;
+    --card-foreground: 213, 31%, 91%;
+
+    --primary: 210, 40%, 98%;
+    --primary-foreground: 222.2, 47.4%, 1.2%;
+
+    --secondary: 222.2, 47.4%, 11.2%;
+    --secondary-foreground: 210, 40%, 98%;
+
+    --destructive: 0, 63%, 31%;
+    --destructive-foreground: 210, 40%, 98%;
+
+    --ring: 216, 34%, 17%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+  }
+
+  /* Remove background for non-authenticated users */
+  body.no-background {
+    background: transparent !important;
+  }
+}
+
+/* Phone input styles */
+.phone-input .PhoneInputCountrySelect {
+  display: flex !important;
+  align-items: center !important;
+  min-width: 80px !important;
+  padding: 8px 12px !important;
+  border-right: 1px solid #d1d5db !important;
+  background: #f9fafb !important;
+}
+
+.phone-input .PhoneInputCountrySelect select {
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  cursor: pointer !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #374151 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+.phone-input .PhoneInputCountryIcon {
+  display: block !important;
+  width: 20px !important;
+  height: 15px !important;
+  margin-right: 6px !important;
+}
+
+.phone-input .PhoneInputCountrySelectArrow {
+  opacity: 1 !important;
+  color: #6b7280 !important;
+  margin-left: 4px !important;
+  font-size: 12px !important;
+}
+
+.phone-input .PhoneInputInput {
+  flex: 1 !important;
+  border: none !important;
+  outline: none !important;
+  padding: 8px 12px !important;
+  background: white !important;
+  font-size: 16px !important;
+}
+
+.phone-input .PhoneInput {
+  display: flex !important;
+  align-items: center !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 6px !important;
+  background: white !important;
+  overflow: hidden !important;
+}
+
+.phone-input .PhoneInput:focus-within {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 1px #3b82f6 !important;
+}
+
+/* RTL support for phone input */
+[dir="rtl"] .phone-input .PhoneInputCountrySelect {
+  border-right: none !important;
+  border-left: 1px solid #d1d5db !important;
+}
+
+[dir="rtl"] .phone-input .PhoneInputCountryIcon {
+  margin-right: 0 !important;
+  margin-left: 6px !important;
+}
+
+[dir="rtl"] .phone-input .PhoneInputCountrySelectArrow {
+  margin-left: 0 !important;
+  margin-right: 4px !important;
+}
+
+[dir="rtl"] .phone-input .PhoneInputCountrySelect select {
+  text-align: right !important;
+}
+
+/* RTL desktop text alignment for pet details */
+@media (min-width: 768px) {
+  .rtl-desktop-right {
+    text-align: right !important;
+    margin-right: 0.5rem !important;
+    margin-left: 0 !important;
+  }
+}
