@@ -15,6 +15,7 @@ const AdminPage = lazy(() => import('./pages/AdminPage'));
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
 const TermsPage = lazy(() => import('./pages/TermsPage'));
 const ServicesPage = lazy(() => import('./pages/ServicesPage'));
+const ServiceDetailsPage = lazy(() => import('./pages/ServiceDetailsPage'));
 
 // Loading component
 const PageLoader = () => (
@@ -59,6 +60,7 @@ function App() {
           <Route path="/:locale/user/settings" element={<Suspense fallback={<PageLoader />}><UserSettingsPage /></Suspense>} />
           <Route path="/:locale/admin" element={<Suspense fallback={<PageLoader />}><AdminPage /></Suspense>} />
           <Route path="/:locale/services" element={<Suspense fallback={<PageLoader />}><ServicesPage /></Suspense>} />
+          <Route path="/:locale/services/:id" element={<Suspense fallback={<PageLoader />}><ServiceDetailsPage /></Suspense>} />
           <Route path="/:locale/privacy" element={<Suspense fallback={<PageLoader />}><PrivacyPage /></Suspense>} />
           <Route path="/:locale/terms" element={<Suspense fallback={<PageLoader />}><TermsPage /></Suspense>} />
           <Route path="/:locale/*" element={<HomePage />} />
