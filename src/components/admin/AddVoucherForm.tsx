@@ -1,0 +1,232 @@
+'use client';
+
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Plus } from 'lucide-react';
+import { useState } from 'react';
+import MediaUpload from '@/components/admin/MediaUpload';
+
+export default function AddVoucherForm() {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+  
+  // HARDCODED TEXT
+  const text = {
+    addNewVoucher: isHebrew ? 'הוסף שובר חדש' : 'Add New Voucher',
+    name: isHebrew ? 'שם' : 'Name',
+    namePlaceholder: isHebrew ? 'הזן שם שובר' : 'Enter voucher name',
+    description: isHebrew ? 'תיאור' : 'Description',
+    descriptionPlaceholder: isHebrew ? 'הזן תיאור' : 'Enter description',
+    price: isHebrew ? 'מחיר (0 לחינם)' : 'Price (0 for free)',
+    pricePlaceholder: isHebrew ? 'הזן מחיר' : 'Enter price',
+    points: isHebrew ? 'נקודות' : 'Points',
+    pointsPlaceholder: isHebrew ? 'הזן נקודות' : 'Enter points',
+    image: isHebrew ? 'תמונה' : 'Image',
+    validFrom: isHebrew ? 'תקף מ' : 'Valid From',
+    validTo: isHebrew ? 'תקף עד' : 'Valid To',
+    createVoucher: isHebrew ? 'צור שובר' : 'Create Voucher',
+    creating: isHebrew ? 'יוצר...' : 'Creating...',
+    cancel: isHebrew ? 'ביטול' : 'Cancel',
+    comingSoon: isHebrew ? 'בפיתוח - יתאפשר בקרוב' : 'Under Development - Coming Soon'
+  };
+  
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    price: '',
+    points: '',
+    imageUrl: '',
+    validFrom: '',
+    validTo: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      // TODO: Implement createVoucher function
+      console.log('Voucher data:', formData);
+      
+      alert(
+        isHebrew
+          ? '⚠️ פונקציית createVoucher עדיין לא מיושמת. נתוני השובר נשמרו בקונסול.'
+          : '⚠️ createVoucher function not yet implemented. Voucher data saved to console.'
+      );
+      
+      // For now, just close the dialog
+      setIsOpen(false);
+      
+      // Reset form
+      setFormData({
+        name: '',
+        description: '',
+        price: '',
+        points: '',
+        imageUrl: '',
+        validFrom: '',
+        validTo: ''
+      });
+      
+    } catch (err: any) {
+      console.error('Error creating voucher:', err);
+      alert(err.message || 'Failed to create voucher');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button className="flex items-center gap-2">
+          <Plus className="h-4 w-4" />
+          {text.addNewVoucher}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{text.addNewVoucher}</DialogTitle>
+        </DialogHeader>
+
+        <div className="mb-4 rounded border border-yellow-400 bg-yellow-50 px-4 py-3 text-yellow-700">
+          ⚠️ {text.comingSoon}
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">{text.name}</Label>
+            <Input
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder={text.namePlaceholder}
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">{text.description}</Label>
+            <Textarea
+              id="description"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder={text.descriptionPlaceholder}
+              rows={3}
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="price">{text.price}</Label>
+              <Input
+                id="price"
+                name="price"
+                type="number"
+                step="0.01"
+                min="0"
+                value={formData.price}
+                onChange={handleChange}
+                placeholder={text.pricePlaceholder}
+              />
+            </div>
+
+            {(formData.price !== '' && parseFloat(formData.price) > 0) && (
+              <div className="space-y-2">
+                <Label htmlFor="points">{text.points}</Label>
+                <Input
+                  id="points"
+                  name="points"
+                  type="number"
+                  min="0"
+                  value={formData.points}
+                  onChange={handleChange}
+                  placeholder={text.pointsPlaceholder}
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="imageUrl">{text.image}</Label>
+            <MediaUpload
+              type="image"
+              value={formData.imageUrl}
+              onChange={(filePath) => {
+                setFormData((prev) => ({ ...prev, imageUrl: filePath }));
+              }}
+              className="w-1/5"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="validFrom">{text.validFrom}</Label>
+              <Input
+                id="validFrom"
+                name="validFrom"
+                type="datetime-local"
+                value={formData.validFrom}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="validTo">{text.validTo}</Label>
+              <Input
+                id="validTo"
+                name="validTo"
+                type="datetime-local"
+                value={formData.validTo}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsOpen(false)}
+            >
+              {text.cancel}
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? text.creating : text.createVoucher}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}

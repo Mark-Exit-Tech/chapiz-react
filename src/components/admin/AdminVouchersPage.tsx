@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { getAllVouchers, type Voucher } from '@/lib/firebase/database/vouchers';
-import { Ticket, Plus } from 'lucide-react';
+import { Ticket } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import AddVoucherForm from '@/components/admin/AddVoucherForm';
 
 export default function AdminVouchersPage() {
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
@@ -91,13 +92,7 @@ export default function AdminVouchersPage() {
             </div>
           </div>
           <div>
-            <button
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-              onClick={() => alert(isHebrew ? 'הוספת שובר - בקרוב' : 'Add Voucher - Coming soon')}
-            >
-              <Plus className="w-4 h-4" />
-              {text.addVoucher}
-            </button>
+            <AddVoucherForm />
           </div>
         </div>
 
