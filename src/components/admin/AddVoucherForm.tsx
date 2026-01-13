@@ -15,6 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import MediaUpload from '@/components/admin/MediaUpload';
+import { createVoucher } from '@/lib/actions/admin';
 
 export default function AddVoucherForm() {
   const [isOpen, setIsOpen] = useState(false);
@@ -71,32 +72,39 @@ export default function AddVoucherForm() {
     setIsSubmitting(true);
 
     try {
-      // TODO: Implement createVoucher function
-      console.log('Voucher data:', formData);
+      const result = await createVoucher(formData);
       
-      alert(
-        isHebrew
-          ? '⚠️ פונקציית createVoucher עדיין לא מיושמת. נתוני השובר נשמרו בקונסול.'
-          : '⚠️ createVoucher function not yet implemented. Voucher data saved to console.'
-      );
-      
-      // For now, just close the dialog
-      setIsOpen(false);
-      
-      // Reset form
-      setFormData({
-        name: '',
-        description: '',
-        price: '',
-        points: '',
-        imageUrl: '',
-        validFrom: '',
-        validTo: ''
-      });
-      
+      if (result.success) {
+        alert(isHebrew ? '✅ שובר נוצר בהצלחה!' : '✅ Voucher created successfully!');
+        setIsOpen(false);
+        
+        // Reset form
+        setFormData({
+          name: '',
+          description: '',
+          price: '',
+          points: '',
+          imageUrl: '',
+          validFrom: '',
+          validTo: ''
+        });
+        
+        // Refresh page to show new voucher
+        window.location.reload();
+      } else {
+        alert(
+          isHebrew 
+            ? `❌ שגיאה ביצירת שובר: ${result.error}` 
+            : `❌ Error creating voucher: ${result.error}`
+        );
+      }
     } catch (err: any) {
       console.error('Error creating voucher:', err);
-      alert(err.message || 'Failed to create voucher');
+      alert(
+        isHebrew 
+          ? '❌ שגיאה ביצירת שובר' 
+          : '❌ Error creating voucher'
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -114,10 +122,6 @@ export default function AddVoucherForm() {
         <DialogHeader>
           <DialogTitle>{text.addNewVoucher}</DialogTitle>
         </DialogHeader>
-
-        <div className="mb-4 rounded border border-yellow-400 bg-yellow-50 px-4 py-3 text-yellow-700">
-          ⚠️ {text.comingSoon}
-        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">

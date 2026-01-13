@@ -287,6 +287,42 @@ export async function createCoupon(data: CreateCouponData) {
   }
 }
 
+// Create Voucher (same as coupon but in vouchers collection)
+export async function createVoucher(data: any) {
+  try {
+    const { collection, addDoc, Timestamp } = await import('firebase/firestore');
+    const { db } = await import('@/lib/firebase/client');
+    
+    const voucherData = {
+      name: data.name,
+      description: data.description,
+      price: Number(data.price) || 0,
+      points: Number(data.points) || 0,
+      imageUrl: data.imageUrl || '',
+      validFrom: Timestamp.fromDate(new Date(data.validFrom)),
+      validTo: Timestamp.fromDate(new Date(data.validTo)),
+      purchaseLimit: Number(data.purchaseLimit) || undefined,
+      isActive: true,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+      createdBy: 'admin'
+    };
+    
+    const vouchersRef = collection(db, 'vouchers');
+    const docRef = await addDoc(vouchersRef, voucherData);
+    
+    console.log('✅ Voucher created successfully:', docRef.id);
+    
+    return { success: true, voucherId: docRef.id, error: undefined };
+  } catch (error) {
+    console.error('❌ Error creating voucher:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Failed to create voucher' 
+    };
+  }
+}
+
 export async function getCoupons() {
   console.warn('getCoupons is a stub - needs Firebase implementation');
   return {
