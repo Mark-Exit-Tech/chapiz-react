@@ -51,7 +51,7 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
   const [isFavorited, setIsFavorited] = useState(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
 
-  const { user } = useAuth();
+  const { user, dbUser } = useAuth();
 
   // Function to translate tags for display
   const translateTag = (tag: string): string => {

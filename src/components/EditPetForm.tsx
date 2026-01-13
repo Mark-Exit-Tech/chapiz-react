@@ -57,7 +57,7 @@ interface UploadProgress {
 
 
 export default function EditPetForm({ pet }: EditPetFormProps) {
-  const { user } = useAuth();
+  const { user, dbUser } = useAuth();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation(['Pet']);
   const locale = (i18n.language || 'en') as 'en' | 'he';

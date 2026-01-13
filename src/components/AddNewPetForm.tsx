@@ -46,7 +46,7 @@ export default function AddNewPetForm() {
     { id: 4, title: t('steps.photo.title'), description: t('steps.photo.description') },
     { id: 5, title: t('steps.complete.title'), description: t('steps.complete.description') }
   ];
-  const { user } = useAuth();
+  const { user, dbUser } = useAuth();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);

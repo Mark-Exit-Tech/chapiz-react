@@ -101,7 +101,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
   const [isMobile, setIsMobile] = useState(false);
   const [floatingCardPosition, setFloatingCardPosition] = useState<{ x: number; y: number } | null>(null);
   const geocoderRef = useRef<any>(null);
-  const { user } = useAuth();
+  const { user, dbUser } = useAuth();
 
   // Handle window resize to update isMobile state
   useEffect(() => {

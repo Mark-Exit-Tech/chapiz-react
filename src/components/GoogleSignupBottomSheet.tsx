@@ -29,7 +29,7 @@ const GoogleSignupBottomSheet: React.FC<GoogleSignupBottomSheetProps> = ({
   onComplete
 }) => {
   const { t } = useTranslation('pages.GoogleSignupBottomSheet');
-  const { user } = useAuth();
+  const { user, dbUser } = useAuth();
   const [name, setName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [address, setAddress] = useState('');

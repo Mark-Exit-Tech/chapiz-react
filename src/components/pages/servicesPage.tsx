@@ -60,7 +60,7 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
   const { t } = useTranslation();
   const locale = useLocale();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, dbUser } = useAuth();
   const [search, setSearch] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [availableTags, setAvailableTags] = useState<string[]>([]);

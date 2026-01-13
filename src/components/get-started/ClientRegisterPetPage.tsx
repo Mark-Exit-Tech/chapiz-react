@@ -32,7 +32,7 @@ export default function ClientRegisterPetPage({
   const navigate = useNavigate();
   const locale = useLocale() as 'en' | 'he';
   const { t } = useTranslation('');
-  const { user } = useAuth();
+  const { user, dbUser } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const { petId: localStoragePetId, clearPetId } = usePetId();
   const params = useParams<{ id: string }>();

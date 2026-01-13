@@ -28,7 +28,13 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   checkEmailExists: (email: string) => Promise<boolean>;
+  // Optional methods (not implemented yet, placeholders for compatibility)
+  sendVerificationCode?: (email: string, userName?: string) => Promise<{ success: boolean; message?: string }>;
   sendDeletionVerificationCode?: (email: string, userName?: string) => Promise<{ success: boolean; message?: string }>;
+  verifyCodeAndCreateAccount?: (email: string, password: string, fullName: string, code: string, address?: string, phone?: string) => Promise<{ success: boolean; user: FirebaseUser | null }>;
+  getStoredOTPCode?: () => string | null;
+  getStoredDeletionOTPCode?: () => string | null;
+  clearDeletionOTPCode?: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

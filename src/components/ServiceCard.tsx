@@ -80,7 +80,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
   const [isFavorited, setIsFavorited] = useState(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
   
-  const { user } = useAuth();
+  const { user, dbUser } = useAuth();
 
   // Load comments when drawer opens
   useEffect(() => {

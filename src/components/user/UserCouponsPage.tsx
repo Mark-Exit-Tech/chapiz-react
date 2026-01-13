@@ -31,7 +31,7 @@ export default function UserCouponsPage() {
     ? window.location.pathname.split('/')[1] || 'en'
     : 'en';
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, dbUser } = useAuth();
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [couponHistory, setCouponHistory] = useState<UserCoupon[]>([]); // All purchased coupons (active + inactive)
   const [userPoints, setUserPoints] = useState(0);

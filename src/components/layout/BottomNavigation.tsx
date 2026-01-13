@@ -9,7 +9,7 @@ import { useAuth } from '@/contexts/FirebaseAuthContext';
 export default function BottomNavigation() {
   const pathname = usePathname();
   const { t } = useTranslation('components');
-  const { user } = useAuth();
+  const { user, dbUser } = useAuth();
 
   // Don't show bottom navigation on admin routes
   const isAdminRoute = pathname?.startsWith('/admin');

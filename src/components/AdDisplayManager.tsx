@@ -11,7 +11,7 @@ import { useAuth } from '@/contexts/FirebaseAuthContext';
 
 export default function AdDisplayManager() {
   const { pathname } = useLocation();
-  const { user } = useAuth();
+  const { user, dbUser } = useAuth();
   const { shouldShowAd, resetAdFlag } = useClickTracker();
   const { petId } = usePetId();
   const [ad, setAd] = useState<any | null>(null);
