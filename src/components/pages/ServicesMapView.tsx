@@ -89,9 +89,9 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
   const [commentText, setCommentText] = useState('');
   const [comments, setComments] = useState<Array<{
     id: string;
-    userName: string;
+    userName?: string;
     content: string;
-    rating: number;
+    rating?: number;
     createdAt: Date;
   }>>([]);
   const [isLoadingComments, setIsLoadingComments] = useState(false);

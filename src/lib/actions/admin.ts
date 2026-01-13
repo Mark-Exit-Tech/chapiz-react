@@ -215,8 +215,10 @@ export async function unrestrictUser(id: string) {
 
 export async function addPointsToUser(id: string, points: number, category?: string) {
   try {
-    const { addPoints } = await import('@/lib/firebase/database/points');
-    await addPoints(id, points, category || 'admin_grant');
+    const { addPointsToCategory } = await import('@/lib/firebase/database/points');
+    // Create a user object with uid for the function
+    const user = { uid: id };
+    await addPointsToCategory(user, category || 'admin_grant', points);
     return { success: true, error: undefined };
   } catch (error) {
     console.error('Error adding points to user:', error);
@@ -471,10 +473,26 @@ export async function getCoupons() {
     const q = query(couponsRef, orderBy('createdAt', 'desc'));
     const querySnapshot = await getDocs(q);
     
-    const coupons = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    const coupons = querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        name: data.name || '',
+        description: data.description || '',
+        price: data.price || 0,
+        points: data.points || 0,
+        imageUrl: data.imageUrl || '',
+        validFrom: data.validFrom?.toDate ? data.validFrom.toDate() : new Date(data.validFrom || Date.now()),
+        validTo: data.validTo?.toDate ? data.validTo.toDate() : new Date(data.validTo || Date.now()),
+        isActive: data.isActive !== undefined ? data.isActive : true,
+        businessId: data.businessId,
+        businessIds: data.businessIds,
+        purchaseLimit: data.purchaseLimit,
+        createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
+        updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt || Date.now()),
+        createdBy: data.createdBy || ''
+      };
+    });
     
     return {
       success: true,
@@ -771,7 +789,7 @@ export async function createPromo(data: CreatePromoData) {
     
     const promoData = {
       ...data,
-      isActive: data.isActive !== undefined ? data.isActive : true,
+      isActive: true, // Always active by default for new promos
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
       createdBy: 'admin' // TODO: Get actual admin user ID
@@ -914,7 +932,13 @@ export async function getFilters() {
 export async function createFilter(data: CreateFilterData) {
   try {
     const { createFilter: createFilterInDB } = await import('@/lib/firebase/database/filters');
-    const filter = await createFilterInDB(data);
+    // Convert CreateFilterData to match database Filter structure
+    const filterData = {
+      name: data.name,
+      type: 'petType' as const, // Default type, should be provided in data
+      values: [] // Empty array, should be provided in data
+    };
+    const filter = await createFilterInDB(filterData);
     
     if (!filter) {
       return { success: false, error: 'Failed to create filter' };

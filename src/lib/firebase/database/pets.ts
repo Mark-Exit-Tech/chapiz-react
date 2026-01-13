@@ -179,6 +179,39 @@ export async function deletePet(id: string): Promise<boolean> {
     }
 }
 
+// Delete pet (alias for admin compatibility)
+export async function deletePetFromFirestore(id: string): Promise<{ success: boolean; error?: string }> {
+    try {
+        const result = await deletePet(id);
+        return { success: result, error: result ? undefined : 'Failed to delete pet' };
+    } catch (error) {
+        console.error('Error deleting pet:', error);
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    }
+}
+
+// Get all pets (admin function)
+export async function getAllPets(): Promise<Pet[]> {
+    try {
+        const petsRef = collection(db, PETS_COLLECTION);
+        const q = query(petsRef, orderBy('createdAt', 'desc'));
+        const querySnapshot = await getDocs(q);
+        
+        return querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                ...data,
+                createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
+                updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt || Date.now())
+            } as Pet;
+        });
+    } catch (error) {
+        console.error('Error fetching all pets:', error);
+        return [];
+    }
+}
+
 // Get breed name by ID
 export async function getBreedNameById(id: number, locale: 'en' | 'he' = 'en'): Promise<string> {
     try {
