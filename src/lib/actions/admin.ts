@@ -293,7 +293,7 @@ export async function createVoucher(data: any) {
     const { collection, addDoc, Timestamp } = await import('firebase/firestore');
     const { db } = await import('@/lib/firebase/client');
     
-    const voucherData = {
+    const voucherData: any = {
       name: data.name,
       description: data.description,
       price: Number(data.price) || 0,
@@ -301,12 +301,16 @@ export async function createVoucher(data: any) {
       imageUrl: data.imageUrl || '',
       validFrom: Timestamp.fromDate(new Date(data.validFrom)),
       validTo: Timestamp.fromDate(new Date(data.validTo)),
-      purchaseLimit: Number(data.purchaseLimit) || undefined,
       isActive: true,
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
       createdBy: 'admin'
     };
+    
+    // Only add purchaseLimit if it has a valid value
+    if (data.purchaseLimit && !isNaN(Number(data.purchaseLimit))) {
+      voucherData.purchaseLimit = Number(data.purchaseLimit);
+    }
     
     const vouchersRef = collection(db, 'vouchers');
     const docRef = await addDoc(vouchersRef, voucherData);

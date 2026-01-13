@@ -198,6 +198,35 @@ export async function getBreedNameById(id: number, locale: 'en' | 'he' = 'en'): 
 // Helper function to get dropdown data
 export async function getBreedsForDropdown(locale: 'en' | 'he' = 'en'): Promise<{ value: string; label: string; }[]> {
     const breeds = await getAllBreeds();
+    
+    if (breeds.length === 0) {
+        // Fallback data if collection is empty (common dog breeds)
+        console.warn('Breeds collection is empty, using fallback data');
+        return locale === 'he'
+            ? [
+                { value: '1', label: 'מעורב' },
+                { value: '2', label: 'גולדן רטריבר' },
+                { value: '3', label: 'לברדור' },
+                { value: '4', label: 'פודל' },
+                { value: '5', label: 'שיצו' },
+                { value: '6', label: 'פאג' },
+                { value: '7', label: 'ביגל' },
+                { value: '8', label: 'רועה גרמני' },
+                { value: '9', label: 'אחר' }
+              ]
+            : [
+                { value: '1', label: 'Mixed' },
+                { value: '2', label: 'Golden Retriever' },
+                { value: '3', label: 'Labrador' },
+                { value: '4', label: 'Poodle' },
+                { value: '5', label: 'Shih Tzu' },
+                { value: '6', label: 'Pug' },
+                { value: '7', label: 'Beagle' },
+                { value: '8', label: 'German Shepherd' },
+                { value: '9', label: 'Other' }
+              ];
+    }
+    
     return breeds.map(breed => ({
         value: breed.id.toString(),
         label: locale === 'he' ? breed.he : breed.en
@@ -214,6 +243,27 @@ export async function getGendersForDropdown(locale: 'en' | 'he' = 'en'): Promise
 
 export async function getPetTypesForDropdown(locale: 'en' | 'he' = 'en'): Promise<{ value: string; label: string; }[]> {
     const petTypes = await getAllPetTypes();
+    
+    if (petTypes.length === 0) {
+        // Fallback data if collection is empty
+        console.warn('Pet types collection is empty, using fallback data');
+        return locale === 'he'
+            ? [
+                { value: '1', label: 'כלב' },
+                { value: '2', label: 'חתול' },
+                { value: '3', label: 'ציפור' },
+                { value: '4', label: 'ארנב' },
+                { value: '5', label: 'אחר' }
+              ]
+            : [
+                { value: '1', label: 'Dog' },
+                { value: '2', label: 'Cat' },
+                { value: '3', label: 'Bird' },
+                { value: '4', label: 'Rabbit' },
+                { value: '5', label: 'Other' }
+              ];
+    }
+    
     return petTypes.map(petType => ({
         value: petType.id.toString(),
         label: locale === 'he' ? petType.he : petType.en
