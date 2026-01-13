@@ -483,17 +483,18 @@ export async function getRecentActivity() {
 
     // Get recent users (last 10, sorted by creation date)
     const recentUsers = users
-      .filter(u => u.created_at)
+      .filter(u => u.createdAt || u.created_at) // Support both camelCase and snake_case
       .sort((a, b) => {
-        const dateA = new Date(a.created_at!).getTime();
-        const dateB = new Date(b.created_at!).getTime();
+        const dateA = new Date((a.createdAt || a.created_at)!).getTime();
+        const dateB = new Date((b.createdAt || b.created_at)!).getTime();
         return dateB - dateA;
       })
       .slice(0, 10)
       .map(u => ({
-        name: u.full_name || u.display_name || u.email,
+        uid: u.uid,
+        fullName: u.displayName || u.display_name || u.full_name || u.email.split('@')[0], // Use actual Firestore field names
         email: u.email,
-        joined: u.created_at
+        createdAt: u.createdAt || u.created_at // Dashboard expects createdAt, not joined
       }));
 
     // Get recent ads
