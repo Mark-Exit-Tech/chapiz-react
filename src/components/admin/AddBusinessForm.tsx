@@ -174,12 +174,12 @@ export default function AddBusinessForm() {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>
-          {t('businessManagement.addNewBusiness')}
+          {text.addNewBusiness}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{t('businessManagement.addNewBusiness')}</DialogTitle>
+          <DialogTitle>{text.addNewBusiness}</DialogTitle>
         </DialogHeader>
 
         {error && (

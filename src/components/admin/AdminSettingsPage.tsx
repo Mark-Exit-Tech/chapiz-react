@@ -1,18 +1,31 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Settings, Mail, Phone, MapPin, Clock, Image as ImageIcon, Globe, Instagram, Facebook, MessageCircle, Upload } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { uploadImage } from '@/lib/firebase/storage';
+import { uploadProfileImage } from '@/lib/firebase/storage';
+import { getSiteSettings, saveSiteSettings, SiteSettings } from '@/lib/firebase/database/settings';
 
 export default function AdminSettingsPage() {
   const [saving, setSaving] = useState(false);
-  const [logoUrl, setLogoUrl] = useState<string>('');
+  const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const [formData, setFormData] = useState<SiteSettings>({
+    siteName: '',
+    email: '',
+    phone: '',
+    address: '',
+    workHours: '',
+    logoUrl: '',
+    facebook: '',
+    instagram: '',
+    whatsapp: ''
+  });
   
   // Get locale from URL
   const locale = typeof window !== 'undefined'
@@ -61,14 +74,38 @@ export default function AdminSettingsPage() {
     uploadError: isHebrew ? 'שגיאה בהעלאת תמונה' : 'Error uploading image'
   };
 
+  // Load settings on mount
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        setLoading(true);
+        const settings = await getSiteSettings();
+        if (settings) {
+          setFormData(settings);
+        }
+      } catch (error) {
+        console.error('Error loading settings:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadSettings();
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+  };
+
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     try {
       setUploading(true);
-      const url = await uploadImage(file, 'settings/logo');
-      setLogoUrl(url);
+      const url = await uploadProfileImage(file, 'settings-logo');
+      setFormData(prev => ({ ...prev, logoUrl: url }));
     } catch (error) {
       console.error('Logo upload error:', error);
       alert(text.uploadError);
@@ -81,12 +118,33 @@ export default function AdminSettingsPage() {
     e.preventDefault();
     setSaving(true);
     
-    // TODO: Save settings to database
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    alert(text.saved);
-    setSaving(false);
+    try {
+      const success = await saveSiteSettings(formData);
+      if (success) {
+        alert(text.saved);
+      } else {
+        alert(isHebrew ? 'שגיאה בשמירה' : 'Error saving settings');
+      }
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      alert(isHebrew ? 'שגיאה בשמירה' : 'Error saving settings');
+    } finally {
+      setSaving(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto p-4 md:p-8">
+        <div className="flex items-center justify-center p-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-gray-500">{isHebrew ? 'טוען...' : 'Loading...'}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-4 md:p-8">
@@ -117,7 +175,8 @@ export default function AdminSettingsPage() {
                   id="siteName"
                   type="text"
                   placeholder={text.siteNamePlaceholder}
-                  defaultValue="Chapiz"
+                  value={formData.siteName}
+                  onChange={handleChange}
                 />
               </div>
 
@@ -130,7 +189,8 @@ export default function AdminSettingsPage() {
                   id="email"
                   type="email"
                   placeholder={text.emailPlaceholder}
-                  defaultValue="info@chapiz.co.il"
+                  value={formData.email}
+                  onChange={handleChange}
                 />
               </div>
 
@@ -143,7 +203,8 @@ export default function AdminSettingsPage() {
                   id="phone"
                   type="tel"
                   placeholder={text.phonePlaceholder}
-                  defaultValue="+972-50-123-4567"
+                  value={formData.phone}
+                  onChange={handleChange}
                 />
               </div>
 
@@ -156,7 +217,8 @@ export default function AdminSettingsPage() {
                   id="address"
                   type="text"
                   placeholder={text.addressPlaceholder}
-                  defaultValue="Tel Aviv, Israel"
+                  value={formData.address}
+                  onChange={handleChange}
                 />
               </div>
 
@@ -169,7 +231,8 @@ export default function AdminSettingsPage() {
                   id="workHours"
                   placeholder={text.workHoursPlaceholder}
                   rows={2}
-                  defaultValue="Sunday-Thursday: 9:00-18:00&#10;Friday: 9:00-14:00"
+                  value={formData.workHours}
+                  onChange={handleChange}
                 />
               </div>
             </div>
@@ -187,8 +250,8 @@ export default function AdminSettingsPage() {
                 <Label htmlFor="logo">{text.logo}</Label>
                 <div className="flex items-center gap-4">
                   <div className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden">
-                    {logoUrl ? (
-                      <img src={logoUrl} alt="Logo" className="w-full h-full object-contain" />
+                    {formData.logoUrl ? (
+                      <img src={formData.logoUrl} alt="Logo" className="w-full h-full object-contain" />
                     ) : (
                       <ImageIcon className="w-8 h-8 text-gray-400" />
                     )}
@@ -235,6 +298,8 @@ export default function AdminSettingsPage() {
                   id="facebook"
                   type="url"
                   placeholder={text.facebookPlaceholder}
+                  value={formData.facebook}
+                  onChange={handleChange}
                 />
               </div>
 
@@ -247,6 +312,8 @@ export default function AdminSettingsPage() {
                   id="instagram"
                   type="url"
                   placeholder={text.instagramPlaceholder}
+                  value={formData.instagram}
+                  onChange={handleChange}
                 />
               </div>
 
@@ -259,7 +326,8 @@ export default function AdminSettingsPage() {
                   id="whatsapp"
                   type="tel"
                   placeholder={text.whatsappPlaceholder}
-                  defaultValue="+972501234567"
+                  value={formData.whatsapp}
+                  onChange={handleChange}
                 />
                 <p className="text-sm text-gray-500">{text.whatsappHelp}</p>
               </div>

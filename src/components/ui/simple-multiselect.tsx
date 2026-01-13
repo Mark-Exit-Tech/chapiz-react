@@ -29,6 +29,8 @@ interface SimpleMultiselectProps {
   selectedValues: string[];
   onSelectionChange: (selectedValues: string[]) => void;
   placeholder?: string;
+  searchPlaceholder?: string;
+  noOptionsText?: string;
   className?: string;
   disabled?: boolean;
 }
@@ -38,6 +40,8 @@ export function SimpleMultiselect({
   selectedValues,
   onSelectionChange,
   placeholder = 'Select options...',
+  searchPlaceholder = 'Search...',
+  noOptionsText = 'No options found.',
   className,
   disabled = false
 }: SimpleMultiselectProps) {
@@ -126,12 +130,12 @@ export function SimpleMultiselect({
       <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
         <Command>
           <CommandInput 
-            placeholder="Search..." 
+            placeholder={searchPlaceholder} 
             value={searchQuery}
             onValueChange={setSearchQuery}
           />
           <CommandList>
-            <CommandEmpty>No options found.</CommandEmpty>
+            <CommandEmpty>{noOptionsText}</CommandEmpty>
             <CommandGroup>
               {filteredOptions.map((option) => {
                 const isSelected = selectedValues.includes(option.value);

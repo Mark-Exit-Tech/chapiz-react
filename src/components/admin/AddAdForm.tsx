@@ -70,7 +70,9 @@ export default function AddAdForm() {
     cancel: isHebrew ? 'ביטול' : 'Cancel',
     createError: isHebrew ? 'שגיאה ביצירת מודעה' : 'Error creating ad',
     clickToUpload: isHebrew ? 'לחץ להעלאת' : 'Click to upload',
-    fileFormats: isHebrew ? 'פורמטים נתמכים' : 'Supported formats'
+    fileFormats: isHebrew ? 'פורמטים נתמכים' : 'Supported formats',
+    search: isHebrew ? 'חיפוש...' : 'Search...',
+    noOptions: isHebrew ? 'לא נמצאו אפשרויות' : 'No options found'
   };
   const [formData, setFormData] = useState({
     title: '',
@@ -424,6 +426,8 @@ export default function AddAdForm() {
                   setFormData((prev) => ({ ...prev, city: values }));
                 }}
                 placeholder={text.cityPlaceholder}
+                searchPlaceholder={text.search}
+                noOptionsText={text.noOptions}
               />
             </div>
           </div>
@@ -480,6 +484,8 @@ export default function AddAdForm() {
                   setFormData((prev) => ({ ...prev, ageRange: values }));
                 }}
                 placeholder={text.ageRangePlaceholder}
+                searchPlaceholder={text.search}
+                noOptionsText={text.noOptions}
               />
             </div>
 
@@ -492,6 +498,8 @@ export default function AddAdForm() {
                   setFormData((prev) => ({ ...prev, weight: values }));
                 }}
                 placeholder={text.weightPlaceholder}
+                searchPlaceholder={text.search}
+                noOptionsText={text.noOptions}
               />
             </div>
           </div>
