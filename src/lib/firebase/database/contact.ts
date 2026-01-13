@@ -5,10 +5,16 @@ export interface ContactSubmission {
     id: string;
     name: string;
     email: string;
-    phone?: string;
-    message: string;
+    phoneNumber?: string;
+    phone?: string; // Legacy field
+    message?: string;
+    address?: string;
+    isEmailPrivate?: boolean;
+    isPhonePrivate?: boolean;
+    isAddressPrivate?: boolean;
     createdAt: Date;
-    read: boolean;
+    updatedAt?: Date;
+    read?: boolean;
 }
 
 const CONTACT_SUBMISSIONS_COLLECTION = 'contactSubmissions';

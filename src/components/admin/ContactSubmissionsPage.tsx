@@ -162,19 +162,19 @@ export default function ContactSubmissionsPage() {
                         </a>
                       </TableCell>
                       <TableCell>
-                        {submission.phone ? (
+                        {(submission.phoneNumber || submission.phone) ? (
                           <a 
-                            href={`tel:${submission.phone}`}
+                            href={`tel:${submission.phoneNumber || submission.phone}`}
                             className="flex items-center gap-1 text-blue-600 hover:underline"
                           >
                             <Phone className="w-4 h-4" />
-                            {submission.phone}
+                            {submission.phoneNumber || submission.phone}
                           </a>
                         ) : '-'}
                       </TableCell>
                       <TableCell>
                         <div className="max-w-xs truncate">
-                          {submission.message}
+                          {submission.message || submission.address || '-'}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -224,11 +224,13 @@ export default function ContactSubmissionsPage() {
                   <a href={`mailto:${selectedSubmission.email}`}>{selectedSubmission.email}</a>
                 </p>
               </div>
-              {selectedSubmission.phone && (
+              {(selectedSubmission.phoneNumber || selectedSubmission.phone) && (
                 <div>
                   <label className="text-sm font-semibold text-gray-700">{text.phone}</label>
                   <p className="text-blue-600">
-                    <a href={`tel:${selectedSubmission.phone}`}>{selectedSubmission.phone}</a>
+                    <a href={`tel:${selectedSubmission.phoneNumber || selectedSubmission.phone}`}>
+                      {selectedSubmission.phoneNumber || selectedSubmission.phone}
+                    </a>
                   </p>
                 </div>
               )}
@@ -236,12 +238,22 @@ export default function ContactSubmissionsPage() {
                 <label className="text-sm font-semibold text-gray-700">{text.date}</label>
                 <p className="text-gray-900">{formatDate(selectedSubmission.createdAt)}</p>
               </div>
-              <div>
-                <label className="text-sm font-semibold text-gray-700">{text.message}</label>
-                <p className="text-gray-900 whitespace-pre-wrap bg-gray-50 p-4 rounded">
-                  {selectedSubmission.message}
-                </p>
-              </div>
+              {selectedSubmission.message && (
+                <div>
+                  <label className="text-sm font-semibold text-gray-700">{text.message}</label>
+                  <p className="text-gray-900 whitespace-pre-wrap bg-gray-50 p-4 rounded">
+                    {selectedSubmission.message}
+                  </p>
+                </div>
+              )}
+              {selectedSubmission.address && (
+                <div>
+                  <label className="text-sm font-semibold text-gray-700">
+                    {isHebrew ? 'כתובת' : 'Address'}
+                  </label>
+                  <p className="text-gray-900">{selectedSubmission.address}</p>
+                </div>
+              )}
             </div>
           )}
         </DialogContent>

@@ -74,14 +74,80 @@ export interface Ad {
 
 // Stub functions that return empty/default values
 export async function getDashboardStats() {
-  return {
-    users: { total: 0, new: 0, byRole: {} },
-    ads: { total: 0, byStatus: {}, byType: {} },
-    pets: { total: 0, new: 0 },
-    contactSubmissions: { total: 0 },
-    comments: { total: 0 },
-    rating: { average: '0.0' }
-  };
+  try {
+    // Import Firebase functions
+    const { getAllUsers } = await import('@/lib/firebase/database/users');
+    const { getAllComments } = await import('@/lib/firebase/database/comments');
+    const { getAllContactSubmissions } = await import('@/lib/firebase/database/contact');
+    
+    // Fetch all data in parallel
+    const [users, comments, submissions, adsResult] = await Promise.all([
+      getAllUsers(),
+      getAllComments(),
+      getAllContactSubmissions(),
+      getAllAds(1, 1000)
+    ]);
+
+    // Calculate stats
+    const usersByRole: Record<string, number> = {};
+    users.forEach(user => {
+      usersByRole[user.role] = (usersByRole[user.role] || 0) + 1;
+    });
+
+    const adsByStatus: Record<string, number> = {};
+    const adsByType: Record<string, number> = {};
+    (adsResult.ads || []).forEach((ad: any) => {
+      adsByStatus[ad.status] = (adsByStatus[ad.status] || 0) + 1;
+      adsByType[ad.type] = (adsByType[ad.type] || 0) + 1;
+    });
+
+    // Calculate average rating
+    const ratingsWithValues = comments.filter(c => c.rating && c.rating > 0);
+    const avgRating = ratingsWithValues.length > 0
+      ? (ratingsWithValues.reduce((sum, c) => sum + (c.rating || 0), 0) / ratingsWithValues.length).toFixed(1)
+      : '0.0';
+
+    return {
+      users: { 
+        total: users.length, 
+        new: users.filter(u => {
+          const created = u.created_at;
+          if (!created) return false;
+          const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+          return new Date(created) > dayAgo;
+        }).length,
+        byRole: usersByRole 
+      },
+      ads: { 
+        total: adsResult.ads?.length || 0,
+        byStatus: adsByStatus,
+        byType: adsByType
+      },
+      pets: { 
+        total: 0, // TODO: Implement when pets collection is ready
+        new: 0 
+      },
+      contactSubmissions: { 
+        total: submissions.length 
+      },
+      comments: { 
+        total: comments.length 
+      },
+      rating: { 
+        average: avgRating
+      }
+    };
+  } catch (error) {
+    console.error('Error getting dashboard stats:', error);
+    return {
+      users: { total: 0, new: 0, byRole: {} },
+      ads: { total: 0, byStatus: {}, byType: {} },
+      pets: { total: 0, new: 0 },
+      contactSubmissions: { total: 0 },
+      comments: { total: 0 },
+      rating: { average: '0.0' }
+    };
+  }
 }
 
 export async function getAllUsers() {
@@ -372,8 +438,48 @@ export async function deletePromo(id: string) {
 }
 
 export async function getRecentActivity() {
-  console.warn('getRecentActivity is a stub - needs Firebase implementation');
-  return { users: [], pets: [], ads: [] };
+  try {
+    // Import Firebase functions
+    const { getAllUsers } = await import('@/lib/firebase/database/users');
+    
+    // Fetch data
+    const [users, adsResult] = await Promise.all([
+      getAllUsers(),
+      getAllAds(1, 10)
+    ]);
+
+    // Get recent users (last 10, sorted by creation date)
+    const recentUsers = users
+      .filter(u => u.created_at)
+      .sort((a, b) => {
+        const dateA = new Date(a.created_at!).getTime();
+        const dateB = new Date(b.created_at!).getTime();
+        return dateB - dateA;
+      })
+      .slice(0, 10)
+      .map(u => ({
+        name: u.full_name || u.display_name || u.email,
+        email: u.email,
+        joined: u.created_at
+      }));
+
+    // Get recent ads
+    const recentAds = (adsResult.ads || []).slice(0, 10).map((ad: any) => ({
+      title: ad.title,
+      status: ad.status,
+      type: ad.type,
+      createdAt: ad.createdAt
+    }));
+
+    return {
+      users: recentUsers,
+      pets: [], // TODO: Implement when pets collection is ready
+      ads: recentAds
+    };
+  } catch (error) {
+    console.error('Error getting recent activity:', error);
+    return { users: [], pets: [], ads: [] };
+  }
 }
 
 export async function getAllAds(page?: number, limit?: number) {

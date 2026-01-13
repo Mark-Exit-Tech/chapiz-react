@@ -50,6 +50,8 @@ export default function CouponsTable() {
   
   // HARDCODED TEXT
   const text = {
+    noCoupons: isHebrew ? 'לא נמצאו קופונים' : 'No coupons found',
+    loading: isHebrew ? 'טוען...' : 'Loading...',
     name: isHebrew ? 'שם' : 'Name',
     description: isHebrew ? 'תיאור' : 'Description',
     image: isHebrew ? 'תמונה' : 'Image',
@@ -60,8 +62,6 @@ export default function CouponsTable() {
     validFrom: isHebrew ? 'תקף מ' : 'Valid From',
     validTo: isHebrew ? 'תקף עד' : 'Valid To',
     status: isHebrew ? 'סטטוס' : 'Status',
-    noCoupons: isHebrew ? 'לא נמצאו קופונים' : 'No coupons found',
-    loading: isHebrew ? 'טוען...' : 'Loading...',
     edit: isHebrew ? 'ערוך' : 'Edit',
     delete: isHebrew ? 'מחק' : 'Delete',
     preview: isHebrew ? 'תצוגה מקדימה' : 'Preview',
@@ -261,7 +261,7 @@ export default function CouponsTable() {
             {coupons.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={9} className="text-center py-8 text-gray-500">
-                  {t('couponsManagement.noCoupons')}
+                  {text.noCoupons}
                 </TableCell>
               </TableRow>
             ) : (
