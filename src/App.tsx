@@ -20,6 +20,16 @@ const ServicesPage = lazy(() => import('./pages/ServicesPage'));
 const ServiceDetailsPage = lazy(() => import('./pages/ServiceDetailsPage'));
 const AddPetPage = lazy(() => import('./components/AddPetPage'));
 
+// Admin sub-pages
+const AdminUsersPage = lazy(() => import('./components/admin/AdminUsersPage'));
+const AdsPageWithTabs = lazy(() => import('./components/admin/AdsPageWithTabs'));
+const PromosPage = lazy(() => import('./components/admin/PromosPage'));
+const AdminCouponsPage = lazy(() => import('./components/admin/AdminCouponsPage'));
+const AdminBusinessesPage = lazy(() => import('./components/admin/AdminBusinessesPage'));
+const ContactSubmissionsPage = lazy(() => import('./components/admin/ContactSubmissionsPage'));
+const AdminPetsPage = lazy(() => import('./components/admin/AdminPetsPage'));
+const BusinessesPage = lazy(() => import('./components/admin/BusinessesPage'));
+
 // Loading component
 const PageLoader = () => (
   <div className="flex items-center justify-center min-h-screen">
@@ -51,7 +61,11 @@ function App() {
           <Route path="/coupons" element={<Navigate to={`/${currentLang}/coupons`} replace />} />
           <Route path="/vouchers" element={<Navigate to={`/${currentLang}/vouchers`} replace />} />
           <Route path="/user/settings" element={<Navigate to={`/${currentLang}/user/settings`} replace />} />
+          
+          {/* Admin route redirects */}
           <Route path="/admin" element={<Navigate to={`/${currentLang}/admin`} replace />} />
+          <Route path="/admin/*" element={<Navigate to={`/${currentLang}/admin`} replace />} />
+          
           <Route path="/services" element={<Navigate to={`/${currentLang}/services`} replace />} />
           <Route path="/privacy" element={<Navigate to={`/${currentLang}/privacy`} replace />} />
           <Route path="/terms" element={<Navigate to={`/${currentLang}/terms`} replace />} />
@@ -67,7 +81,19 @@ function App() {
           <Route path="/:locale/coupons" element={<Suspense fallback={<PageLoader />}><CouponsPage /></Suspense>} />
           <Route path="/:locale/vouchers" element={<Suspense fallback={<PageLoader />}><VouchersPage /></Suspense>} />
           <Route path="/:locale/user/settings" element={<Suspense fallback={<PageLoader />}><UserSettingsPage /></Suspense>} />
+          
+          {/* Admin routes */}
           <Route path="/:locale/admin" element={<Suspense fallback={<PageLoader />}><AdminPage /></Suspense>} />
+          <Route path="/:locale/admin/users" element={<Suspense fallback={<PageLoader />}><AdminUsersPage /></Suspense>} />
+          <Route path="/:locale/admin/ads" element={<Suspense fallback={<PageLoader />}><AdsPageWithTabs /></Suspense>} />
+          <Route path="/:locale/admin/promos" element={<Suspense fallback={<PageLoader />}><PromosPage /></Suspense>} />
+          <Route path="/:locale/admin/coupons" element={<Suspense fallback={<PageLoader />}><AdminCouponsPage /></Suspense>} />
+          <Route path="/:locale/admin/businesses" element={<Suspense fallback={<PageLoader />}><AdminBusinessesPage /></Suspense>} />
+          <Route path="/:locale/admin/business" element={<Suspense fallback={<PageLoader />}><BusinessesPage /></Suspense>} />
+          <Route path="/:locale/admin/contact-submissions" element={<Suspense fallback={<PageLoader />}><ContactSubmissionsPage /></Suspense>} />
+          <Route path="/:locale/admin/pets" element={<Suspense fallback={<PageLoader />}><AdminPetsPage /></Suspense>} />
+          <Route path="/:locale/admin/settings" element={<Suspense fallback={<PageLoader />}><AdminPage /></Suspense>} />
+          
           <Route path="/:locale/services" element={<Suspense fallback={<PageLoader />}><ServicesPage /></Suspense>} />
           <Route path="/:locale/services/:id" element={<Suspense fallback={<PageLoader />}><ServiceDetailsPage /></Suspense>} />
           <Route path="/:locale/privacy" element={<Suspense fallback={<PageLoader />}><PrivacyPage /></Suspense>} />
