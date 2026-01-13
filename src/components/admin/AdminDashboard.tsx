@@ -377,7 +377,14 @@ export default function AdminDashboard() {
                                 : 'bg-gray-100 text-gray-800'
                             }`}
                         >
-                          {t(`adsManagement.status.${ad.status}`)}
+                          {ad.status === 'active' 
+                            ? (isHebrew ? 'פעיל' : 'Active')
+                            : ad.status === 'scheduled'
+                            ? (isHebrew ? 'מתוזמן' : 'Scheduled')
+                            : ad.status === 'draft'
+                            ? (isHebrew ? 'טיוטה' : 'Draft')
+                            : (isHebrew ? 'לא פעיל' : 'Inactive')
+                          }
                         </span>
                       </TableCell>
                     </TableRow>
