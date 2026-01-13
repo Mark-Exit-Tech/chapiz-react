@@ -31,6 +31,47 @@ export default function AddAdForm() {
   const [isOpen, setIsOpen] = useState(false);
   const locale = useLocale() as 'en' | 'he';
   const [mediaType, setMediaType] = useState<'image' | 'video' | 'youtube'>('image');
+  
+  const isHebrew = locale === 'he';
+  
+  // HARDCODED TEXT
+  const text = {
+    addNewAd: isHebrew ? 'הוסף מודעה חדשה' : 'Add New Ad',
+    addNewAdvertisement: isHebrew ? 'הוסף מודעה חדשה' : 'Add New Advertisement',
+    title: isHebrew ? 'כותרת' : 'Title',
+    mediaType: isHebrew ? 'סוג מדיה' : 'Media Type',
+    image: isHebrew ? 'תמונה' : 'Image',
+    video: isHebrew ? 'וידאו' : 'Video',
+    youtube: isHebrew ? 'יוטיוב' : 'YouTube',
+    content: isHebrew ? 'תוכן' : 'Content',
+    youtubeUrl: isHebrew ? 'קישור יוטיוב' : 'YouTube URL',
+    youtubeUrlHelp: isHebrew ? 'הזן את קישור הסרטון מיוטיוב' : 'Enter the YouTube video URL',
+    description: isHebrew ? 'תיאור' : 'Description',
+    descriptionPlaceholder: isHebrew ? 'הזן תיאור למודעה' : 'Enter ad description',
+    phoneNumber: isHebrew ? 'מספר טלפון' : 'Phone Number',
+    phonePlaceholder: isHebrew ? 'הזן מספר טלפון' : 'Enter phone number',
+    location: isHebrew ? 'מיקום' : 'Location',
+    locationPlaceholder: isHebrew ? 'הזן מיקום' : 'Enter location',
+    area: isHebrew ? 'אזור' : 'Area',
+    areaPlaceholder: isHebrew ? 'בחר אזור' : 'Select area',
+    city: isHebrew ? 'עיר' : 'City',
+    cityPlaceholder: isHebrew ? 'בחר עיר' : 'Select city',
+    petType: isHebrew ? 'סוג חיה' : 'Pet Type',
+    petTypePlaceholder: isHebrew ? 'בחר סוג חיה' : 'Select pet type',
+    breed: isHebrew ? 'גזע' : 'Breed',
+    breedPlaceholder: isHebrew ? 'בחר גזע' : 'Select breed',
+    ageRange: isHebrew ? 'טווח גיל' : 'Age Range',
+    ageRangePlaceholder: isHebrew ? 'בחר טווח גיל' : 'Select age range',
+    weight: isHebrew ? 'משקל' : 'Weight',
+    weightPlaceholder: isHebrew ? 'בחר משקל' : 'Select weight',
+    tags: isHebrew ? 'תגיות' : 'Tags',
+    createAd: isHebrew ? 'צור מודעה' : 'Create Ad',
+    creating: isHebrew ? 'יוצר...' : 'Creating...',
+    cancel: isHebrew ? 'ביטול' : 'Cancel',
+    createError: isHebrew ? 'שגיאה ביצירת מודעה' : 'Error creating ad',
+    clickToUpload: isHebrew ? 'לחץ להעלאת' : 'Click to upload',
+    fileFormats: isHebrew ? 'פורמטים נתמכים' : 'Supported formats'
+  };
   const [formData, setFormData] = useState({
     title: '',
     content: '',
@@ -201,7 +242,7 @@ export default function AddAdForm() {
       window.location.reload();
     } catch (err: any) {
       setError(
-        err.message || t('forms.addAd.createError')
+        err.message || text.createError
       );
       console.error(err);
     } finally {
@@ -213,12 +254,12 @@ export default function AddAdForm() {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>
-          {t('adsManagement.addNewAd')}
+          {text.addNewAd}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{t('adsManagement.addNewAdvertisement')}</DialogTitle>
+          <DialogTitle>{text.addNewAdvertisement}</DialogTitle>
         </DialogHeader>
 
         {error && (
@@ -229,7 +270,7 @@ export default function AddAdForm() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="title">{t('forms.addAd.title')}</Label>
+            <Label htmlFor="title">{text.title}</Label>
             <Input
               id="title"
               name="title"
@@ -242,7 +283,7 @@ export default function AddAdForm() {
 
 
           <div className="space-y-2">
-            <Label>{t('forms.addAd.mediaType') || 'Media Type'}</Label>
+            <Label>{text.mediaType || 'Media Type'}</Label>
             <div className="flex gap-4">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -252,7 +293,7 @@ export default function AddAdForm() {
                   onChange={(e) => setMediaType(e.target.value as 'image' | 'video' | 'youtube')}
                   className="cursor-pointer"
                 />
-                <span>{t('forms.addAd.image') || 'Image'}</span>
+                <span>{text.image || 'Image'}</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -262,7 +303,7 @@ export default function AddAdForm() {
                   onChange={(e) => setMediaType(e.target.value as 'image' | 'video' | 'youtube')}
                   className="cursor-pointer"
                 />
-                <span>{t('forms.addAd.video') || 'Video'}</span>
+                <span>{text.video || 'Video'}</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -272,14 +313,14 @@ export default function AddAdForm() {
                   onChange={(e) => setMediaType(e.target.value as 'image' | 'video' | 'youtube')}
                   className="cursor-pointer"
                 />
-                <span>{t('forms.addAd.youtube') || 'YouTube'}</span>
+                <span>{text.youtube || 'YouTube'}</span>
               </label>
             </div>
           </div>
 
           {mediaType === 'youtube' ? (
             <div className="space-y-2">
-              <Label htmlFor="youtubeUrl">{t('forms.addAd.youtubeUrl') || 'YouTube URL'}</Label>
+              <Label htmlFor="youtubeUrl">{text.youtubeUrl || 'YouTube URL'}</Label>
               <Input
                 id="youtubeUrl"
                 name="youtubeUrl"
@@ -290,7 +331,7 @@ export default function AddAdForm() {
                 required
               />
               <p className="text-sm text-gray-500">
-                {t('forms.addAd.youtubeUrlHelp') || 'Enter a YouTube video URL'}
+                {text.youtubeUrlHelp || 'Enter a YouTube video URL'}
               </p>
               {formData.youtubeUrl && getYouTubeEmbedUrl(formData.youtubeUrl) && (
                 <div className="mt-4 rounded-md overflow-hidden border">
@@ -308,7 +349,7 @@ export default function AddAdForm() {
             </div>
           ) : (
             <div className="space-y-2">
-              <Label htmlFor="content">{t('forms.addAd.content')}</Label>
+              <Label htmlFor="content">{text.content}</Label>
               <MediaUpload
                 type={mediaType}
                 value={formData.content}
@@ -320,49 +361,49 @@ export default function AddAdForm() {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="description">{t('forms.addAd.description')}</Label>
+            <Label htmlFor="description">{text.description}</Label>
             <Textarea
               id="description"
               name="description"
               value={formData.description}
               onChange={handleChange}
-              placeholder={t('forms.addAd.descriptionPlaceholder')}
+              placeholder={text.descriptionPlaceholder}
               rows={3}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="phone">{t('forms.addAd.phoneNumber')}</Label>
+              <Label htmlFor="phone">{text.phoneNumber}</Label>
               <Input
                 id="phone"
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                placeholder={t('forms.addAd.phonePlaceholder')}
+                placeholder={text.phonePlaceholder}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="location">{t('forms.addAd.location')}</Label>
+              <Label htmlFor="location">{text.location}</Label>
               <Input
                 id="location"
                 name="location"
                 value={formData.location}
                 onChange={handleChange}
-                placeholder={t('forms.addAd.locationPlaceholder')}
+                placeholder={text.locationPlaceholder}
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="area">{t('forms.addAd.area')}</Label>
+              <Label htmlFor="area">{text.area}</Label>
               <Select value={formData.area} onValueChange={(value) => {
                 setFormData((prev) => ({ ...prev, area: value }));
               }}>
                 <SelectTrigger>
-                  <SelectValue placeholder={t('forms.addAd.areaPlaceholder')} />
+                  <SelectValue placeholder={text.areaPlaceholder} />
                 </SelectTrigger>
                 <SelectContent>
                   {areas.map((area) => (
@@ -375,26 +416,26 @@ export default function AddAdForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="city">{t('forms.addAd.city')}</Label>
+              <Label htmlFor="city">{text.city}</Label>
               <SimpleMultiselect
                 options={cities}
                 selectedValues={formData.city}
                 onSelectionChange={(values) => {
                   setFormData((prev) => ({ ...prev, city: values }));
                 }}
-                placeholder={t('forms.addAd.cityPlaceholder')}
+                placeholder={text.cityPlaceholder}
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="petType">{t('forms.addAd.petType')}</Label>
+              <Label htmlFor="petType">{text.petType}</Label>
               <Select value={formData.petType} onValueChange={(value) => {
                 setFormData((prev) => ({ ...prev, petType: value, breed: '' }));
               }}>
                 <SelectTrigger>
-                  <SelectValue placeholder={t('forms.addAd.petTypePlaceholder')} />
+                  <SelectValue placeholder={text.petTypePlaceholder} />
                 </SelectTrigger>
                 <SelectContent>
                   {petTypes.map((type) => (
@@ -407,7 +448,7 @@ export default function AddAdForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="breed">{t('forms.addAd.breed')}</Label>
+              <Label htmlFor="breed">{text.breed}</Label>
               <Select
                 value={formData.breed}
                 onValueChange={(value) => {
@@ -416,7 +457,7 @@ export default function AddAdForm() {
                 disabled={!formData.petType}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder={t('forms.addAd.breedPlaceholder')} />
+                  <SelectValue placeholder={text.breedPlaceholder} />
                 </SelectTrigger>
                 <SelectContent>
                   {breeds.map((breed) => (
@@ -431,32 +472,32 @@ export default function AddAdForm() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="ageRange">{t('forms.addAd.ageRange')}</Label>
+              <Label htmlFor="ageRange">{text.ageRange}</Label>
               <SimpleMultiselect
                 options={ageRanges}
                 selectedValues={formData.ageRange}
                 onSelectionChange={(values) => {
                   setFormData((prev) => ({ ...prev, ageRange: values }));
                 }}
-                placeholder={t('forms.addAd.ageRangePlaceholder')}
+                placeholder={text.ageRangePlaceholder}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="weight">{t('forms.addAd.weight')}</Label>
+              <Label htmlFor="weight">{text.weight}</Label>
               <SimpleMultiselect
                 options={weightRanges}
                 selectedValues={formData.weight}
                 onSelectionChange={(values) => {
                   setFormData((prev) => ({ ...prev, weight: values }));
                 }}
-                placeholder={t('forms.addAd.weightPlaceholder')}
+                placeholder={text.weightPlaceholder}
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tags">{t('adActions.tags')}</Label>
+            <Label htmlFor="tags">{text.tags}</Label>
 
             {/* Predefined Hebrew Service Tags */}
             <div className="space-y-2">
@@ -513,10 +554,10 @@ export default function AddAdForm() {
               variant="outline"
               onClick={() => setIsOpen(false)}
             >
-              {t('common.cancel')}
+              {text.cancel}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? t('forms.addAd.creating') : t('forms.addAd.createAd')}
+              {isSubmitting ? text.creating : text.createAd}
             </Button>
           </DialogFooter>
         </form>
