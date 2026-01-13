@@ -251,7 +251,40 @@ export async function createAd(data: any) {
 }
 
 export async function createCoupon(data: CreateCouponData) {
-  return { success: true, error: undefined };
+  try {
+    const { collection, addDoc, Timestamp } = await import('firebase/firestore');
+    const { db } = await import('@/lib/firebase/client');
+    
+    // Create coupon document
+    const couponData = {
+      name: data.name,
+      description: data.description,
+      price: data.price,
+      points: data.points,
+      imageUrl: data.imageUrl || '',
+      validFrom: Timestamp.fromDate(new Date(data.validFrom)),
+      validTo: Timestamp.fromDate(new Date(data.validTo)),
+      businessIds: data.businessIds || [],
+      purchaseLimit: data.purchaseLimit,
+      isActive: true,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+      createdBy: 'admin' // TODO: Get actual admin user ID
+    };
+    
+    const couponsRef = collection(db, 'coupons');
+    const docRef = await addDoc(couponsRef, couponData);
+    
+    console.log('✅ Coupon created successfully:', docRef.id);
+    
+    return { success: true, couponId: docRef.id, error: undefined };
+  } catch (error) {
+    console.error('❌ Error creating coupon:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Failed to create coupon' 
+    };
+  }
 }
 
 export async function getCoupons() {
