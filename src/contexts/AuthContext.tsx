@@ -226,11 +226,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         hasUser: !!data.user, 
         hasSession: !!data.session,
         error: error?.message,
-        userEmail: data.user?.email
+        errorStatus: error?.status,
+        errorCode: (error as any)?.code,
+        userEmail: data.user?.email,
+        userConfirmed: data.user?.email_confirmed_at
       });
 
       if (error) {
-        console.error('❌ Supabase sign in error:', error);
+        console.error('❌ Supabase sign in error:', {
+          message: error.message,
+          status: error.status,
+          code: (error as any)?.code,
+          name: error.name
+        });
+        
+        // Provide more specific error messages
+        if (error.message?.includes('Invalid login credentials')) {
+          throw new Error('Invalid email or password. Please check your credentials.');
+        } else if (error.message?.includes('Email not confirmed')) {
+          throw new Error('Please confirm your email address before signing in. Check your inbox for the confirmation link.');
+        } else if (error.message?.includes('User not found')) {
+          throw new Error('No account found with this email. Please sign up first.');
+        }
+        
         throw error;
       }
 
