@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { getAllComments, deleteComment, type Comment } from '@/lib/firebase/database/comments';
-import { Trash2, MessageSquare } from 'lucide-react';
+import { Trash2, MessageSquare, User } from 'lucide-react';
 
 export default function AdminCommentsPage() {
   const [comments, setComments] = useState<Comment[]>([]);
@@ -121,10 +121,12 @@ export default function AdminCommentsPage() {
                             <img 
                               src={comment.userImage} 
                               alt={comment.userName || text.user}
-                              className="w-8 h-8 rounded-full mr-2"
+                              className="w-8 h-8 rounded-full mr-2 object-cover"
                             />
                           ) : (
-                            <div className="w-8 h-8 rounded-full bg-gray-200 mr-2" />
+                            <div className="w-8 h-8 rounded-full bg-gray-200 mr-2 flex items-center justify-center">
+                              <User className="w-5 h-5 text-gray-500" />
+                            </div>
                           )}
                           <span className="text-sm text-gray-900">{comment.userName || text.user}</span>
                         </div>
