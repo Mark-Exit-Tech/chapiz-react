@@ -218,7 +218,7 @@ export default function UserCouponsPage() {
       // Fetch user points from userPoints collection
       if (user) {
         console.log('Fetching user points for UID:', user.uid);
-        const pointsResult = await getUserPoints(user.uid);
+        const pointsResult = await getUserPoints(user);
         console.log('Points result:', pointsResult);
         if (pointsResult.success) {
           setUserPoints(pointsResult.totalPoints || pointsResult.points || 0);
@@ -348,7 +348,7 @@ export default function UserCouponsPage() {
       // Only deduct points if freeCouponPrice is disabled
       if (!freeCouponPrice) {
         const deductResult = await deductPointsFromCategory(
-          user.uid,
+          user,
           'share',
           coupon.points
         );
@@ -365,7 +365,7 @@ export default function UserCouponsPage() {
       if (!purchaseResult.success) {
         // Refund points if purchase failed and points were deducted
         if (!freeCouponPrice) {
-          await addPointsToCategory(user.uid, 'share', coupon.points);
+          await addPointsToCategory(user, 'share', coupon.points);
         }
         toast.error(purchaseResult.error || t('failedToPurchase'));
         return;
