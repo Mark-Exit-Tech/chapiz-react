@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { getAllComments, deleteComment, type Comment } from '@/lib/firebase/database/comments';
 import { Trash2, MessageSquare } from 'lucide-react';
-import { toast } from 'sonner';
 
 export default function AdminCommentsPage() {
   const [comments, setComments] = useState<Comment[]>([]);
@@ -55,10 +54,10 @@ export default function AdminCommentsPage() {
 
     const success = await deleteComment(id);
     if (success) {
-      toast.success(text.deleteSuccess);
+      alert(text.deleteSuccess);
       setComments(comments.filter(c => c.id !== id));
     } else {
-      toast.error(text.deleteFailed);
+      alert(text.deleteFailed);
     }
   };
 
