@@ -15,6 +15,10 @@ export interface User {
   restriction_reason?: string;
   created_at?: Date;
   updated_at?: Date;
+  // Additional Firebase-compatible fields
+  photoURL?: string;
+  profile_image?: string;
+  name?: string; // Alias for full_name
 }
 
 const USERS_COLLECTION = 'users';
