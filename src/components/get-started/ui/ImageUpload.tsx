@@ -73,7 +73,7 @@ const ImageUpload = ({
         });
       }, 200);
 
-      const result = await uploadPetImage(file, user.id);
+      const result = await uploadPetImage(file, user.uid);
 
       clearInterval(progressInterval);
       setProgress(100);

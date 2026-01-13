@@ -120,17 +120,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           // If user doesn't exist in database but is authenticated (OAuth user), create them
           if (!dbUserData && session.user) {
             console.log('🔍 OAuth user not found in database, creating record...');
-            const fullName = session.user.user_metadata?.full_name ||
-              session.user.user_metadata?.name ||
+            const fullName = session.dbUser?.full_name ||
+              session.dbUser?.name ||
               session.user.email?.split('@')[0] ||
               'User';
-            const avatarUrl = session.user.user_metadata?.avatar_url ||
-              session.user.user_metadata?.picture ||
+            const avatarUrl = session.dbUser?.avatar_url ||
+              session.dbUser?.picture ||
               null;
 
             try {
               await upsertUser({
-                uid: session.user.id,
+                uid: session.user.uid,
                 email: session.user.email,
                 full_name: fullName,
                 display_name: fullName,
@@ -172,17 +172,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         // If user doesn't exist in database but is authenticated (OAuth user), create them
         if (!dbUserData && session.user) {
           console.log('🔍 OAuth user not found in database, creating record...');
-          const fullName = session.user.user_metadata?.full_name ||
-            session.user.user_metadata?.name ||
+          const fullName = session.dbUser?.full_name ||
+            session.dbUser?.name ||
             session.user.email?.split('@')[0] ||
             'User';
-          const avatarUrl = session.user.user_metadata?.avatar_url ||
-            session.user.user_metadata?.picture ||
+          const avatarUrl = session.dbUser?.avatar_url ||
+            session.dbUser?.picture ||
             null;
 
           try {
             await upsertUser({
-              uid: session.user.id,
+              uid: session.user.uid,
               email: session.user.email,
               full_name: fullName,
               display_name: fullName,
@@ -335,12 +335,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         email, 
         userRole, 
         cookiePreference, 
-        uid: data.user.id 
+        uid: data.user.uid 
       });
 
       try {
         const dbUser = await upsertUser({
-          uid: data.user.id,
+          uid: data.user.uid,
           email: email.trim().toLowerCase(),
           full_name: fullName,
           display_name: fullName,

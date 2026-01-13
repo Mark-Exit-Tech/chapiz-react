@@ -285,7 +285,7 @@ export default function AdminDashboard() {
                 </TableHeader>
                 <TableBody>
                   {activity.users.map((user) => (
-                    <TableRow key={user.id}>
+                    <TableRow key={user.uid}>
                       <TableCell className="px-2 md:px-4 text-xs md:text-sm">{user.fullName}</TableCell>
                       <TableCell className="px-2 md:px-4 text-xs md:text-sm text-gray-600">{user.email}</TableCell>
                       <TableCell className="px-2 md:px-4 text-xs md:text-sm">

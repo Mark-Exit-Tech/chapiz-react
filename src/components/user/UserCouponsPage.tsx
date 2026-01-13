@@ -218,8 +218,8 @@ export default function UserCouponsPage() {
 
       // Fetch user points from userPoints collection
       if (user) {
-        console.log('Fetching user points for UID:', user.id);
-        const pointsResult = await getUserPoints(user.id);
+        console.log('Fetching user points for UID:', user.uid);
+        const pointsResult = await getUserPoints(user.uid);
         console.log('Points result:', pointsResult);
         if (pointsResult.success && pointsResult.points) {
           setUserPoints(pointsResult.points.totalPoints || 0);
@@ -229,13 +229,13 @@ export default function UserCouponsPage() {
         }
 
         // Fetch user settings to check freeCouponPrice
-        const userResult = await getUserFromFirestore(user.id);
+        const userResult = await getUserFromFirestore(user.uid);
         if (userResult.success && userResult.user) {
           setFreeCouponPrice(false);
         }
 
         // Fetch all purchased coupons for history (active + inactive)
-        const historyResult = await getCouponHistory(user.id);
+        const historyResult = await getCouponHistory(user.uid);
         if (historyResult.success && historyResult.coupons) {
           // Convert ISO strings back to Date objects
           const allCoupons = historyResult.coupons.map(uc => ({
@@ -349,7 +349,7 @@ export default function UserCouponsPage() {
       // Only deduct points if freeCouponPrice is disabled
       if (!freeCouponPrice) {
         const deductResult = await deductPointsFromCategory(
-          user.id,
+          user.uid,
           'share',
           coupon.points
         );
@@ -361,12 +361,12 @@ export default function UserCouponsPage() {
       }
 
       // Purchase the coupon (with 0 points if free)
-      const purchaseResult = await purchaseCoupon(user.id, coupon.id, pointsNeeded);
+      const purchaseResult = await purchaseCoupon(user.uid, coupon.id, pointsNeeded);
       
       if (!purchaseResult.success) {
         // Refund points if purchase failed and points were deducted
         if (!freeCouponPrice) {
-          await addPointsToCategory(user.id, 'share', coupon.points);
+          await addPointsToCategory(user.uid, 'share', coupon.points);
         }
         toast.error(purchaseResult.error || t('failedToPurchase'));
         return;
@@ -404,7 +404,7 @@ export default function UserCouponsPage() {
       toast.success(t('couponMarkedAsUsed') || 'Coupon marked as used!');
       // Refresh history
       if (user) {
-        const historyResult = await getCouponHistory(user.id);
+        const historyResult = await getCouponHistory(user.uid);
         if (historyResult.success && historyResult.coupons) {
           const allCoupons = historyResult.coupons.map(uc => ({
             ...uc,

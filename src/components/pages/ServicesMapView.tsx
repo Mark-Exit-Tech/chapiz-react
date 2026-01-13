@@ -263,7 +263,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
 
     try {
       // Check if favorited
-      // Use user.id or user.uid depending on AuthContext provider type
+      // Use user.uid or user.uid depending on AuthContext provider type
       const userId = (user as any).id || (user as any).uid;
       if (userId) {
         const favorited = await isAdFavorited(user as any, serviceId); // isAdFavorited expects user object apparently? Check signature.
@@ -293,7 +293,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
         const result = await submitComment({
           adId: selectedService.id,
           adTitle: selectedService.name,
-          userName: (user.user_metadata?.full_name as string) || user.email?.split('@')[0] || 'User',
+          userName: (dbUser?.full_name as string) || user.email?.split('@')[0] || 'User',
           userEmail: user.email || '',
           content: commentText.trim() || '',
           rating: userRating
@@ -334,7 +334,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
     setIsTogglingFavorite(true);
 
     try {
-      // Use user.id or user.uid depending on AuthContext provider type
+      // Use user.uid or user.uid depending on AuthContext provider type
       const userId = (user as any).id || (user as any).uid;
 
       if (!userId) {

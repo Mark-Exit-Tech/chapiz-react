@@ -75,7 +75,7 @@ export default function ClientRegisterPetPage({
       weight: '', // Add weight field
       notes: '',
       // Use authenticated user data if available, otherwise use userDetails
-      ownerFullName: user?.user_metadata?.full_name || user?.user_metadata?.name || userDetails.fullName || '',
+      ownerFullName: dbUser?.full_name || dbUser?.name || userDetails.fullName || '',
       ownerPhoneNumber: userDetails.phone || '',
       ownerEmailAddress: user?.email || userDetails.email || '',
       ownerHomeAddress: '',
@@ -104,7 +104,7 @@ export default function ClientRegisterPetPage({
     const fetchUserDetails = async () => {
       if (user && isHydrated) {
         try {
-          const userResult = await getUserFromFirestore(user.id);
+          const userResult = await getUserFromFirestore(user.uid);
           if (userResult.success && userResult.user) {
             // Format phone number to include country code if it doesn't have one
             let phoneNumber = userResult.user.phone || userDetails.phone || '';
@@ -118,7 +118,7 @@ export default function ClientRegisterPetPage({
             }
 
             const updatedData = {
-              ownerFullName: user.user_metadata?.full_name || user.user_metadata?.name || userResult.user.display_name || userResult.user.full_name || userDetails.fullName || '',
+              ownerFullName: dbUser?.full_name || dbUser?.name || userResult.user.display_name || userResult.user.full_name || userDetails.fullName || '',
               ownerEmailAddress: user.email || userResult.user.email || userDetails.email || '',
               ownerPhoneNumber: phoneNumber,
               ownerHomeAddress: userResult.user.address || '' // Fetch address from user profile
@@ -141,7 +141,7 @@ export default function ClientRegisterPetPage({
           console.error('Error fetching user details:', error);
           // Fallback to userDetails if Firestore fetch fails
           const updatedData = {
-            ownerFullName: user.user_metadata?.full_name || user.user_metadata?.name || userDetails.fullName || '',
+            ownerFullName: dbUser?.full_name || dbUser?.name || userDetails.fullName || '',
             ownerEmailAddress: user.email || userDetails.email || '',
             ownerPhoneNumber: userDetails.phone || ''
           };
@@ -171,7 +171,7 @@ export default function ClientRegisterPetPage({
         id: petId,
         ...allFormData,
         user_email: user.email,
-        owner_id: user.id
+        owner_id: user.uid
       } as any);
 
       if (result.success) {

@@ -60,12 +60,12 @@ const ProfileContent = () => {
         fullName: dbUser.display_name || dbUser.full_name || '',
         phone: dbUser.phone || '',
         address: dbUser.address || '',
-        profileImageURL: dbUser.profile_image || user.user_metadata?.avatar_url || '',
+        profileImageURL: dbUser.profile_image || dbUser?.avatar_url || '',
         language: locale
       }));
     } else if (user && !dbUser) {
-      const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || '';
-      const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture || '';
+      const fullName = dbUser?.full_name || dbUser?.name || user.email?.split('@')[0] || '';
+      const avatarUrl = dbUser?.avatar_url || dbUser?.picture || '';
 
       setFormData(prev => ({
         ...prev,
@@ -121,7 +121,7 @@ const ProfileContent = () => {
       setUploadProgress({ progress: 0, status: 'uploading' });
 
       try {
-        const result = await uploadProfileImage(file, user.id);
+        const result = await uploadProfileImage(file, user.uid);
 
         // uploadProfileImage in chapiz-react returns string (publicUrl) directly
         if (result) {
@@ -227,7 +227,7 @@ const ProfileContent = () => {
             fullName: u.display_name || u.full_name || '',
             phone: u.phone || '',
             address: u.address || '',
-            profileImageURL: u.profile_image || user.user_metadata?.avatar_url || '',
+            profileImageURL: u.profile_image || dbUser?.avatar_url || '',
             language: locale
           }));
         }
@@ -252,7 +252,7 @@ const ProfileContent = () => {
 
     setDeletingAccount(true);
     try {
-      const userName = dbUser?.display_name || dbUser?.full_name || user.user_metadata?.full_name || 'User';
+      const userName = dbUser?.display_name || dbUser?.full_name || dbUser?.full_name || 'User';
       const result = await sendDeletionVerificationCode(user.email!, userName);
 
       if (result.success) {
@@ -286,7 +286,7 @@ const ProfileContent = () => {
   if (!user) return null;
 
   if (showDeletionVerification) {
-    const userName = dbUser?.display_name || dbUser?.full_name || user?.user_metadata?.full_name || 'User';
+    const userName = dbUser?.display_name || dbUser?.full_name || dbUser?.full_name || 'User';
     return (
       <div className="flex grow flex-col pb-16 md:pb-0">
         <DeletionVerificationPage

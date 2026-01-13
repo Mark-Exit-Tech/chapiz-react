@@ -100,7 +100,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
     if (!user || !service.id) return;
     
     try {
-      const favorited = await isAdFavorited(user.id, service.id);
+      const favorited = await isAdFavorited(user.uid, service.id);
       setIsFavorited(favorited);
     } catch (error) {
       console.error('Error checking if favorited:', error);
@@ -154,7 +154,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
         const result = await submitComment({
           adId: service.id,
           adTitle: service.name,
-          userName: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
+          userName: dbUser?.full_name || user.email?.split('@')[0] || 'User',
           userEmail: user.email || '',
           content: commentText.trim() || '', // Allow empty content
           rating: userRating
@@ -199,14 +199,14 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
     
     try {
       if (isFavorited) {
-        const result = await removeFromFavorites(user.id, service.id);
+        const result = await removeFromFavorites(user.uid, service.id);
         if (result.success) {
           setIsFavorited(false);
         } else {
           alert('Failed to remove from favorites');
         }
       } else {
-        const result = await addToFavorites(user.id, service.id, service.name, 'service');
+        const result = await addToFavorites(user.uid, service.id, service.name, 'service');
         if (result.success) {
           setIsFavorited(true);
         } else {

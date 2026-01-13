@@ -70,14 +70,14 @@ export default function SettingsPage() {
         fullName: dbUser.display_name || dbUser.full_name || '',
         phone: dbUser.phone || '',
         address: dbUser.address || '',
-        profileImageURL: dbUser.profile_image || user.user_metadata?.avatar_url || '',
+        profileImageURL: dbUser.profile_image || dbUser?.avatar_url || '',
         language: locale // Always use current locale, not stored preference
       }));
     } else if (user && !dbUser) {
       // User authenticated but no database record yet - use Supabase auth metadata
-      console.log('Using Supabase auth metadata:', user.user_metadata);
-      const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || '';
-      const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture || '';
+      console.log('Using Supabase auth metadata:', dbUser);
+      const fullName = dbUser?.full_name || dbUser?.name || user.email?.split('@')[0] || '';
+      const avatarUrl = dbUser?.avatar_url || dbUser?.picture || '';
 
       setFormData(prev => ({
         ...prev,
@@ -168,7 +168,7 @@ export default function SettingsPage() {
 
       try {
         // Use the new simple upload function
-        const result = await uploadProfileImage(file, user.id);
+        const result = await uploadProfileImage(file, user.uid);
 
         if (result) {
           setUploadProgress({ progress: 100, status: 'completed', downloadURL: result });
@@ -317,7 +317,7 @@ export default function SettingsPage() {
           if (userResult.success && userResult.user) {
             console.log('Reloading user data after save:', userResult.user);
             const fullName = userResult.user.display_name || userResult.user.full_name || '';
-            const avatarUrl = userResult.user.profile_image || user.user_metadata?.avatar_url || '';
+            const avatarUrl = userResult.user.profile_image || dbUser?.avatar_url || '';
 
             setFormData(prev => ({
               ...prev,
@@ -355,7 +355,7 @@ export default function SettingsPage() {
     setDeletingAccount(true);
     try {
       // Send deletion verification code
-      const userName = dbUser?.display_name || dbUser?.full_name || user.user_metadata?.full_name || 'User';
+      const userName = dbUser?.display_name || dbUser?.full_name || dbUser?.full_name || 'User';
       const result = await sendDeletionVerificationCode(user.email!, userName);
 
       if (result.success) {
@@ -410,7 +410,7 @@ export default function SettingsPage() {
   // Show deletion verification page if needed
   if (showDeletionVerification) {
     console.log('🔍 Rendering DeletionVerificationPage with email:', user?.email);
-    const userName = dbUser?.display_name || dbUser?.full_name || user?.user_metadata?.full_name || 'User';
+    const userName = dbUser?.display_name || dbUser?.full_name || dbUser?.full_name || 'User';
     return (
       <DeletionVerificationPage
         email={user!.email!}
@@ -500,9 +500,9 @@ export default function SettingsPage() {
                       alt="Profile"
                       className="w-full h-full object-cover"
                     />
-                  ) : user?.user_metadata?.avatar_url ? (
+                  ) : dbUser?.avatar_url ? (
                     <img
-                      src={user.user_metadata.avatar_url}
+                      src={dbUser.avatar_url}
                       alt="Profile"
                       className="w-full h-full object-cover"
                     />

@@ -41,10 +41,10 @@ const GoogleSignupBottomSheet: React.FC<GoogleSignupBottomSheetProps> = ({
 
   // Fetch name from Google account when component mounts
   useEffect(() => {
-    if (user?.user_metadata?.full_name) {
-      setName(user.user_metadata.full_name);
-    } else if (user?.user_metadata?.name) {
-      setName(user.user_metadata.name);
+    if (dbUser?.full_name) {
+      setName(dbUser.full_name);
+    } else if (dbUser?.name) {
+      setName(dbUser.name);
     }
   }, [user]);
 
@@ -106,7 +106,7 @@ const GoogleSignupBottomSheet: React.FC<GoogleSignupBottomSheetProps> = ({
       }
 
       // Save name, phone number, address, and coordinates to Supabase
-      const result = await updateUserByUid(user.id, {
+      const result = await updateUserByUid(user.uid, {
         displayName: name.trim(),
         phone: phoneNumber.trim(),
         address: address.trim(),

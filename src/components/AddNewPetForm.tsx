@@ -97,7 +97,7 @@ export default function AddNewPetForm() {
     setUploadProgress({ progress: 0, status: 'uploading' });
 
     try {
-      const result = await uploadPetImage(file, user.id);
+      const result = await uploadPetImage(file, user.uid);
 
       if (result.success && result.downloadURL) {
         setFormData(prev => ({

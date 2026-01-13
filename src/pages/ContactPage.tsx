@@ -66,13 +66,13 @@ export default function ContactPage() {
             const loadUserData = async () => {
                 try {
                     // Try to get user data from Firestore first
-                    const userResult = await getUserFromFirestore(user.id);
+                    const userResult = await getUserFromFirestore(user.uid);
 
                     if (userResult.success && userResult.user) {
                         // Use Firestore data if available
                         setFormData(prev => ({
                             ...prev,
-                            name: user.user_metadata?.full_name || userResult.user?.display_name || '',
+                            name: dbUser?.full_name || userResult.user?.display_name || '',
                             email: user.email || '',
                             phone: userResult.user?.phone || ''
                         }));
@@ -80,7 +80,7 @@ export default function ContactPage() {
                         // Fallback to Supabase Auth data
                         setFormData(prev => ({
                             ...prev,
-                            name: user.user_metadata?.full_name || '',
+                            name: dbUser?.full_name || '',
                             email: user.email || ''
                         }));
                     }
@@ -89,7 +89,7 @@ export default function ContactPage() {
                     // Fallback to basic data
                     setFormData(prev => ({
                         ...prev,
-                        name: user.user_metadata?.full_name || '',
+                        name: dbUser?.full_name || '',
                         email: user.email || ''
                     }));
                 }

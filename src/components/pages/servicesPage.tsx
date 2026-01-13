@@ -90,7 +90,7 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
 
         // Load user favorites if logged in
         if (user) {
-          const favorites = await getUserFavorites(user.id);
+          const favorites = await getUserFavorites(user.uid);
           setFavoriteAdIds(favorites);
         }
       } catch (error) {

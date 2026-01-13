@@ -151,7 +151,7 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
     };
 
     fetchPets();
-  }, [user?.id, user?.email, loading]);
+  }, [user?.uid, user?.email, loading]);
 
   const filteredPets = pets.filter((pet) =>
     pet.name.toLowerCase().includes(search.toLowerCase())

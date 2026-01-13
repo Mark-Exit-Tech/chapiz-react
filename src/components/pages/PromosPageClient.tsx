@@ -58,7 +58,7 @@ export default function PromosPageClient({ promos, business, businesses = [] }: 
       const usedSet = new Set<string>();
       await Promise.all(
         promos.map(async (promo) => {
-          const used = await isPromoUsed(user.id, promo.id);
+          const used = await isPromoUsed(user.uid, promo.id);
           if (used) {
             usedSet.add(promo.id);
           }
@@ -67,7 +67,7 @@ export default function PromosPageClient({ promos, business, businesses = [] }: 
       setUsedPromoIds(usedSet);
 
       // Get all used promos for history
-      const usedPromosResult = await getUserUsedPromos(user.id);
+      const usedPromosResult = await getUserUsedPromos(user.uid);
       console.log('Used promos result:', usedPromosResult);
       if (usedPromosResult.success && usedPromosResult.promos) {
         console.log(`Setting ${usedPromosResult.promos.length} used promos`);
