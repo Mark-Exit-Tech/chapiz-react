@@ -168,10 +168,9 @@ export default function ClientRegisterPetPage({
 
     try {
       const result = await createPetInFirestore({
-        id: petId,
         ...allFormData,
-        user_email: user.email,
-        owner_id: user.uid
+        userEmail: user.email,
+        ownerId: user.uid
       } as any);
 
       if (result.success) {

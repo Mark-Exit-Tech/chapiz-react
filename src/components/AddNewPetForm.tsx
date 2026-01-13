@@ -138,6 +138,11 @@ export default function AddNewPetForm() {
     setLoading(true);
 
     try {
+      if (!user || !user.email) {
+        toast.error(t('errors.loginRequired'));
+        return;
+      }
+      
       const petData = {
         name: formData.name.trim(),
         type: formData.type,
@@ -145,8 +150,9 @@ export default function AddNewPetForm() {
         breedId: breedId,
         imageUrl: formData.imageUrl || '/default-pet.png',
         description: '',
-        age: '',
-        gender: ''
+        userEmail: user.email,
+        ownerId: user.uid,
+        genderId: 1 // Default gender
       };
 
       const result = await createPetInFirestore(petData);

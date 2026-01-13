@@ -220,8 +220,8 @@ export default function UserCouponsPage() {
         console.log('Fetching user points for UID:', user.uid);
         const pointsResult = await getUserPoints(user.uid);
         console.log('Points result:', pointsResult);
-        if (pointsResult.success && pointsResult.points) {
-          setUserPoints(pointsResult.points.totalPoints || 0);
+        if (pointsResult.success) {
+          setUserPoints(pointsResult.totalPoints || pointsResult.points || 0);
         } else {
           // Default to 0 if points not found
           setUserPoints(0);

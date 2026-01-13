@@ -116,3 +116,54 @@ export async function checkEmailExists(email: string): Promise<boolean> {
     return false;
   }
 }
+
+// Compatibility wrapper - getUserFromFirestore
+export async function getUserFromFirestore(uid: string): Promise<{ success: boolean; user?: User; error?: string }> {
+  try {
+    const user = await getUserByUid(uid);
+    if (user) {
+      return { success: true, user };
+    }
+    return { success: false, error: 'User not found' };
+  } catch (error) {
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown error' 
+    };
+  }
+}
+
+// Compatibility wrapper - updateUserByUid
+export async function updateUserByUid(uid: string, updates: {
+  displayName?: string;
+  phone?: string;
+  address?: string;
+  coordinates?: { lat: number; lng: number };
+  placeId?: string;
+  profileImage?: string;
+  language?: string;
+}): Promise<{ success: boolean; error?: string }> {
+  try {
+    const updateData: Partial<User> = {};
+    
+    if (updates.displayName !== undefined) {
+      updateData.display_name = updates.displayName;
+      updateData.full_name = updates.displayName;
+    }
+    if (updates.phone !== undefined) updateData.phone = updates.phone;
+    if (updates.address !== undefined) updateData.address = updates.address;
+    if (updates.profileImage !== undefined) {
+      updateData.profile_image = updates.profileImage;
+      updateData.photoURL = updates.profileImage;
+    }
+    if (updates.language !== undefined) updateData.language = updates.language;
+    
+    await updateUser(uid, updateData);
+    return { success: true };
+  } catch (error) {
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown error' 
+    };
+  }
+}

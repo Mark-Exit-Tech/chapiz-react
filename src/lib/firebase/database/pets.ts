@@ -8,6 +8,8 @@ export interface Pet {
     imageUrl: string;
     genderId: number;
     breedId: number;
+    breedName?: string; // Compatibility field
+    breed?: string; // Compatibility field
     birthDate?: string;
     notes?: string;
     userEmail: string;
@@ -123,29 +125,28 @@ export async function getPetById(id: string, withResult?: true): Promise<Pet | n
 }
 
 // Create pet
-export async function createPetInFirestore(petData: Omit<Pet, 'id' | 'createdAt' | 'updatedAt'>): Promise<Pet | null> {
+export async function createPetInFirestore(petData: any): Promise<{ success: boolean; petId?: string; error?: string }> {
     try {
         const petsRef = collection(db, PETS_COLLECTION);
         const newPetRef = doc(petsRef);
         const now = new Date();
         
-        const pet: Pet = {
-            id: newPetRef.id,
+        const pet = {
             ...petData,
             createdAt: now,
             updatedAt: now
         };
         
         await setDoc(newPetRef, pet);
-        return pet;
+        return { success: true, petId: newPetRef.id };
     } catch (error) {
         console.error('Error creating pet:', error);
-        return null;
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
 }
 
 // Update pet
-export async function updatePetInFirestore(id: string, updates: Partial<Pet>): Promise<Pet | null> {
+export async function updatePetInFirestore(id: string, updates: any): Promise<{ success: boolean; pet?: Pet; error?: string }> {
     try {
         const petRef = doc(db, PETS_COLLECTION, id);
         await updateDoc(petRef, {
@@ -154,12 +155,15 @@ export async function updatePetInFirestore(id: string, updates: Partial<Pet>): P
         });
         
         const updatedDoc = await getDoc(petRef);
-        if (!updatedDoc.exists()) return null;
+        if (!updatedDoc.exists()) {
+            return { success: false, error: 'Pet not found after update' };
+        }
         
-        return { id: updatedDoc.id, ...updatedDoc.data() } as Pet;
+        const pet = { id: updatedDoc.id, ...updatedDoc.data() } as Pet;
+        return { success: true, pet };
     } catch (error) {
         console.error('Error updating pet:', error);
-        return null;
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
 }
 
@@ -192,16 +196,28 @@ export async function getBreedNameById(id: number, locale: 'en' | 'he' = 'en'): 
 }
 
 // Helper function to get dropdown data
-export async function getBreedsForDropdown(): Promise<Breed[]> {
-    return getAllBreeds();
+export async function getBreedsForDropdown(locale: 'en' | 'he' = 'en'): Promise<{ value: string; label: string; }[]> {
+    const breeds = await getAllBreeds();
+    return breeds.map(breed => ({
+        value: breed.id.toString(),
+        label: locale === 'he' ? breed.he : breed.en
+    }));
 }
 
-export async function getGendersForDropdown(): Promise<Gender[]> {
-    return getAllGenders();
+export async function getGendersForDropdown(locale: 'en' | 'he' = 'en'): Promise<{ value: string; label: string; }[]> {
+    const genders = await getAllGenders();
+    return genders.map(gender => ({
+        value: gender.id.toString(),
+        label: locale === 'he' ? gender.he : gender.en
+    }));
 }
 
-export async function getPetTypesForDropdown(): Promise<PetType[]> {
-    return getAllPetTypes();
+export async function getPetTypesForDropdown(locale: 'en' | 'he' = 'en'): Promise<{ value: string; label: string; }[]> {
+    const petTypes = await getAllPetTypes();
+    return petTypes.map(petType => ({
+        value: petType.id.toString(),
+        label: locale === 'he' ? petType.he : petType.en
+    }));
 }
 
 // Get pet with consolidated owner
@@ -216,18 +232,18 @@ export async function getPetWithConsolidatedOwner(petId: string) {
 }
 
 // Stub functions for compatibility
-export async function getAreasForDropdown(): Promise<string[]> {
+export async function getAreasForDropdown(locale: 'en' | 'he' = 'en'): Promise<{ value: string; label: string; }[]> {
     return [];
 }
 
-export async function getCitiesForDropdown(): Promise<string[]> {
+export async function getCitiesForDropdown(locale: 'en' | 'he' = 'en'): Promise<{ value: string; label: string; }[]> {
     return [];
 }
 
-export async function getAgeRangesForDropdown(): Promise<string[]> {
+export async function getAgeRangesForDropdown(locale: 'en' | 'he' = 'en'): Promise<{ value: string; label: string; }[]> {
     return [];
 }
 
-export async function getWeightRangesForDropdown(): Promise<string[]> {
+export async function getWeightRangesForDropdown(locale: 'en' | 'he' = 'en'): Promise<{ value: string; label: string; }[]> {
     return [];
 }

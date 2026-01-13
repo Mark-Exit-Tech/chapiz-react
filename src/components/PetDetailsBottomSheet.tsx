@@ -21,7 +21,8 @@ import { deletePet, getBreedNameById } from '@/lib/firebase/database/pets';
 interface Pet {
   id: string;
   name: string;
-  breed: string;
+  breed?: string;
+  breedId?: number;
   image: string;
   description?: string;
   age?: string;
@@ -92,13 +93,18 @@ export default function PetDetailsBottomSheet({
 
   React.useEffect(() => {
     const fetchBreed = async () => {
-      if (pet?.breed) {
-        const name = await getBreedNameById(pet.breed, locale);
+      if (pet?.breedId) {
+        const name = await getBreedNameById(pet.breedId, locale as 'en' | 'he');
+        setBreedName(name);
+      } else if (pet?.breed) {
+        // Convert string breed ID to number if needed
+        const breedId = typeof pet.breed === 'string' ? parseInt(pet.breed) : pet.breed;
+        const name = await getBreedNameById(breedId, locale as 'en' | 'he');
         setBreedName(name);
       }
     };
     fetchBreed();
-  }, [pet?.breed, locale]);
+  }, [pet?.breed, pet?.breedId, locale]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

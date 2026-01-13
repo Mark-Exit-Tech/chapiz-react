@@ -155,7 +155,7 @@ export default function NFCScanPage({ pet }: NFCScanPageProps) {
                 </div>
                 <div>
                   <h2 className="text-xl font-bold">{pet.name}</h2>
-                  <p className="text-gray-600">{getBreedNameById(pet.breedName, locale as 'en' | 'he')}</p>
+                  <p className="text-gray-600">{pet.breedName || 'Unknown Breed'}</p>
                 </div>
               </CardTitle>
             </CardHeader>

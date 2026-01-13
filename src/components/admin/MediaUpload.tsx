@@ -92,12 +92,18 @@ export default function MediaUpload({
         });
       }, 500);
 
-      const downloadURL = await uploadAdMedia(fileToUpload, type);
+      const result = await uploadAdMedia(fileToUpload, 'ad-media');
 
       clearInterval(interval);
       setProgress(100);
-      onChange(downloadURL);
-      toast.success(`${type} uploaded successfully`);
+      
+      if (result.success && result.downloadURL) {
+        onChange(result.downloadURL);
+        toast.success(`${type} uploaded successfully`);
+      } else {
+        throw new Error(result.error || 'Upload failed');
+      }
+      
       setIsUploading(false);
 
     } catch (error: any) {
@@ -141,7 +147,7 @@ export default function MediaUpload({
     }
 
     try {
-      await deleteAdMedia(value, type);
+      await deleteAdMedia(value);
       onChange('');
       toast.success('File removed successfully');
     } catch (error: any) {

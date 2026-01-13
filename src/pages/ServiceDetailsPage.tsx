@@ -43,7 +43,7 @@ export default function ServiceDetailsPage() {
             phone: ad.phone,
             location: ad.location,
             tags: ad.tags,
-            imageUrl: ad.image_url || ad.content,
+            imageUrl: ad.imageUrl || ad.content,
           });
         } else {
           setService(null);

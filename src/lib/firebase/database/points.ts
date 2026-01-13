@@ -22,24 +22,25 @@ export interface PointsTransaction {
 /**
  * Get user points
  */
-export async function getUserPoints(user: any): Promise<{ points: number }> {
+export async function getUserPoints(user: any): Promise<{ success: boolean; points?: number; totalPoints?: number; error?: string }> {
     try {
         if (!user || !user.uid) {
-            return { points: 0 };
+            return { success: true, points: 0, totalPoints: 0 };
         }
         
         const pointsRef = doc(db, USER_POINTS_COLLECTION, user.uid);
         const pointsDoc = await getDoc(pointsRef);
         
         if (!pointsDoc.exists()) {
-            return { points: 0 };
+            return { success: true, points: 0, totalPoints: 0 };
         }
         
         const data = pointsDoc.data() as UserPoints;
-        return { points: data.points || 0 };
+        const pointsValue = data.points || 0;
+        return { success: true, points: pointsValue, totalPoints: pointsValue };
     } catch (error) {
         console.error('Error fetching user points:', error);
-        return { points: 0 };
+        return { success: false, points: 0, totalPoints: 0, error: error instanceof Error ? error.message : 'Unknown error' };
     }
 }
 
@@ -105,10 +106,10 @@ export async function addPointsToCategory(user: any, category: string, points: n
 /**
  * Deduct points from category
  */
-export async function deductPointsFromCategory(user: any, category: string, points: number): Promise<boolean> {
+export async function deductPointsFromCategory(user: any, category: string, points: number): Promise<{ success: boolean; error?: string }> {
     try {
         if (!user || !user.uid) {
-            return false;
+            return { success: false, error: 'No user provided' };
         }
         
         // Update total points (decrement)
@@ -131,10 +132,10 @@ export async function deductPointsFromCategory(user: any, category: string, poin
             createdAt: new Date()
         });
         
-        return true;
+        return { success: true };
     } catch (error) {
         console.error('Error deducting points:', error);
-        return false;
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
 }
 

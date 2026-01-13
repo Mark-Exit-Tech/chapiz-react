@@ -24,7 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { UserPlus } from 'lucide-react';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
 
-// TODO: Implement with Supabase
+// TODO: Implement with Firebase
 const sendUserInvitationByAdmin = async (data: any): Promise<{ success: boolean; error?: string; warning?: string }> => {
   console.warn('sendUserInvitationByAdmin not yet implemented with Firebase');
   return { success: true, warning: 'Function not yet implemented with Firebase' };
