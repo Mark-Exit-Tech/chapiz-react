@@ -6,8 +6,11 @@ export interface Filter {
     name: string;
     type: 'petType' | 'breed' | 'age' | 'area' | 'city' | 'gender';
     values: string[];
+    audienceIds?: string[]; // For compatibility with promo.ts
+    isActive?: boolean;
     createdAt: Date;
     updatedAt: Date;
+    createdBy?: string;
 }
 
 const FILTERS_COLLECTION = 'filters';
@@ -46,18 +49,30 @@ export async function getFilterById(id: string): Promise<Filter | null> {
 // Create filter
 export async function createFilter(filterData: Omit<Filter, 'id' | 'createdAt' | 'updatedAt'>): Promise<Filter | null> {
     try {
+        const { Timestamp } = await import('firebase/firestore');
         const filtersRef = collection(db, FILTERS_COLLECTION);
         const newFilterRef = doc(filtersRef);
-        const now = new Date();
+        const now = Timestamp.now();
         
-        const filter: Filter = {
-            id: newFilterRef.id,
+        const firestoreData = {
             ...filterData,
+            isActive: filterData.isActive !== undefined ? filterData.isActive : true,
+            createdBy: filterData.createdBy || 'admin',
             createdAt: now,
             updatedAt: now
         };
         
-        await setDoc(newFilterRef, filter);
+        await setDoc(newFilterRef, firestoreData);
+        
+        const filter: Filter = {
+            id: newFilterRef.id,
+            ...filterData,
+            isActive: filterData.isActive !== undefined ? filterData.isActive : true,
+            createdBy: filterData.createdBy || 'admin',
+            createdAt: now.toDate(),
+            updatedAt: now.toDate()
+        };
+        
         return filter;
     } catch (error) {
         console.error('Error creating filter:', error);

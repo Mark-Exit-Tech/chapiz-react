@@ -650,10 +650,24 @@ export async function getPromos() {
     const q = query(promosRef, orderBy('createdAt', 'desc'));
     const querySnapshot = await getDocs(q);
     
-    const promos = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    const promos = querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        name: data.name || '',
+        description: data.description || '',
+        imageUrl: data.imageUrl || '',
+        youtubeUrl: data.youtubeUrl,
+        businessId: data.businessId,
+        businessIds: data.businessIds,
+        isActive: data.isActive !== undefined ? data.isActive : true,
+        startDate: data.startDate?.toDate ? data.startDate.toDate() : (data.startDate ? new Date(data.startDate) : undefined),
+        endDate: data.endDate?.toDate ? data.endDate.toDate() : (data.endDate ? new Date(data.endDate) : undefined),
+        createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
+        updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt || Date.now()),
+        createdBy: data.createdBy || ''
+      };
+    });
     
     return { success: true, promos, error: undefined };
   } catch (error) {

@@ -5,14 +5,17 @@ export interface Audience {
     id: string;
     name: string;
     description?: string;
+    targetCriteria?: string[]; // For compatibility with promo.ts
     petType?: string;
     ageRange?: string[];
     breed?: string[];
     city?: string[];
     area?: string;
     gender?: string;
+    isActive?: boolean;
     createdAt: Date;
     updatedAt: Date;
+    createdBy?: string;
 }
 
 const AUDIENCES_COLLECTION = 'audiences';
@@ -51,18 +54,30 @@ export async function getAudienceById(id: string): Promise<Audience | null> {
 // Create audience
 export async function createAudience(audienceData: Omit<Audience, 'id' | 'createdAt' | 'updatedAt'>): Promise<Audience | null> {
     try {
+        const { Timestamp } = await import('firebase/firestore');
         const audiencesRef = collection(db, AUDIENCES_COLLECTION);
         const newAudienceRef = doc(audiencesRef);
-        const now = new Date();
+        const now = Timestamp.now();
         
-        const audience: Audience = {
-            id: newAudienceRef.id,
+        const firestoreData = {
             ...audienceData,
+            isActive: audienceData.isActive !== undefined ? audienceData.isActive : true,
+            createdBy: audienceData.createdBy || 'admin',
             createdAt: now,
             updatedAt: now
         };
         
-        await setDoc(newAudienceRef, audience);
+        await setDoc(newAudienceRef, firestoreData);
+        
+        const audience: Audience = {
+            id: newAudienceRef.id,
+            ...audienceData,
+            isActive: audienceData.isActive !== undefined ? audienceData.isActive : true,
+            createdBy: audienceData.createdBy || 'admin',
+            createdAt: now.toDate(),
+            updatedAt: now.toDate()
+        };
+        
         return audience;
     } catch (error) {
         console.error('Error creating audience:', error);
