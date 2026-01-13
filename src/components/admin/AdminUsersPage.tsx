@@ -20,6 +20,7 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import AddUserForm from '@/components/admin/AddUserForm';
+import AdminLayout from '@/components/admin/AdminLayout';
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -171,19 +172,22 @@ export default function AdminUsersPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-4 md:p-8">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <div className="text-gray-600">{text.loading}</div>
+      <AdminLayout>
+        <div className="container mx-auto p-4 md:p-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+              <div className="text-gray-600">{text.loading}</div>
+            </div>
           </div>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="container mx-auto p-4 md:p-8">
+    <AdminLayout>
+      <div className="container mx-auto p-4 md:p-8">
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
           <div className="text-left rtl:text-right">
@@ -357,5 +361,6 @@ export default function AdminUsersPage() {
         </DialogContent>
       </Dialog>
     </div>
+    </AdminLayout>
   );
 }
