@@ -159,33 +159,69 @@ export async function getUserById(id: string) {
 }
 
 export async function updateUser(id: string, data: any) {
-  console.warn('updateUser stub');
-  return { success: true, error: undefined };
+  try {
+    const { updateUser: updateUserInDB } = await import('@/lib/firebase/database/users');
+    await updateUserInDB(id, data);
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Error updating user:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function deleteUser(id: string) {
-  console.warn('deleteUser stub');
-  return { success: true, error: undefined };
+  try {
+    const { deleteUser: deleteUserFromDB } = await import('@/lib/firebase/database/users');
+    await deleteUserFromDB(id);
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function updateUserRole(id: string, role: string) {
-  console.warn('updateUserRole is a stub - needs Firebase implementation');
-  return { success: true, error: undefined };
+  try {
+    const { updateUser: updateUserInDB } = await import('@/lib/firebase/database/users');
+    await updateUserInDB(id, { role: role as 'user' | 'admin' | 'super_admin' });
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Error updating user role:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function restrictUser(id: string, reason: string) {
-  console.warn('restrictUser is a stub - needs Firebase implementation');
-  return { success: true, error: undefined };
+  try {
+    const { updateUser: updateUserInDB } = await import('@/lib/firebase/database/users');
+    await updateUserInDB(id, { is_restricted: true, restriction_reason: reason });
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Error restricting user:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function unrestrictUser(id: string) {
-  console.warn('unrestrictUser is a stub - needs Firebase implementation');
-  return { success: true, error: undefined };
+  try {
+    const { updateUser: updateUserInDB } = await import('@/lib/firebase/database/users');
+    await updateUserInDB(id, { is_restricted: false, restriction_reason: '' });
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Error unrestricting user:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function addPointsToUser(id: string, points: number, category?: string) {
-  console.warn('addPointsToUser is a stub - needs Firebase implementation');
-  return { success: true, error: undefined };
+  try {
+    const { addPoints } = await import('@/lib/firebase/database/points');
+    await addPoints(id, points, category || 'admin_grant');
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Error adding points to user:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function getAllBusinesses() {
@@ -282,15 +318,71 @@ export async function saveInstallBannerSettings(settings: InstallBannerSettings)
 }
 
 export async function updateAd(id: string, data: any) {
-  return { success: true, error: undefined };
+  try {
+    const { updateAd: updateAdInDB } = await import('@/lib/firebase/database/advertisements');
+    const ad = await updateAdInDB(id, data);
+    
+    if (!ad) {
+      return { success: false, error: 'Failed to update ad in database' };
+    }
+    
+    return { success: true, ad, error: undefined };
+  } catch (error) {
+    console.error('Error updating ad:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function deleteAd(id: string) {
-  return { success: true, error: undefined };
+  try {
+    const { deleteAd: deleteAdFromDB } = await import('@/lib/firebase/database/advertisements');
+    const success = await deleteAdFromDB(id);
+    
+    if (!success) {
+      return { success: false, error: 'Failed to delete ad from database' };
+    }
+    
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Error deleting ad:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function createAd(data: any) {
-  return { success: true, error: undefined };
+  try {
+    const { createAd: createAdInDB } = await import('@/lib/firebase/database/advertisements');
+    const ad = await createAdInDB({
+      title: data.title,
+      content: data.content,
+      type: data.type,
+      status: data.status || 'active',
+      startDate: data.startDate || null,
+      endDate: data.endDate || null,
+      phone: data.phone,
+      location: data.location,
+      description: data.description,
+      tags: data.tags || [],
+      area: data.area,
+      city: data.city,
+      petType: data.petType,
+      breed: data.breed,
+      ageRange: data.ageRange,
+      weight: data.weight,
+      views: 0,
+      clicks: 0,
+      duration: data.duration || 5
+    });
+    
+    if (!ad) {
+      return { success: false, error: 'Failed to create ad in database' };
+    }
+    
+    return { success: true, ad, error: undefined };
+  } catch (error) {
+    console.error('Error creating ad:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function createCoupon(data: CreateCouponData) {
@@ -371,31 +463,103 @@ export async function createVoucher(data: any) {
 }
 
 export async function getCoupons() {
-  console.warn('getCoupons is a stub - needs Firebase implementation');
-  return {
-    success: true,
-    coupons: [],
-    error: undefined
-  };
+  try {
+    const { collection, getDocs, query, orderBy } = await import('firebase/firestore');
+    const { db } = await import('@/lib/firebase/client');
+    
+    const couponsRef = collection(db, 'coupons');
+    const q = query(couponsRef, orderBy('createdAt', 'desc'));
+    const querySnapshot = await getDocs(q);
+    
+    const coupons = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    
+    return {
+      success: true,
+      coupons,
+      error: undefined
+    };
+  } catch (error) {
+    console.error('Error fetching coupons:', error);
+    return {
+      success: false,
+      coupons: [],
+      error: String(error)
+    };
+  }
 }
 
 export async function getCouponById(id: string) {
-  console.warn('getCouponById is a stub - needs Firebase implementation');
-  return {
-    success: true,
-    coupon: null,
-    error: undefined
-  };
+  try {
+    const { doc, getDoc } = await import('firebase/firestore');
+    const { db } = await import('@/lib/firebase/client');
+    
+    const couponRef = doc(db, 'coupons', id);
+    const couponDoc = await getDoc(couponRef);
+    
+    if (!couponDoc.exists()) {
+      return {
+        success: false,
+        coupon: null,
+        error: 'Coupon not found'
+      };
+    }
+    
+    return {
+      success: true,
+      coupon: { id: couponDoc.id, ...couponDoc.data() },
+      error: undefined
+    };
+  } catch (error) {
+    console.error('Error fetching coupon:', error);
+    return {
+      success: false,
+      coupon: null,
+      error: String(error)
+    };
+  }
 }
 
 export async function updateCoupon(id: string, data: UpdateCouponData) {
-  console.warn('updateCoupon is a stub - needs Firebase implementation');
-  return { success: true, error: undefined };
+  try {
+    const { doc, updateDoc, Timestamp } = await import('firebase/firestore');
+    const { db } = await import('@/lib/firebase/client');
+    
+    const couponRef = doc(db, 'coupons', id);
+    const updateData: any = { ...data };
+    
+    // Convert date strings to Timestamps if present
+    if (data.validFrom) {
+      updateData.validFrom = Timestamp.fromDate(new Date(data.validFrom));
+    }
+    if (data.validTo) {
+      updateData.validTo = Timestamp.fromDate(new Date(data.validTo));
+    }
+    
+    updateData.updatedAt = Timestamp.now();
+    
+    await updateDoc(couponRef, updateData);
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Error updating coupon:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function deleteCoupon(id: string) {
-  console.warn('deleteCoupon is a stub - needs Firebase implementation');
-  return { success: true, error: undefined };
+  try {
+    const { doc, deleteDoc } = await import('firebase/firestore');
+    const { db } = await import('@/lib/firebase/client');
+    
+    const couponRef = doc(db, 'coupons', id);
+    await deleteDoc(couponRef);
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Error deleting coupon:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 // Add more stub functions as needed
@@ -455,13 +619,43 @@ export async function getBusinessById(id: string) {
 }
 
 export async function getPromos() {
-  console.warn('getPromos is a stub - needs Firebase implementation');
-  return { success: true, promos: [], error: undefined };
+  try {
+    const { collection, getDocs, query, orderBy } = await import('firebase/firestore');
+    const { db } = await import('@/lib/firebase/client');
+    
+    const promosRef = collection(db, 'promos');
+    const q = query(promosRef, orderBy('createdAt', 'desc'));
+    const querySnapshot = await getDocs(q);
+    
+    const promos = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    
+    return { success: true, promos, error: undefined };
+  } catch (error) {
+    console.error('Error fetching promos:', error);
+    return { success: false, promos: [], error: String(error) };
+  }
 }
 
 export async function getPromoById(id: string) {
-  console.warn('getPromoById is a stub - needs Firebase implementation');
-  return null;
+  try {
+    const { doc, getDoc } = await import('firebase/firestore');
+    const { db } = await import('@/lib/firebase/client');
+    
+    const promoRef = doc(db, 'promos', id);
+    const promoDoc = await getDoc(promoRef);
+    
+    if (!promoDoc.exists()) {
+      return null;
+    }
+    
+    return { id: promoDoc.id, ...promoDoc.data() };
+  } catch (error) {
+    console.error('Error fetching promo:', error);
+    return null;
+  }
 }
 
 export async function getAdById(id: string): Promise<Ad | null> {
@@ -487,29 +681,58 @@ export async function getAdById(id: string): Promise<Ad | null> {
 }
 
 export async function getAllComments() {
-  console.warn('getAllComments is a stub - needs Firebase implementation');
-  return [];
+  try {
+    const { getAllComments: getAllCommentsFromDB } = await import('@/lib/firebase/database/comments');
+    return await getAllCommentsFromDB();
+  } catch (error) {
+    console.error('Error fetching all comments:', error);
+    return [];
+  }
 }
 
 export async function getAllContactSubmissions() {
-  console.warn('getAllContactSubmissions is a stub - needs Firebase implementation');
-  return [];
+  try {
+    const { getAllContactSubmissions: getAllContactSubmissionsFromDB } = await import('@/lib/firebase/database/contact');
+    return await getAllContactSubmissionsFromDB();
+  } catch (error) {
+    console.error('Error fetching contact submissions:', error);
+    return [];
+  }
 }
 
 export async function getAllPetsForAdmin() {
-  console.warn('getAllPetsForAdmin is a stub - needs Firebase implementation');
-  return [];
+  try {
+    const { getAllPets } = await import('@/lib/firebase/database/pets');
+    return await getAllPets();
+  } catch (error) {
+    console.error('Error fetching all pets:', error);
+    return [];
+  }
 }
 
 // Comment stubs
 export async function getCommentsForAd(adId: string) {
-  console.warn('getCommentsForAd is a stub - needs Firebase implementation');
-  return [];
+  try {
+    const { getCommentsForAd: getCommentsFromDB } = await import('@/lib/firebase/database/comments');
+    return await getCommentsFromDB(adId);
+  } catch (error) {
+    console.error('Error fetching comments for ad:', error);
+    return [];
+  }
 }
 
 export async function submitComment(data: any) {
-  console.warn('submitComment is a stub - needs Firebase implementation');
-  return { success: true, error: undefined };
+  try {
+    const { createComment } = await import('@/lib/firebase/database/comments');
+    const comment = await createComment(data);
+    if (!comment) {
+      return { success: false, error: 'Failed to create comment' };
+    }
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Error submitting comment:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function getPetsByUserEmail(email: string) {
@@ -542,15 +765,59 @@ export async function getPetsByUserEmail(email: string) {
 
 // Additional stub functions for admin components
 export async function createPromo(data: CreatePromoData) {
-  return { success: true, error: undefined };
+  try {
+    const { collection, addDoc, Timestamp } = await import('firebase/firestore');
+    const { db } = await import('@/lib/firebase/client');
+    
+    const promoData = {
+      ...data,
+      isActive: data.isActive !== undefined ? data.isActive : true,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+      createdBy: 'admin' // TODO: Get actual admin user ID
+    };
+    
+    const promosRef = collection(db, 'promos');
+    const docRef = await addDoc(promosRef, promoData);
+    
+    return { success: true, promoId: docRef.id, error: undefined };
+  } catch (error) {
+    console.error('Error creating promo:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function updatePromo(id: string, data: UpdatePromoData) {
-  return { success: true, error: undefined };
+  try {
+    const { doc, updateDoc, Timestamp } = await import('firebase/firestore');
+    const { db } = await import('@/lib/firebase/client');
+    
+    const promoRef = doc(db, 'promos', id);
+    await updateDoc(promoRef, {
+      ...data,
+      updatedAt: Timestamp.now()
+    });
+    
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Error updating promo:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function deletePromo(id: string) {
-  return { success: true, error: undefined };
+  try {
+    const { doc, deleteDoc } = await import('firebase/firestore');
+    const { db } = await import('@/lib/firebase/client');
+    
+    const promoRef = doc(db, 'promos', id);
+    await deleteDoc(promoRef);
+    
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Error deleting promo:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function getRecentActivity() {
@@ -599,26 +866,97 @@ export async function getRecentActivity() {
   }
 }
 
-export async function getAllAds(page?: number, limit?: number) {
-  console.warn('getAllAds is a stub - needs Firebase implementation');
-  return { ads: [] };
+export async function getAllAds(page: number = 1, limit: number = 1000) {
+  try {
+    const { getAllAds: getAllAdsFromDB } = await import('@/lib/firebase/database/advertisements');
+    const allAds = await getAllAdsFromDB();
+    
+    // Convert Date objects to strings for serialization
+    const ads = allAds.map(ad => ({
+      ...ad,
+      createdAt: ad.createdAt instanceof Date ? ad.createdAt.toISOString() : ad.createdAt
+    }));
+    
+    // Apply pagination
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedAds = ads.slice(startIndex, endIndex);
+    
+    return {
+      ads: paginatedAds,
+      total: ads.length,
+      page,
+      limit
+    };
+  } catch (error) {
+    console.error('Error fetching all ads:', error);
+    return { ads: [], total: 0, page, limit };
+  }
 }
 
 export async function getFilters() {
-  console.warn('getFilters is a stub - needs Firebase implementation');
-  return { success: true, filters: [], audiences: [], error: undefined };
+  try {
+    const { getAllFilters } = await import('@/lib/firebase/database/filters');
+    const { getAllAudiences } = await import('@/lib/firebase/database/audiences');
+    
+    const [filters, audiences] = await Promise.all([
+      getAllFilters(),
+      getAllAudiences()
+    ]);
+    
+    return { success: true, filters, audiences, error: undefined };
+  } catch (error) {
+    console.error('Error fetching filters and audiences:', error);
+    return { success: false, filters: [], audiences: [], error: String(error) };
+  }
 }
 
 export async function createFilter(data: CreateFilterData) {
-  return { success: true, error: undefined };
+  try {
+    const { createFilter: createFilterInDB } = await import('@/lib/firebase/database/filters');
+    const filter = await createFilterInDB(data);
+    
+    if (!filter) {
+      return { success: false, error: 'Failed to create filter' };
+    }
+    
+    return { success: true, filter, error: undefined };
+  } catch (error) {
+    console.error('Error creating filter:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function updateFilter(id: string, data: UpdateFilterData) {
-  return { success: true, error: undefined };
+  try {
+    const { updateFilter: updateFilterInDB } = await import('@/lib/firebase/database/filters');
+    const filter = await updateFilterInDB(id, data);
+    
+    if (!filter) {
+      return { success: false, error: 'Failed to update filter' };
+    }
+    
+    return { success: true, filter, error: undefined };
+  } catch (error) {
+    console.error('Error updating filter:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function deleteFilter(id: string) {
-  return { success: true, error: undefined };
+  try {
+    const { deleteFilter: deleteFilterFromDB } = await import('@/lib/firebase/database/filters');
+    const success = await deleteFilterFromDB(id);
+    
+    if (!success) {
+      return { success: false, error: 'Failed to delete filter' };
+    }
+    
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Error deleting filter:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function bulkDeleteBusinesses(ids: string[]) {
@@ -709,7 +1047,19 @@ export async function bulkAssignTags(ids: string[], tagsToAdd: string[], tagsToR
 }
 
 export async function deleteComment(id: string) {
-  return { success: true, error: undefined };
+  try {
+    const { deleteComment: deleteCommentFromDB } = await import('@/lib/firebase/database/comments');
+    const success = await deleteCommentFromDB(id);
+    
+    if (!success) {
+      return { success: false, error: 'Failed to delete comment' };
+    }
+    
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Error deleting comment:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function saveContactInfo(data: any) {
@@ -721,38 +1071,122 @@ export async function updateContactInfo(data: any) {
 }
 
 export async function deleteContactSubmission(id: string) {
-  console.warn('deleteContactSubmission is a stub - needs Firebase implementation');
-  return { success: true, error: undefined };
+  try {
+    const { doc, deleteDoc } = await import('firebase/firestore');
+    const { db } = await import('@/lib/firebase/client');
+    
+    const submissionRef = doc(db, 'contactSubmissions', id);
+    await deleteDoc(submissionRef);
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Error deleting contact submission:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function updateContactSubmissionReadStatus(id: string, isRead: boolean) {
-  console.warn('updateContactSubmissionReadStatus is a stub - needs Firebase implementation');
-  return { success: true, error: undefined };
+  try {
+    const { doc, updateDoc } = await import('firebase/firestore');
+    const { db } = await import('@/lib/firebase/client');
+    
+    const submissionRef = doc(db, 'contactSubmissions', id);
+    await updateDoc(submissionRef, { read: isRead });
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Error updating contact submission read status:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function createAudience(data: CreateAudienceData) {
-  return { success: true, error: undefined };
+  try {
+    const { createAudience: createAudienceInDB } = await import('@/lib/firebase/database/audiences');
+    const audience = await createAudienceInDB(data);
+    
+    if (!audience) {
+      return { success: false, error: 'Failed to create audience' };
+    }
+    
+    return { success: true, audience, error: undefined };
+  } catch (error) {
+    console.error('Error creating audience:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function updateAudience(id: string, data: UpdateAudienceData) {
-  return { success: true, error: undefined };
+  try {
+    const { updateAudience: updateAudienceInDB } = await import('@/lib/firebase/database/audiences');
+    const audience = await updateAudienceInDB(id, data);
+    
+    if (!audience) {
+      return { success: false, error: 'Failed to update audience' };
+    }
+    
+    return { success: true, audience, error: undefined };
+  } catch (error) {
+    console.error('Error updating audience:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function deleteAudience(id: string) {
-  return { success: true, error: undefined };
+  try {
+    const { deleteAudience: deleteAudienceFromDB } = await import('@/lib/firebase/database/audiences');
+    const success = await deleteAudienceFromDB(id);
+    
+    if (!success) {
+      return { success: false, error: 'Failed to delete audience' };
+    }
+    
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Error deleting audience:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function getAudiences() {
-  console.warn('getAudiences is a stub - needs Firebase implementation');
-  return { success: true, audiences: [], error: undefined };
+  try {
+    const { getAllAudiences } = await import('@/lib/firebase/database/audiences');
+    const audiences = await getAllAudiences();
+    return { success: true, audiences, error: undefined };
+  } catch (error) {
+    console.error('Error fetching audiences:', error);
+    return { success: false, audiences: [], error: String(error) };
+  }
 }
 
 export async function updatePetField(id: string, field: string, value: any) {
-  return { success: true, error: undefined };
+  try {
+    const { updatePetInFirestore } = await import('@/lib/firebase/database/pets');
+    const result = await updatePetInFirestore(id, { [field]: value });
+    
+    if (!result.success) {
+      return { success: false, error: result.error || 'Failed to update pet' };
+    }
+    
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Error updating pet field:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function deletePet(id: string): Promise<{ success: boolean; error?: string }> {
-  return { success: true, error: undefined };
+  try {
+    const { deletePetFromFirestore } = await import('@/lib/firebase/database/pets');
+    const result = await deletePetFromFirestore(id);
+    
+    if (!result.success) {
+      return { success: false, error: result.error || 'Failed to delete pet' };
+    }
+    
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Error deleting pet:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function saveCookieSettings(data: CookieSettings): Promise<{ success: boolean; error?: string }> {

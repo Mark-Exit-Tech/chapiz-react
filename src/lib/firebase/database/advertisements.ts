@@ -80,6 +80,29 @@ export async function getActiveAds(): Promise<Ad[]> {
     }
 }
 
+// Get all ads (for admin panel)
+export async function getAllAds(): Promise<Ad[]> {
+    try {
+        const adsRef = collection(db, ADS_COLLECTION);
+        const q = query(adsRef, orderBy('createdAt', 'desc'));
+        const querySnapshot = await getDocs(q);
+        
+        const ads = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                ...data,
+                createdAt: data.createdAt?.toDate?.() || data.createdAt || new Date()
+            } as Ad;
+        });
+        console.log(`✅ Fetched ${ads.length} total ads from Firebase`);
+        return ads;
+    } catch (error) {
+        console.error('❌ Error fetching all ads:', error);
+        return [];
+    }
+}
+
 // Create ad
 export async function createAd(adData: Omit<Ad, 'id' | 'createdAt'>): Promise<Ad | null> {
     try {
