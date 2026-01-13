@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, User, Phone, Camera, Loader2, Save, Globe, Upload, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, User, Phone, Camera, Loader2, Save, Globe, Upload, CheckCircle, XCircle, LogOut } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { uploadProfileImage, testStorageConnection } from '@/lib/supabase/storage';
 import { updateUserByUid, getUserFromFirestore } from '@/lib/supabase/database/users';
@@ -21,7 +21,7 @@ const ProfileContent = () => {
   const location = useLocation();
   const { t, i18n } = useTranslation();
   const locale = i18n.language || 'en';
-  const { user, dbUser, loading: authLoading, sendDeletionVerificationCode } = useAuth();
+  const { user, dbUser, loading: authLoading, sendDeletionVerificationCode, signOut } = useAuth();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
