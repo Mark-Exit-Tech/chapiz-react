@@ -43,6 +43,36 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
   const [error, setError] = useState<string | null>(null);
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loadingBusinesses, setLoadingBusinesses] = useState(false);
+  
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+  
+  // HARDCODED TEXT
+  const text = {
+    title: isHebrew ? 'ערוך קופון' : 'Edit Coupon',
+    name: isHebrew ? 'שם' : 'Name',
+    namePlaceholder: isHebrew ? 'הזן שם קופון' : 'Enter coupon name',
+    description: isHebrew ? 'תיאור' : 'Description',
+    descriptionPlaceholder: isHebrew ? 'הזן תיאור' : 'Enter description',
+    price: isHebrew ? 'מחיר (0 לחינם)' : 'Price (0 for free)',
+    pricePlaceholder: isHebrew ? 'הזן מחיר' : 'Enter price',
+    points: isHebrew ? 'נקודות' : 'Points',
+    pointsPlaceholder: isHebrew ? 'הזן נקודות' : 'Enter points',
+    image: isHebrew ? 'תמונה' : 'Image',
+    business: isHebrew ? 'עסק' : 'Business',
+    businessPlaceholder: isHebrew ? 'בחר עסקים' : 'Select businesses',
+    validFrom: isHebrew ? 'תקף מ' : 'Valid From',
+    validTo: isHebrew ? 'תקף עד' : 'Valid To',
+    purchaseLimit: isHebrew ? 'מגבלת רכישה' : 'Purchase Limit',
+    purchaseLimitPlaceholder: isHebrew ? 'הזן מגבלה (אופציונלי)' : 'Enter limit (optional)',
+    purchaseLimitHelp: isHebrew ? 'מספר פעמים שמשתמש יכול לרכוש קופון זה' : 'Number of times a user can purchase this coupon',
+    cancel: isHebrew ? 'ביטול' : 'Cancel',
+    update: isHebrew ? 'עדכן' : 'Update',
+    updating: isHebrew ? 'מעדכן...' : 'Updating...'
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -186,7 +216,7 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{t('dialogs.editCoupon.title')}</DialogTitle>
+          <DialogTitle>{text.title}</DialogTitle>
         </DialogHeader>
 
         {error && (
@@ -197,25 +227,25 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">{t('couponsManagement.name')}</Label>
+            <Label htmlFor="name">{text.name}</Label>
             <Input
               id="name"
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder={t('couponsManagement.namePlaceholder')}
+              placeholder={text.namePlaceholder}
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">{t('couponsManagement.description')}</Label>
+            <Label htmlFor="description">{text.description}</Label>
             <Textarea
               id="description"
               name="description"
               value={formData.description}
               onChange={handleChange}
-              placeholder={t('couponsManagement.descriptionPlaceholder')}
+              placeholder={text.descriptionPlaceholder}
               rows={3}
               required
             />
@@ -223,7 +253,7 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="price">{t('couponsManagement.price')} (0 for free)</Label>
+              <Label htmlFor="price">{text.price}</Label>
               <Input
                 id="price"
                 name="price"
@@ -232,27 +262,27 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
                 min="0"
                 value={formData.price}
                 onChange={handleChange}
-                placeholder={t('couponsManagement.pricePlaceholder') || '0.00 (leave empty or 0 for free)'}
+                placeholder={text.pricePlaceholder}
               />
             </div>
 
             {(formData.price !== '' && parseFloat(formData.price) > 0) && (
               <div className="space-y-2">
-                <Label htmlFor="points">{t('couponsManagement.points')}</Label>
+                <Label htmlFor="points">{text.points}</Label>
                 <Input
                   id="points"
                   name="points"
                   type="number"
                   value={formData.points}
                   onChange={handleChange}
-                  placeholder={t('couponsManagement.pointsPlaceholder')}
+                  placeholder={text.pointsPlaceholder}
                 />
               </div>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="imageUrl">{t('couponsManagement.image')}</Label>
+            <Label htmlFor="imageUrl">{text.image}</Label>
             <MediaUpload
               type="image"
               value={formData.imageUrl}
@@ -264,19 +294,19 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
           </div>
 
           <div className="space-y-2">
-            <Label>{t('couponsManagement.business') || 'Businesses (Optional)'}</Label>
+            <Label>{text.business}</Label>
             <BusinessMultiselect
               businesses={businesses}
               selectedIds={formData.businessIds}
               onSelectionChange={handleBusinessIdsChange}
-              placeholder={t('couponsManagement.businessPlaceholder') || 'Select businesses (optional)'}
+              placeholder={text.businessPlaceholder}
               disabled={loadingBusinesses}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="validFrom">{t('couponsManagement.validFrom')}</Label>
+              <Label htmlFor="validFrom">{text.validFrom}</Label>
               <Input
                 id="validFrom"
                 name="validFrom"
@@ -288,7 +318,7 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="validTo">{t('couponsManagement.validTo')}</Label>
+              <Label htmlFor="validTo">{text.validTo}</Label>
               <Input
                 id="validTo"
                 name="validTo"
@@ -301,7 +331,7 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="purchaseLimit">{t('couponsManagement.purchaseLimit')}</Label>
+            <Label htmlFor="purchaseLimit">{text.purchaseLimit}</Label>
             <Input
               id="purchaseLimit"
               name="purchaseLimit"
@@ -309,19 +339,19 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
               min="1"
               value={formData.purchaseLimit}
               onChange={handleChange}
-              placeholder={t('couponsManagement.purchaseLimitPlaceholder')}
+              placeholder={text.purchaseLimitPlaceholder}
             />
             <p className="text-xs text-gray-500">
-              {t('couponsManagement.purchaseLimitHelp')}
+              {text.purchaseLimitHelp}
             </p>
           </div>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
-              {t('dialogs.editCoupon.cancel')}
+              {text.cancel}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? t('dialogs.editCoupon.updating') : t('dialogs.editCoupon.update')}
+              {isSubmitting ? text.updating : text.update}
             </Button>
           </DialogFooter>
         </form>

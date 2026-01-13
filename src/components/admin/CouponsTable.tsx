@@ -148,7 +148,8 @@ export default function CouponsTable() {
   };
 
   const handleDelete = async (coupon: Coupon) => {
-    if (!confirm(t('couponsManagement.confirmDelete', { name: coupon.name }))) {
+    const confirmMessage = isHebrew ? `האם אתה בטוח שברצונך למחוק את ${coupon.name}?` : `Are you sure you want to delete ${coupon.name}?`;
+    if (!confirm(confirmMessage)) {
       return;
     }
 
