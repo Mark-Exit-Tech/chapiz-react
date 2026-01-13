@@ -170,7 +170,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </li>
             <li>
               <Link
-                to={`/${locale}/admin/businesses`}
+                to={`/${locale}/admin/business`}
                 className="flex gap-3 rounded p-2 transition hover:bg-white hover:shadow-xs"
               >
                 <Building2 className="h-6 w-6" />

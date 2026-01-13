@@ -11,7 +11,6 @@ export const AdminPetsPage = lazy(() => import('@/components/admin/AdminPetsPage
 
 export const AdminUsersPage = lazy(() => import('@/components/admin/AdminUsersPage'));
 
-export const AdminBusinessesPage = lazy(() => import('@/components/admin/AdminBusinessesPage'));
 
 export const AdsPageWithTabs = lazy(() => import('@/components/admin/AdsPageWithTabs'));
 

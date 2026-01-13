@@ -58,7 +58,7 @@ export default function AdminTopNav({ userEmail, userRole, locale }: AdminTopNav
             label: t('navigation.manageCoupons'),
         },
         {
-            href: `/${locale}/admin/businesses`,
+            href: `/${locale}/admin/business`,
             icon: Building2,
             label: t('navigation.manageBusinesses'),
         },

@@ -25,7 +25,6 @@ const AdminUsersPage = lazy(() => import('./components/admin/AdminUsersPage'));
 const AdsPageWithTabs = lazy(() => import('./components/admin/AdsPageWithTabs'));
 const PromosPage = lazy(() => import('./components/admin/PromosPage'));
 const AdminCouponsPage = lazy(() => import('./components/admin/AdminCouponsPage'));
-const AdminBusinessesPage = lazy(() => import('./components/admin/AdminBusinessesPage'));
 const ContactSubmissionsPage = lazy(() => import('./components/admin/ContactSubmissionsPage'));
 const AdminPetsPage = lazy(() => import('./components/admin/AdminPetsPage'));
 const AdminCommentsPage = lazy(() => import('./components/admin/AdminCommentsPage'));
@@ -92,7 +91,6 @@ function App() {
           <Route path="/:locale/admin/promos" element={<Suspense fallback={<PageLoader />}><PromosPage /></Suspense>} />
           <Route path="/:locale/admin/coupons" element={<Suspense fallback={<PageLoader />}><AdminCouponsPage /></Suspense>} />
           <Route path="/:locale/admin/vouchers" element={<Suspense fallback={<PageLoader />}><AdminVouchersPage /></Suspense>} />
-          <Route path="/:locale/admin/businesses" element={<Suspense fallback={<PageLoader />}><AdminBusinessesPage /></Suspense>} />
           <Route path="/:locale/admin/business" element={<Suspense fallback={<PageLoader />}><BusinessesPage /></Suspense>} />
           <Route path="/:locale/admin/contact-submissions" element={<Suspense fallback={<PageLoader />}><ContactSubmissionsPage /></Suspense>} />
           <Route path="/:locale/admin/pets" element={<Suspense fallback={<PageLoader />}><AdminPetsPage /></Suspense>} />
