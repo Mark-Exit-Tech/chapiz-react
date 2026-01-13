@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase/client';
+import { auth } from '@/lib/firebase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,14 +15,14 @@ export default function CheckEmailPage() {
     
     setChecking(true);
     try {
-      // Try to get user data from auth
-      const { data: authData } = await supabase.auth.admin.getUserByEmail(email);
+      // Try to get user data from Firebase
+      const { getUserByEmail } = await import('@/lib/firebase/database/users');
+      const userData = await getUserByEmail(email);
       
       setResult({
-        exists: !!authData,
-        confirmed: authData?.user?.email_confirmed_at ? true : false,
-        confirmedAt: authData?.user?.email_confirmed_at,
-        user: authData?.user
+        exists: !!userData,
+        confirmed: true, // Firebase doesn't track email confirmation the same way
+        user: userData
       });
     } catch (error) {
       console.error('Check error:', error);

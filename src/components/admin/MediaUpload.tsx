@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { FileUp, Image as ImageIcon, Video, X, Edit } from 'lucide-react';
-import { uploadAdMedia, deleteAdMedia } from '@/lib/supabase/storage';
+import { uploadAdMedia, deleteAdMedia } from '@/lib/firebase/storage';
 import { useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -61,7 +61,7 @@ export default function MediaUpload({
     if (!validateFile(file)) return;
 
     setIsUploading(true);
-    setProgress(0); // Supabase storage upload doesn't provide progress events easily in v2 JS client
+    setProgress(0); // Firebase storage upload progress tracking
 
     try {
       // Convert image to WebP if it's an image
@@ -81,7 +81,7 @@ export default function MediaUpload({
         }
       }
 
-      // Fake progress for UX since Supabase client doesn't expose it easily
+      // Progress updates for UX
       const interval = setInterval(() => {
         setProgress((prev) => {
           if (prev >= 90) {

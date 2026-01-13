@@ -12,7 +12,7 @@ import GetStartedSelect from './ui/GetStartedSelect';
 import ImageUpload from './ui/ImageUpload';
 import { BreedSelect } from '@/components/ui/breed-select';
 import { cn } from '@/lib/utils';
-import { getGendersForDropdown, getPetTypesForDropdown } from '@/lib/supabase/database/pets';
+import { getGendersForDropdown, getPetTypesForDropdown } from '@/lib/firebase/database/pets';
 
 interface PetDetailsPageProps {
   // No longer need to pass genders and breeds as we'll fetch them from database

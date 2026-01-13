@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import BottomNavigation from '@/components/layout/BottomNavigation';
 import ServiceDetailsPageClient from '@/components/pages/ServiceDetailsPageClient';
-import { getAdById } from '@/lib/supabase/database/ads';
+import { getAdById } from '@/lib/firebase/database/advertisements';
 import { useLocale } from '@/hooks/use-locale';
 
 interface Service {

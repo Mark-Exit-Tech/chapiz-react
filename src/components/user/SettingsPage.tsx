@@ -13,8 +13,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Separator } from '../ui/separator';
 import { ArrowLeft, User, Phone, Camera, Loader2, Save, Globe, Upload, CheckCircle, XCircle, AlertTriangle, MapPin } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { uploadProfileImage, testStorageConnection } from '@/lib/supabase/storage';
-import { updateUserByUid, getUserFromFirestore } from '@/lib/supabase/database/users';
+import { uploadProfileImage, testStorageConnection } from '@/lib/firebase/storage';
+import { updateUserByUid, getUserFromFirestore } from '@/lib/firebase/database/users';
 import LocationAutocompleteComboSelect from '../get-started/ui/LocationAutocompleteSelector';
 import DeletionVerificationPage from '../auth/DeletionVerificationPage';
 
@@ -74,8 +74,8 @@ export default function SettingsPage() {
         language: locale // Always use current locale, not stored preference
       }));
     } else if (user && !dbUser) {
-      // User authenticated but no database record yet - use Supabase auth metadata
-      console.log('Using Supabase auth metadata:', dbUser);
+      // User authenticated but no database record yet - use Firebase auth metadata
+      console.log('Using Firebase auth metadata:', dbUser);
       const fullName = dbUser?.full_name || dbUser?.name || user.email?.split('@')[0] || '';
       const avatarUrl = dbUser?.photoURL || dbUser?.photoURL || '';
 
@@ -378,7 +378,7 @@ export default function SettingsPage() {
 
     setDeletingAccount(true);
     try {
-      // TODO: Implement Supabase deletion logic.
+      // TODO: Implement Firebase deletion logic.
       console.warn('Account deletion temporarily unavailable during migration.');
       toast.error('Account deletion is temporarily unavailable. Please contact support.');
       setDeletingAccount(false);
@@ -386,7 +386,7 @@ export default function SettingsPage() {
       return;
 
       /*
-      // TODO: Delete user data from Supabase collections
+      // TODO: Delete user data from Firebase collections
       // Delete user document
       // Delete user's pets, owners, ads, favorites, comments etc.
       

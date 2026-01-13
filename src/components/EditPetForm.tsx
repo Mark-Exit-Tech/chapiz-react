@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
-import { uploadPetImage } from '@/lib/supabase/storage';
-import { updatePetInFirestore } from '@/lib/supabase/database/pets';
+import { uploadPetImage } from '@/lib/firebase/storage';
+import { updatePetInFirestore } from '@/lib/firebase/database/pets';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
@@ -11,7 +11,7 @@ import { Label } from './ui/label';
 import { Upload, Loader2, CheckCircle, XCircle, Save, ArrowLeft, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import { getBreedsForDropdown, getGendersForDropdown, getPetTypesForDropdown } from '@/lib/supabase/database/pets';
+import { getBreedsForDropdown, getGendersForDropdown, getPetTypesForDropdown } from '@/lib/firebase/database/pets';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 // Image removed;

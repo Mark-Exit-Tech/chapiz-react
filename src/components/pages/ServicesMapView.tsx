@@ -19,7 +19,7 @@ import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { getCommentsForAd, submitComment } from '@/lib/actions/admin';
-import { addToFavorites, removeFromFavorites, isAdFavorited } from '@/lib/supabase/database/favorites';
+import { addToFavorites, removeFromFavorites, isAdFavorited } from '@/lib/firebase/database/favorites';
 import { useNavigate } from 'react-router-dom';
 import { useLocale } from '@/hooks/use-locale';
 import { SERVICE_TAGS_TRANSLATIONS } from '@/lib/constants/hebrew-service-tags';

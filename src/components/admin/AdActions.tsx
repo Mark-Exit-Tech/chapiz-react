@@ -35,7 +35,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocale } from '@/hooks/use-locale';
 import { useState, useEffect } from 'react';
 import { HEBREW_SERVICE_TAGS } from '@/lib/constants/hebrew-service-tags';
-import { getPetTypesForDropdown, getBreedsForDropdown, getAreasForDropdown, getCitiesForDropdown, getAgeRangesForDropdown, getWeightRangesForDropdown } from '@/lib/supabase/database/pets';
+import { getPetTypesForDropdown, getBreedsForDropdown, getAreasForDropdown, getCitiesForDropdown, getAgeRangesForDropdown, getWeightRangesForDropdown } from '@/lib/firebase/database/pets';
 import { SimpleMultiselect } from '@/components/ui/simple-multiselect';
 
 interface AdActionsProps {

@@ -10,7 +10,7 @@ import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { getCommentsForAd, submitComment } from '@/lib/actions/admin';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
-import { addToFavorites, removeFromFavorites, isAdFavorited } from '@/lib/supabase/database/favorites';
+import { addToFavorites, removeFromFavorites, isAdFavorited } from '@/lib/firebase/database/favorites';
 import { useTranslation } from 'react-i18next';
 import { useLocale } from '@/hooks/use-locale';
 import { useNavigate } from 'react-router-dom';

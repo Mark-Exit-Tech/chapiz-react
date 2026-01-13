@@ -30,12 +30,12 @@ export default function ServicesPage() {
 
   const businessId = searchParams.get('businessId') || undefined;
 
-  // TODO: Fetch ads from Supabase
+  // TODO: Fetch ads from Firebase
   useEffect(() => {
     const fetchAds = async () => {
       try {
-        // Replace this with actual Supabase fetch
-        // const { data } = await supabase
+        // Replace this with actual Firebase fetch
+        // Use getActiveAds from @/lib/firebase/database/advertisements
         //   .from('ads')
         //   .select('*')
         //   .eq('status', 'active');

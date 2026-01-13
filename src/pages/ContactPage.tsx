@@ -9,10 +9,10 @@ import { Mail, Phone, MapPin, Send, CheckCircle, Facebook, Instagram, MessageCir
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { useTranslation } from 'react-i18next';
-import { createContactSubmission } from '@/lib/supabase/database/contact';
+import { createContactSubmission } from '@/lib/firebase/database/contact';
 import { getContactInfo } from '@/lib/actions/admin';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
-import { getUserFromFirestore } from '@/lib/supabase/database/users';
+import { getUserFromFirestore } from '@/lib/firebase/database/users';
 
 export default function ContactPage() {
     const { t } = useTranslation();
@@ -77,7 +77,7 @@ export default function ContactPage() {
                             phone: userResult.user?.phone || ''
                         }));
                     } else {
-                        // Fallback to Supabase Auth data
+                        // Fallback to Firebase Auth data
                         setFormData(prev => ({
                             ...prev,
                             name: dbUser?.full_name || '',

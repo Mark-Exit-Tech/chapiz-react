@@ -1,4 +1,4 @@
-// TODO: Rewrite for Supabase
+// Firebase admin utilities
 
 export type UserRole = 'user' | 'admin' | 'super_admin';
 

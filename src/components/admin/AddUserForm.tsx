@@ -26,8 +26,8 @@ import { useAuth } from '@/contexts/FirebaseAuthContext';
 
 // TODO: Implement with Supabase
 const sendUserInvitationByAdmin = async (data: any): Promise<{ success: boolean; error?: string; warning?: string }> => {
-  console.warn('sendUserInvitationByAdmin not yet implemented with Supabase');
-  return { success: true, warning: 'Function not yet implemented with Supabase' };
+  console.warn('sendUserInvitationByAdmin not yet implemented with Firebase');
+  return { success: true, warning: 'Function not yet implemented with Firebase' };
 };
 
 export default function AddUserForm() {

@@ -26,8 +26,8 @@ export default function MyPetsPage() {
       if (user?.email && !loading) {
         setPetsLoading(true);
         try {
-          // TODO: Fetch pets from Supabase based on user email
-          // const { data: petsData, error } = await supabase
+          // TODO: Fetch pets from Firebase based on user email
+          // Use getPetsByUserEmail from @/lib/firebase/database/pets
           //   .from('pets')
           //   .select('*')
           //   .eq('user_email', user.email);

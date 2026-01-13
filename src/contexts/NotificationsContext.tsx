@@ -1,5 +1,5 @@
-// TEMPORARY STUB - Supabase implementation needed
-// TODO: Rewrite for Supabase
+// TEMPORARY STUB - Firebase implementation needed
+// TODO: Implement with Firebase
 
 'use client';
 

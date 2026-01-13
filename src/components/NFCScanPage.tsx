@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLocale } from '@/hooks/use-locale';
 import { getMobileAppLinks } from '@/lib/actions/admin';
-import { getBreedNameById } from '@/lib/supabase/database/pets';
+import { getBreedNameById } from '@/lib/firebase/database/pets';
 
 interface Pet {
   id: string;

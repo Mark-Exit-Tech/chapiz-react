@@ -12,8 +12,7 @@ import { Separator } from './ui/separator';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useLocale } from '@/hooks/use-locale';
-import { getBreedNameById } from '@/lib/supabase/database/pets';
-import { supabase } from '@/lib/supabase/client';
+import { getBreedNameById, getPetsByUserEmail } from '@/lib/firebase/database/pets';
 
 interface Pet {
   id: string;
@@ -42,20 +41,11 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
       if (user?.email && !loading) {
         setPetsLoading(true);
         try {
-          // Use Supabase to fetch pets
-          const { getPetWithConsolidatedOwner } = await import('@/lib/supabase/database/pets');
+          // Use Firebase to fetch pets
+          const { getPetWithConsolidatedOwner } = await import('@/lib/firebase/database/pets');
 
           // Query pets by user email
-          const { data: petsData, error } = await supabase
-            .from('pets')
-            .select('id')
-            .eq('user_email', user.email);
-
-          if (error) {
-            console.error('Error fetching pets:', error);
-            setPetsLoading(false);
-            return;
-          }
+          const petsData = await getPetsByUserEmail(user.email);
 
           const querySnapshot = { empty: !petsData || petsData.length === 0, size: petsData?.length || 0, docs: petsData || [] };
           console.log('Query snapshot size:', querySnapshot.size);
@@ -110,7 +100,7 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
                     breed: 'Unknown Breed',
                     image: '/default-pet.png'
                   };
-                  /* Legacy fallback - not needed with Supabase
+                  /* Legacy fallback - not needed with Firebase
                   const data = petDoc;
                   let breedDisplay = data.breedName || data.breed || 'Unknown Breed';
                   if (data.breedId) {

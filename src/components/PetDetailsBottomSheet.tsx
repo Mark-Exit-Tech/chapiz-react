@@ -16,7 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useLocale } from '@/hooks/use-locale';
-import { deletePet, getBreedNameById } from '@/lib/supabase/database/pets';
+import { deletePet, getBreedNameById } from '@/lib/firebase/database/pets';
 
 interface Pet {
   id: string;

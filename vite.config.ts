@@ -55,7 +55,9 @@ export default defineConfig({
             '@icons-pack/react-simple-icons',
           ],
           'auth-vendor': [
-            '@supabase/supabase-js',
+            'firebase/auth',
+            'firebase/firestore',
+            'firebase/storage',
           ],
           'forms-vendor': [
             'react-hook-form',

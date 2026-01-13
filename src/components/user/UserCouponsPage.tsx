@@ -16,11 +16,10 @@ import { Coupon } from '@/types/coupon';
 import { getCoupons, getContactInfo, getBusinesses, getCouponById } from '@/lib/actions/admin';
 import { Business } from '@/types/promo';
 import MapCard from '@/components/cards/MapCard';
-import { getUserFromFirestore } from '@/lib/supabase/database/users';
-import { addPointsToCategory, getUserPoints, deductPointsFromCategory } from '@/lib/supabase/database/points';
-import { purchaseCoupon, getActiveUserCoupons, getCouponHistory, markCouponAsUsed, UserCoupon } from '@/lib/supabase/database/coupons';
+import { getUserFromFirestore } from '@/lib/firebase/database/users';
+import { addPointsToCategory, getUserPoints, deductPointsFromCategory } from '@/lib/firebase/database/points';
+import { purchaseCoupon, getActiveUserCoupons, getCouponHistory, markCouponAsUsed, UserCoupon } from '@/lib/firebase/database/coupons';
 import { useShopRedirect } from '@/hooks/use-shop-redirect';
-import { User } from '@supabase/supabase-js';
 import toast from 'react-hot-toast';
 
 export default function UserCouponsPage() {

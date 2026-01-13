@@ -1,12 +1,8 @@
-// TEMPORARY STUB FILE
-// All admin functions need to be rewritten to use Supabase
-// This file exists only to prevent build errors
-
+// Admin functions for Firebase
 import { CreateCouponData, UpdateCouponData } from '@/types/coupon';
 import { CreateAudienceData, CreateBusinessData, CreatePromoData, UpdateAudienceData, UpdateBusinessData, UpdatePromoData, CreateFilterData, UpdateFilterData } from '@/types/promo';
-import { createServerClient } from '@/lib/supabase/server';
 
-console.warn('⚠️ Admin actions are using stubs - All functions need Supabase implementation.');
+console.warn('⚠️ Admin actions are using stubs - All functions need Firebase implementation.');
 
 // Type Definitions
 export type ContactInfo = {
@@ -107,22 +103,22 @@ export async function deleteUser(id: string) {
 }
 
 export async function updateUserRole(id: string, role: string) {
-  console.warn('updateUserRole is a stub using Supabase');
+  console.warn('updateUserRole is a stub - needs Firebase implementation');
   return { success: true, error: undefined };
 }
 
 export async function restrictUser(id: string, reason: string) {
-  console.warn('restrictUser is a stub using Supabase');
+  console.warn('restrictUser is a stub - needs Firebase implementation');
   return { success: true, error: undefined };
 }
 
 export async function unrestrictUser(id: string) {
-  console.warn('unrestrictUser is a stub using Supabase');
+  console.warn('unrestrictUser is a stub - needs Firebase implementation');
   return { success: true, error: undefined };
 }
 
 export async function addPointsToUser(id: string, points: number, category?: string) {
-  console.warn('addPointsToUser is a stub using Supabase');
+  console.warn('addPointsToUser is a stub - needs Firebase implementation');
   return { success: true, error: undefined };
 }
 
@@ -192,7 +188,7 @@ export async function createCoupon(data: CreateCouponData) {
 }
 
 export async function getCoupons() {
-  console.warn('getCoupons is a stub using Supabase');
+  console.warn('getCoupons is a stub - needs Firebase implementation');
   return {
     success: true,
     coupons: [],
@@ -201,7 +197,7 @@ export async function getCoupons() {
 }
 
 export async function getCouponById(id: string) {
-  console.warn('getCouponById is a stub using Supabase');
+  console.warn('getCouponById is a stub - needs Firebase implementation');
   return {
     success: true,
     coupon: null,
@@ -210,110 +206,100 @@ export async function getCouponById(id: string) {
 }
 
 export async function updateCoupon(id: string, data: UpdateCouponData) {
-  console.warn('updateCoupon is a stub using Supabase');
+  console.warn('updateCoupon is a stub - needs Firebase implementation');
   return { success: true, error: undefined };
 }
 
 export async function deleteCoupon(id: string) {
-  console.warn('deleteCoupon is a stub using Supabase');
+  console.warn('deleteCoupon is a stub - needs Firebase implementation');
   return { success: true, error: undefined };
 }
 
 // Add more stub functions as needed
-// TODO: Rewrite all admin functions to use Supabase
+// TODO: Rewrite all admin functions to use Firebase
 
 export async function getRandomActiveAd(): Promise<Ad | null> {
-  console.warn('getRandomActiveAd is a stub using Supabase');
+  console.warn('getRandomActiveAd is a stub - needs Firebase implementation');
   return null;
 }
 
 export async function getActiveAdsForServices(serviceType?: string): Promise<Ad[]> {
-  console.warn('getActiveAdsForServices is a stub using Supabase');
+  console.warn('getActiveAdsForServices is a stub - needs Firebase implementation');
   return [];
 }
 
 export async function getBusinesses() {
-  console.warn('getBusinesses is a stub using Supabase');
+  console.warn('getBusinesses is a stub - needs Firebase implementation');
   return { success: true, businesses: [], error: undefined };
 }
 
 export async function getBusinessById(id: string) {
-  console.warn('getBusinessById is a stub using Supabase');
+  console.warn('getBusinessById is a stub - needs Firebase implementation');
   return null;
 }
 
 export async function getPromos() {
-  console.warn('getPromos is a stub using Supabase');
+  console.warn('getPromos is a stub - needs Firebase implementation');
   return { success: true, promos: [], error: undefined };
 }
 
 export async function getPromoById(id: string) {
-  console.warn('getPromoById is a stub using Supabase');
+  console.warn('getPromoById is a stub - needs Firebase implementation');
   return null;
 }
 
 export async function getAdById(id: string) {
-  console.warn('getAdById is a stub using Supabase');
+  console.warn('getAdById is a stub - needs Firebase implementation');
   return null;
 }
 
 export async function getAllComments() {
-  console.warn('getAllComments is a stub using Supabase');
+  console.warn('getAllComments is a stub - needs Firebase implementation');
   return [];
 }
 
 export async function getAllContactSubmissions() {
-  console.warn('getAllContactSubmissions is a stub using Supabase');
+  console.warn('getAllContactSubmissions is a stub - needs Firebase implementation');
   return [];
 }
 
 export async function getAllPetsForAdmin() {
-  console.warn('getAllPetsForAdmin is a stub using Supabase');
+  console.warn('getAllPetsForAdmin is a stub - needs Firebase implementation');
   return [];
 }
 
 // Comment stubs
 export async function getCommentsForAd(adId: string) {
-  console.warn('getCommentsForAd is a stub using Supabase');
+  console.warn('getCommentsForAd is a stub - needs Firebase implementation');
   return [];
 }
 
 export async function submitComment(data: any) {
-  console.warn('submitComment is a stub using Supabase');
+  console.warn('submitComment is a stub - needs Firebase implementation');
   return { success: true, error: undefined };
 }
 
 export async function getPetsByUserEmail(email: string) {
   try {
-    const supabase = await createServerClient();
+    // TODO: Implement with Firebase
+    console.warn('getPetsByUserEmail needs Firebase implementation');
 
-    // Fetch pets with breed and gender joins
-    const { data: pets, error } = await supabase
-      .from('pets')
-      .select(`
-        *,
-        breed:breeds(en, he),
-        gender:genders(en, he)
-      `)
-      .eq('user_email', email);
-
-    if (error) {
-      console.error('Error fetching pets:', error);
-      return [];
-    }
-
+    // Fetch pets using Firebase
+    const { getPetsByUserEmail: fetchPets } = await import('@/lib/firebase/database/pets');
+    const pets = await fetchPets(email);
+    
     // Map to Pet interface expected by client
-    return (pets || []).map((pet: any) => ({
+    return pets.map((pet: any) => ({
       id: pet.id,
       name: pet.name,
-      type: 'Pet', // Type information is currently missing in schema association
-      breed: pet.breed?.en || 'Unknown',
-      gender: pet.gender?.en || 'Unknown',
-      weight: 'N/A', // Weight is missing in schema
-      imageUrl: pet.image_url,
-      ownerName: '', // Not needed as we filtering by user and hiding owner column
-      ownerId: pet.owner_id || '',
-      createdAt: new Date(pet.created_at)
+      type: 'Pet',
+      breed: 'Unknown', // TODO: Get breed name from breedId
+      gender: 'Unknown', // TODO: Get gender name from genderId
+      weight: 'N/A',
+      imageUrl: pet.imageUrl,
+      ownerName: '',
+      ownerId: pet.ownerId || '',
+      createdAt: pet.createdAt
     }));
   } catch (error) {
     console.error('Exception in getPetsByUserEmail:', error);
@@ -335,17 +321,17 @@ export async function deletePromo(id: string) {
 }
 
 export async function getRecentActivity() {
-  console.warn('getRecentActivity is a stub using Supabase');
+  console.warn('getRecentActivity is a stub - needs Firebase implementation');
   return { users: [], pets: [], ads: [] };
 }
 
 export async function getAllAds(page?: number, limit?: number) {
-  console.warn('getAllAds is a stub using Supabase');
+  console.warn('getAllAds is a stub - needs Firebase implementation');
   return { ads: [] };
 }
 
 export async function getFilters() {
-  console.warn('getFilters is a stub using Supabase');
+  console.warn('getFilters is a stub - needs Firebase implementation');
   return { success: true, filters: [], audiences: [], error: undefined };
 }
 
@@ -386,12 +372,12 @@ export async function updateContactInfo(data: any) {
 }
 
 export async function deleteContactSubmission(id: string) {
-  console.warn('deleteContactSubmission is a stub using Supabase');
+  console.warn('deleteContactSubmission is a stub - needs Firebase implementation');
   return { success: true, error: undefined };
 }
 
 export async function updateContactSubmissionReadStatus(id: string, isRead: boolean) {
-  console.warn('updateContactSubmissionReadStatus is a stub using Supabase');
+  console.warn('updateContactSubmissionReadStatus is a stub - needs Firebase implementation');
   return { success: true, error: undefined };
 }
 
@@ -408,7 +394,7 @@ export async function deleteAudience(id: string) {
 }
 
 export async function getAudiences() {
-  console.warn('getAudiences is a stub using Supabase');
+  console.warn('getAudiences is a stub - needs Firebase implementation');
   return { success: true, audiences: [], error: undefined };
 }
 

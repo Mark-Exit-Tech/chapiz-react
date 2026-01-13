@@ -76,7 +76,7 @@ const SignupPage = () => {
       await signUp(formData.email, formData.password, formData.fullName, formData.phone, formData.address);
       console.log('✅ Signup successful');
       
-      // Wait for Supabase to process
+      // Wait for Firebase to process
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Try to sign in

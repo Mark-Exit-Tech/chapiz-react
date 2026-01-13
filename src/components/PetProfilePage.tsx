@@ -15,7 +15,7 @@ import { Button } from './ui/button';
 import GiftPopup from './GiftPopup';
 import Navbar from './layout/Navbar';
 import ShareButton from './ShareButton';
-import { getBreedNameById } from '@/lib/supabase/database/pets';
+import { getBreedNameById } from '@/lib/firebase/database/pets';
 import { getGenders } from '@/lib/hardcoded-data';
 import { breedsData } from '@/lib/data/comprehensive-breeds';
 import AdFullPage from './get-started/AdFullPage';

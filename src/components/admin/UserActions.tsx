@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
-import { getUserFromFirestore } from '@/lib/supabase/database/users';
+import { getUserFromFirestore } from '@/lib/firebase/database/users';
 import {
   Dialog,
   DialogContent,
@@ -30,7 +30,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { deleteUser, updateUserRole, restrictUser, unrestrictUser, addPointsToUser } from '@/lib/actions/admin';
-import { updateUserByUid } from '@/lib/supabase/database/users';
+import { updateUserByUid } from '@/lib/firebase/database/users';
 import { MoreHorizontal, Phone, PawPrint, Coins } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';

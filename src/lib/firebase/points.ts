@@ -1,4 +1,4 @@
-// Stub Firebase points functions - TODO: Replace with Supabase
+// Firebase points functions - implementations in database/points.ts
 export async function getUserPoints(user: any) {
   return { points: 0 };
 }

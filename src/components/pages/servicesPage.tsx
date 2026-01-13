@@ -10,7 +10,7 @@ import { FilterChips, FilterChip } from '../ui/filter-chips';
 import { TagsFilter } from '../ui/tags-filter';
 import { Button } from '../ui/button';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
-import { getUserFavorites, getAllAdTags } from '@/lib/supabase/database/favorites';
+import { getUserFavorites, getAllAdTags } from '@/lib/firebase/database/favorites';
 import { SERVICE_TAGS_TRANSLATIONS } from '@/lib/constants/hebrew-service-tags';
 import ServicesMapView from './ServicesMapView';
 
