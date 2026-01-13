@@ -41,6 +41,37 @@ export default function CouponsTable() {
   const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [previewCoupon, setPreviewCoupon] = useState<Coupon | null>(null);
+  
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+  
+  // HARDCODED TEXT
+  const text = {
+    name: isHebrew ? 'שם' : 'Name',
+    description: isHebrew ? 'תיאור' : 'Description',
+    image: isHebrew ? 'תמונה' : 'Image',
+    points: isHebrew ? 'נקודות' : 'Points',
+    price: isHebrew ? 'מחיר' : 'Price',
+    business: isHebrew ? 'עסק' : 'Business',
+    validPeriod: isHebrew ? 'תקופת תוקף' : 'Valid Period',
+    validFrom: isHebrew ? 'תקף מ' : 'Valid From',
+    validTo: isHebrew ? 'תקף עד' : 'Valid To',
+    status: isHebrew ? 'סטטוס' : 'Status',
+    noCoupons: isHebrew ? 'לא נמצאו קופונים' : 'No coupons found',
+    loading: isHebrew ? 'טוען...' : 'Loading...',
+    edit: isHebrew ? 'ערוך' : 'Edit',
+    delete: isHebrew ? 'מחק' : 'Delete',
+    preview: isHebrew ? 'תצוגה מקדימה' : 'Preview',
+    activate: isHebrew ? 'הפעל' : 'Activate',
+    deactivate: isHebrew ? 'השבת' : 'Deactivate',
+    active: isHebrew ? 'פעיל' : 'Active',
+    inactive: isHebrew ? 'לא פעיל' : 'Inactive',
+    deleteConfirm: isHebrew ? 'האם אתה בטוח שברצונך למחוק קופון זה?' : 'Are you sure you want to delete this coupon?',
+    close: isHebrew ? 'סגור' : 'Close'
+  };
 
   useEffect(() => {
     fetchData();
@@ -215,14 +246,14 @@ export default function CouponsTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('couponsManagement.name')}</TableHead>
-              <TableHead>{t('couponsManagement.description')}</TableHead>
-              <TableHead>{t('couponsManagement.business') || 'Business'}</TableHead>
-              <TableHead>{t('couponsManagement.price')}</TableHead>
-              <TableHead>{t('couponsManagement.points')}</TableHead>
-              <TableHead>{t('couponsManagement.image')}</TableHead>
-              <TableHead>{t('couponsManagement.validPeriod')}</TableHead>
-              <TableHead>{t('couponsManagement.status')}</TableHead>
+              <TableHead>{text.name}</TableHead>
+              <TableHead>{text.description}</TableHead>
+              <TableHead>{text.business || 'Business'}</TableHead>
+              <TableHead>{text.price}</TableHead>
+              <TableHead>{text.points}</TableHead>
+              <TableHead>{text.image}</TableHead>
+              <TableHead>{text.validPeriod}</TableHead>
+              <TableHead>{text.status}</TableHead>
               <TableHead className="w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
@@ -366,23 +397,23 @@ export default function CouponsTable() {
                 {/* Details */}
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="font-semibold text-gray-600">{t('couponsManagement.price')}: </span>
+                    <span className="font-semibold text-gray-600">{text.price}: </span>
                     <span>{formatPrice(previewCoupon.price)}</span>
                   </div>
                   <div>
-                    <span className="font-semibold text-gray-600">{t('couponsManagement.points')}: </span>
+                    <span className="font-semibold text-gray-600">{text.points}: </span>
                     <span>{previewCoupon.points} pts</span>
                   </div>
                   <div>
-                    <span className="font-semibold text-gray-600">{t('couponsManagement.validFrom')}: </span>
+                    <span className="font-semibold text-gray-600">{text.validFrom}: </span>
                     <span>{formatDate(previewCoupon.validFrom)}</span>
                   </div>
                   <div>
-                    <span className="font-semibold text-gray-600">{t('couponsManagement.validTo')}: </span>
+                    <span className="font-semibold text-gray-600">{text.validTo}: </span>
                     <span>{formatDate(previewCoupon.validTo)}</span>
                   </div>
                   <div>
-                    <span className="font-semibold text-gray-600">{t('couponsManagement.status')}: </span>
+                    <span className="font-semibold text-gray-600">{text.status}: </span>
                     <Badge variant={previewCoupon.isActive ? 'default' : 'secondary'}>
                       {previewCoupon.isActive ? 'Active' : 'Inactive'}
                     </Badge>
@@ -392,7 +423,7 @@ export default function CouponsTable() {
                 {/* Businesses */}
                 {getBusinessNames(previewCoupon).length > 0 && (
                   <div>
-                    <span className="font-semibold text-gray-600 block mb-2">{t('couponsManagement.business')}:</span>
+                    <span className="font-semibold text-gray-600 block mb-2">{text.business}:</span>
                     <div className="flex flex-wrap gap-2">
                       {getBusinessNames(previewCoupon).map((businessName, index) => (
                         <Badge key={index} variant="outline">

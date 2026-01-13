@@ -36,7 +36,16 @@ export async function getAllComments(): Promise<Comment[]> {
         const q = query(commentsRef, orderBy('createdAt', 'desc'));
         const querySnapshot = await getDocs(q);
         
-        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Comment));
+        return querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                ...data,
+                // Convert Firestore Timestamp to Date
+                createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
+                updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : (data.updatedAt ? new Date(data.updatedAt) : undefined)
+            } as Comment;
+        });
     } catch (error) {
         console.error('Error fetching all comments:', error);
         return [];

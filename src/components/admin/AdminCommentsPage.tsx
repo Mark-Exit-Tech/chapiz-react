@@ -140,7 +140,26 @@ export default function AdminCommentsPage() {
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(comment.createdAt).toLocaleDateString(isHebrew ? 'he-IL' : 'en-US')}
+                        {(() => {
+                          try {
+                            const date = comment.createdAt;
+                            // Handle Firestore Timestamp
+                            if (date && typeof date === 'object' && 'toDate' in date) {
+                              return (date as any).toDate().toLocaleDateString(isHebrew ? 'he-IL' : 'en-US');
+                            }
+                            // Handle Date object
+                            if (date instanceof Date) {
+                              return date.toLocaleDateString(isHebrew ? 'he-IL' : 'en-US');
+                            }
+                            // Handle string date
+                            if (typeof date === 'string') {
+                              return new Date(date).toLocaleDateString(isHebrew ? 'he-IL' : 'en-US');
+                            }
+                            return '-';
+                          } catch (e) {
+                            return '-';
+                          }
+                        })()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <button
