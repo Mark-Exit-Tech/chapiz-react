@@ -14,6 +14,45 @@ export default function AdminDashboard() {
   const locale = typeof window !== 'undefined'
     ? window.location.pathname.split('/')[1] || 'en'
     : 'en';
+  const isHebrew = locale === 'he';
+
+  // HARDCODED TEXT - NO TRANSLATION KEYS!
+  const text = {
+    loading: isHebrew ? 'טוען...' : 'Loading...',
+    dashboard: isHebrew ? 'לוח בקרה' : 'Dashboard',
+    stats: {
+      totalAds: isHebrew ? 'סך המודעות' : 'Total Ads',
+      advertisements: isHebrew ? 'מודעות' : 'Advertisements',
+      contactForms: isHebrew ? 'טפסי יצירת קשר' : 'Contact Forms',
+      submissions: isHebrew ? 'פניות' : 'Submissions',
+      totalComments: isHebrew ? 'סך התגובות' : 'Total Comments',
+      comments: isHebrew ? 'תגובות' : 'Comments',
+      rating: isHebrew ? 'דירוג' : 'Rating',
+      averageRating: isHebrew ? 'דירוג ממוצע' : 'Average Rating',
+      totalUsers: isHebrew ? 'סך המשתמשים' : 'Total Users',
+      users: isHebrew ? 'משתמשים' : 'Users',
+      totalPets: isHebrew ? 'סך חיות המחמד' : 'Total Pets',
+      pets: isHebrew ? 'חיות מחמד' : 'Pets',
+    },
+    userActivity: isHebrew ? 'פעילות משתמשים' : 'User Activity',
+    adActivity: isHebrew ? 'פעילות מודעות' : 'Ad Activity',
+    manageUsers: isHebrew ? 'ניהול משתמשים' : 'Manage Users',
+    noActivity: isHebrew ? 'אין פעילות' : 'No activity',
+    usersManagement: {
+      table: {
+        name: isHebrew ? 'שם' : 'Name',
+        email: isHebrew ? 'אימייל' : 'Email',
+        joined: isHebrew ? 'הצטרף' : 'Joined',
+      }
+    },
+    adsManagement: {
+      manageAds: isHebrew ? 'ניהול מודעות' : 'Manage Ads',
+      table: {
+        title: isHebrew ? 'כותרת' : 'Title',
+        status: isHebrew ? 'סטטוס' : 'Status',
+      }
+    },
+  };
 
   const [stats, setStats] = useState({
     users: { total: 0, new: 0, byRole: {} },
@@ -74,7 +113,7 @@ export default function AdminDashboard() {
     return (
       <div className="container mx-auto p-8">
         <div className="flex items-center justify-center h-64">
-          <div className="text-lg">{t('loading')}</div>
+          <div className="text-lg">{text.loading}</div>
         </div>
       </div>
     );
@@ -82,14 +121,14 @@ export default function AdminDashboard() {
 
   return (
     <div className="container mx-auto p-3 md:p-8">
-      <h1 className="mb-4 md:mb-6 text-xl md:text-3xl font-bold">{t('dashboard')}</h1>
+      <h1 className="mb-4 md:mb-6 text-xl md:text-3xl font-bold">{text.dashboard}</h1>
 
       {/* Top Section - Statistics Overview */}
       <div className="mb-4 md:mb-6 grid grid-cols-2 gap-3 md:gap-6 lg:grid-cols-3 xl:grid-cols-6">
         {/* Total Ads */}
         <div className="rounded-lg bg-white p-4 md:p-6 shadow-md">
           <div className="mb-3 md:mb-4 flex items-center justify-between">
-            <h3 className="text-sm md:text-lg font-semibold">{t('stats.totalAds')}</h3>
+            <h3 className="text-sm md:text-lg font-semibold">{text.stats.totalAds}</h3>
             <div className="rounded-lg bg-blue-100 p-1.5 md:p-2 text-blue-800">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -111,14 +150,14 @@ export default function AdminDashboard() {
             <div className="text-2xl md:text-4xl font-bold text-blue-600">
               {stats.ads.total}
             </div>
-            <div className="mt-1 text-xs md:text-sm text-gray-500">{t('stats.advertisements')}</div>
+            <div className="mt-1 text-xs md:text-sm text-gray-500">{text.stats.advertisements}</div>
           </div>
         </div>
 
         {/* Contact Forms */}
         <div className="rounded-lg bg-white p-4 md:p-6 shadow-md">
           <div className="mb-3 md:mb-4 flex items-center justify-between">
-            <h3 className="text-sm md:text-lg font-semibold">{t('stats.contactForms')}</h3>
+            <h3 className="text-sm md:text-lg font-semibold">{text.stats.contactForms}</h3>
             <div className="rounded-lg bg-green-100 p-1.5 md:p-2 text-green-800">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -140,14 +179,14 @@ export default function AdminDashboard() {
             <div className="text-2xl md:text-4xl font-bold text-green-600">
               {stats.contactSubmissions.total}
             </div>
-            <div className='mt-1 text-xs md:text-sm text-gray-500'>{t('stats.submissions')}</div>
+            <div className='mt-1 text-xs md:text-sm text-gray-500'>{text.stats.submissions}</div>
           </div>
         </div>
 
         {/* Ad Comments */}
         <div className="rounded-lg bg-white p-4 md:p-6 shadow-md">
           <div className="mb-3 md:mb-4 flex items-center justify-between">
-            <h3 className="text-sm md:text-lg font-semibold">{t('stats.totalComments')}</h3>
+            <h3 className="text-sm md:text-lg font-semibold">{text.stats.totalComments}</h3>
             <div className="rounded-lg bg-purple-100 p-1.5 md:p-2 text-purple-800">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -169,14 +208,14 @@ export default function AdminDashboard() {
             <div className="text-2xl md:text-4xl font-bold text-purple-600">
               {stats.comments.total}
             </div>
-            <div className='mt-1 text-xs md:text-sm text-gray-500'>{t('stats.comments')}</div>
+            <div className='mt-1 text-xs md:text-sm text-gray-500'>{text.stats.comments}</div>
           </div>
         </div>
 
         {/* Rating */}
         <div className="rounded-lg bg-white p-4 md:p-6 shadow-md">
           <div className="mb-3 md:mb-4 flex items-center justify-between">
-            <h3 className="text-sm md:text-lg font-semibold">{t('stats.rating')}</h3>
+            <h3 className="text-sm md:text-lg font-semibold">{text.stats.rating}</h3>
             <div className="rounded-lg bg-yellow-100 p-1.5 md:p-2 text-yellow-800">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -198,14 +237,14 @@ export default function AdminDashboard() {
             <div className="text-2xl md:text-4xl font-bold text-yellow-600">
               {stats.rating.average}
             </div>
-            <div className='mt-1 text-xs md:text-sm text-gray-500'>{t('stats.averageRating')}</div>
+            <div className='mt-1 text-xs md:text-sm text-gray-500'>{text.stats.averageRating}</div>
           </div>
         </div>
 
         {/* Total Users */}
         <div className="rounded-lg bg-white p-4 md:p-6 shadow-md">
           <div className="mb-3 md:mb-4 flex items-center justify-between">
-            <h3 className="text-sm md:text-lg font-semibold">{t('stats.totalUsers')}</h3>
+            <h3 className="text-sm md:text-lg font-semibold">{text.stats.totalUsers}</h3>
             <div className="rounded-lg bg-indigo-100 p-1.5 md:p-2 text-indigo-800">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -227,14 +266,14 @@ export default function AdminDashboard() {
             <div className="text-2xl md:text-4xl font-bold text-indigo-600">
               {stats.users.total}
             </div>
-            <div className='mt-1 text-xs md:text-sm text-gray-500'>{t('stats.users')}</div>
+            <div className='mt-1 text-xs md:text-sm text-gray-500'>{text.stats.users}</div>
           </div>
         </div>
 
         {/* Total Pets */}
         <div className="rounded-lg bg-white p-4 md:p-6 shadow-md">
           <div className="mb-3 md:mb-4 flex items-center justify-between">
-            <h3 className="text-sm md:text-lg font-semibold">{t('stats.totalPets')}</h3>
+            <h3 className="text-sm md:text-lg font-semibold">{text.stats.totalPets}</h3>
             <div className="rounded-lg bg-pink-100 p-1.5 md:p-2 text-pink-800">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -256,7 +295,7 @@ export default function AdminDashboard() {
             <div className="text-2xl md:text-4xl font-bold text-pink-600">
               {stats.pets.total}
             </div>
-            <div className='mt-1 text-xs md:text-sm text-gray-500'>{t('stats.pets')}</div>
+            <div className='mt-1 text-xs md:text-sm text-gray-500'>{text.stats.pets}</div>
           </div>
         </div>
       </div>
@@ -265,12 +304,12 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 gap-4 md:gap-6 lg:grid-cols-2">
         <div className="rounded-lg bg-white p-3 md:p-4 shadow-md">
           <div className="mb-3 md:mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-            <h3 className="text-base md:text-lg font-semibold order-1">{t('userActivity')}</h3>
+            <h3 className="text-base md:text-lg font-semibold order-1">{text.userActivity}</h3>
             <Link
               to={`/${locale}/admin/users`}
               className="rounded bg-blue-500 px-3 md:px-4 py-2 text-sm md:text-base text-white transition hover:bg-blue-600 w-full sm:w-auto text-center order-2"
             >
-              {t('manageUsers')}
+              {text.manageUsers}
             </Link>
           </div>
           <div className="overflow-x-auto -mx-3 md:mx-0">
@@ -278,9 +317,9 @@ export default function AdminDashboard() {
               <Table className="min-w-full">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="px-2 md:px-4 text-xs md:text-sm">{t('usersManagement.table.name')}</TableHead>
-                    <TableHead className="px-2 md:px-4 text-xs md:text-sm">{t('usersManagement.table.email')}</TableHead>
-                    <TableHead className="px-2 md:px-4 text-xs md:text-sm">{t('usersManagement.table.joined')}</TableHead>
+                    <TableHead className="px-2 md:px-4 text-xs md:text-sm">{text.usersManagement.table.name}</TableHead>
+                    <TableHead className="px-2 md:px-4 text-xs md:text-sm">{text.usersManagement.table.email}</TableHead>
+                    <TableHead className="px-2 md:px-4 text-xs md:text-sm">{text.usersManagement.table.joined}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -296,7 +335,7 @@ export default function AdminDashboard() {
                   {activity.users.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={3} className='text-center text-gray-500 text-xs md:text-sm'>
-                        {t('noActivity')}
+                        {text.noActivity}
                       </TableCell>
                     </TableRow>
                   )}
@@ -308,12 +347,12 @@ export default function AdminDashboard() {
 
         <div className="rounded-lg bg-white p-3 md:p-4 shadow-md">
           <div className="mb-3 md:mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-            <h3 className="text-base md:text-lg font-semibold order-1">{t('adActivity')}</h3>
+            <h3 className="text-base md:text-lg font-semibold order-1">{text.adActivity}</h3>
             <Link
               to={`/${locale}/admin/ads`}
               className="rounded bg-blue-500 px-3 md:px-4 py-2 text-sm md:text-base text-white transition hover:bg-blue-600 w-full sm:w-auto text-center order-2"
             >
-              {t('adsManagement.manageAds')}
+              {text.adsManagement.manageAds}
             </Link>
           </div>
           <div className="overflow-x-auto -mx-3 md:mx-0">
@@ -321,8 +360,8 @@ export default function AdminDashboard() {
               <Table className="min-w-full">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="px-2 md:px-4 text-xs md:text-sm">{t('adsManagement.table.title')}</TableHead>
-                    <TableHead className="px-2 md:px-4 text-xs md:text-sm">{t('adsManagement.table.status')}</TableHead>
+                    <TableHead className="px-2 md:px-4 text-xs md:text-sm">{text.adsManagement.table.title}</TableHead>
+                    <TableHead className="px-2 md:px-4 text-xs md:text-sm">{text.adsManagement.table.status}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -346,7 +385,7 @@ export default function AdminDashboard() {
                   {activity.ads.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={2} className='text-center text-gray-500 text-xs md:text-sm'>
-                        {t('noActivity')}
+                        {text.noActivity}
                       </TableCell>
                     </TableRow>
                   )}

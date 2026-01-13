@@ -22,6 +22,33 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const locale = typeof window !== 'undefined'
     ? window.location.pathname.split('/')[1] || 'en'
     : 'en';
+  const isHebrew = locale === 'he';
+  
+  // HARDCODED TEXT - NO TRANSLATION KEYS!
+  const text = {
+    loading: isHebrew ? 'טוען...' : 'Loading...',
+    unauthorized: isHebrew ? 'אין הרשאה' : 'Unauthorized',
+    unauthorizedMessage: isHebrew ? 'אין לך הרשאה לגשת לדף זה' : 'You do not have permission to access this page',
+    goBack: isHebrew ? 'חזור' : 'Go Back',
+    signIn: isHebrew ? 'התחבר' : 'Sign In',
+    navigation: {
+      dashboard: isHebrew ? 'לוח בקרה' : 'Dashboard',
+      manageAds: isHebrew ? 'ניהול מודעות' : 'Manage Ads',
+      managePromos: isHebrew ? 'ניהול מבצעים' : 'Manage Promos',
+      manageCoupons: isHebrew ? 'ניהול שוברים' : 'Manage Coupons',
+      manageBusinesses: isHebrew ? 'ניהול עסקים' : 'Manage Businesses',
+      manageComments: isHebrew ? 'ניהול תגובות' : 'Manage Comments',
+      contactSubmissions: isHebrew ? 'פניות יצירת קשר' : 'Contact Submissions',
+      settings: isHebrew ? 'הגדרות' : 'Settings',
+      manageUsers: isHebrew ? 'ניהול משתמשים' : 'Manage Users',
+    },
+    roles: {
+      user: isHebrew ? 'משתמש' : 'User',
+      admin: isHebrew ? 'מנהל' : 'Admin',
+      super_admin: isHebrew ? 'מנהל על' : 'Super Admin',
+    }
+  };
+  
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [roleLoading, setRoleLoading] = useState(true);
 
@@ -56,7 +83,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p className="text-gray-500">{t('loading')}</p>
+          <p className="text-gray-500">{text.loading}</p>
         </div>
       </div>
     );
@@ -68,19 +95,19 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center p-8 bg-white rounded-lg shadow-lg max-w-md mx-auto">
           <ShieldX className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('unauthorized')}</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">{text.unauthorized}</h1>
           <p className="text-gray-600 mb-6">
-            {t('unauthorizedMessage')}
+            {text.unauthorizedMessage}
           </p>
           <div className="space-y-3">
             <Link to={`/${locale}`}>
               <Button className="w-full">
-                {t('goBack')}
+                {text.goBack}
               </Button>
             </Link>
             <Link to={`/${locale}/signin`}>
               <Button variant="outline" className="w-full">
-                Sign In
+                {text.signIn}
               </Button>
             </Link>
           </div>
@@ -95,7 +122,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       <div className="md:hidden">
         <AdminTopNav
           userEmail={user.email || ''}
-          userRole={userRole ? t(`roles.${userRole}`) : 'Loading...'}
+          userRole={userRole ? text.roles[userRole] : text.loading}
           locale={locale}
         />
 
@@ -111,7 +138,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 className="flex gap-3 rounded p-2 transition hover:bg-white hover:shadow-xs"
               >
                 <LayoutDashboard className="h-6 w-6" />
-                {t('navigation.dashboard')}
+                {text.navigation.dashboard}
               </Link>
             </li>
             <li>
@@ -120,7 +147,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 className="flex gap-3 rounded p-2 transition hover:bg-white hover:shadow-xs"
               >
                 <AppWindow className="h-6 w-6" />
-                {t('navigation.manageAds')}
+                {text.navigation.manageAds}
               </Link>
             </li>
             <li>
@@ -129,7 +156,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 className="flex gap-3 rounded p-2 transition hover:bg-white hover:shadow-xs"
               >
                 <Megaphone className="h-6 w-6" />
-                {t('navigation.managePromos')}
+                {text.navigation.managePromos}
               </Link>
             </li>
             <li>
@@ -138,7 +165,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 className="flex gap-3 rounded p-2 transition hover:bg-white hover:shadow-xs"
               >
                 <Ticket className="h-6 w-6" />
-                {t('navigation.manageCoupons')}
+                {text.navigation.manageCoupons}
               </Link>
             </li>
             <li>
@@ -147,7 +174,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 className="flex gap-3 rounded p-2 transition hover:bg-white hover:shadow-xs"
               >
                 <Building2 className="h-6 w-6" />
-                {t('navigation.manageBusinesses')}
+                {text.navigation.manageBusinesses}
               </Link>
             </li>
             <li>
@@ -156,7 +183,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 className="flex gap-3 rounded p-2 transition hover:bg-white hover:shadow-xs"
               >
                 <MessageSquare className="h-6 w-6" />
-                {t('navigation.manageComments')}
+                {text.navigation.manageComments}
               </Link>
             </li>
             <li>
@@ -165,7 +192,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 className="flex gap-3 rounded p-2 transition hover:bg-white hover:shadow-xs"
               >
                 <Mail className="h-6 w-6" />
-                {t('navigation.contactSubmissions')}
+                {text.navigation.contactSubmissions}
               </Link>
             </li>
             <li>
@@ -174,7 +201,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 className="flex gap-3 rounded p-2 transition hover:bg-white hover:shadow-xs"
               >
                 <Settings className="h-6 w-6" />
-                {t('navigation.settings')}
+                {text.navigation.settings}
               </Link>
             </li>
             <li>
@@ -183,7 +210,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 className="flex gap-3 rounded p-2 transition hover:bg-white hover:shadow-xs"
               >
                 <Users className="h-6 w-6" />
-                {t('navigation.manageUsers')}
+                {text.navigation.manageUsers}
               </Link>
             </li>
           </ul>
@@ -192,7 +219,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         {/* User info */}
         <div className="mt-8 p-2 bg-white/10 rounded">
           <p className="font-medium truncate">{user.email}</p>
-          <p className="text-xs text-gray-500 capitalize">{userRole ? t(`roles.${userRole}`) : 'Loading...'}</p>
+          <p className="text-xs text-gray-500 capitalize">{userRole ? text.roles[userRole] : text.loading}</p>
         </div>
       </div>
 
