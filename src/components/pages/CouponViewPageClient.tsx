@@ -1,11 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, CheckCircle2, Share2, Trophy, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useLocale } from '@/hooks/use-locale';
 import { Promo, Business } from '@/types/promo';
 import Navbar from '@/components/layout/Navbar';
 import { Card, CardContent } from '@/components/ui/card';
@@ -32,10 +30,37 @@ interface CouponViewPageClientProps {
 }
 
 export default function CouponViewPageClient({ coupon, business, businesses = [] }: CouponViewPageClientProps) {
-  const { t } = useTranslation('pages.PromosPage');
   const navigate = useNavigate();
-  const locale = useLocale();
   const { user, dbUser } = useAuth();
+  
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+  
+  // HARDCODED TEXT
+  const text = {
+    back: isHebrew ? 'חזור' : 'Back',
+    use: isHebrew ? 'השתמש' : 'Use',
+    used: isHebrew ? 'משומש' : 'Used',
+    using: isHebrew ? 'משתמש...' : 'Using...',
+    share: isHebrew ? 'שתף' : 'Share',
+    shared: isHebrew ? 'שותף בהצלחה!' : 'Shared successfully!',
+    linkCopied: isHebrew ? 'הלינק הועתק!' : 'Link copied!',
+    promoUsed: isHebrew ? 'הקופון סומן כמשומש!' : 'Coupon marked as used!',
+    gotPrize: isHebrew ? 'קיבלתי פרס!' : 'I got a prize!',
+    couponUsedSuccess: isHebrew ? 'הקופון נוצל בהצלחה!' : 'Coupon used successfully!',
+    startDate: isHebrew ? 'תחילה' : 'Start',
+    endDate: isHebrew ? 'סיום' : 'End',
+    importantInfo: isHebrew ? 'מידע חשוב' : 'Important Information',
+    couponUsageInfo: isHebrew ? 'ניתן להשתמש בקופון זה רק בעסק שמציע את המבצע' : 'This coupon can only be used at the shop that offers this promo',
+    oneTimeUse: isHebrew ? 'קופון זה תקף לשימוש חד פעמי בלבד' : 'This coupon is valid for one-time use only',
+    confirmUse: isHebrew ? 'אשר שימוש בקופון' : 'Confirm Use Coupon',
+    confirmUseMessage: isHebrew ? 'האם אתה בטוח שברצונך להשתמש בקופון זה? פעולה זו אינה ניתנת לביטול.' : 'Are you sure you want to use this coupon? This action cannot be undone.',
+    cancel: isHebrew ? 'ביטול' : 'Cancel',
+    confirm: isHebrew ? 'אישור' : 'Confirm',
+  };
   const [isUsingCoupon, setIsUsingCoupon] = useState(false);
   const [isUsed, setIsUsed] = useState(false);
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
@@ -89,7 +114,7 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
       if (result.success) {
         setIsUsed(true);
         setShowSuccessAnimation(true);
-        toast.success(t('promoUsed') || 'Coupon marked as used!');
+        toast.success(text.promoUsed);
 
         // Hide animation and redirect after 2 seconds
         setTimeout(() => {
@@ -118,18 +143,18 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
           text: coupon.description || coupon.name,
           url: couponUrl,
         });
-        toast.success(t('shared') || 'Shared successfully!');
+        toast.success(text.shared);
       } catch (error: any) {
         if (error.name !== 'AbortError') {
           // Fallback to clipboard
           navigator.clipboard.writeText(couponUrl);
-          toast.success(t('linkCopied') || 'Link copied to clipboard!');
+          toast.success(text.linkCopied);
         }
       }
     } else {
       // Fallback to clipboard
       navigator.clipboard.writeText(couponUrl);
-      toast.success(t('linkCopied') || 'Link copied to clipboard!');
+      toast.success(text.linkCopied);
     }
   };
 
@@ -150,7 +175,7 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
           ) : (
             <ArrowLeft className="h-4 w-4 mr-2" />
           )}
-          {t('back') || 'Back'}
+          {text.back}
         </Button>
 
         <Card className="overflow-hidden">
@@ -197,7 +222,7 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
                     <p>{t('startDate') || 'Start'}: {new Date(coupon.startDate).toLocaleDateString('en-GB')}</p>
                   )}
                   {coupon.endDate && (
-                    <p>{t('endDate') || 'End'}: {new Date(coupon.endDate).toLocaleDateString('en-GB')}</p>
+                    <p>{text.endDate}: {new Date(coupon.endDate).toLocaleDateString(isHebrew ? 'he-IL' : 'en-GB')}</p>
                   )}
                 </div>
               )}
@@ -214,11 +239,11 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
                 <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
                 <div className="flex-1">
                   <p className="text-sm text-blue-900 font-medium mb-1">
-                    {t('importantInfo') || 'Important Information'}
+                    {text.importantInfo}
                   </p>
                   <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
-                    <li>{t('couponUsageInfo') || 'This coupon can only be used at the shop that offers this promo'}</li>
-                    <li>{t('oneTimeUse') || 'This coupon is valid for one-time use only'}</li>
+                    <li>{text.couponUsageInfo}</li>
+                    <li>{text.oneTimeUse}</li>
                   </ul>
                 </div>
               </div>
@@ -239,8 +264,8 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
                   className="bg-white rounded-lg p-8 text-center max-w-sm mx-4 shadow-2xl"
                 >
                   <Trophy className="w-20 h-20 mx-auto mb-4 text-yellow-500" />
-                  <p className="text-2xl font-bold text-gray-900 mb-2">{t('gotPrize') || 'I got a prize!'}</p>
-                  <p className="text-gray-600">{t('couponUsedSuccess') || 'Coupon used successfully!'}</p>
+                  <p className="text-2xl font-bold text-gray-900 mb-2">{text.gotPrize}</p>
+                  <p className="text-gray-600">{text.couponUsedSuccess}</p>
                 </motion.div>
               </motion.div>
             )}
@@ -258,17 +283,17 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
                   {isUsingCoupon ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                      {t('using') || 'Using...'}
+                      {text.using}
                     </>
                   ) : isUsed ? (
                     <>
                       <CheckCircle2 className="w-4 h-4 mr-2" />
-                      {t('used') || 'Used'}
+                      {text.used}
                     </>
                   ) : (
                     <>
                       <CheckCircle2 className="w-4 h-4 mr-2" />
-                      {t('use') || 'Use'}
+                      {text.use}
                     </>
                   )}
                 </Button>
@@ -279,7 +304,7 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
                   className="flex-1"
                 >
                   <Share2 className="w-4 h-4 mr-2" />
-                  {t('share') || 'Share'}
+                  {text.share}
                 </Button>
               </div>
             </div>
@@ -288,9 +313,9 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
             <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
               <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                  <DialogTitle>{t('confirmUse') || 'Confirm Use Coupon'}</DialogTitle>
+                  <DialogTitle>{text.confirmUse}</DialogTitle>
                   <DialogDescription>
-                    {t('confirmUseMessage') || `Are you sure you want to use "${coupon.name}"? This action cannot be undone.`}
+                    {text.confirmUseMessage}
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
@@ -299,7 +324,7 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
                     onClick={() => setShowConfirmDialog(false)}
                     disabled={isUsingCoupon}
                   >
-                    {t('cancel') || 'Cancel'}
+                    {text.cancel}
                   </Button>
                   <Button
                     variant="default"
@@ -309,12 +334,12 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
                     {isUsingCoupon ? (
                       <>
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                        {t('using') || 'Using...'}
+                        {text.using}
                       </>
                     ) : (
                       <>
                         <CheckCircle2 className="w-4 h-4 mr-2" />
-                        {t('confirm') || 'Confirm'}
+                        {text.confirm}
                       </>
                     )}
                   </Button>

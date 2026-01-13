@@ -11,6 +11,7 @@ const SignupPage = lazy(() => import('./pages/SignupPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const MyPetsPage = lazy(() => import('./pages/MyPetsPage'));
 const CouponsPage = lazy(() => import('./pages/CouponsPage'));
+const CouponDetailPage = lazy(() => import('./pages/CouponDetailPage'));
 const VouchersPage = lazy(() => import('./pages/VouchersPage'));
 const UserSettingsPage = lazy(() => import('./pages/UserSettingsPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
@@ -81,6 +82,7 @@ function App() {
           <Route path="/:locale/my-pets" element={<Suspense fallback={<PageLoader />}><MyPetsPage /></Suspense>} />
           <Route path="/:locale/add-pet" element={<Suspense fallback={<PageLoader />}><AddPetPage /></Suspense>} />
           <Route path="/:locale/coupons" element={<Suspense fallback={<PageLoader />}><CouponsPage /></Suspense>} />
+          <Route path="/:locale/coupons/:id" element={<Suspense fallback={<PageLoader />}><CouponDetailPage /></Suspense>} />
           <Route path="/:locale/vouchers" element={<Suspense fallback={<PageLoader />}><VouchersPage /></Suspense>} />
           <Route path="/:locale/user/settings" element={<Suspense fallback={<PageLoader />}><UserSettingsPage /></Suspense>} />
           

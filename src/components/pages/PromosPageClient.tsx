@@ -171,7 +171,8 @@ export default function PromosPageClient({
   const renderPromoCard = (promo: Promo) => (
     <Card 
       key={promo.id} 
-      className="overflow-hidden hover:shadow-lg transition-shadow relative"
+      className="overflow-hidden hover:shadow-lg transition-shadow relative cursor-pointer"
+      onClick={() => handleViewQR(promo)}
     >
       {promo.imageUrl && (
         <div className="relative w-full h-48">
@@ -184,7 +185,7 @@ export default function PromosPageClient({
       )}
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-2 mb-2">
-          <h3 className="font-semibold text-lg">{promo.name}</h3>
+          <h3 className="font-semibold text-lg line-clamp-1">{promo.name}</h3>
           <Tag className="w-5 h-5 text-primary flex-shrink-0" />
         </div>
         
@@ -200,7 +201,10 @@ export default function PromosPageClient({
 
         <div className="flex gap-2">
           <Button 
-            onClick={() => handleViewQR(promo)}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleViewQR(promo);
+            }}
             className="flex-1"
             size="sm"
           >
@@ -209,7 +213,10 @@ export default function PromosPageClient({
           </Button>
           {getPromoBusinesses(promo).length > 0 && (
             <Button 
-              onClick={() => handleShowMap(promo)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleShowMap(promo);
+              }}
               variant="outline"
               size="sm"
             >
