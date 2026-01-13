@@ -18,6 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import AdminLayout from './AdminLayout';
 
 export default function ContactSubmissionsPage() {
   const [submissions, setSubmissions] = useState<ContactSubmission[]>([]);
@@ -89,19 +90,22 @@ export default function ContactSubmissionsPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-4 md:p-8">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <div className="text-gray-600">{text.loading}</div>
+      <AdminLayout>
+        <div className="container mx-auto p-4 md:p-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+              <div className="text-gray-600">{text.loading}</div>
+            </div>
           </div>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="container mx-auto p-4 md:p-8">
+    <AdminLayout>
+      <div className="container mx-auto p-4 md:p-8">
       <div className="space-y-6">
         <div className="text-left rtl:text-right">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2">
@@ -258,6 +262,6 @@ export default function ContactSubmissionsPage() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </AdminLayout>
   );
 }

@@ -19,6 +19,7 @@ import {
 import { format } from 'date-fns';
 import { ArrowDown, ArrowUp, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import AdminLayout from './AdminLayout';
 
 interface Pet {
   id: string;
@@ -159,7 +160,8 @@ export default function PetsPageClient({ pets, searchParams, hideOwnerColumn = f
   };
 
   return (
-    <div className="container mx-auto p-8">
+    <AdminLayout>
+      <div className="container mx-auto p-8">
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-3xl font-bold">{t('petsManagement.title')}</h1>
       </div>
@@ -372,6 +374,7 @@ export default function PetsPageClient({ pets, searchParams, hideOwnerColumn = f
         }}
       />
 
-    </div>
+      </div>
+    </AdminLayout>
   );
 }

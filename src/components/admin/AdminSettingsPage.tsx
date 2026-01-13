@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { uploadProfileImage } from '@/lib/firebase/storage';
 import { getSiteSettings, saveSiteSettings, SiteSettings } from '@/lib/firebase/database/settings';
+import AdminLayout from './AdminLayout';
 
 export default function AdminSettingsPage() {
   const [saving, setSaving] = useState(false);
@@ -135,19 +136,22 @@ export default function AdminSettingsPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-4 md:p-8">
-        <div className="flex items-center justify-center p-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-gray-500">{isHebrew ? 'טוען...' : 'Loading...'}</p>
+      <AdminLayout>
+        <div className="container mx-auto p-4 md:p-8">
+          <div className="flex items-center justify-center p-8">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-gray-500">{isHebrew ? 'טוען...' : 'Loading...'}</p>
+            </div>
           </div>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="container mx-auto p-4 md:p-8">
+    <AdminLayout>
+      <div className="container mx-auto p-4 md:p-8">
       <div className="space-y-6">
         {/* Header */}
         <div className="text-left rtl:text-right">
@@ -342,6 +346,7 @@ export default function AdminSettingsPage() {
           </div>
         </form>
       </div>
-    </div>
+      </div>
+    </AdminLayout>
   );
 }

@@ -3,12 +3,14 @@
 import { useTranslation } from 'react-i18next';
 import AddCouponForm from '@/components/admin/AddCouponForm';
 import CouponsTable from '@/components/admin/CouponsTable';
+import AdminLayout from './AdminLayout';
 
 export default function CouponsPage() {
   const { t } = useTranslation('Admin');
 
   return (
-    <div className="p-4 md:p-6 space-y-6">
+    <AdminLayout>
+      <div className="p-4 md:p-6 space-y-6">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
         <div className="text-left rtl:text-right order-2 rtl:order-1">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 text-left rtl:text-right">
@@ -24,6 +26,7 @@ export default function CouponsPage() {
       </div>
 
       <CouponsTable />
-    </div>
+      </div>
+    </AdminLayout>
   );
 }

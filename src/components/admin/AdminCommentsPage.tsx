@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { getAllComments, deleteComment, type Comment } from '@/lib/firebase/database/comments';
 import { Trash2, MessageSquare, User } from 'lucide-react';
+import AdminLayout from './AdminLayout';
 
 export default function AdminCommentsPage() {
   const [comments, setComments] = useState<Comment[]>([]);
@@ -63,16 +64,19 @@ export default function AdminCommentsPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-4 md:p-8">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-gray-600">{text.loading}</div>
+      <AdminLayout>
+        <div className="container mx-auto p-4 md:p-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-gray-600">{text.loading}</div>
+          </div>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="container mx-auto p-4 md:p-8">
+    <AdminLayout>
+      <div className="container mx-auto p-4 md:p-8">
       <div className="space-y-6">
         <div className="text-left rtl:text-right">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2">
@@ -179,6 +183,6 @@ export default function AdminCommentsPage() {
           </div>
         )}
       </div>
-    </div>
+    </AdminLayout>
   );
 }
