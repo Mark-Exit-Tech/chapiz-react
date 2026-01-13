@@ -4,18 +4,18 @@ import { db } from '../client';
 export interface Audience {
     id: string;
     name: string;
-    description?: string;
-    targetCriteria?: string[]; // For compatibility with promo.ts
+    description: string; // Required to match promo.ts
+    targetCriteria: string[]; // Required to match promo.ts
     petType?: string;
     ageRange?: string[];
     breed?: string[];
     city?: string[];
     area?: string;
     gender?: string;
-    isActive?: boolean;
+    isActive: boolean;
     createdAt: Date;
     updatedAt: Date;
-    createdBy?: string;
+    createdBy: string;
 }
 
 const AUDIENCES_COLLECTION = 'audiences';
@@ -27,7 +27,25 @@ export async function getAllAudiences(): Promise<Audience[]> {
         const q = query(audiencesRef, orderBy('name', 'asc'));
         const querySnapshot = await getDocs(q);
         
-        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Audience));
+        return querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                name: data.name || '',
+                description: data.description || '',
+                targetCriteria: data.targetCriteria || [],
+                petType: data.petType,
+                ageRange: data.ageRange,
+                breed: data.breed,
+                city: data.city,
+                area: data.area,
+                gender: data.gender,
+                isActive: data.isActive !== undefined ? data.isActive : true,
+                createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
+                updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt || Date.now()),
+                createdBy: data.createdBy || 'admin'
+            } as Audience;
+        });
     } catch (error) {
         console.error('Error fetching audiences:', error);
         return [];
@@ -60,7 +78,15 @@ export async function createAudience(audienceData: Omit<Audience, 'id' | 'create
         const now = Timestamp.now();
         
         const firestoreData = {
-            ...audienceData,
+            name: audienceData.name,
+            description: audienceData.description || '',
+            targetCriteria: audienceData.targetCriteria || [],
+            petType: audienceData.petType,
+            ageRange: audienceData.ageRange,
+            breed: audienceData.breed,
+            city: audienceData.city,
+            area: audienceData.area,
+            gender: audienceData.gender,
             isActive: audienceData.isActive !== undefined ? audienceData.isActive : true,
             createdBy: audienceData.createdBy || 'admin',
             createdAt: now,
@@ -71,7 +97,15 @@ export async function createAudience(audienceData: Omit<Audience, 'id' | 'create
         
         const audience: Audience = {
             id: newAudienceRef.id,
-            ...audienceData,
+            name: audienceData.name,
+            description: audienceData.description || '',
+            targetCriteria: audienceData.targetCriteria || [],
+            petType: audienceData.petType,
+            ageRange: audienceData.ageRange,
+            breed: audienceData.breed,
+            city: audienceData.city,
+            area: audienceData.area,
+            gender: audienceData.gender,
             isActive: audienceData.isActive !== undefined ? audienceData.isActive : true,
             createdBy: audienceData.createdBy || 'admin',
             createdAt: now.toDate(),

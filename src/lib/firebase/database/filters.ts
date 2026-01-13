@@ -4,13 +4,13 @@ import { db } from '../client';
 export interface Filter {
     id: string;
     name: string;
-    type: 'petType' | 'breed' | 'age' | 'area' | 'city' | 'gender';
-    values: string[];
-    audienceIds?: string[]; // For compatibility with promo.ts
-    isActive?: boolean;
+    type?: 'petType' | 'breed' | 'age' | 'area' | 'city' | 'gender'; // Optional for flexibility
+    values?: string[]; // Optional for flexibility
+    audienceIds: string[]; // Required to match promo.ts
+    isActive: boolean;
     createdAt: Date;
     updatedAt: Date;
-    createdBy?: string;
+    createdBy: string;
 }
 
 const FILTERS_COLLECTION = 'filters';
@@ -22,7 +22,20 @@ export async function getAllFilters(): Promise<Filter[]> {
         const q = query(filtersRef, orderBy('name', 'asc'));
         const querySnapshot = await getDocs(q);
         
-        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Filter));
+        return querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                name: data.name || '',
+                type: data.type,
+                values: data.values,
+                audienceIds: data.audienceIds || [],
+                isActive: data.isActive !== undefined ? data.isActive : true,
+                createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
+                updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt || Date.now()),
+                createdBy: data.createdBy || 'admin'
+            } as Filter;
+        });
     } catch (error) {
         console.error('Error fetching filters:', error);
         return [];
@@ -55,7 +68,10 @@ export async function createFilter(filterData: Omit<Filter, 'id' | 'createdAt' |
         const now = Timestamp.now();
         
         const firestoreData = {
-            ...filterData,
+            name: filterData.name,
+            type: filterData.type,
+            values: filterData.values,
+            audienceIds: filterData.audienceIds || [],
             isActive: filterData.isActive !== undefined ? filterData.isActive : true,
             createdBy: filterData.createdBy || 'admin',
             createdAt: now,
@@ -66,7 +82,10 @@ export async function createFilter(filterData: Omit<Filter, 'id' | 'createdAt' |
         
         const filter: Filter = {
             id: newFilterRef.id,
-            ...filterData,
+            name: filterData.name,
+            type: filterData.type,
+            values: filterData.values,
+            audienceIds: filterData.audienceIds || [],
             isActive: filterData.isActive !== undefined ? filterData.isActive : true,
             createdBy: filterData.createdBy || 'admin',
             createdAt: now.toDate(),
