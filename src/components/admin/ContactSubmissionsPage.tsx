@@ -262,7 +262,6 @@ export default function ContactSubmissionsPage() {
           )}
         </DialogContent>
       </Dialog>
-        </div>
       </div>
     </AdminLayout>
   );
