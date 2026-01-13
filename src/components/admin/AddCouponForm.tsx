@@ -232,7 +232,7 @@ export default function AddCouponForm() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="price">{text.price} (0 for free)</Label>
+              <Label htmlFor="price">{text.price}</Label>
               <Input
                 id="price"
                 name="price"
@@ -241,7 +241,7 @@ export default function AddCouponForm() {
                 min="0"
                 value={formData.price}
                 onChange={handleChange}
-                placeholder={text.pricePlaceholder || '0.00 (leave empty or 0 for free)'}
+                placeholder={text.pricePlaceholder}
               />
             </div>
 

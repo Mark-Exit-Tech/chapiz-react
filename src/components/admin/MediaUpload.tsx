@@ -31,6 +31,21 @@ export default function MediaUpload({
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [editedImageUrl, setEditedImageUrl] = useState<string | null>(null);
+  
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+  
+  // HARDCODED TEXT
+  const text = {
+    uploading: isHebrew ? 'מעלה' : 'Uploading',
+    clickToUploadImage: isHebrew ? 'לחץ להעלאת תמונה' : 'Click to upload image',
+    clickToUploadVideo: isHebrew ? 'לחץ להעלאת וידאו' : 'Click to upload video',
+    imageFormats: isHebrew ? 'PNG, JPG, GIF עד 20MB' : 'PNG, JPG, GIF up to 20MB',
+    videoFormats: isHebrew ? 'MP4, MOV, AVI עד 100MB' : 'MP4, MOV, AVI up to 100MB'
+  };
 
   const validateFile = (file: File): boolean => {
     // 20MB limit for images, 100MB for videos
@@ -234,11 +249,11 @@ export default function MediaUpload({
             )}
             <span className="text-xs font-medium">
               {isUploading
-                ? t('uploading')
-                : (type === 'image' ? t('clickToUploadImage') : t('clickToUploadVideo'))}
+                ? text.uploading
+                : (type === 'image' ? text.clickToUploadImage : text.clickToUploadVideo)}
             </span>
             <span className="text-muted-foreground mt-0.5 text-[10px]">
-              {type === 'image' ? t('fileFormats.image') : t('fileFormats.video')}
+              {type === 'image' ? text.imageFormats : text.videoFormats}
             </span>
           </div>
         </Button>
@@ -248,7 +263,7 @@ export default function MediaUpload({
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <FileUp className="h-4 w-4 animate-pulse" />
-            <span className="text-sm">{t('uploading')} {type}...</span>
+            <span className="text-sm">{text.uploading} {type}...</span>
           </div>
           <Progress value={progress} className="h-2" />
         </div>
