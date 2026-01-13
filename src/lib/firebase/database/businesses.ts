@@ -1,0 +1,143 @@
+import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, where, orderBy, limit as firestoreLimit } from 'firebase/firestore';
+import { db } from '../client';
+
+export interface Business {
+    id: string;
+    name: string;
+    description?: string;
+    logoUrl?: string;
+    website?: string;
+    phone?: string;
+    email?: string;
+    address?: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+const BUSINESSES_COLLECTION = 'businesses';
+
+// Get all businesses
+export async function getAllBusinesses(): Promise<Business[]> {
+    try {
+        const businessesRef = collection(db, BUSINESSES_COLLECTION);
+        const q = query(businessesRef, orderBy('name', 'asc'));
+        const querySnapshot = await getDocs(q);
+        
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Business));
+    } catch (error) {
+        console.error('Error fetching businesses:', error);
+        return [];
+    }
+}
+
+// Get business by ID
+export async function getBusinessById(id: string): Promise<Business | null> {
+    try {
+        const businessRef = doc(db, BUSINESSES_COLLECTION, id);
+        const businessDoc = await getDoc(businessRef);
+        
+        if (!businessDoc.exists()) {
+            console.error('Business not found');
+            return null;
+        }
+        
+        return { id: businessDoc.id, ...businessDoc.data() } as Business;
+    } catch (error) {
+        console.error('Error fetching business:', error);
+        return null;
+    }
+}
+
+// Search businesses
+export async function searchBusinesses(searchTerm: string): Promise<Business[]> {
+    try {
+        // Note: Firestore doesn't support full-text search natively
+        // This is a simplified version - you may want to use Algolia or similar
+        const businessesRef = collection(db, BUSINESSES_COLLECTION);
+        const querySnapshot = await getDocs(businessesRef);
+        
+        return querySnapshot.docs
+            .map(doc => ({ id: doc.id, ...doc.data() } as Business))
+            .filter(business => 
+                business.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                business.description?.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+    } catch (error) {
+        console.error('Error searching businesses:', error);
+        return [];
+    }
+}
+
+// Create business
+export async function createBusiness(businessData: Omit<Business, 'id' | 'createdAt' | 'updatedAt'>): Promise<Business | null> {
+    try {
+        const businessesRef = collection(db, BUSINESSES_COLLECTION);
+        const newBusinessRef = doc(businessesRef);
+        const now = new Date();
+        
+        const business: Business = {
+            id: newBusinessRef.id,
+            ...businessData,
+            createdAt: now,
+            updatedAt: now
+        };
+        
+        await setDoc(newBusinessRef, business);
+        return business;
+    } catch (error) {
+        console.error('Error creating business:', error);
+        return null;
+    }
+}
+
+// Update business
+export async function updateBusiness(id: string, updates: Partial<Business>): Promise<Business | null> {
+    try {
+        const businessRef = doc(db, BUSINESSES_COLLECTION, id);
+        await updateDoc(businessRef, {
+            ...updates,
+            updatedAt: new Date()
+        });
+        
+        const updatedDoc = await getDoc(businessRef);
+        if (!updatedDoc.exists()) return null;
+        
+        return { id: updatedDoc.id, ...updatedDoc.data() } as Business;
+    } catch (error) {
+        console.error('Error updating business:', error);
+        return null;
+    }
+}
+
+// Delete business
+export async function deleteBusiness(id: string): Promise<boolean> {
+    try {
+        const businessRef = doc(db, BUSINESSES_COLLECTION, id);
+        await deleteDoc(businessRef);
+        return true;
+    } catch (error) {
+        console.error('Error deleting business:', error);
+        return false;
+    }
+}
+
+// Get businesses with pagination
+export async function getBusinessesPaginated(page: number = 1, pageSize: number = 20): Promise<{ businesses: Business[], total: number }> {
+    try {
+        const businessesRef = collection(db, BUSINESSES_COLLECTION);
+        const q = query(businessesRef, orderBy('name', 'asc'));
+        const querySnapshot = await getDocs(q);
+        
+        const allBusinesses = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Business));
+        const from = (page - 1) * pageSize;
+        const to = from + pageSize;
+        
+        return {
+            businesses: allBusinesses.slice(from, to),
+            total: allBusinesses.length
+        };
+    } catch (error) {
+        console.error('Error fetching businesses:', error);
+        return { businesses: [], total: 0 };
+    }
+}
