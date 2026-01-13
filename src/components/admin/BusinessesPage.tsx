@@ -6,6 +6,18 @@ import BusinessesTable from '@/components/admin/BusinessesTable';
 
 export default function BusinessesPage() {
   const { t } = useTranslation('Admin');
+  
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+  
+  // HARDCODED TEXT
+  const text = {
+    title: isHebrew ? 'ניהול עסקים' : 'Business Management',
+    description: isHebrew ? 'הוסף וערוך עסקים בפלטפורמה' : 'Add and edit businesses on the platform'
+  };
 
   return (
     <div className="p-4 md:p-6 space-y-6">
@@ -13,10 +25,10 @@ export default function BusinessesPage() {
         <AddBusinessForm />
         <div className="text-left rtl:text-right">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-            {t('businessManagement.title')}
+            {text.title}
           </h1>
           <p className="text-gray-600 mt-2 text-sm md:text-base">
-            {t('businessManagement.description')}
+            {text.description}
           </p>
         </div>
       </div>

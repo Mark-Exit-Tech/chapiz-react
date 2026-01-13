@@ -74,18 +74,29 @@ export default function AdminBusinessesPage() {
   return (
     <div className="container mx-auto p-4 md:p-8">
       <div className="space-y-6">
-        <div className="text-left rtl:text-right">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2">
-            <Store className="w-8 h-8" />
-            {text.title}
-          </h1>
-          <p className="text-gray-600 mt-2 text-sm md:text-base">
-            {text.description}
-          </p>
-          <div className="mt-4">
-            <Badge variant="outline" className="text-lg px-4 py-2">
-              {text.totalBusinesses}: {businesses.length}
-            </Badge>
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+          <div className="text-left rtl:text-right">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2">
+              <Store className="w-8 h-8" />
+              {text.title}
+            </h1>
+            <p className="text-gray-600 mt-2 text-sm md:text-base">
+              {text.description}
+            </p>
+            <div className="mt-4">
+              <Badge variant="outline" className="text-lg px-4 py-2">
+                {text.totalBusinesses}: {businesses.length}
+              </Badge>
+            </div>
+          </div>
+          <div>
+            <a 
+              href={`/${locale}/admin/business`}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              <Store className="w-4 h-4" />
+              {isHebrew ? 'הוסף עסק' : 'Add Business'}
+            </a>
           </div>
         </div>
 
