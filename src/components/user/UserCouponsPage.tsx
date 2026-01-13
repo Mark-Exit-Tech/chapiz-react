@@ -688,7 +688,7 @@ export default function UserCouponsPage() {
                     <ShoppingCart className="h-5 w-5" />
                     {freeCouponPrice 
                       ? text.getFree
-                      : (userPoints < coupon.points ? t('insufficientPoints') : text.purchase)
+                      : (userPoints < coupon.points ? text.insufficientPoints : text.purchase)
                     }
                   </Button>
                   <Button
@@ -743,7 +743,7 @@ export default function UserCouponsPage() {
 
         {/* My Coupons Tab */}
         <TabsContent value="myCoupons" className="space-y-6">
-          <h2 className="text-3xl lg:text-4xl font-bold mb-6 lg:mb-8 text-gray-900">{t('myCoupons')}</h2>
+          <h2 className="text-3xl lg:text-4xl font-bold mb-6 lg:mb-8 text-gray-900">{text.myCoupons}</h2>
           {couponHistory.length === 0 ? (
             <div className="text-center py-16 lg:py-24 bg-white rounded-2xl border-2 border-dashed border-gray-200">
               <div className="inline-flex p-4 rounded-full bg-gray-100 mb-4">
