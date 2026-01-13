@@ -145,17 +145,17 @@ export default function AdminBusinessesPage() {
                       <TableCell>
                         <div className="flex items-center gap-1 text-sm">
                           <MapPin className="w-4 h-4 text-gray-400" />
-                          <span>{business.address || '-'}</span>
+                          <span>{business.contactInfo?.address || business.address || '-'}</span>
                         </div>
                       </TableCell>
                       <TableCell>
-                        {business.phone ? (
+                        {(business.contactInfo?.phone || business.phone) ? (
                           <a 
-                            href={`tel:${business.phone}`}
+                            href={`tel:${business.contactInfo?.phone || business.phone}`}
                             className="flex items-center gap-1 text-blue-600 hover:underline"
                           >
                             <Phone className="w-4 h-4" />
-                            {business.phone}
+                            {business.contactInfo?.phone || business.phone}
                           </a>
                         ) : '-'}
                       </TableCell>
