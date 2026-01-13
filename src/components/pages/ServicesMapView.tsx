@@ -781,7 +781,28 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
       script.defer = true;
       script.setAttribute('data-services-map', 'true');
 
-      window.initServicesMap = initializeMap;
+      // Wrapper function to ensure google.maps is fully loaded
+      window.initServicesMap = () => {
+        console.log('🗺️ Google Maps callback triggered');
+        
+        // Double-check that google.maps is available
+        if (window.google && window.google.maps && window.google.maps.Map) {
+          console.log('✅ Google Maps API fully loaded');
+          initializeMap();
+        } else {
+          console.error('❌ Google Maps API loaded but Map constructor not available');
+          // Retry after a short delay
+          setTimeout(() => {
+            if (window.google && window.google.maps && window.google.maps.Map) {
+              console.log('✅ Google Maps API ready on retry');
+              initializeMap();
+            } else {
+              console.error('❌ Google Maps API still not ready after retry');
+            }
+          }, 500);
+        }
+      };
+      
       document.head.appendChild(script);
       console.log('✅ Loading Google Maps with key:', apiKey);
     };
@@ -801,37 +822,54 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
   }, []);
 
   const initializeMap = (force = false) => {
-    if (!mapRef.current || !window.google) return;
+    try {
+      if (!mapRef.current) {
+        console.warn('⚠️ Map container ref not available');
+        return;
+      }
+      
+      if (!window.google || !window.google.maps) {
+        console.warn('⚠️ Google Maps API not loaded');
+        return;
+      }
 
-    // If map already exists and is bound to the same container, skip unless forced
-    if (map && !force && map.getDiv && map.getDiv() === mapRef.current) {
-      return;
+      // If map already exists and is bound to the same container, skip unless forced
+      if (map && !force && map.getDiv && map.getDiv() === mapRef.current) {
+        console.log('ℹ️ Map already initialized, skipping');
+        return;
+      }
+
+      console.log('🗺️ Initializing Google Maps...');
+
+      // Default center (Israel)
+      const defaultCenter = { lat: 31.7683, lng: 35.2137 };
+
+      const mapInstance = new window.google.maps.Map(mapRef.current, {
+        center: defaultCenter,
+        zoom: 8,
+        mapId: "DEMO_MAP_ID",
+        mapTypeControl: true,
+        streetViewControl: true,
+        fullscreenControl: true,
+        draggable: true,
+        scrollwheel: true,
+        gestureHandling: 'greedy',
+        keyboardShortcuts: true,
+        clickableIcons: true,
+      });
+
+      console.log('✅ Map instance created successfully');
+
+      const geocoderInstance = new window.google.maps.Geocoder();
+      geocoderRef.current = geocoderInstance;
+
+      setMap(mapInstance);
+
+      // Geocode all services and add markers
+      geocodeAllServices(mapInstance);
+    } catch (error) {
+      console.error('❌ Error initializing map:', error);
     }
-
-    // Default center (Israel)
-    const defaultCenter = { lat: 31.7683, lng: 35.2137 };
-
-    const mapInstance = new window.google.maps.Map(mapRef.current, {
-      center: defaultCenter,
-      zoom: 8,
-      mapId: "DEMO_MAP_ID",
-      mapTypeControl: true,
-      streetViewControl: true,
-      fullscreenControl: true,
-      draggable: true,
-      scrollwheel: true,
-      gestureHandling: 'greedy',
-      keyboardShortcuts: true,
-      clickableIcons: true,
-    });
-
-    const geocoderInstance = new window.google.maps.Geocoder();
-    geocoderRef.current = geocoderInstance;
-
-    setMap(mapInstance);
-
-    // Geocode all services and add markers
-    geocodeAllServices(mapInstance);
   };
 
   // Automatically request location when map is ready

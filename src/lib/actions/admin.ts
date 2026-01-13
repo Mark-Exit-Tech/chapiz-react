@@ -226,7 +226,15 @@ export async function getRandomActiveAd(): Promise<Ad | null> {
 
 export async function getActiveAdsForServices(serviceType?: string): Promise<Ad[]> {
   const { getActiveAds } = await import('@/lib/firebase/database/advertisements');
-  const ads = await getActiveAds();
+  const dbAds = await getActiveAds();
+  
+  // Convert database Ad format to admin Ad format (Date -> string)
+  const ads: Ad[] = dbAds.map(ad => ({
+    ...ad,
+    startDate: ad.startDate ? (typeof ad.startDate === 'string' ? ad.startDate : ad.startDate) : null,
+    endDate: ad.endDate ? (typeof ad.endDate === 'string' ? ad.endDate : ad.endDate) : null,
+    createdAt: ad.createdAt ? (ad.createdAt instanceof Date ? ad.createdAt.toISOString() : ad.createdAt.toString()) : undefined
+  }));
   
   // Filter by serviceType if provided (could be a tag or other field)
   if (serviceType) {
@@ -270,10 +278,20 @@ export async function getPromoById(id: string) {
   return null;
 }
 
-export async function getAdById(id: string) {
+export async function getAdById(id: string): Promise<Ad | null> {
   try {
     const { getAdById: getAdByIdFromDB } = await import('@/lib/firebase/database/advertisements');
-    return await getAdByIdFromDB(id);
+    const dbAd = await getAdByIdFromDB(id);
+    
+    if (!dbAd) return null;
+    
+    // Convert database Ad format to admin Ad format (Date -> string)
+    return {
+      ...dbAd,
+      startDate: dbAd.startDate ? (typeof dbAd.startDate === 'string' ? dbAd.startDate : dbAd.startDate) : null,
+      endDate: dbAd.endDate ? (typeof dbAd.endDate === 'string' ? dbAd.endDate : dbAd.endDate) : null,
+      createdAt: dbAd.createdAt ? (dbAd.createdAt instanceof Date ? dbAd.createdAt.toISOString() : dbAd.createdAt.toString()) : undefined
+    };
   } catch (error) {
     console.error('Error fetching ad by ID:', error);
     return null;

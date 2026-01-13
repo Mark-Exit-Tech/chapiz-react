@@ -69,12 +69,26 @@ export async function isAdFavorited(userId: string, adId: string): Promise<boole
 }
 
 /**
- * Get all ad tags
+ * Get all ad tags from advertisements collection
+ * Note: Businesses collection doesn't have tags by default
  */
 export async function getAllAdTags(): Promise<string[]> {
     try {
-        console.warn('getAllAdTags not yet fully implemented');
-        return [];
+        // Import advertisements functions dynamically
+        const { getActiveAds } = await import('./advertisements');
+        const ads = await getActiveAds();
+        
+        // Collect all unique tags from all ads
+        const tagsSet = new Set<string>();
+        ads.forEach(ad => {
+            if (ad.tags && Array.isArray(ad.tags)) {
+                ad.tags.forEach(tag => tagsSet.add(tag));
+            }
+        });
+        
+        const tags = Array.from(tagsSet).sort();
+        console.log(`✅ Loaded ${tags.length} unique tags from advertisements`);
+        return tags;
     } catch (error) {
         console.error('Error fetching ad tags:', error);
         return [];

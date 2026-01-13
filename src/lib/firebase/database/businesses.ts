@@ -4,14 +4,26 @@ import { db } from '../client';
 export interface Business {
     id: string;
     name: string;
-    description?: string;
+    description: string;
+    imageUrl: string;
+    contactInfo: {
+        email: string;
+        phone: string;
+        address: string;
+    };
+    tags: string[];
+    filterIds?: string[];
+    rating?: number;
+    isActive: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    createdBy: string;
+    // Legacy fields for backward compatibility
     logoUrl?: string;
     website?: string;
     phone?: string;
     email?: string;
     address?: string;
-    createdAt: Date;
-    updatedAt: Date;
 }
 
 const BUSINESSES_COLLECTION = 'businesses';
@@ -23,7 +35,34 @@ export async function getAllBusinesses(): Promise<Business[]> {
         const q = query(businessesRef, orderBy('name', 'asc'));
         const querySnapshot = await getDocs(q);
         
-        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Business));
+        return querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            // Normalize data to match new interface while supporting legacy format
+            return {
+                id: doc.id,
+                name: data.name || '',
+                description: data.description || '',
+                imageUrl: data.imageUrl || data.logoUrl || '',
+                contactInfo: data.contactInfo || {
+                    email: data.email || '',
+                    phone: data.phone || '',
+                    address: data.address || ''
+                },
+                tags: data.tags || [],
+                filterIds: data.filterIds,
+                rating: data.rating,
+                isActive: data.isActive !== undefined ? data.isActive : true,
+                createdAt: data.createdAt || new Date(),
+                updatedAt: data.updatedAt || new Date(),
+                createdBy: data.createdBy || '',
+                // Legacy fields
+                logoUrl: data.logoUrl,
+                website: data.website,
+                phone: data.phone,
+                email: data.email,
+                address: data.address
+            } as Business;
+        });
     } catch (error) {
         console.error('Error fetching businesses:', error);
         return [];
@@ -41,7 +80,32 @@ export async function getBusinessById(id: string): Promise<Business | null> {
             return null;
         }
         
-        return { id: businessDoc.id, ...businessDoc.data() } as Business;
+        const data = businessDoc.data();
+        // Normalize data to match new interface while supporting legacy format
+        return {
+            id: businessDoc.id,
+            name: data.name || '',
+            description: data.description || '',
+            imageUrl: data.imageUrl || data.logoUrl || '',
+            contactInfo: data.contactInfo || {
+                email: data.email || '',
+                phone: data.phone || '',
+                address: data.address || ''
+            },
+            tags: data.tags || [],
+            filterIds: data.filterIds,
+            rating: data.rating,
+            isActive: data.isActive !== undefined ? data.isActive : true,
+            createdAt: data.createdAt || new Date(),
+            updatedAt: data.updatedAt || new Date(),
+            createdBy: data.createdBy || '',
+            // Legacy fields
+            logoUrl: data.logoUrl,
+            website: data.website,
+            phone: data.phone,
+            email: data.email,
+            address: data.address
+        } as Business;
     } catch (error) {
         console.error('Error fetching business:', error);
         return null;
@@ -57,7 +121,32 @@ export async function searchBusinesses(searchTerm: string): Promise<Business[]> 
         const querySnapshot = await getDocs(businessesRef);
         
         return querySnapshot.docs
-            .map(doc => ({ id: doc.id, ...doc.data() } as Business))
+            .map(doc => {
+                const data = doc.data();
+                return {
+                    id: doc.id,
+                    name: data.name || '',
+                    description: data.description || '',
+                    imageUrl: data.imageUrl || data.logoUrl || '',
+                    contactInfo: data.contactInfo || {
+                        email: data.email || '',
+                        phone: data.phone || '',
+                        address: data.address || ''
+                    },
+                    tags: data.tags || [],
+                    filterIds: data.filterIds,
+                    rating: data.rating,
+                    isActive: data.isActive !== undefined ? data.isActive : true,
+                    createdAt: data.createdAt || new Date(),
+                    updatedAt: data.updatedAt || new Date(),
+                    createdBy: data.createdBy || '',
+                    logoUrl: data.logoUrl,
+                    website: data.website,
+                    phone: data.phone,
+                    email: data.email,
+                    address: data.address
+                } as Business;
+            })
             .filter(business => 
                 business.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 business.description?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -102,7 +191,30 @@ export async function updateBusiness(id: string, updates: Partial<Business>): Pr
         const updatedDoc = await getDoc(businessRef);
         if (!updatedDoc.exists()) return null;
         
-        return { id: updatedDoc.id, ...updatedDoc.data() } as Business;
+        const data = updatedDoc.data();
+        return {
+            id: updatedDoc.id,
+            name: data.name || '',
+            description: data.description || '',
+            imageUrl: data.imageUrl || data.logoUrl || '',
+            contactInfo: data.contactInfo || {
+                email: data.email || '',
+                phone: data.phone || '',
+                address: data.address || ''
+            },
+            tags: data.tags || [],
+            filterIds: data.filterIds,
+            rating: data.rating,
+            isActive: data.isActive !== undefined ? data.isActive : true,
+            createdAt: data.createdAt || new Date(),
+            updatedAt: data.updatedAt || new Date(),
+            createdBy: data.createdBy || '',
+            logoUrl: data.logoUrl,
+            website: data.website,
+            phone: data.phone,
+            email: data.email,
+            address: data.address
+        } as Business;
     } catch (error) {
         console.error('Error updating business:', error);
         return null;
@@ -128,7 +240,33 @@ export async function getBusinessesPaginated(page: number = 1, pageSize: number 
         const q = query(businessesRef, orderBy('name', 'asc'));
         const querySnapshot = await getDocs(q);
         
-        const allBusinesses = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Business));
+        const allBusinesses = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                name: data.name || '',
+                description: data.description || '',
+                imageUrl: data.imageUrl || data.logoUrl || '',
+                contactInfo: data.contactInfo || {
+                    email: data.email || '',
+                    phone: data.phone || '',
+                    address: data.address || ''
+                },
+                tags: data.tags || [],
+                filterIds: data.filterIds,
+                rating: data.rating,
+                isActive: data.isActive !== undefined ? data.isActive : true,
+                createdAt: data.createdAt || new Date(),
+                updatedAt: data.updatedAt || new Date(),
+                createdBy: data.createdBy || '',
+                logoUrl: data.logoUrl,
+                website: data.website,
+                phone: data.phone,
+                email: data.email,
+                address: data.address
+            } as Business;
+        });
+        
         const from = (page - 1) * pageSize;
         const to = from + pageSize;
         

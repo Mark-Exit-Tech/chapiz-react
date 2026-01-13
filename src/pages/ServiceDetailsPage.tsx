@@ -43,12 +43,12 @@ export default function ServiceDetailsPage() {
           setService({
             id: business.id,
             title: business.name,
-            description: business.description,
-            content: business.logoUrl,
-            phone: business.phone,
-            location: business.address,
-            tags: [],
-            imageUrl: business.logoUrl,
+            description: business.description || '',
+            content: business.imageUrl || business.logoUrl,
+            phone: business.contactInfo?.phone || business.phone,
+            location: business.contactInfo?.address || business.address,
+            tags: business.tags || [],
+            imageUrl: business.imageUrl || business.logoUrl,
           });
         } else {
           // Fallback: try advertisements collection
