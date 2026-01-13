@@ -1,11 +1,12 @@
 'use client';
 
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import AddAdForm from '@/components/admin/AddAdForm';
 import AdsTable from '@/components/admin/AdsTable';
 
 interface AdsPageProps {
-  searchParams: {
+  searchParams?: {
     page?: string;
     limit?: string;
     search?: string;
@@ -15,8 +16,19 @@ interface AdsPageProps {
   };
 }
 
-export default function AdsPage({ searchParams }: AdsPageProps) {
+export default function AdsPage({ searchParams: propsSearchParams }: AdsPageProps) {
   const { t } = useTranslation('Admin');
+  const [urlSearchParams] = useSearchParams();
+  
+  // Use searchParams from props if provided, otherwise get from URL
+  const searchParams = propsSearchParams || {
+    page: urlSearchParams.get('page') || undefined,
+    limit: urlSearchParams.get('limit') || undefined,
+    search: urlSearchParams.get('search') || undefined,
+    sort: urlSearchParams.get('sort') || undefined,
+    order: (urlSearchParams.get('order') as 'asc' | 'desc') || undefined,
+    tab: urlSearchParams.get('tab') || undefined,
+  };
 
   return (
     <div className="container mx-auto p-4 md:p-8">

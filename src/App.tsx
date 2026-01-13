@@ -85,7 +85,7 @@ function App() {
           {/* Admin routes */}
           <Route path="/:locale/admin" element={<Suspense fallback={<PageLoader />}><AdminPage /></Suspense>} />
           <Route path="/:locale/admin/users" element={<Suspense fallback={<PageLoader />}><AdminUsersPage /></Suspense>} />
-          <Route path="/:locale/admin/ads" element={<Suspense fallback={<PageLoader />}><AdsPageWithTabs searchParams={{}} /></Suspense>} />
+          <Route path="/:locale/admin/ads" element={<Suspense fallback={<PageLoader />}><AdsPageWithTabs /></Suspense>} />
           <Route path="/:locale/admin/promos" element={<Suspense fallback={<PageLoader />}><PromosPage /></Suspense>} />
           <Route path="/:locale/admin/coupons" element={<Suspense fallback={<PageLoader />}><AdminCouponsPage /></Suspense>} />
           <Route path="/:locale/admin/businesses" element={<Suspense fallback={<PageLoader />}><AdminBusinessesPage /></Suspense>} />
