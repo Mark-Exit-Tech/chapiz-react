@@ -231,19 +231,82 @@ export async function getPetWithConsolidatedOwner(petId: string) {
     }
 }
 
-// Stub functions for compatibility
+// Get areas for dropdown
 export async function getAreasForDropdown(locale: 'en' | 'he' = 'en'): Promise<{ value: string; label: string; }[]> {
-    return [];
+    try {
+        const areasRef = collection(db, 'areas');
+        const snapshot = await getDocs(areasRef);
+        
+        return snapshot.docs.map(doc => {
+            const data = doc.data();
+            const label = locale === 'he' ? (data.nameHe || data.name_he || data.name) : (data.nameEn || data.name_en || data.name);
+            return {
+                value: doc.id,
+                label: label || doc.id
+            };
+        }).sort((a, b) => a.label.localeCompare(b.label));
+    } catch (error) {
+        console.error('Error fetching areas:', error);
+        return [];
+    }
 }
 
+// Get cities for dropdown
 export async function getCitiesForDropdown(locale: 'en' | 'he' = 'en'): Promise<{ value: string; label: string; }[]> {
-    return [];
+    try {
+        const citiesRef = collection(db, 'cities');
+        const snapshot = await getDocs(citiesRef);
+        
+        return snapshot.docs.map(doc => {
+            const data = doc.data();
+            const label = locale === 'he' ? (data.nameHe || data.name_he || data.name) : (data.nameEn || data.name_en || data.name);
+            return {
+                value: doc.id,
+                label: label || doc.id
+            };
+        }).sort((a, b) => a.label.localeCompare(b.label));
+    } catch (error) {
+        console.error('Error fetching cities:', error);
+        return [];
+    }
 }
 
+// Get age ranges for dropdown
 export async function getAgeRangesForDropdown(locale: 'en' | 'he' = 'en'): Promise<{ value: string; label: string; }[]> {
-    return [];
+    try {
+        const ageRangesRef = collection(db, 'ageRanges');
+        const snapshot = await getDocs(ageRangesRef);
+        
+        return snapshot.docs.map(doc => {
+            const data = doc.data();
+            const label = locale === 'he' ? (data.nameHe || data.name_he || data.name) : (data.nameEn || data.name_en || data.name);
+            return {
+                value: doc.id,
+                label: label || doc.id
+            };
+        });
+    } catch (error) {
+        console.error('Error fetching age ranges:', error);
+        return [];
+    }
 }
 
+// Get weight ranges for dropdown
 export async function getWeightRangesForDropdown(locale: 'en' | 'he' = 'en'): Promise<{ value: string; label: string; }[]> {
-    return [];
+    try {
+        const weightRangesRef = collection(db, 'weightRanges');
+        const snapshot = await getDocs(weightRangesRef);
+        
+        return snapshot.docs.map(doc => {
+            const data = doc.data();
+            const label = locale === 'he' ? (data.nameHe || data.name_he || data.name) : (data.nameEn || data.name_en || data.name);
+            return {
+                value: doc.id,
+                label: label || doc.id
+            };
+        });
+    } catch (error) {
+        console.error('Error fetching weight ranges:', error);
+        return [];
+    }
 }
