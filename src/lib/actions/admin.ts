@@ -955,7 +955,10 @@ export async function createFilter(data: CreateFilterData) {
     const filterData = {
       name: data.name,
       type: 'petType' as const, // Default type, should be provided in data
-      values: [] // Empty array, should be provided in data
+      values: [] as string[], // Empty array, should be provided in data
+      audienceIds: [] as string[],
+      isActive: true,
+      createdBy: 'admin'
     };
     const filter = await createFilterInDB(filterData);
     
@@ -1144,7 +1147,12 @@ export async function updateContactSubmissionReadStatus(id: string, isRead: bool
 export async function createAudience(data: CreateAudienceData) {
   try {
     const { createAudience: createAudienceInDB } = await import('@/lib/firebase/database/audiences');
-    const audience = await createAudienceInDB(data);
+    const audienceData = {
+      ...data,
+      isActive: true,
+      createdBy: 'admin'
+    };
+    const audience = await createAudienceInDB(audienceData);
     
     if (!audience) {
       return { success: false, error: 'Failed to create audience' };
