@@ -123,7 +123,8 @@ export async function addPointsToUser(id: string, points: number, category?: str
 }
 
 export async function getAllBusinesses() {
-  return [];
+  const { getAllBusinesses: getBusinessesFromDB } = await import('@/lib/firebase/database/businesses');
+  return await getBusinessesFromDB();
 }
 
 export async function createBusiness(data: CreateBusinessData) {
@@ -224,18 +225,39 @@ export async function getRandomActiveAd(): Promise<Ad | null> {
 }
 
 export async function getActiveAdsForServices(serviceType?: string): Promise<Ad[]> {
-  console.warn('getActiveAdsForServices is a stub - needs Firebase implementation');
-  return [];
+  const { getActiveAds } = await import('@/lib/firebase/database/advertisements');
+  const ads = await getActiveAds();
+  
+  // Filter by serviceType if provided (could be a tag or other field)
+  if (serviceType) {
+    return ads.filter(ad => 
+      ad.tags?.includes(serviceType) || 
+      ad.type === serviceType
+    );
+  }
+  
+  return ads;
 }
 
 export async function getBusinesses() {
-  console.warn('getBusinesses is a stub - needs Firebase implementation');
-  return { success: true, businesses: [], error: undefined };
+  try {
+    const { getAllBusinesses } = await import('@/lib/firebase/database/businesses');
+    const businesses = await getAllBusinesses();
+    return { success: true, businesses, error: undefined };
+  } catch (error) {
+    console.error('Error fetching businesses:', error);
+    return { success: false, businesses: [], error: String(error) };
+  }
 }
 
 export async function getBusinessById(id: string) {
-  console.warn('getBusinessById is a stub - needs Firebase implementation');
-  return null;
+  try {
+    const { getBusinessById: getBusinessByIdFromDB } = await import('@/lib/firebase/database/businesses');
+    return await getBusinessByIdFromDB(id);
+  } catch (error) {
+    console.error('Error fetching business by ID:', error);
+    return null;
+  }
 }
 
 export async function getPromos() {
@@ -249,8 +271,13 @@ export async function getPromoById(id: string) {
 }
 
 export async function getAdById(id: string) {
-  console.warn('getAdById is a stub - needs Firebase implementation');
-  return null;
+  try {
+    const { getAdById: getAdByIdFromDB } = await import('@/lib/firebase/database/advertisements');
+    return await getAdByIdFromDB(id);
+  } catch (error) {
+    console.error('Error fetching ad by ID:', error);
+    return null;
+  }
 }
 
 export async function getAllComments() {

@@ -50,12 +50,32 @@ export async function getAdById(id: string): Promise<Ad | null> {
 export async function getActiveAds(): Promise<Ad[]> {
     try {
         const adsRef = collection(db, ADS_COLLECTION);
-        const q = query(adsRef, where('status', '==', 'active'), orderBy('createdAt', 'desc'));
-        const querySnapshot = await getDocs(q);
         
-        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Ad));
+        // Try query with orderBy first
+        try {
+            const q = query(adsRef, where('status', '==', 'active'), orderBy('createdAt', 'desc'));
+            const querySnapshot = await getDocs(q);
+            
+            const ads = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Ad));
+            console.log(`✅ Fetched ${ads.length} active ads from Firebase`);
+            return ads;
+        } catch (indexError: any) {
+            // If index doesn't exist, try without orderBy
+            if (indexError.code === 'failed-precondition' || indexError.message?.includes('index')) {
+                console.warn('⚠️ Firestore index not found for (status, createdAt). Fetching without ordering...');
+                const q = query(adsRef, where('status', '==', 'active'));
+                const querySnapshot = await getDocs(q);
+                
+                const ads = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Ad));
+                // Sort in memory
+                ads.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+                console.log(`✅ Fetched ${ads.length} active ads from Firebase (sorted in memory)`);
+                return ads;
+            }
+            throw indexError;
+        }
     } catch (error) {
-        console.error('Error fetching active ads:', error);
+        console.error('❌ Error fetching active ads:', error);
         return [];
     }
 }

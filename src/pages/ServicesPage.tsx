@@ -3,6 +3,7 @@ import BottomNavigation from '@/components/layout/BottomNavigation';
 import ServicesPageContent from '@/components/pages/servicesPage';
 import { useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { getActiveAds } from '@/lib/firebase/database/advertisements';
 
 interface Ad {
   id: string;
@@ -30,19 +31,23 @@ export default function ServicesPage() {
 
   const businessId = searchParams.get('businessId') || undefined;
 
-  // TODO: Fetch ads from Firebase
+  // Fetch ads from Firebase
   useEffect(() => {
     const fetchAds = async () => {
       try {
-        // Replace this with actual Firebase fetch
-        // Use getActiveAds from @/lib/firebase/database/advertisements
-        //   .from('ads')
-        //   .select('*')
-        //   .eq('status', 'active');
-        // setAds(data || []);
-        setAds([]); // Placeholder
+        console.log('📡 Fetching services data from Firebase...');
+        const activeAds = await getActiveAds();
+        
+        if (activeAds.length === 0) {
+          console.warn('⚠️ No active ads found in advertisements collection');
+        } else {
+          console.log(`✅ Successfully loaded ${activeAds.length} services`);
+        }
+        
+        setAds(activeAds as Ad[]);
       } catch (error) {
-        console.error('Error fetching ads:', error);
+        console.error('❌ Error fetching ads:', error);
+        setAds([]);
       } finally {
         setLoading(false);
       }
