@@ -5,10 +5,8 @@ import UserCouponsPage from '@/components/user/UserCouponsPage';
 export default function VouchersPage() {
   return (
     <>
-      {/* Navbar - only visible on md and above */}
-      <div className="hidden md:block">
-        <Navbar />
-      </div>
+      {/* Navbar - visible on all screen sizes */}
+      <Navbar />
       <UserCouponsPage />
       {/* Bottom Navigation - only visible on mobile */}
       <div className="md:hidden">

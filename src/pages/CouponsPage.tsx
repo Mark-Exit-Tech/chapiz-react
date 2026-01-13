@@ -5,10 +5,8 @@ import PromosPageClient from '@/components/pages/PromosPageClient';
 export default function CouponsPage() {
   return (
     <>
-      {/* Navbar - only visible on md and above */}
-      <div className="hidden md:block">
-        <Navbar />
-      </div>
+      {/* Navbar - visible on all screen sizes */}
+      <Navbar />
       <PromosPageClient />
       {/* Bottom Navigation - only visible on mobile */}
       <div className="md:hidden">
