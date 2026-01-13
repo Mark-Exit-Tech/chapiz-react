@@ -70,7 +70,7 @@ export async function getUserById(id: string): Promise<User | null> {
 }
 
 // Create or update user
-export async function upsertUser(userData: Partial<User>): Promise<User | null> {
+export async function upsertUser(userData: Partial<User>): Promise<User> {
     const { data, error } = await supabase
         .from('users')
         .upsert(userData, { onConflict: 'email' })
@@ -79,7 +79,11 @@ export async function upsertUser(userData: Partial<User>): Promise<User | null> 
 
     if (error) {
         console.error('Error upserting user:', error);
-        return null;
+        throw new Error(`Failed to create user in database: ${error.message}`);
+    }
+
+    if (!data) {
+        throw new Error('Failed to create user: No data returned');
     }
 
     return data;

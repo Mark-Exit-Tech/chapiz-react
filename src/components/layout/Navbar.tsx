@@ -67,11 +67,11 @@ const Navbar = () => {
           {/* Brand / Logo */}
           <Link to="/" className="flex-shrink-0 flex items-center">
             <OptimizedImage
-              src="/assets/Facepet"
+              src="/assets/Chapiz-logo"
               alt="Chapiz"
-              width={128}
-              height={64}
-              className="h-8 sm:h-10 w-auto object-contain"
+              width={96}
+              height={96}
+              className="h-10 sm:h-12 w-auto object-contain"
             />
           </Link>
 
@@ -239,7 +239,7 @@ const Navbar = () => {
                   <Button
                     variant="default"
                     size="sm"
-                    onClick={() => navigate('/auth')}
+                    onClick={() => navigate('/login')}
                     className="bg-primary hover:bg-primary hover:opacity-70 text-white border-primary flex items-center justify-center text-xs sm:text-sm px-2 sm:px-3 gap-1.5 sm:gap-2 transition-opacity"
                   >
                     <LogIn className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -275,7 +275,7 @@ const Navbar = () => {
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link to="/auth" className="flex items-center">
+                        <Link to="/login" className="flex items-center">
                           <LogIn className="mr-2 h-4 w-4" />
                           <span>{t('components.Navbar.signIn')}</span>
                         </Link>

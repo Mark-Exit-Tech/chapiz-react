@@ -10,7 +10,7 @@ interface AuthGuardProps {
   redirectTo?: string;
 }
 
-const AuthGuard = ({ children, redirectTo = '/auth' }: AuthGuardProps) => {
+const AuthGuard = ({ children, redirectTo = '/login' }: AuthGuardProps) => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation('pages.HomePage');

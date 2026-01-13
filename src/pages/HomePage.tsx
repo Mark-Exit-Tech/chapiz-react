@@ -172,7 +172,7 @@ const PublicLandingPage = ({ t, navigate }: { t: any; navigate: any }) => {
               {/* Desktop Get Started Button */}
               <div className="mt-8 flex w-full items-center justify-center">
                 <Button
-                  onClick={() => navigate('/auth')}
+                  onClick={() => navigate('/signup')}
                   className="bg-primary hover:bg-primary h-16 w-52 rounded-full text-lg font-normal shadow-lg hover:opacity-70"
                 >
                   {t('pages.HomePage.buttonLabel')}
@@ -200,7 +200,7 @@ const PublicLandingPage = ({ t, navigate }: { t: any; navigate: any }) => {
             {/* Mobile Get Started Button */}
             <div className="mt-8 flex justify-center">
               <Button
-                onClick={() => navigate('/auth')}
+                onClick={() => navigate('/login')}
                 className="h-[48px] w-auto px-8 bg-primary hover:bg-primary hover:opacity-70 rounded-full text-lg font-normal shadow-lg flex items-center justify-center"
               >
                 {t('pages.HomePage.buttonLabel')}

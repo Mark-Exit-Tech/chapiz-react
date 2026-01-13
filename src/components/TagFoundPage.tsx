@@ -27,7 +27,7 @@ export default function TagFoundPage({ petId }: TagFoundPageProps) {
     } else {
       // User is not logged in, save the pet ID and redirect to auth
       savePetId(petId);
-      navigate('/auth');
+      navigate('/login');
     }
   };
 

@@ -48,7 +48,7 @@ const ProfileContent = () => {
   // Redirect to sign in if not authenticated
   useEffect(() => {
     if (!authLoading && !user) {
-      navigate('/auth');
+      navigate('/login');
     }
   }, [user, authLoading, navigate]);
 

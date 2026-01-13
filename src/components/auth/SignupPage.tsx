@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,23 +13,18 @@ import toast from 'react-hot-toast';
 import OptimizedImage from '@/components/OptimizedImage';
 import LocaleSwitcher from '@/components/LocaleSwitcher';
 
-const AuthPage = () => {
+const SignupPage = () => {
   const { t } = useTranslation();
-  const { signIn, signUp, signInWithGoogle, sendVerificationCode, user, loading: authLoading } = useAuth();
+  const { signIn, signUp, signInWithGoogle, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  
-  // Debug logging
-  console.log('AuthPage rendered:', { user, authLoading });
   
   // Redirect if user is already authenticated
   useEffect(() => {
     if (!authLoading && user) {
-      console.log('User already authenticated, redirecting to dashboard');
       navigate('/pages/my-pets');
     }
   }, [user, authLoading, navigate]);
   
-  const [isSignUp, setIsSignUp] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
@@ -54,77 +49,54 @@ const AuthPage = () => {
     setFormLoading(true);
 
     // Validate form data
-    if (isSignUp) {
-      if (!formData.fullName?.trim()) {
-        toast.error('Full name is required');
-        setFormLoading(false);
-        return;
-      }
-      if (!formData.email?.trim()) {
-        toast.error('Email is required');
-        setFormLoading(false);
-        return;
-      }
-      if (!formData.password || formData.password.length < 6) {
-        toast.error('Password must be at least 6 characters');
-        setFormLoading(false);
-        return;
-      }
-    } else {
-      if (!formData.email?.trim()) {
-        toast.error('Email is required');
-        setFormLoading(false);
-        return;
-      }
-      if (!formData.password) {
-        toast.error('Password is required');
-        setFormLoading(false);
-        return;
-      }
+    if (!formData.fullName?.trim()) {
+      toast.error('Full name is required');
+      setFormLoading(false);
+      return;
+    }
+    if (!formData.email?.trim()) {
+      toast.error('Email is required');
+      setFormLoading(false);
+      return;
+    }
+    if (!formData.password || formData.password.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      setFormLoading(false);
+      return;
     }
 
     try {
-      if (isSignUp) {
-        console.log('🔍 Starting signup process:', { 
-          email: formData.email, 
-          hasPassword: !!formData.password,
-          hasFullName: !!formData.fullName 
-        });
-        
-        // Sign up and directly sign in (email verification disabled)
-        await signUp(formData.email, formData.password, formData.fullName, formData.phone, formData.address);
-        console.log('✅ Signup successful, attempting sign in...');
-        
-        toast.success(t('pages.AuthPage.accountCreatedSuccess'));
-        
-        // Wait a bit for the session to be established
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        try {
-          await signIn(formData.email, formData.password);
-          console.log('✅ Sign in successful');
-          toast.success(t('pages.AuthPage.signInSuccess'));
-          await new Promise(resolve => setTimeout(resolve, 500));
-          navigate('/pages/my-pets');
-        } catch (signInError: any) {
-          // If sign-in fails, likely email confirmation is required
-          if (signInError.message?.includes('Email not confirmed') || signInError.message?.includes('not confirmed')) {
-            console.log('📧 Email confirmation required');
-            setSignupEmail(formData.email);
-            setShowEmailConfirmation(true);
-            toast.success('Account created! Please check your email to confirm.');
-          } else {
-            console.error('⚠️ Sign in after signup failed:', signInError);
-            toast.success('Account created! Please sign in.');
-            navigate('/pages/my-pets');
-          }
-        }
-      } else {
-        console.log('🔍 Starting sign in process:', { email: formData.email });
+      console.log('🔍 Starting signup process:', { 
+        email: formData.email, 
+        hasPassword: !!formData.password,
+        hasFullName: !!formData.fullName 
+      });
+      
+      // Sign up
+      await signUp(formData.email, formData.password, formData.fullName, formData.phone, formData.address);
+      console.log('✅ Signup successful');
+      
+      // Wait for Supabase to process
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Try to sign in
+      console.log('🔄 Attempting to establish session...');
+      try {
         await signIn(formData.email, formData.password);
-        console.log('✅ Sign in successful');
+        console.log('✅ Session established - redirecting');
         toast.success(t('pages.AuthPage.signInSuccess'));
+        await new Promise(resolve => setTimeout(resolve, 500));
         navigate('/pages/my-pets');
+      } catch (signInError: any) {
+        // If sign-in fails, likely email confirmation is required
+        if (signInError.message?.includes('Email not confirmed') || signInError.message?.includes('not confirmed')) {
+          console.log('📧 Email confirmation required');
+          setSignupEmail(formData.email);
+          setShowEmailConfirmation(true);
+          toast.success('Account created! Please check your email to confirm.');
+        } else {
+          throw signInError;
+        }
       }
     } catch (error: any) {
       console.error('❌ Auth error details:', {
@@ -172,7 +144,7 @@ const AuthPage = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-2 border-primary mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
@@ -189,10 +161,10 @@ const AuthPage = () => {
               <Mail className="w-8 h-8 text-primary" />
             </div>
             <CardTitle className="text-2xl font-bold text-gray-900">
-              {t('pages.AuthPage.checkEmail') || 'Check Your Email'}
+              Check Your Email
             </CardTitle>
             <p className="text-gray-600">
-              {t('pages.AuthPage.confirmationSent') || "We've sent a confirmation link to:"}
+              We've sent a confirmation link to:
             </p>
             <p className="text-primary font-semibold">{signupEmail}</p>
           </CardHeader>
@@ -200,20 +172,20 @@ const AuthPage = () => {
           <CardContent className="space-y-4">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
               <p className="text-sm text-gray-700">
-                <strong>{t('pages.AuthPage.nextSteps') || 'Next steps:'}</strong>
+                <strong>Next steps:</strong>
               </p>
               <ol className="text-sm text-gray-600 space-y-1 list-decimal list-inside">
-                <li>{t('pages.AuthPage.step1') || 'Open your email inbox'}</li>
-                <li>{t('pages.AuthPage.step2') || 'Click the confirmation link'}</li>
-                <li>{t('pages.AuthPage.step3') || 'Return here and sign in'}</li>
+                <li>Open your email inbox</li>
+                <li>Click the confirmation link</li>
+                <li>Return here and sign in</li>
               </ol>
             </div>
 
             <Button
-              onClick={() => { setShowEmailConfirmation(false); setIsSignUp(false); }}
+              onClick={() => navigate('/login')}
               className="w-full bg-primary hover:bg-primary/90"
             >
-              {t('pages.AuthPage.goToSignIn') || 'Go to Sign In'}
+              Go to Sign In
             </Button>
 
             <Button
@@ -221,7 +193,7 @@ const AuthPage = () => {
               onClick={() => setShowEmailConfirmation(false)}
               className="w-full"
             >
-              {t('pages.AuthPage.backToSignUp') || 'Back to Sign Up'}
+              Back to Sign Up
             </Button>
           </CardContent>
         </Card>
@@ -259,7 +231,7 @@ const AuthPage = () => {
           </div>
         </div>
 
-        {/* Right Side - Authentication Form */}
+        {/* Right Side - Signup Form */}
         <div className="w-full max-w-md mx-auto">
           <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
             {/* Language Switcher */}
@@ -268,13 +240,10 @@ const AuthPage = () => {
             </div>
             <CardHeader className="space-y-2 text-center pb-8">
               <CardTitle className="text-2xl font-bold text-gray-900">
-                {isSignUp ? t('pages.AuthPage.createAccount') : t('pages.AuthPage.welcomeBack')}
+                {t('pages.AuthPage.createAccount')}
               </CardTitle>
               <p className="text-gray-600">
-                {isSignUp 
-                  ? t('pages.AuthPage.joinFacePet') 
-                  : t('pages.AuthPage.signInToAccount')
-                }
+                {t('pages.AuthPage.joinFacePet')}
               </p>
             </CardHeader>
 
@@ -318,57 +287,53 @@ const AuthPage = () => {
 
               {/* Email Form */}
               <form onSubmit={handleEmailAuth} className="space-y-4">
-                {isSignUp && (
-                  <>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">{t('pages.AuthPage.fullName')}</label>
-                      <div className="relative">
-                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                        <Input
-                          name="fullName"
-                          type="text"
-                          placeholder={t('pages.AuthPage.fullNamePlaceholder')}
-                          value={formData.fullName}
-                          onChange={handleInputChange}
-                          required={isSignUp}
-                          className="pl-10 h-12"
-                        />
-                      </div>
-                    </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">{t('pages.AuthPage.fullName')}</label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Input
+                      name="fullName"
+                      type="text"
+                      placeholder={t('pages.AuthPage.fullNamePlaceholder')}
+                      value={formData.fullName}
+                      onChange={handleInputChange}
+                      required
+                      className="pl-10 h-12"
+                    />
+                  </div>
+                </div>
 
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">{t('pages.AuthPage.address')}</label>
-                      <div className="relative">
-                        <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                        <Input
-                          name="address"
-                          type="text"
-                          placeholder={t('pages.AuthPage.addressPlaceholder')}
-                          value={formData.address}
-                          onChange={handleInputChange}
-                          required={isSignUp}
-                          className="pl-10 h-12"
-                        />
-                      </div>
-                    </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">{t('pages.AuthPage.address')}</label>
+                  <div className="relative">
+                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Input
+                      name="address"
+                      type="text"
+                      placeholder={t('pages.AuthPage.addressPlaceholder')}
+                      value={formData.address}
+                      onChange={handleInputChange}
+                      required
+                      className="pl-10 h-12"
+                    />
+                  </div>
+                </div>
 
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">{t('pages.AuthPage.phone')}</label>
-                      <div className="relative">
-                        <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                        <Input
-                          name="phone"
-                          type="tel"
-                          placeholder={t('pages.AuthPage.phonePlaceholder')}
-                          value={formData.phone}
-                          onChange={handleInputChange}
-                          required={isSignUp}
-                          className="pl-10 h-12"
-                        />
-                      </div>
-                    </div>
-                  </>
-                )}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">{t('pages.AuthPage.phone')}</label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Input
+                      name="phone"
+                      type="tel"
+                      placeholder={t('pages.AuthPage.phonePlaceholder')}
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      required
+                      className="pl-10 h-12"
+                    />
+                  </div>
+                </div>
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">{t('pages.AuthPage.email')}</label>
@@ -420,33 +385,21 @@ const AuthPage = () => {
                       <span>{t('pages.AuthPage.loading')}</span>
                     </div>
                   ) : (
-                    isSignUp ? t('pages.AuthPage.signUpButton') : t('pages.AuthPage.signInButton')
+                    t('pages.AuthPage.signUpButton')
                   )}
                 </Button>
-
-                {!isSignUp && (
-                  <div className="text-center">
-                    <button
-                      type="button"
-                      onClick={() => navigate('/auth/forgot')}
-                      className="text-sm text-gray-600 hover:text-primary underline"
-                    >
-                      {t('pages.AuthPage.forgotPassword')}
-                    </button>
-                  </div>
-                )}
               </form>
 
-              {/* Toggle Sign In/Sign Up */}
+              {/* Link to Login */}
               <div className="text-center">
                 <p className="text-sm text-gray-600">
-                  {isSignUp ? t('pages.AuthPage.haveAccount') : t('pages.AuthPage.noAccount')}
-                  <button
-                    onClick={() => setIsSignUp(!isSignUp)}
-                    className="ml-1 text-primary hover:underline font-medium"
+                  {t('pages.AuthPage.haveAccount')}{' '}
+                  <Link
+                    to="/login"
+                    className="text-primary hover:underline font-medium"
                   >
-                    {isSignUp ? t('pages.AuthPage.signInLink') : t('pages.AuthPage.signUpLink')}
-                  </button>
+                    {t('pages.AuthPage.signInLink')}
+                  </Link>
                 </p>
               </div>
             </CardContent>
@@ -457,4 +410,4 @@ const AuthPage = () => {
   );
 };
 
-export default AuthPage;
+export default SignupPage;

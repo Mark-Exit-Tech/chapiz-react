@@ -67,7 +67,7 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
   const handleUseCouponClick = () => {
     if (!user) {
       toast.error('Please sign in to use coupons');
-      navigate('/auth');
+      navigate('/login');
       return;
     }
 

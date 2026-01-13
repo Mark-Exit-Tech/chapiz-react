@@ -6,6 +6,8 @@ import HomePage from './pages/HomePage';
 
 // Lazy load pages - reduces initial bundle size
 const AuthPage = lazy(() => import('./pages/AuthPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const SignupPage = lazy(() => import('./pages/SignupPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const MyPetsPage = lazy(() => import('./pages/MyPetsPage'));
 const CouponsPage = lazy(() => import('./pages/CouponsPage'));
@@ -40,6 +42,8 @@ function App() {
 
           {/* Redirect non-locale routes to locale routes */}
           <Route path="/auth" element={<Navigate to={`/${currentLang}/auth`} replace />} />
+          <Route path="/login" element={<Navigate to={`/${currentLang}/login`} replace />} />
+          <Route path="/signup" element={<Navigate to={`/${currentLang}/signup`} replace />} />
           <Route path="/contact" element={<Navigate to={`/${currentLang}/contact`} replace />} />
           <Route path="/my-pets" element={<Navigate to={`/${currentLang}/my-pets`} replace />} />
           <Route path="/pages/my-pets" element={<Navigate to={`/${currentLang}/my-pets`} replace />} />
@@ -55,6 +59,8 @@ function App() {
           {/* Locale-based routes */}
           <Route path="/:locale" element={<HomePage />} />
           <Route path="/:locale/auth" element={<Suspense fallback={<PageLoader />}><AuthPage /></Suspense>} />
+          <Route path="/:locale/login" element={<Suspense fallback={<PageLoader />}><LoginPage /></Suspense>} />
+          <Route path="/:locale/signup" element={<Suspense fallback={<PageLoader />}><SignupPage /></Suspense>} />
           <Route path="/:locale/contact" element={<Suspense fallback={<PageLoader />}><ContactPage /></Suspense>} />
           <Route path="/:locale/my-pets" element={<Suspense fallback={<PageLoader />}><MyPetsPage /></Suspense>} />
           <Route path="/:locale/add-pet" element={<Suspense fallback={<PageLoader />}><AddPetPage /></Suspense>} />

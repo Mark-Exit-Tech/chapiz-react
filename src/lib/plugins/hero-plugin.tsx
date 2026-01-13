@@ -148,7 +148,7 @@ export const HeroPlugin = () => {
           {!user && !loading ? (
             <>
               <Button
-                onClick={() => navigate('/auth')}
+                onClick={() => navigate('/signup')}
                 size="lg"
                 className="bg-primary hover:bg-primary/90"
               >
@@ -157,7 +157,7 @@ export const HeroPlugin = () => {
               <Button
                 variant="outline"
                 size="lg"
-                onClick={() => navigate('/auth')}
+                onClick={() => navigate('/login')}
               >
                 {t('signIn')}
               </Button>

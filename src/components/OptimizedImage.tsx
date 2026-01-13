@@ -33,25 +33,11 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   const loading = priority ? 'eager' : 'lazy';
   const decoding = priority ? 'sync' : 'async';
 
-  // Generate srcset for responsive images
-  const generateSrcSet = (basePath: string): string => {
-    return `
-      ${basePath}.avif 1x,
-      ${basePath}@2x.avif 2x
-    `.trim();
-  };
-
   return (
     <picture>
-      {/* AVIF format - best compression (20-30% better than WebP) */}
+      {/* WebP format - excellent compression with transparency support */}
       <source
-        srcSet={generateSrcSet(src)}
-        type="image/avif"
-      />
-      
-      {/* WebP format - fallback for older browsers */}
-      <source
-        srcSet={`${src}.webp 1x, ${src}@2x.webp 2x`}
+        srcSet={`${src}.webp`}
         type="image/webp"
       />
       

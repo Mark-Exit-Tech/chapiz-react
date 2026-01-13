@@ -105,46 +105,60 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   // Listen to auth state changes
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session }, error }) => {
+      if (error) {
+        console.error('Error getting session:', error);
+        setLoading(false);
+        return;
+      }
+      
       setUser(session?.user ?? null);
       if (session?.user?.email) {
-        const dbUserData = await getUserByEmail(session.user.email);
+        try {
+          const dbUserData = await getUserByEmail(session.user.email);
 
-        // If user doesn't exist in database but is authenticated (OAuth user), create them
-        if (!dbUserData && session.user) {
-          console.log('🔍 OAuth user not found in database, creating record...');
-          const fullName = session.user.user_metadata?.full_name ||
-            session.user.user_metadata?.name ||
-            session.user.email?.split('@')[0] ||
-            'User';
-          const avatarUrl = session.user.user_metadata?.avatar_url ||
-            session.user.user_metadata?.picture ||
-            null;
+          // If user doesn't exist in database but is authenticated (OAuth user), create them
+          if (!dbUserData && session.user) {
+            console.log('🔍 OAuth user not found in database, creating record...');
+            const fullName = session.user.user_metadata?.full_name ||
+              session.user.user_metadata?.name ||
+              session.user.email?.split('@')[0] ||
+              'User';
+            const avatarUrl = session.user.user_metadata?.avatar_url ||
+              session.user.user_metadata?.picture ||
+              null;
 
-          try {
-            await upsertUser({
-              email: session.user.email,
-              full_name: fullName,
-              display_name: fullName,
-              phone: '',
-              address: '',
-              role: getUserRole(session.user.email),
-              language: 'en',
-              accept_cookies: false,
-              profile_image: avatarUrl,
-            });
+            try {
+              await upsertUser({
+                uid: session.user.id,
+                email: session.user.email,
+                full_name: fullName,
+                display_name: fullName,
+                phone: '',
+                address: '',
+                role: getUserRole(session.user.email),
+                language: 'en',
+                accept_cookies: false,
+                profile_image: avatarUrl,
+              });
 
-            // Fetch the newly created user
-            const newDbUser = await getUserByEmail(session.user.email);
-            setDbUser(newDbUser);
-            console.log('✅ OAuth user created in database');
-          } catch (error) {
-            console.error('Error creating OAuth user in database:', error);
+              // Fetch the newly created user
+              const newDbUser = await getUserByEmail(session.user.email);
+              setDbUser(newDbUser);
+              console.log('✅ OAuth user created in database');
+            } catch (error) {
+              console.error('Error creating OAuth user in database:', error);
+            }
+          } else {
+            setDbUser(dbUserData);
           }
-        } else {
-          setDbUser(dbUserData);
+        } catch (error) {
+          console.error('Error fetching user from database:', error);
         }
       }
+      setLoading(false);
+    }).catch((error) => {
+      console.error('Error in getSession:', error);
       setLoading(false);
     });
 
@@ -168,6 +182,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
           try {
             await upsertUser({
+              uid: session.user.id,
               email: session.user.email,
               full_name: fullName,
               display_name: fullName,
@@ -200,66 +215,150 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signIn = async (email: string, password: string) => {
     try {
+      console.log('🔍 Starting Supabase sign in:', { email });
+      
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+        email: email.trim().toLowerCase(),
         password,
       });
 
-      if (error) throw error;
+      console.log('🔍 Supabase sign in response:', { 
+        hasUser: !!data.user, 
+        hasSession: !!data.session,
+        error: error?.message,
+        userEmail: data.user?.email
+      });
+
+      if (error) {
+        console.error('❌ Supabase sign in error:', error);
+        throw error;
+      }
+
+      if (!data.user) {
+        throw new Error('Sign in failed: No user returned');
+      }
 
       // Check if user is restricted
       if (data.user?.email) {
-        const dbUserData = await getUserByEmail(data.user.email);
-        if (dbUserData?.is_restricted) {
-          await supabase.auth.signOut();
-          throw new Error(`Your account has been restricted by an administrator. Reason: ${dbUserData.restriction_reason || 'No reason provided'}`);
+        try {
+          const dbUserData = await getUserByEmail(data.user.email);
+          if (dbUserData?.is_restricted) {
+            await supabase.auth.signOut();
+            throw new Error(`Your account has been restricted by an administrator. Reason: ${dbUserData.restriction_reason || 'No reason provided'}`);
+          }
+        } catch (dbError) {
+          console.warn('⚠️ Could not check user restriction status:', dbError);
+          // Continue anyway - might be a new user without DB record yet
         }
       }
+      
+      console.log('✅ Sign in successful');
     } catch (error: any) {
-      console.error('Sign in error:', error);
+      console.error('❌ Sign in error:', {
+        message: error.message,
+        code: error.code,
+        status: error.status,
+        error
+      });
       throw error;
     }
   };
 
   const signUp = async (email: string, password: string, fullName: string, phone?: string, address?: string) => {
     try {
+      console.log('🔍 Starting Supabase signup:', { email, hasPassword: !!password, fullName });
+      
       // Create Supabase auth user
+      const currentOrigin = window.location.origin;
+      console.log('🔗 Using redirect URL:', currentOrigin);
+      
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: email.trim().toLowerCase(),
         password,
         options: {
           data: {
             full_name: fullName,
             display_name: fullName,
           },
+          // Use current origin for email verification redirect
+          emailRedirectTo: `${currentOrigin}/login?verified=true`,
         },
       });
 
-      if (error) throw error;
-      if (!data.user) throw new Error('Failed to create user');
+      console.log('🔍 Supabase signup response:', { 
+        hasUser: !!data.user, 
+        hasSession: !!data.session,
+        error: error?.message,
+        userEmail: data.user?.email,
+        userConfirmed: data.user?.email_confirmed_at
+      });
+
+      if (error) {
+        console.error('❌ Supabase signup error:', error);
+        throw error;
+      }
+      
+      if (!data.user) {
+        console.error('❌ No user returned from signup');
+        throw new Error('Failed to create user account');
+      }
+
+      // Check if email confirmation is required
+      if (!data.session && !data.user.email_confirmed_at) {
+        console.warn('⚠️ Email confirmation may be required. User created but not confirmed.');
+        // Continue anyway - user can confirm later
+      }
 
       // Create user in database
       const userRole = getUserRole(email);
       const cookiePreference = typeof window !== 'undefined' ? localStorage.getItem('acceptCookies') === 'true' : false;
 
-      console.log('🔍 Creating user in database:', { email, userRole, cookiePreference });
-
-      await upsertUser({
-        email,
-        full_name: fullName,
-        display_name: fullName,
-        phone: phone || '',
-        address: address || '',
-        role: userRole,
-        language: 'en',
-        accept_cookies: cookiePreference,
+      console.log('🔍 Creating user in database:', { 
+        email, 
+        userRole, 
+        cookiePreference, 
+        uid: data.user.id 
       });
 
+      try {
+        const dbUser = await upsertUser({
+          uid: data.user.id,
+          email: email.trim().toLowerCase(),
+          full_name: fullName,
+          display_name: fullName,
+          phone: phone || '',
+          address: address || '',
+          role: userRole,
+          language: 'en',
+          accept_cookies: cookiePreference,
+        });
+
+        console.log('✅ User created in database:', dbUser);
+      } catch (dbError: any) {
+        console.error('❌ Database user creation failed:', dbError);
+        // Don't throw here - auth user is created, we can retry database creation later
+        console.warn('⚠️ Auth user created but database user creation failed. This can be fixed later.');
+      }
+
+      // Return session if available
+      return data.session;
+
     } catch (error: any) {
-      console.error('Sign up error:', error);
-      if (error.message?.includes('already registered')) {
+      console.error('❌ Sign up error:', {
+        message: error.message,
+        code: error.code,
+        status: error.status,
+        error
+      });
+      
+      if (error.message?.includes('already registered') || error.message?.includes('already exists')) {
         throw new Error('This email is already registered. Please sign in instead.');
       }
+      
+      if (error.message?.includes('Password')) {
+        throw new Error(error.message);
+      }
+      
       throw error;
     }
   };
