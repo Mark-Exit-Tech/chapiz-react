@@ -33,6 +33,25 @@ export default function BulkEditBusinessDialog({
     const [tagsToAdd, setTagsToAdd] = useState<string[]>([]);
     const [tagsToRemove, setTagsToRemove] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    
+    // Get locale from URL
+    const locale = typeof window !== 'undefined'
+      ? window.location.pathname.split('/')[1] || 'en'
+      : 'en';
+    const isHebrew = locale === 'he';
+    
+    // HARDCODED TEXT
+    const text = {
+      title: isHebrew ? `ערוך ${selectedCount} עסקים` : `Edit ${selectedCount} Businesses`,
+      description: isHebrew ? 'הוסף או הסר תגיות מהעסקים הנבחרים' : 'Add or remove tags from selected businesses',
+      addTags: isHebrew ? 'הוסף תגיות' : 'Add Tags',
+      removeTags: isHebrew ? 'הסר תגיות' : 'Remove Tags',
+      selectedToAdd: isHebrew ? 'נבחר להוספה' : 'Selected to add',
+      selectedToRemove: isHebrew ? 'נבחר להסרה' : 'Selected to remove',
+      cancel: isHebrew ? 'ביטול' : 'Cancel',
+      applying: isHebrew ? 'מבצע...' : 'Applying...',
+      apply: isHebrew ? 'החל שינויים' : 'Apply Changes'
+    };
 
     const handleTagClick = (tag: string) => {
         // If tag is in "to add" list, remove it
@@ -94,17 +113,17 @@ export default function BulkEditBusinessDialog({
             <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader className="text-center pr-8">
                     <DialogTitle className="text-center">
-                        {t('businessManagement.bulkEditTitle', { count: selectedCount })}
+                        {text.title}
                     </DialogTitle>
                     <DialogDescription className="text-center">
-                        {t('businessManagement.bulkEditDescription')}
+                        {text.description}
                     </DialogDescription>
                 </DialogHeader>
 
                 <div className="space-y-6">
                     {/* Tags to Add Section */}
                     <div className="space-y-2">
-                        <Label>{t('businessManagement.addTags')}</Label>
+                        <Label>{text.addTags}</Label>
                         <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto border rounded-md p-2">
                             {HEBREW_SERVICE_TAGS.map((tag) => (
                                 <button
@@ -128,7 +147,7 @@ export default function BulkEditBusinessDialog({
                         {tagsToAdd.length > 0 && (
                             <div className="mt-2">
                                 <p className="text-xs text-gray-600 mb-1">
-                                    {t('businessManagement.selectedToAdd', { count: tagsToAdd.length })} ({tagsToAdd.length})
+                                    {text.selectedToAdd} ({tagsToAdd.length})
                                 </p>
                                 <div className="flex flex-wrap gap-2">
                                     {tagsToAdd.map((tag) => (
@@ -149,7 +168,7 @@ export default function BulkEditBusinessDialog({
 
                     {/* Tags to Remove Section */}
                     <div className="space-y-2">
-                        <Label>{t('businessManagement.removeTags')}</Label>
+                        <Label>{text.removeTags}</Label>
                         <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto border rounded-md p-2">
                             {HEBREW_SERVICE_TAGS.map((tag) => (
                                 <button
@@ -173,7 +192,7 @@ export default function BulkEditBusinessDialog({
                         {tagsToRemove.length > 0 && (
                             <div className="mt-2">
                                 <p className="text-xs text-gray-600 mb-1">
-                                    {t('businessManagement.selectedToRemove', { count: tagsToRemove.length })} ({tagsToRemove.length})
+                                    {text.selectedToRemove} ({tagsToRemove.length})
                                 </p>
                                 <div className="flex flex-wrap gap-2">
                                     {tagsToRemove.map((tag) => (
@@ -195,14 +214,14 @@ export default function BulkEditBusinessDialog({
 
                 <DialogFooter>
                     <Button type="button" variant="outline" onClick={handleClose}>
-                        {t('common.cancel')}
+                        {text.cancel}
                     </Button>
                     <Button
                         type="button"
                         onClick={handleApply}
                         disabled={isSubmitting || (tagsToAdd.length === 0 && tagsToRemove.length === 0)}
                     >
-                        {isSubmitting ? t('businessManagement.applying') : t('businessManagement.applyChanges')}
+                        {isSubmitting ? text.applying : text.apply}
                     </Button>
                 </DialogFooter>
             </DialogContent>

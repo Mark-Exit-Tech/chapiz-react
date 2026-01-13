@@ -46,6 +46,36 @@ export default function AddBusinessForm() {
   const [error, setError] = useState<string | null>(null);
 
   const router = useNavigate();
+  
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+  
+  // HARDCODED TEXT
+  const text = {
+    addNewBusiness: isHebrew ? 'הוסף עסק חדש' : 'Add New Business',
+    name: isHebrew ? 'שם' : 'Name',
+    namePlaceholder: isHebrew ? 'הכנס שם עסק' : 'Enter business name',
+    description: isHebrew ? 'תיאור' : 'Description',
+    descriptionPlaceholder: isHebrew ? 'הכנס תיאור' : 'Enter description',
+    image: isHebrew ? 'תמונה' : 'Image',
+    tags: isHebrew ? 'תגיות' : 'Tags',
+    selectedTags: isHebrew ? 'תגיות נבחרות' : 'Selected tags',
+    rating: isHebrew ? 'דירוג' : 'Rating',
+    ratingPlaceholder: isHebrew ? '1-5' : '1-5',
+    contactInfo: isHebrew ? 'פרטי קשר' : 'Contact Information',
+    email: isHebrew ? 'אימייל' : 'Email',
+    emailPlaceholder: isHebrew ? 'example@email.com' : 'example@email.com',
+    phone: isHebrew ? 'טלפון' : 'Phone',
+    phonePlaceholder: isHebrew ? '+972-50-123-4567' : '+972-50-123-4567',
+    address: isHebrew ? 'כתובת' : 'Address',
+    addressPlaceholder: isHebrew ? 'הכנס כתובת' : 'Enter address',
+    cancel: isHebrew ? 'ביטול' : 'Cancel',
+    creating: isHebrew ? 'יוצר...' : 'Creating...',
+    create: isHebrew ? 'צור עסק' : 'Create Business'
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -160,32 +190,32 @@ export default function AddBusinessForm() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">{t('businessManagement.name')}</Label>
+            <Label htmlFor="name">{text.name}</Label>
             <Input
               id="name"
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder={t('businessManagement.namePlaceholder')}
+              placeholder={text.namePlaceholder}
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">{t('businessManagement.description')}</Label>
+            <Label htmlFor="description">{text.description}</Label>
             <Textarea
               id="description"
               name="description"
               value={formData.description}
               onChange={handleChange}
-              placeholder={t('businessManagement.descriptionPlaceholder')}
+              placeholder={text.descriptionPlaceholder}
               rows={3}
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="imageUrl">{t('businessManagement.image')}</Label>
+            <Label htmlFor="imageUrl">{text.image}</Label>
             <MediaUpload
               type="image"
               value={formData.imageUrl}
@@ -196,7 +226,7 @@ export default function AddBusinessForm() {
           </div>
 
           <div className="space-y-2">
-            <Label>{t('businessManagement.tags')}</Label>
+            <Label>{text.tags}</Label>
             <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto border rounded-md p-2">
               {HEBREW_SERVICE_TAGS.map((tag) => (
                 <button
@@ -217,7 +247,7 @@ export default function AddBusinessForm() {
             </div>
             {formData.tags.length > 0 && (
               <div className="mt-2">
-                <p className="text-xs text-gray-600 mb-1">Selected tags ({formData.tags.length}):</p>
+                <p className="text-xs text-gray-600 mb-1">{text.selectedTags} ({formData.tags.length}):</p>
                 <div className="flex flex-wrap gap-2">
                   {formData.tags.map((tag) => (
                     <span
@@ -233,7 +263,7 @@ export default function AddBusinessForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="rating">{t('businessManagement.rating')}</Label>
+            <Label htmlFor="rating">{text.rating}</Label>
             <Input
               id="rating"
               name="rating"
@@ -243,46 +273,46 @@ export default function AddBusinessForm() {
               step="0.1"
               value={formData.rating}
               onChange={handleChange}
-              placeholder={t('businessManagement.ratingPlaceholder')}
+              placeholder={text.ratingPlaceholder}
             />
           </div>
 
           <div className="space-y-4">
-            <Label>Contact Information</Label>
+            <Label>{text.contactInfo}</Label>
             
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{text.email}</Label>
               <Input
                 id="email"
                 name="contactInfo.email"
                 type="email"
                 value={formData.contactInfo.email}
                 onChange={handleChange}
-                placeholder={t('businessManagement.emailPlaceholder')}
+                placeholder={text.emailPlaceholder}
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="phone">{text.phone}</Label>
               <Input
                 id="phone"
                 name="contactInfo.phone"
                 value={formData.contactInfo.phone}
                 onChange={handleChange}
-                placeholder={t('businessManagement.phonePlaceholder')}
+                placeholder={text.phonePlaceholder}
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="address">Address</Label>
+              <Label htmlFor="address">{text.address}</Label>
               <Textarea
                 id="address"
                 name="contactInfo.address"
                 value={formData.contactInfo.address}
                 onChange={handleChange}
-                placeholder={t('businessManagement.addressPlaceholder')}
+                placeholder={text.addressPlaceholder}
                 rows={2}
                 required
               />
@@ -295,10 +325,10 @@ export default function AddBusinessForm() {
               variant="outline"
               onClick={() => setIsOpen(false)}
             >
-              {t('common.cancel')}
+              {text.cancel}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? t('businessManagement.creating') : t('businessManagement.createBusiness')}
+              {isSubmitting ? text.creating : text.create}
             </Button>
           </DialogFooter>
         </form>
