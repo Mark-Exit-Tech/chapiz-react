@@ -60,12 +60,12 @@ const ProfileContent = () => {
         fullName: dbUser.display_name || dbUser.full_name || '',
         phone: dbUser.phone || '',
         address: dbUser.address || '',
-        profileImageURL: dbUser.profile_image || dbUser?.avatar_url || '',
+        profileImageURL: dbUser.photoURL || dbUser?.photoURL || '',
         language: locale
       }));
     } else if (user && !dbUser) {
       const fullName = dbUser?.full_name || dbUser?.name || user.email?.split('@')[0] || '';
-      const avatarUrl = dbUser?.avatar_url || dbUser?.picture || '';
+      const avatarUrl = dbUser?.photoURL || dbUser?.photoURL || '';
 
       setFormData(prev => ({
         ...prev,
@@ -227,7 +227,7 @@ const ProfileContent = () => {
             fullName: u.display_name || u.full_name || '',
             phone: u.phone || '',
             address: u.address || '',
-            profileImageURL: u.profile_image || dbUser?.avatar_url || '',
+            profileImageURL: u.photoURL || dbUser?.photoURL || '',
             language: locale
           }));
         }

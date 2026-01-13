@@ -44,7 +44,7 @@ const GoogleSignupBottomSheet: React.FC<GoogleSignupBottomSheetProps> = ({
     if (dbUser?.full_name) {
       setName(dbUser.full_name);
     } else if (dbUser?.name) {
-      setName(dbUser.name);
+      setName(dbUser.full_name);
     }
   }, [user]);
 

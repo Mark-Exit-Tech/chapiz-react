@@ -124,8 +124,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
               session.dbUser?.name ||
               session.user.email?.split('@')[0] ||
               'User';
-            const avatarUrl = session.dbUser?.avatar_url ||
-              session.dbUser?.picture ||
+            const avatarUrl = session.dbUser?.photoURL ||
+              session.dbUser?.photoURL ||
               null;
 
             try {
@@ -176,8 +176,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             session.dbUser?.name ||
             session.user.email?.split('@')[0] ||
             'User';
-          const avatarUrl = session.dbUser?.avatar_url ||
-            session.dbUser?.picture ||
+          const avatarUrl = session.dbUser?.photoURL ||
+            session.dbUser?.photoURL ||
             null;
 
           try {

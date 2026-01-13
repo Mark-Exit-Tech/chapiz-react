@@ -70,14 +70,14 @@ export default function SettingsPage() {
         fullName: dbUser.display_name || dbUser.full_name || '',
         phone: dbUser.phone || '',
         address: dbUser.address || '',
-        profileImageURL: dbUser.profile_image || dbUser?.avatar_url || '',
+        profileImageURL: dbUser.photoURL || dbUser?.photoURL || '',
         language: locale // Always use current locale, not stored preference
       }));
     } else if (user && !dbUser) {
       // User authenticated but no database record yet - use Supabase auth metadata
       console.log('Using Supabase auth metadata:', dbUser);
       const fullName = dbUser?.full_name || dbUser?.name || user.email?.split('@')[0] || '';
-      const avatarUrl = dbUser?.avatar_url || dbUser?.picture || '';
+      const avatarUrl = dbUser?.photoURL || dbUser?.photoURL || '';
 
       setFormData(prev => ({
         ...prev,
@@ -317,7 +317,7 @@ export default function SettingsPage() {
           if (userResult.success && userResult.user) {
             console.log('Reloading user data after save:', userResult.user);
             const fullName = userResult.user.display_name || userResult.user.full_name || '';
-            const avatarUrl = userResult.user.profile_image || dbUser?.avatar_url || '';
+            const avatarUrl = userResult.user.photoURL || dbUser?.photoURL || '';
 
             setFormData(prev => ({
               ...prev,
@@ -494,15 +494,15 @@ export default function SettingsPage() {
                       alt="Profile"
                       className="w-full h-full object-cover"
                     />
-                  ) : dbUser?.profile_image ? (
+                  ) : dbUser?.photoURL ? (
                     <img
-                      src={dbUser.profile_image}
+                      src={dbUser.photoURL}
                       alt="Profile"
                       className="w-full h-full object-cover"
                     />
-                  ) : dbUser?.avatar_url ? (
+                  ) : dbUser?.photoURL ? (
                     <img
-                      src={dbUser.avatar_url}
+                      src={dbUser.photoURL}
                       alt="Profile"
                       className="w-full h-full object-cover"
                     />

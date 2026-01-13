@@ -16,7 +16,7 @@ import { getUserFromFirestore } from '@/lib/supabase/database/users';
 
 export default function ContactPage() {
     const { t } = useTranslation();
-    const { user } = useAuth();
+    const { user, dbUser } = useAuth();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
