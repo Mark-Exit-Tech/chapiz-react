@@ -32,6 +32,38 @@ const VOUCHERS_COLLECTION = 'vouchers';
 const USER_VOUCHERS_COLLECTION = 'userVouchers';
 
 /**
+ * Get all vouchers (admin function)
+ */
+export async function getAllVouchers(): Promise<Voucher[]> {
+    try {
+        const q = query(
+            collection(db, VOUCHERS_COLLECTION),
+            orderBy('createdAt', 'desc')
+        );
+        
+        const querySnapshot = await getDocs(q);
+        const vouchers: Voucher[] = [];
+        
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            vouchers.push({
+                id: doc.id,
+                ...data,
+                validFrom: data.validFrom?.toDate() || new Date(),
+                validTo: data.validTo?.toDate() || new Date(),
+                createdAt: data.createdAt?.toDate() || new Date(),
+                updatedAt: data.updatedAt?.toDate() || new Date(),
+            } as Voucher);
+        });
+        
+        return vouchers;
+    } catch (error) {
+        console.error('Error fetching all vouchers:', error);
+        return [];
+    }
+}
+
+/**
  * Get all active vouchers
  */
 export async function getActiveVouchers(): Promise<Voucher[]> {
