@@ -4,21 +4,27 @@ import { db } from '../client';
 export interface User {
   uid: string;
   email: string;
-  full_name: string;
-  display_name?: string;
+  displayName?: string; // ACTUAL Firestore field (camelCase)
   phone?: string;
   address?: string;
   role: 'user' | 'admin' | 'super_admin';
   language?: string;
+  acceptCookies?: boolean; // ACTUAL Firestore field (camelCase)
+  profileImage?: string; // ACTUAL Firestore field (camelCase)
+  createdAt?: Date; // ACTUAL Firestore field (camelCase)
+  updatedAt?: Date; // ACTUAL Firestore field (camelCase)
+  
+  // Legacy fields for backward compatibility (snake_case - OLD)
+  full_name?: string;
+  display_name?: string;
   accept_cookies?: boolean;
   is_restricted?: boolean;
   restriction_reason?: string;
   created_at?: Date;
   updated_at?: Date;
-  // Additional Firebase-compatible fields
   photoURL?: string;
   profile_image?: string;
-  name?: string; // Alias for full_name
+  name?: string;
 }
 
 const USERS_COLLECTION = 'users';
@@ -117,9 +123,12 @@ export async function getAllUsers(): Promise<User[]> {
       return {
         uid: doc.id,
         ...data,
-        // Convert Firestore Timestamps to Date objects
-        created_at: data.created_at?.toDate ? data.created_at.toDate() : (data.created_at ? new Date(data.created_at) : undefined),
-        updated_at: data.updated_at?.toDate ? data.updated_at.toDate() : (data.updated_at ? new Date(data.updated_at) : undefined)
+        // Convert Firestore Timestamps to Date objects (camelCase - ACTUAL Firestore fields)
+        createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : (data.createdAt ? new Date(data.createdAt) : undefined),
+        updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : (data.updatedAt ? new Date(data.updatedAt) : undefined),
+        // Legacy snake_case fields for backward compatibility
+        created_at: data.createdAt?.toDate ? data.createdAt.toDate() : (data.created_at?.toDate ? data.created_at.toDate() : undefined),
+        updated_at: data.updatedAt?.toDate ? data.updatedAt.toDate() : (data.updated_at?.toDate ? data.updated_at.toDate() : undefined)
       } as User;
     });
   } catch (error) {

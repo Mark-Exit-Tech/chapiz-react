@@ -46,6 +46,32 @@ export default function AddUserForm() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const router = useNavigate();
+  
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+  
+  // HARDCODED TEXT
+  const text = {
+    addUser: isHebrew ? 'הוסף משתמש' : 'Add User',
+    title: isHebrew ? 'הוסף משתמש חדש' : 'Add New User',
+    fullName: isHebrew ? 'שם מלא' : 'Full Name',
+    email: isHebrew ? 'אימייל' : 'Email',
+    phone: isHebrew ? 'טלפון' : 'Phone',
+    role: isHebrew ? 'תפקיד' : 'Role',
+    selectRole: isHebrew ? 'בחר תפקיד' : 'Select Role',
+    user: isHebrew ? 'משתמש' : 'User',
+    admin: isHebrew ? 'מנהל' : 'Admin',
+    superAdmin: isHebrew ? 'מנהל על' : 'Super Admin',
+    language: isHebrew ? 'שפה' : 'Language',
+    selectLanguage: isHebrew ? 'בחר שפה' : 'Select Language',
+    cancel: isHebrew ? 'ביטול' : 'Cancel',
+    creating: isHebrew ? 'יוצר...' : 'Creating...',
+    createUser: isHebrew ? 'צור משתמש' : 'Create User',
+    error: isHebrew ? 'שגיאה ביצירת משתמש' : 'Error creating user'
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -73,7 +99,7 @@ export default function AddUserForm() {
       });
 
       if (!result.success) {
-        setError(result.error || t('forms.addUser.error'));
+        setError(result.error || text.error);
         setIsSubmitting(false);
         return;
       }
@@ -102,7 +128,7 @@ export default function AddUserForm() {
     } catch (err: any) {
       // Handle unexpected errors
       console.error('Unexpected error in form submission:', err);
-      const errorMessage = err?.message || err?.errorInfo?.message || t('forms.addUser.error');
+      const errorMessage = err?.message || err?.errorInfo?.message || text.error;
       setError(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -114,12 +140,12 @@ export default function AddUserForm() {
       <DialogTrigger asChild>
         <Button className="flex items-center gap-2">
           <UserPlus className="h-4 w-4" />
-          {t('navigation.addUser')}
+          {text.addUser}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{t('forms.addUser.title')}</DialogTitle>
+          <DialogTitle>{text.title}</DialogTitle>
         </DialogHeader>
 
         {error && (
@@ -136,7 +162,7 @@ export default function AddUserForm() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="fullName">{t('forms.addUser.fullName')}</Label>
+            <Label htmlFor="fullName">{text.fullName}</Label>
             <Input
               id="fullName"
               name="fullName"
@@ -147,7 +173,7 @@ export default function AddUserForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">{t('forms.addUser.email')}</Label>
+            <Label htmlFor="email">{text.email}</Label>
             <Input
               id="email"
               name="email"
@@ -159,7 +185,7 @@ export default function AddUserForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone">{t('forms.addUser.phone')}</Label>
+            <Label htmlFor="phone">{text.phone}</Label>
             <Input
               id="phone"
               name="phone"
@@ -170,7 +196,7 @@ export default function AddUserForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="role">{t('forms.addUser.role')}</Label>
+            <Label htmlFor="role">{text.role}</Label>
             <Select
               name="role"
               value={formData.role}
@@ -182,12 +208,12 @@ export default function AddUserForm() {
               }
             >
               <SelectTrigger>
-                <SelectValue placeholder={t('forms.addUser.selectRole')} />
+                <SelectValue placeholder={text.selectRole} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="user">{t('usersManagement.roles.user')}</SelectItem>
-                <SelectItem value="admin">{t('usersManagement.roles.admin')}</SelectItem>
-                <SelectItem value="super_admin">{t('usersManagement.roles.super_admin')}</SelectItem>
+                <SelectItem value="user">{text.user}</SelectItem>
+                <SelectItem value="admin">{text.admin}</SelectItem>
+                <SelectItem value="super_admin">{text.superAdmin}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -220,10 +246,10 @@ export default function AddUserForm() {
               variant="outline"
               onClick={() => setIsOpen(false)}
             >
-              {t('common.cancel')}
+              {text.cancel}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? t('forms.addUser.creating') : t('forms.addUser.createUser')}
+              {isSubmitting ? text.creating : text.createUser}
             </Button>
           </DialogFooter>
         </form>
