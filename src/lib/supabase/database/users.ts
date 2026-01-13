@@ -10,6 +10,7 @@ export interface User {
     role: 'user' | 'admin' | 'super_admin';
     email_verified: boolean;
     profile_image?: string;
+    photoURL?: string; // Alias for profile_image for compatibility
     address?: string;
     language?: string;
     created_at: string;
