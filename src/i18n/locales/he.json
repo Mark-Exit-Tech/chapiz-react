@@ -937,7 +937,9 @@
       "notifications": "התראות",
       "noNotifications": "אין התראות חדשות",
       "shareWithFriends": "שתף עם חברים",
-      "shareDescription": "שתף וקבל 10 נקודות עבור כל חבר שמצטרף!"
+      "shareDescription": "שתף וקבל 10 נקודות עבור כל חבר שמצטרף!",
+      "unknownPet": "חיית מחמד לא ידועה",
+      "unknownBreed": "גזע לא ידוע"
     },
     "AddPetPage": {
       "back": "חזור",

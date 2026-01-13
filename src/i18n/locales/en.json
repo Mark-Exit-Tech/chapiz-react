@@ -930,7 +930,9 @@
       "notifications": "Notifications",
       "noNotifications": "No new notifications",
       "shareWithFriends": "Share with Friends",
-      "shareDescription": "Share and get 10 points for every friend who joins!"
+      "shareDescription": "Share and get 10 points for every friend who joins!",
+      "unknownPet": "Unknown Pet",
+      "unknownBreed": "Unknown Breed"
     },
     "AddPetPage": {
       "back": "Back",
