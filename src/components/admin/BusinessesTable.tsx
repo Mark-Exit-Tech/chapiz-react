@@ -44,14 +44,44 @@ import {
 export default function BusinessesTable() {
   const { t } = useTranslation('Admin');
   const [businesses, setBusinesses] = useState<Business[]>([]);
-  const [savedFilters, setSavedFilters] = useState<FilterType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingBusiness, setEditingBusiness] = useState<Business | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [selectedFilterId, setSelectedFilterId] = useState<string>('__all__');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isBulkEditOpen, setIsBulkEditOpen] = useState(false);
+  
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+  
+  // HARDCODED TEXT
+  const text = {
+    loading: isHebrew ? 'טוען...' : 'Loading...',
+    selectedCount: isHebrew ? '{count} נבחרו' : '{count} selected',
+    bulkAssignTags: isHebrew ? 'הוסף תגיות' : 'Assign Tags',
+    bulkToggleStatus: isHebrew ? 'שנה סטטוס' : 'Toggle Status',
+    bulkDelete: isHebrew ? 'מחק נבחרים' : 'Delete Selected',
+    confirmBulkDelete: isHebrew ? 'האם למחוק {count} עסקים?' : 'Delete {count} businesses?',
+    bulkDeleteSuccess: isHebrew ? '{count} עסקים נמחקו' : '{count} businesses deleted',
+    bulkDeleteError: isHebrew ? 'שגיאה במחיקה' : 'Delete failed',
+    bulkUpdateSuccess: isHebrew ? '{count} עסקים עודכנו' : '{count} businesses updated',
+    bulkUpdateError: isHebrew ? 'שגיאה בעדכון' : 'Update failed',
+    name: isHebrew ? 'שם' : 'Name',
+    tags: isHebrew ? 'תגיות' : 'Tags',
+    contact: isHebrew ? 'יצירת קשר' : 'Contact',
+    created: isHebrew ? 'נוצר' : 'Created',
+    status: isHebrew ? 'סטטוס' : 'Status',
+    actions: isHebrew ? 'פעולות' : 'Actions',
+    active: isHebrew ? 'פעיל' : 'Active',
+    inactive: isHebrew ? 'לא פעיל' : 'Inactive',
+    edit: isHebrew ? 'ערוך' : 'Edit',
+    delete: isHebrew ? 'מחק' : 'Delete',
+    confirmDelete: isHebrew ? 'למחוק את {name}?' : 'Delete {name}?',
+    noBusinesses: isHebrew ? 'אין עסקים' : 'No businesses'
+  };
 
   useEffect(() => {
     fetchData();
@@ -60,22 +90,15 @@ export default function BusinessesTable() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [businessesResult, filtersResult] = await Promise.all([
-        getBusinesses(),
-        getFilters()
-      ]);
+      const businessesResult = await getBusinesses();
 
       if (businessesResult.success) {
         setBusinesses(businessesResult.businesses);
       } else {
-        setError(businessesResult.error || 'Failed to fetch businesses');
-      }
-
-      if (filtersResult.success) {
-        setSavedFilters(filtersResult.filters);
+        setError(businessesResult.error || (isHebrew ? 'שגיאה בטעינת עסקים' : 'Failed to fetch businesses'));
       }
     } catch (err) {
-      setError('Failed to fetch data');
+      setError(isHebrew ? 'שגיאה בטעינת נתונים' : 'Failed to fetch data');
       console.error(err);
     } finally {
       setLoading(false);
@@ -160,7 +183,7 @@ export default function BusinessesTable() {
   const handleBulkDelete = async () => {
     if (selectedIds.length === 0) return;
 
-    const confirmMessage = t('businessManagement.confirmBulkDelete', { count: selectedIds.length });
+    const confirmMessage = text.confirmBulkDelete.replace('{count}', String(selectedIds.length));
     if (!confirm(confirmMessage)) return;
 
     try {
@@ -168,12 +191,12 @@ export default function BusinessesTable() {
       if (result.success) {
         setBusinesses(prev => prev.filter(b => !selectedIds.includes(b.id)));
         setSelectedIds([]);
-        alert(t('businessManagement.bulkDeleteSuccess', { count: selectedIds.length }));
+        alert(text.bulkDeleteSuccess.replace('{count}', String(selectedIds.length)));
       } else {
-        setError(result.error || t('businessManagement.bulkDeleteError'));
+        setError(result.error || text.bulkDeleteError);
       }
     } catch (err) {
-      setError(t('businessManagement.bulkDeleteError'));
+      setError(text.bulkDeleteError);
       console.error(err);
     }
   };
@@ -195,12 +218,12 @@ export default function BusinessesTable() {
           )
         );
         setSelectedIds([]);
-        alert(t('businessManagement.bulkUpdateSuccess', { count: selectedIds.length }));
+        alert(text.bulkUpdateSuccess.replace('{count}', String(selectedIds.length)));
       } else {
-        setError(result.error || t('businessManagement.bulkUpdateError'));
+        setError(result.error || text.bulkUpdateError);
       }
     } catch (err) {
-      setError(t('businessManagement.bulkUpdateError'));
+      setError(text.bulkUpdateError);
       console.error(err);
     }
   };
@@ -214,42 +237,25 @@ export default function BusinessesTable() {
         // Refresh data to get updated tags
         await fetchData();
         setSelectedIds([]);
-        alert(t('businessManagement.bulkUpdateSuccess', { count: selectedIds.length }));
+        alert(text.bulkUpdateSuccess.replace('{count}', String(selectedIds.length)));
       } else {
-        setError(result.error || t('businessManagement.bulkUpdateError'));
+        setError(result.error || text.bulkUpdateError);
       }
     } catch (err) {
-      setError(t('businessManagement.bulkUpdateError'));
+      setError(text.bulkUpdateError);
       console.error(err);
     }
   };
 
-  // Get selected filter
-  const selectedFilter = useMemo(() => {
-    if (selectedFilterId === '__all__') {
-      return null;
-    }
-    return savedFilters.find(f => f.id === selectedFilterId);
-  }, [savedFilters, selectedFilterId]);
-
-  // Filter businesses based on selected filter
-  const filteredBusinesses = useMemo(() => {
-    if (!selectedFilter) {
-      return businesses;
-    }
-    return businesses.filter(business => {
-      // Check if business has the selected filter ID
-      const businessFilterIds = business.filterIds || [];
-      return businessFilterIds.includes(selectedFilter.id);
-    });
-  }, [businesses, selectedFilter]);
+  // No filtering needed - show all businesses
+  const filteredBusinesses = businesses;
 
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-500">Loading...</p>
+          <p className="text-gray-500">{text.loading}</p>
         </div>
       </div>
     );
@@ -266,39 +272,6 @@ export default function BusinessesTable() {
   // Table view for all screen sizes
   return (
     <div className="space-y-4">
-      {/* Filter Section */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between p-4 bg-gray-50 rounded-lg border">
-        <div className="flex items-center gap-3 flex-1 w-full sm:w-auto">
-          <Filter className="h-5 w-5 text-gray-500 shrink-0" />
-          <div className="flex-1 min-w-0">
-            <Select value={selectedFilterId} onValueChange={setSelectedFilterId}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder={t('businessManagement.selectFilter') || 'Select a filter...'} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="__all__">{t('businessManagement.allBusinesses') || 'All Businesses'}</SelectItem>
-                {savedFilters.filter(f => f.isActive).map((filter) => (
-                  <SelectItem key={filter.id} value={filter.id}>
-                    {filter.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        {selectedFilterId && selectedFilterId !== '__all__' && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setSelectedFilterId('__all__')}
-            className="shrink-0"
-          >
-            <X className="h-4 w-4 mr-2" />
-            {t('businessManagement.clearFilter') || 'Clear filter'}
-          </Button>
-        )}
-      </div>
-
       {/* Bulk Actions Toolbar */}
       {selectedIds.length > 0 && (
         <div className="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-lg">
@@ -308,7 +281,7 @@ export default function BusinessesTable() {
               onCheckedChange={handleSelectAll}
             />
             <span className="font-medium text-blue-900">
-              {t('businessManagement.selectedCount', { count: selectedIds.length })}
+              {text.selectedCount.replace('{count}', String(selectedIds.length))}
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -319,7 +292,7 @@ export default function BusinessesTable() {
               className="gap-2"
             >
               <Tags className="h-4 w-4" />
-              {t('businessManagement.bulkAssignTags')}
+              {text.bulkAssignTags}
             </Button>
             <Button
               variant="outline"
@@ -327,7 +300,7 @@ export default function BusinessesTable() {
               onClick={handleBulkToggleStatus}
               className="gap-2"
             >
-              {t('businessManagement.bulkToggleStatus')}
+              {text.bulkToggleStatus}
             </Button>
             <Button
               variant="destructive"
@@ -336,18 +309,13 @@ export default function BusinessesTable() {
               className="gap-2"
             >
               <Trash2 className="h-4 w-4" />
-              {t('businessManagement.bulkDelete')}
+              {text.bulkDelete}
             </Button>
           </div>
         </div>
       )}
 
       {/* Results count */}
-      {selectedFilterId && selectedFilterId !== '__all__' && selectedFilter && (
-        <div className="text-sm text-gray-600">
-          {t('businessManagement.showingResults') || 'Showing'} {filteredBusinesses.length} {t('businessManagement.of') || 'of'} {businesses.length} {t('businessManagement.businesses') || 'businesses'}
-        </div>
-      )}
 
       <div className="rounded-md border">
         <Table>
@@ -359,12 +327,12 @@ export default function BusinessesTable() {
                   onCheckedChange={handleSelectAll}
                 />
               </TableHead>
-              <TableHead>{t('businessManagement.name')}</TableHead>
-              <TableHead>{t('businessManagement.description')}</TableHead>
-              <TableHead>{t('businessManagement.image')}</TableHead>
-              <TableHead>{t('businessManagement.contactInfo')}</TableHead>
-              <TableHead>{t('businessManagement.status')}</TableHead>
-              <TableHead>{t('businessManagement.createdAt')}</TableHead>
+              <TableHead>{text.name}</TableHead>
+              <TableHead>{isHebrew ? 'תיאור' : 'Description'}</TableHead>
+              <TableHead>{isHebrew ? 'תמונה' : 'Image'}</TableHead>
+              <TableHead>{text.contact}</TableHead>
+              <TableHead>{text.status}</TableHead>
+              <TableHead>{text.created}</TableHead>
               <TableHead className="w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
@@ -372,10 +340,7 @@ export default function BusinessesTable() {
             {filteredBusinesses.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={8} className="text-center py-8 text-gray-500">
-                  {selectedFilterId && selectedFilterId !== '__all__'
-                    ? (t('businessManagement.noBusinessesMatchingFilter') || 'No businesses match the selected filter')
-                    : t('businessManagement.noBusinesses')
-                  }
+                  {text.noBusinesses}
                 </TableCell>
               </TableRow>
             ) : (
@@ -443,17 +408,17 @@ export default function BusinessesTable() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => handleEdit(business)}>
                           <Edit className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" />
-                          {t('businessManagement.edit')}
+                          {text.edit}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleToggleActive(business)}>
-                          {business.isActive ? t('businessManagement.deactivate') : t('businessManagement.activate')}
+                          {business.isActive ? text.inactive : text.active}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleDelete(business)}
                           className="text-red-600"
                         >
                           <Trash2 className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" />
-                          {t('businessManagement.delete')}
+                          {text.delete}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
