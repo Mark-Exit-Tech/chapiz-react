@@ -9,22 +9,22 @@ import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import toast from 'react-hot-toast';
+import { getPromos, getBusinesses } from '@/lib/actions/admin';
+import { isPromoUsed, getUserUsedPromos, UserPromo } from '@/lib/firebase/database/promos';
 
-// TODO: Import actual types and functions when implemented
 type Promo = any;
 type Business = any;
-type UserPromo = any;
 
 interface PromosPageClientProps {
   initialPromos?: Promo[];
   business?: Business | null;
-  businesses?: Business[];
+  initialBusinesses?: Business[];
 }
 
 export default function PromosPageClient({ 
   initialPromos = [], 
   business = null, 
-  businesses = [] 
+  initialBusinesses = [] 
 }: PromosPageClientProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -55,6 +55,7 @@ export default function PromosPageClient({
   };
 
   const [promos, setPromos] = useState<Promo[]>(initialPromos);
+  const [businesses, setBusinesses] = useState<Business[]>(initialBusinesses);
   const [usedPromoIds, setUsedPromoIds] = useState<Set<string>>(new Set());
   const [usedPromos, setUsedPromos] = useState<UserPromo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,24 +63,39 @@ export default function PromosPageClient({
   const [showMapDialog, setShowMapDialog] = useState(false);
   const [selectedPromo, setSelectedPromo] = useState<Promo | null>(null);
 
-  // Load promos from Firebase
+  // Load promos and businesses from Firebase
   useEffect(() => {
-    const loadPromos = async () => {
+    const loadData = async () => {
       try {
         setLoading(true);
-        // TODO: Implement getPromos() from Firebase
-        // const promos = await getPromos();
-        // setPromos(promos);
-        console.log('TODO: Load promos from Firebase');
+        
+        // Load promos
+        const promosResult = await getPromos();
+        if (promosResult.success && promosResult.promos) {
+          // Filter to only show active promos
+          const activePromos = promosResult.promos.filter((p: any) => p.isActive);
+          setPromos(activePromos);
+          console.log('✅ Loaded promos:', activePromos.length);
+        } else {
+          console.error('Failed to load promos:', promosResult.error);
+          setPromos([]);
+        }
+        
+        // Load businesses
+        const businessesResult = await getBusinesses();
+        if (businessesResult && Array.isArray(businessesResult)) {
+          setBusinesses(businessesResult);
+          console.log('✅ Loaded businesses:', businessesResult.length);
+        }
       } catch (error) {
-        console.error('Error loading promos:', error);
+        console.error('Error loading data:', error);
         toast.error(text.noCoupons);
       } finally {
         setLoading(false);
       }
     };
 
-    loadPromos();
+    loadData();
   }, []);
 
   // Check which promos are used
@@ -91,10 +107,28 @@ export default function PromosPageClient({
 
     try {
       setLoading(true);
-      // TODO: Implement isPromoUsed() and getUserUsedPromos()
-      console.log('TODO: Load used promos from Firebase');
-      setUsedPromoIds(new Set());
-      setUsedPromos([]);
+      
+      // Check which of the current promos are used
+      const usedSet = new Set<string>();
+      await Promise.all(
+        promos.map(async (promo: any) => {
+          const used = await isPromoUsed(user.uid, promo.id);
+          if (used) {
+            usedSet.add(promo.id);
+          }
+        })
+      );
+      setUsedPromoIds(usedSet);
+
+      // Get all used promos for history
+      const usedPromosResult = await getUserUsedPromos(user.uid);
+      if (usedPromosResult.success && usedPromosResult.promos) {
+        setUsedPromos(usedPromosResult.promos);
+        console.log('✅ Loaded used promos:', usedPromosResult.promos.length);
+      } else {
+        console.error('Failed to get used promos:', usedPromosResult.error);
+        setUsedPromos([]);
+      }
     } catch (error) {
       console.error('Error checking used promos:', error);
       setUsedPromos([]);
