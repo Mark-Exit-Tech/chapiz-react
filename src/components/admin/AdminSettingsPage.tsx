@@ -1,14 +1,18 @@
 'use client';
 
-import { useState } from 'react';
-import { Settings, Mail, Phone, MapPin, Clock, Image, Globe, Instagram, Facebook } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Settings, Mail, Phone, MapPin, Clock, Image as ImageIcon, Globe, Instagram, Facebook, MessageCircle, Upload } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { uploadImage } from '@/lib/firebase/storage';
 
 export default function AdminSettingsPage() {
   const [saving, setSaving] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string>('');
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Get locale from URL
   const locale = typeof window !== 'undefined'
@@ -46,12 +50,31 @@ export default function AdminSettingsPage() {
     facebookPlaceholder: isHebrew ? 'https://facebook.com/chapiz' : 'https://facebook.com/chapiz',
     instagram: isHebrew ? 'Instagram' : 'Instagram',
     instagramPlaceholder: isHebrew ? 'https://instagram.com/chapiz' : 'https://instagram.com/chapiz',
-    website: isHebrew ? 'אתר אינטרנט' : 'Website',
-    websitePlaceholder: isHebrew ? 'https://chapiz.co.il' : 'https://chapiz.co.il',
+    whatsapp: isHebrew ? 'WhatsApp' : 'WhatsApp',
+    whatsappPlaceholder: isHebrew ? '+972501234567' : '+972501234567',
+    whatsappHelp: isHebrew ? 'מספר טלפון עם קידומת (ללא מקפים או רווחים)' : 'Phone number with country code (no dashes or spaces)',
     
     save: isHebrew ? 'שמור שינויים' : 'Save Changes',
     saving: isHebrew ? 'שומר...' : 'Saving...',
-    saved: isHebrew ? 'נשמר בהצלחה' : 'Saved successfully'
+    saved: isHebrew ? 'נשמר בהצלחה' : 'Saved successfully',
+    uploading: isHebrew ? 'מעלה...' : 'Uploading...',
+    uploadError: isHebrew ? 'שגיאה בהעלאת תמונה' : 'Error uploading image'
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploading(true);
+      const url = await uploadImage(file, 'settings/logo');
+      setLogoUrl(url);
+    } catch (error) {
+      console.error('Logo upload error:', error);
+      alert(text.uploadError);
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -155,7 +178,7 @@ export default function AdminSettingsPage() {
           {/* Branding */}
           <div className="bg-white shadow-md rounded-lg p-6">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <Image className="w-5 h-5" />
+              <ImageIcon className="w-5 h-5" />
               {text.branding}
             </h2>
             
@@ -163,12 +186,30 @@ export default function AdminSettingsPage() {
               <div className="space-y-2">
                 <Label htmlFor="logo">{text.logo}</Label>
                 <div className="flex items-center gap-4">
-                  <div className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
-                    <Image className="w-8 h-8 text-gray-400" />
+                  <div className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden">
+                    {logoUrl ? (
+                      <img src={logoUrl} alt="Logo" className="w-full h-full object-contain" />
+                    ) : (
+                      <ImageIcon className="w-8 h-8 text-gray-400" />
+                    )}
                   </div>
                   <div className="flex-1">
-                    <Button type="button" variant="outline">
-                      {text.uploadLogo}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                    />
+                    <Button 
+                      type="button" 
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                      className="gap-2"
+                    >
+                      <Upload className="w-4 h-4" />
+                      {uploading ? text.uploading : text.uploadLogo}
                     </Button>
                     <p className="text-sm text-gray-500 mt-2">{text.logoHelp}</p>
                   </div>
@@ -210,16 +251,17 @@ export default function AdminSettingsPage() {
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="website" className="flex items-center gap-2">
-                  <Globe className="w-4 h-4" />
-                  {text.website}
+                <Label htmlFor="whatsapp" className="flex items-center gap-2">
+                  <MessageCircle className="w-4 h-4" />
+                  {text.whatsapp}
                 </Label>
                 <Input
-                  id="website"
-                  type="url"
-                  placeholder={text.websitePlaceholder}
-                  defaultValue="https://chapiz.co.il"
+                  id="whatsapp"
+                  type="tel"
+                  placeholder={text.whatsappPlaceholder}
+                  defaultValue="+972501234567"
                 />
+                <p className="text-sm text-gray-500">{text.whatsappHelp}</p>
               </div>
             </div>
           </div>

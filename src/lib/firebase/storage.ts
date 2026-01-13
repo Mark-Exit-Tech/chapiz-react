@@ -134,3 +134,25 @@ export async function deleteAdMedia(mediaUrl: string): Promise<boolean> {
         return false;
     }
 }
+
+/**
+ * Generic upload image function for any path
+ */
+export async function uploadImage(file: File, customPath: string): Promise<string> {
+    try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}.${fileExt}`;
+        const filePath = `${customPath}/${fileName}`;
+        
+        const storageRef = ref(storage, filePath);
+        const snapshot = await uploadBytes(storageRef, file, {
+            cacheControl: 'public, max-age=3600'
+        });
+        
+        const downloadURL = await getDownloadURL(snapshot.ref);
+        return downloadURL;
+    } catch (error) {
+        console.error('Error in uploadImage:', error);
+        throw error;
+    }
+}
