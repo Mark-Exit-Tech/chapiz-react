@@ -125,7 +125,7 @@ export default function AdminDashboard() {
   return (
     <AdminLayout>
       <div className="container mx-auto p-3 md:p-8">
-      <h1 className="mb-4 md:mb-6 text-xl md:text-3xl font-bold">{text.dashboard}</h1>
+        <h1 className="mb-4 md:mb-6 text-xl md:text-3xl font-bold">{text.dashboard}</h1>
 
       {/* Top Section - Statistics Overview */}
       <div className="mb-4 md:mb-6 grid grid-cols-2 gap-3 md:gap-6 lg:grid-cols-3 xl:grid-cols-6">
@@ -404,6 +404,7 @@ export default function AdminDashboard() {
               </Table>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </AdminLayout>

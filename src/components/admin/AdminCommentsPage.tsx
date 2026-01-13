@@ -77,7 +77,7 @@ export default function AdminCommentsPage() {
   return (
     <AdminLayout>
       <div className="container mx-auto p-4 md:p-8">
-      <div className="space-y-6">
+        <div className="space-y-6">
         <div className="text-left rtl:text-right">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2">
             <MessageSquare className="w-8 h-8" />
@@ -182,6 +182,7 @@ export default function AdminCommentsPage() {
             </div>
           </div>
         )}
+        </div>
       </div>
     </AdminLayout>
   );
