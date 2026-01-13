@@ -25,6 +25,39 @@ export default function AddCouponForm() {
   const { t } = useTranslation('Admin');
   const { t: commonT } = useTranslation('common');
   const [isOpen, setIsOpen] = useState(false);
+  
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+  
+  // HARDCODED TEXT
+  const text = {
+    addNewCoupon: isHebrew ? 'הוסף קופון חדש' : 'Add New Coupon',
+    name: isHebrew ? 'שם' : 'Name',
+    namePlaceholder: isHebrew ? 'הזן שם קופון' : 'Enter coupon name',
+    description: isHebrew ? 'תיאור' : 'Description',
+    descriptionPlaceholder: isHebrew ? 'הזן תיאור' : 'Enter description',
+    price: isHebrew ? 'מחיר (0 לחינם)' : 'Price (0 for free)',
+    pricePlaceholder: isHebrew ? 'הזן מחיר' : 'Enter price',
+    points: isHebrew ? 'נקודות' : 'Points',
+    pointsPlaceholder: isHebrew ? 'הזן נקודות' : 'Enter points',
+    image: isHebrew ? 'תמונה' : 'Image',
+    business: isHebrew ? 'עסק' : 'Business',
+    businessPlaceholder: isHebrew ? 'בחר עסקים' : 'Select businesses',
+    validFrom: isHebrew ? 'תקף מ' : 'Valid From',
+    validTo: isHebrew ? 'תקף עד' : 'Valid To',
+    purchaseLimit: isHebrew ? 'מגבלת רכישה' : 'Purchase Limit',
+    purchaseLimitPlaceholder: isHebrew ? 'הזן מגבלה (אופציונלי)' : 'Enter limit (optional)',
+    purchaseLimitHelp: isHebrew ? 'מספר פעמים שמשתמש יכול לרכוש קופון זה' : 'Number of times a user can purchase this coupon',
+    createCoupon: isHebrew ? 'צור קופון' : 'Create Coupon',
+    creating: isHebrew ? 'יוצר...' : 'Creating...',
+    cancel: isHebrew ? 'ביטול' : 'Cancel',
+    clickToUpload: isHebrew ? 'לחץ להעלאת תמונה' : 'Click to upload image',
+    fileFormats: isHebrew ? 'PNG, JPG, GIF עד 10MB' : 'PNG, JPG, GIF up to 10MB'
+  };
+  
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -157,12 +190,12 @@ export default function AddCouponForm() {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>
-          {t('couponsManagement.addNewCoupon')}
+          {text.addNewCoupon}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{t('couponsManagement.addNewCoupon')}</DialogTitle>
+          <DialogTitle>{text.addNewCoupon}</DialogTitle>
         </DialogHeader>
 
         {error && (
@@ -173,25 +206,25 @@ export default function AddCouponForm() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">{t('couponsManagement.name')}</Label>
+            <Label htmlFor="name">{text.name}</Label>
             <Input
               id="name"
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder={t('couponsManagement.namePlaceholder')}
+              placeholder={text.namePlaceholder}
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">{t('couponsManagement.description')}</Label>
+            <Label htmlFor="description">{text.description}</Label>
             <Textarea
               id="description"
               name="description"
               value={formData.description}
               onChange={handleChange}
-              placeholder={t('couponsManagement.descriptionPlaceholder')}
+              placeholder={text.descriptionPlaceholder}
               rows={3}
               required
             />
@@ -199,7 +232,7 @@ export default function AddCouponForm() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="price">{t('couponsManagement.price')} (0 for free)</Label>
+              <Label htmlFor="price">{text.price} (0 for free)</Label>
               <Input
                 id="price"
                 name="price"
@@ -208,13 +241,13 @@ export default function AddCouponForm() {
                 min="0"
                 value={formData.price}
                 onChange={handleChange}
-                placeholder={t('couponsManagement.pricePlaceholder') || '0.00 (leave empty or 0 for free)'}
+                placeholder={text.pricePlaceholder || '0.00 (leave empty or 0 for free)'}
               />
             </div>
 
             {(formData.price !== '' && parseFloat(formData.price) > 0) && (
               <div className="space-y-2">
-                <Label htmlFor="points">{t('couponsManagement.points')}</Label>
+                <Label htmlFor="points">{text.points}</Label>
                 <Input
                   id="points"
                   name="points"
@@ -222,14 +255,14 @@ export default function AddCouponForm() {
                   min="0"
                   value={formData.points}
                   onChange={handleChange}
-                  placeholder={t('couponsManagement.pointsPlaceholder')}
+                  placeholder={text.pointsPlaceholder}
                 />
               </div>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="imageUrl">{t('couponsManagement.image')}</Label>
+            <Label htmlFor="imageUrl">{text.image}</Label>
             <MediaUpload
               type="image"
               value={formData.imageUrl}
@@ -241,19 +274,19 @@ export default function AddCouponForm() {
           </div>
 
           <div className="space-y-2">
-            <Label>{t('couponsManagement.business') || 'Businesses (Optional)'}</Label>
+            <Label>{text.business || 'Businesses (Optional)'}</Label>
             <BusinessMultiselect
               businesses={businesses}
               selectedIds={formData.businessIds}
               onSelectionChange={handleBusinessIdsChange}
-              placeholder={t('couponsManagement.businessPlaceholder') || 'Select businesses (optional)'}
+              placeholder={text.businessPlaceholder || 'Select businesses (optional)'}
               disabled={loadingBusinesses}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="validFrom">{t('couponsManagement.validFrom')}</Label>
+              <Label htmlFor="validFrom">{text.validFrom}</Label>
               <Input
                 id="validFrom"
                 name="validFrom"
@@ -264,7 +297,7 @@ export default function AddCouponForm() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="validTo">{t('couponsManagement.validTo')}</Label>
+              <Label htmlFor="validTo">{text.validTo}</Label>
               <Input
                 id="validTo"
                 name="validTo"
@@ -277,7 +310,7 @@ export default function AddCouponForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="purchaseLimit">{t('couponsManagement.purchaseLimit')}</Label>
+            <Label htmlFor="purchaseLimit">{text.purchaseLimit}</Label>
             <Input
               id="purchaseLimit"
               name="purchaseLimit"
@@ -285,10 +318,10 @@ export default function AddCouponForm() {
               min="1"
               value={formData.purchaseLimit}
               onChange={handleChange}
-              placeholder={t('couponsManagement.purchaseLimitPlaceholder')}
+              placeholder={text.purchaseLimitPlaceholder}
             />
             <p className="text-xs text-gray-500">
-              {t('couponsManagement.purchaseLimitHelp')}
+              {text.purchaseLimitHelp}
             </p>
           </div>
 
@@ -298,10 +331,10 @@ export default function AddCouponForm() {
               variant="outline"
               onClick={() => setIsOpen(false)}
             >
-              {commonT('cancel')}
+              {text.cancel}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? commonT('creating') : t('couponsManagement.createCoupon')}
+              {isSubmitting ? text.creating : text.createCoupon}
             </Button>
           </DialogFooter>
         </form>
