@@ -22,11 +22,24 @@ export default function VoucherViewPageClient({ userCoupon }: VoucherViewPageCli
   const { t } = useTranslation('components.UserCoupons');
   const navigate = useNavigate();
   const locale = useLocale();
+  const isHebrew = locale === 'he';
   const coupon = userCoupon.coupon;
   const { redirectToShop } = useShopRedirect();
   const [shopUrl, setShopUrl] = useState<string>('');
   const [voucherUrl, setVoucherUrl] = useState<string>('');
   const [isMounted, setIsMounted] = useState(false);
+  
+  // HARDCODED TEXT - NO TRANSLATION KEYS!
+  const text = {
+    codeCopied: isHebrew ? 'קוד השובר הועתק ללוח!' : 'Voucher code copied to clipboard!',
+    failedToCopy: isHebrew ? 'נכשל בהעתקת הקוד' : 'Failed to copy code',
+    sharedSuccessfully: isHebrew ? 'שותף בהצלחה!' : 'Shared successfully!',
+    linkCopied: isHebrew ? 'הלינק הועתק ללוח!' : 'Link copied to clipboard!',
+    back: isHebrew ? 'חזור' : 'Back',
+    qrCodeDescription: isHebrew ? 'סרקו את קוד ה-QR הזה כדי לצפות בשובר' : 'Scan this QR code to view this voucher',
+    useVoucher: isHebrew ? 'השתמש בשובר' : 'Use Voucher',
+    share: isHebrew ? 'שתף' : 'Share',
+  };
 
   useEffect(() => {
     setIsMounted(true);
@@ -54,15 +67,15 @@ export default function VoucherViewPageClient({ userCoupon }: VoucherViewPageCli
     // Copy the code first
     if (couponCode) {
       navigator.clipboard.writeText(couponCode).then(() => {
-        toast.success(t('codeCopied') || 'Voucher code copied to clipboard!');
+        toast.success(text.codeCopied);
       }).catch(() => {
-        toast.error(t('failedToCopy') || 'Failed to copy code');
+        toast.error(text.failedToCopy);
       });
     }
 
     // Then redirect to shop with the coupon code
     if (!shopUrl) {
-      toast.error('Shop URL is not configured. Please contact support.');
+      toast.error(isHebrew ? 'כתובת החנות לא הוגדרה. אנא צרו קשר עם התמיכה.' : 'Shop URL is not configured. Please contact support.');
       return;
     }
 
@@ -79,18 +92,18 @@ export default function VoucherViewPageClient({ userCoupon }: VoucherViewPageCli
           text: coupon.description || coupon.name,
           url: voucherUrl,
         });
-        toast.success(t('sharedSuccessfully') || 'Shared successfully!');
+        toast.success(text.sharedSuccessfully);
       } catch (error: any) {
         if (error.name !== 'AbortError') {
           // Fallback to clipboard
           navigator.clipboard.writeText(voucherUrl);
-          toast.success(t('linkCopied') || 'Link copied to clipboard!');
+          toast.success(text.linkCopied);
         }
       }
     } else {
       // Fallback to clipboard
       navigator.clipboard.writeText(voucherUrl);
-      toast.success(t('linkCopied') || 'Link copied to clipboard!');
+      toast.success(text.linkCopied);
     }
   };
 
@@ -111,7 +124,7 @@ export default function VoucherViewPageClient({ userCoupon }: VoucherViewPageCli
           ) : (
             <ArrowLeft className="h-4 w-4 mr-2" />
           )}
-          {t('back') || 'Back'}
+          {text.back}
         </Button>
 
         <Card className="overflow-hidden">
@@ -139,7 +152,7 @@ export default function VoucherViewPageClient({ userCoupon }: VoucherViewPageCli
             <div className="mb-8">
               <QRCodeCard
                 url={voucherUrl}
-                description={t('qrCodeDescription') || 'Scan this QR code to view this voucher'}
+                description={text.qrCodeDescription}
               />
             </div>
 

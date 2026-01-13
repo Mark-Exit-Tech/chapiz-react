@@ -29,6 +29,57 @@ export default function UserCouponsPage() {
   const locale = typeof window !== 'undefined'
     ? window.location.pathname.split('/')[1] || 'en'
     : 'en';
+  const isHebrew = locale === 'he';
+  
+  // HARDCODED TEXT - NO TRANSLATION KEYS!
+  const text = {
+    loading: isHebrew ? 'טוען...' : 'Loading...',
+    title: isHebrew ? 'השוברים שלי' : 'Vouchers',
+    description: isHebrew ? 'עיינו וקנו בשוברים באמצעות הנקודות שלכם!' : 'Browse and purchase vouchers using your points!',
+    share: isHebrew ? 'שתף' : 'Share',
+    myPoints: isHebrew ? 'הנקודות שלי' : 'My Points',
+    pointsDescription: isHebrew ? 'השתמשו בנקודות שלכם כדי לקנות שוברים!' : 'Use your points to purchase vouchers!',
+    shop: isHebrew ? 'חנות' : 'Shop',
+    myCoupons: isHebrew ? 'השוברים שלי' : 'My Coupons',
+    availableCoupons: isHebrew ? 'שוברים זמינים' : 'Available Vouchers',
+    noCoupons: isHebrew ? 'אין שוברים זמינים כרגע' : 'No vouchers available at the moment',
+    validUntil: isHebrew ? 'תקף עד' : 'Valid until',
+    pointsRequired: isHebrew ? 'נקודות נדרשות' : 'Points required',
+    price: isHebrew ? 'מחיר' : 'Price',
+    free: isHebrew ? 'חינם' : 'Free',
+    getFree: isHebrew ? 'קבל חינם' : 'Get Free',
+    purchase: isHebrew ? 'רכוש' : 'Purchase',
+    insufficientPoints: isHebrew ? 'אין מספיק נקודות' : 'Insufficient Points',
+    showMap: isHebrew ? 'הצג במפה' : 'Show Map',
+    noHistory: isHebrew ? 'אין שוברים' : 'No vouchers yet',
+    historyDescription: isHebrew ? 'השוברים שרכשת יופיעו כאן' : 'Vouchers you purchase will appear here',
+    active: isHebrew ? 'פעיל' : 'Active',
+    expired: isHebrew ? 'פג תוקף' : 'Expired',
+    used: isHebrew ? 'משומש' : 'Used',
+    showQR: isHebrew ? 'הצג QR' : 'Show QR',
+    back: isHebrew ? 'חזור' : 'Back',
+    validFrom: isHebrew ? 'תקף מ' : 'Valid from',
+    qrCodeDescription: isHebrew ? 'סרקו את קוד ה-QR הזה כדי לצפות בשובר' : 'Scan this QR code to view this voucher',
+    acceptedAt: isHebrew ? 'תקף ב' : 'Accepted at',
+    storeLocation: isHebrew ? 'מיקום החנות' : 'Store Location',
+    noBusinessesFound: isHebrew ? 'לא נמצאו עסקים עבור שובר זה' : 'No businesses found for this voucher',
+    // Toast messages
+    pleaseSignIn: isHebrew ? 'אנא התחבר כדי לרכוש שוברים' : 'Please sign in to purchase vouchers',
+    pleaseSignInShare: isHebrew ? 'אנא התחבר כדי לשתף' : 'Please sign in to share',
+    failedToLoad: isHebrew ? 'נכשל בטעינת הנתונים' : 'Failed to load data',
+    purchaseSuccess: isHebrew ? 'השובר נרכש בהצלחה!' : 'Voucher purchased successfully!',
+    failedToPurchase: isHebrew ? 'נכשל ברכישת השובר' : 'Failed to purchase voucher',
+    codeCopied: isHebrew ? 'הקוד הועתק ללוח!' : 'Code copied to clipboard!',
+    failedToCopy: isHebrew ? 'נכשל בהעתקת הקוד' : 'Failed to copy code',
+    sharedSuccessfully: isHebrew ? 'שותף בהצלחה!' : 'Shared successfully!',
+    linkCopied: isHebrew ? 'הלינק הועתק ללוח!' : 'Link copied to clipboard!',
+    failedToShare: isHebrew ? 'נכשל בשיתוף' : 'Failed to share',
+    couponMarkedAsUsed: isHebrew ? 'השובר סומן כמשומש והועבר להיסטוריה' : 'Voucher marked as used and moved to history',
+    failedToMarkAsUsed: isHebrew ? 'נכשל בסימון השובר כמשומש' : 'Failed to mark voucher as used',
+    shareShopTitle: isHebrew ? 'בדקו את החנות שלנו!' : 'Check out our shop!',
+    shareShopText: isHebrew ? 'בדקו את החנות שלנו עם הקישור המיוחד הזה!' : 'Check out our shop with this special link!',
+  };
+  
   const navigate = useNavigate();
   const { user, dbUser } = useAuth();
   const [coupons, setCoupons] = useState<Coupon[]>([]);
@@ -277,7 +328,7 @@ export default function UserCouponsPage() {
       }
     } catch (error) {
       console.error('Error fetching data:', error);
-      toast.error(t('failedToLoad'));
+      toast.error(text.failedToLoad);
     } finally {
       setLoading(false);
     }
@@ -285,12 +336,12 @@ export default function UserCouponsPage() {
 
   const handleShare = async () => {
     if (!user) {
-      toast.error(t('pleaseSignInShare'));
+      toast.error(text.pleaseSignInShare);
       return;
     }
 
     if (!shopUrl) {
-      toast.error('Shop URL is not configured');
+      toast.error(isHebrew ? 'כתובת החנות לא הוגדרה' : 'Shop URL is not configured');
       return;
     }
 
@@ -300,24 +351,24 @@ export default function UserCouponsPage() {
     const generatedShopUrl = getShopUrl();
     
     if (!generatedShopUrl) {
-      toast.error('Failed to generate shop URL');
+      toast.error(isHebrew ? 'נכשל ביצירת קישור החנות' : 'Failed to generate shop URL');
       return;
     }
 
     const shareData = {
-      title: t('shareShopTitle') || 'Check out our shop!',
-      text: t('shareShopText') || 'Check out our shop with this special link!',
+      title: text.shareShopTitle,
+      text: text.shareShopText,
       url: generatedShopUrl
     };
 
     try {
       if (navigator.share && navigator.canShare(shareData)) {
         await navigator.share(shareData);
-        toast.success(t('sharedSuccessfully') || 'Shared successfully!');
+        toast.success(text.sharedSuccessfully);
       } else {
         // Fallback: copy to clipboard
         await navigator.clipboard.writeText(generatedShopUrl);
-        toast.success(t('linkCopied') || 'Link copied to clipboard!');
+        toast.success(text.linkCopied);
       }
       // Note: Points will be awarded when someone actually uses the callback URL,
       // not when the link is shared. This is handled by the shop callback API endpoint.
@@ -325,14 +376,14 @@ export default function UserCouponsPage() {
       console.error('Failed to share:', err);
       // Only show error if it's not a user cancellation
       if ((err as any).name !== 'AbortError') {
-        toast.error(t('failedToShare') || 'Failed to share');
+        toast.error(text.failedToShare);
       }
     }
   };
 
   const handlePurchaseCoupon = async (coupon: Coupon) => {
     if (!user) {
-      toast.error(t('pleaseSignIn'));
+      toast.error(text.pleaseSignIn);
       return;
     }
 
@@ -340,7 +391,7 @@ export default function UserCouponsPage() {
     const pointsNeeded = freeCouponPrice ? 0 : coupon.points;
 
     if (!freeCouponPrice && userPoints < coupon.points) {
-      toast.error(t('insufficientPoints'));
+      toast.error(text.insufficientPoints);
       return;
     }
 
@@ -354,7 +405,7 @@ export default function UserCouponsPage() {
         );
 
         if (!deductResult.success) {
-          toast.error(deductResult.error || t('failedToPurchase'));
+          toast.error(deductResult.error || text.failedToPurchase);
           return;
         }
       }
@@ -367,11 +418,11 @@ export default function UserCouponsPage() {
         if (!freeCouponPrice) {
           await addPointsToCategory(user, 'share', coupon.points);
         }
-        toast.error(purchaseResult.error || t('failedToPurchase'));
+        toast.error(purchaseResult.error || text.failedToPurchase);
         return;
       }
 
-      toast.success(t('purchaseSuccess', { name: coupon.name }));
+      toast.success(isHebrew ? `השובר "${coupon.name}" נרכש בהצלחה!` : `Voucher "${coupon.name}" purchased successfully!`);
       
       // Refresh all data
       await fetchData();
@@ -380,7 +431,7 @@ export default function UserCouponsPage() {
       setActiveTab('myCoupons');
     } catch (error) {
       console.error('Error purchasing coupon:', error);
-      toast.error(t('failedToPurchase'));
+      toast.error(text.failedToPurchase);
     }
   };
 
@@ -388,11 +439,11 @@ export default function UserCouponsPage() {
     try {
       await navigator.clipboard.writeText(code);
       setCopiedCode(code);
-      toast.success(t('codeCopied'));
+      toast.success(text.codeCopied);
       setTimeout(() => setCopiedCode(null), 2000);
     } catch (error) {
       console.error('Failed to copy code:', error);
-      toast.error(t('failedToCopy'));
+      toast.error(text.failedToCopy);
     }
   };
 
@@ -400,7 +451,7 @@ export default function UserCouponsPage() {
     // Mark as used and move to history
     const result = await markCouponAsUsed(userCoupon.id);
     if (result.success) {
-      toast.success(t('couponMarkedAsUsed') || 'Coupon marked as used!');
+      toast.success(text.couponMarkedAsUsed);
       // Refresh history
       if (user) {
         const historyResult = await getCouponHistory(user.uid);
@@ -449,7 +500,7 @@ export default function UserCouponsPage() {
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-gray-500">{t('loading')}</p>
+            <p className="text-gray-500">{text.loading}</p>
           </div>
         </div>
       </div>
@@ -464,9 +515,9 @@ export default function UserCouponsPage() {
           <div className="flex items-start justify-between gap-4 mb-3">
             <div className="flex-1">
           <h1 className="text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-            {t('title')}
+            {text.title}
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl ml-auto">{t('description')}</p>
+          <p className="text-lg text-gray-600 max-w-2xl ml-auto">{text.description}</p>
             </div>
             <Button
               onClick={handleShare}
@@ -475,7 +526,7 @@ export default function UserCouponsPage() {
               className="flex items-center gap-2 flex-shrink-0"
             >
               <Share2 className="h-5 w-5" />
-              {t('share') || 'Share'}
+              {text.share}
             </Button>
           </div>
         </div>
@@ -488,7 +539,7 @@ export default function UserCouponsPage() {
                 <div className="p-2 rounded-full bg-yellow-100">
                   <Coins className="h-6 w-6 text-yellow-600" />
                 </div>
-                {t('myPoints')}
+                {text.myPoints}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -498,7 +549,7 @@ export default function UserCouponsPage() {
                     <div className="text-5xl lg:text-6xl font-bold bg-gradient-to-r from-yellow-600 to-yellow-500 bg-clip-text text-transparent mb-3">
                       {userPoints.toLocaleString()}
                     </div>
-                    <p className="text-base text-gray-600">{t('pointsDescription')}</p>
+                    <p className="text-base text-gray-600">{text.pointsDescription}</p>
                   </div>
                 </div>
               </div>
@@ -516,26 +567,26 @@ export default function UserCouponsPage() {
             className="flex items-center gap-2 text-sm lg:text-base font-medium data-[state=active]:bg-white data-[state=active]:shadow-md transition-all rounded-lg"
           >
             <ShoppingCart className="h-4 w-4 lg:h-5 lg:w-5" />
-            {t('shop') || 'Shop'}
+            {text.shop}
           </TabsTrigger>
           <TabsTrigger 
             value="myCoupons" 
             className="flex items-center gap-2 text-sm lg:text-base font-medium data-[state=active]:bg-white data-[state=active]:shadow-md transition-all rounded-lg"
           >
             <Wallet className="h-4 w-4 lg:h-5 lg:w-5" />
-            {t('myCoupons') || 'My Coupons'}
+            {text.myCoupons}
           </TabsTrigger>
         </TabsList>
 
         {/* Shop Tab */}
         <TabsContent value="shop" className="space-y-6">
-          <h2 className="text-3xl lg:text-4xl font-bold mb-6 lg:mb-8 text-gray-900">{t('availableCoupons')}</h2>
+          <h2 className="text-3xl lg:text-4xl font-bold mb-6 lg:mb-8 text-gray-900">{text.availableCoupons}</h2>
         {coupons.length === 0 ? (
           <div className="text-center py-16 lg:py-24 bg-white rounded-2xl border-2 border-dashed border-gray-200">
             <div className="inline-flex p-4 rounded-full bg-gray-100 mb-4">
               <Wallet className="h-12 w-12 lg:h-16 lg:w-16 text-gray-400" />
             </div>
-            <p className="text-lg lg:text-xl text-gray-500 font-medium">{t('noCoupons')}</p>
+            <p className="text-lg lg:text-xl text-gray-500 font-medium">{text.noCoupons}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 lg:gap-8 pb-24">
@@ -568,7 +619,7 @@ export default function UserCouponsPage() {
                     <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm px-3 py-2">
                       <div className="flex items-center gap-1.5 text-white text-sm font-medium">
                         <Calendar className="h-4 w-4" />
-                        <span>{t('validUntil')}: {formatDate(coupon.validTo)}</span>
+                        <span>{text.validUntil}: {formatDate(coupon.validTo)}</span>
                       </div>
                     </div>
                   </div>
@@ -605,10 +656,10 @@ export default function UserCouponsPage() {
                 <CardContent className="space-y-4" onClick={(e) => e.stopPropagation()}>
                   <div className="space-y-3">
                     <div className={`flex items-center justify-between p-3 rounded-lg ${coupon.price === 0 ? 'bg-green-50' : 'bg-amber-50'}`}>
-                      <span className="text-sm font-medium text-gray-600">{t('pointsRequired')}</span>
+                      <span className="text-sm font-medium text-gray-600">{text.pointsRequired}</span>
                       {coupon.price === 0 ? (
                         <Badge className="bg-green-500 text-white hover:bg-green-600 px-3 py-1">
-                          <span className="font-bold">{t('free')}</span>
+                          <span className="font-bold">{text.free}</span>
                         </Badge>
                       ) : (
                       <Badge variant="outline" className={`flex items-center gap-1.5 bg-white px-3 py-1 ${freeCouponPrice ? 'border-green-200 text-green-700' : 'border-amber-200 text-amber-700'}`}>
@@ -619,9 +670,9 @@ export default function UserCouponsPage() {
                     </div>
                     {freeCouponPrice && (
                       <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                        <span className="text-sm font-medium text-gray-600">{t('price')}</span>
+                        <span className="text-sm font-medium text-gray-600">{text.price}</span>
                         <Badge variant="outline" className="flex items-center gap-1.5 bg-white border-green-200 text-green-700 px-3 py-1">
-                          <span className="font-semibold">{t('free')}</span>
+                          <span className="font-semibold">{text.free}</span>
                         </Badge>
                       </div>
                     )}
@@ -636,8 +687,8 @@ export default function UserCouponsPage() {
                   >
                     <ShoppingCart className="h-5 w-5" />
                     {freeCouponPrice 
-                      ? t('getFree')
-                      : (userPoints < coupon.points ? t('insufficientPoints') : t('purchase'))
+                      ? text.getFree
+                      : (userPoints < coupon.points ? t('insufficientPoints') : text.purchase)
                     }
                   </Button>
                   <Button
@@ -681,7 +732,7 @@ export default function UserCouponsPage() {
                     }}
                   >
                     <MapPin className="h-5 w-5" />
-                    {t('showMap')}
+                    {text.showMap}
                   </Button>
                 </CardFooter>
               </Card>
@@ -698,8 +749,8 @@ export default function UserCouponsPage() {
               <div className="inline-flex p-4 rounded-full bg-gray-100 mb-4">
                 <History className="h-12 w-12 lg:h-16 lg:w-16 text-gray-400" />
               </div>
-              <p className="text-lg lg:text-xl text-gray-500 font-medium mb-2">{t('noHistory')}</p>
-              <p className="text-sm lg:text-base text-gray-400">{t('historyDescription')}</p>
+              <p className="text-lg lg:text-xl text-gray-500 font-medium mb-2">{text.noHistory}</p>
+              <p className="text-sm lg:text-base text-gray-400">{text.historyDescription}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 lg:gap-8">
@@ -729,7 +780,7 @@ export default function UserCouponsPage() {
                         variant={isActive && !isExpired ? 'default' : isExpired ? 'destructive' : 'secondary'} 
                         className={`shadow-md ${isActive && !isExpired ? 'bg-green-500' : ''}`}
                       >
-                        {isActive && !isExpired ? t('active') : isExpired ? t('expired') : t('used')}
+                        {isActive && !isExpired ? text.active : isExpired ? text.expired : text.used}
                       </Badge>
                     </div>
                     {coupon.imageUrl && (
@@ -762,7 +813,7 @@ export default function UserCouponsPage() {
                         <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm px-3 py-2">
                           <div className="flex items-center gap-1.5 text-white text-sm font-medium">
                             <Calendar className="h-4 w-4" />
-                            <span>{t('validUntil')}: {formatDate(coupon.validTo)}</span>
+                            <span>{text.validUntil}: {formatDate(coupon.validTo)}</span>
                           </div>
                         </div>
                       </div>
@@ -813,14 +864,14 @@ export default function UserCouponsPage() {
                           <span className={`text-sm font-medium ${
                             isActive && !isExpired ? 'text-gray-600' : 'text-gray-500'
                           }`}>
-                            {t('price')}
+                            {text.price}
                           </span>
                           <span className={`text-lg font-bold ${
                             isActive && !isExpired 
                               ? (coupon.price === 0 ? 'text-green-600' : 'text-primary')
                               : 'text-gray-600 line-through'
                           }`}>
-                            {coupon.price === 0 ? t('free') : formatPrice(coupon.price)}
+                            {coupon.price === 0 ? text.free : formatPrice(coupon.price)}
                           </span>
                         </div>
                       </div>
@@ -833,7 +884,7 @@ export default function UserCouponsPage() {
                         className="w-full h-12 flex items-center justify-center gap-2"
                       >
                         <QrCode className="h-5 w-5" />
-                        {t('showQR') || 'Show QR'}
+                        {text.showQR}
                       </Button>
                       <Button
                         variant="outline"
@@ -876,7 +927,7 @@ export default function UserCouponsPage() {
                         }}
                       >
                         <MapPin className="h-5 w-5" />
-                        {t('showMap')}
+                        {text.showMap}
                       </Button>
                     </CardFooter>
                   </Card>
@@ -920,7 +971,7 @@ export default function UserCouponsPage() {
                   <div className="flex items-center gap-2 text-gray-600">
                     <Calendar className="h-4 w-4" />
                     <span className="text-sm">
-                      {t('validUntil')}: {
+                      {text.validUntil}: {
                         selectedCouponImage.coupon 
                           ? formatDate(selectedCouponImage.coupon.validTo)
                           : selectedCouponImage.userCoupon?.coupon
@@ -934,10 +985,10 @@ export default function UserCouponsPage() {
                   {selectedCouponImage.coupon && (
                     <div className="p-4 bg-gray-50 rounded-lg">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-600">{t('pointsRequired')}</span>
+                        <span className="text-sm font-medium text-gray-600">{text.pointsRequired}</span>
                         {selectedCouponImage.coupon.price === 0 ? (
                           <Badge className="bg-green-500 text-white">
-                            {t('free')}
+                            {text.free}
                           </Badge>
                         ) : (
                           <Badge variant="outline" className={`flex items-center gap-1.5 ${freeCouponPrice ? 'border-green-200 text-green-700' : 'border-amber-200 text-amber-700'}`}>
@@ -966,10 +1017,10 @@ export default function UserCouponsPage() {
                         <ShoppingCart className="h-5 w-5" />
                         <span className="font-semibold">
                           {freeCouponPrice 
-                            ? t('getFree') 
+                            ? text.getFree 
                             : (selectedCouponImage.coupon && userPoints < selectedCouponImage.coupon.points 
                               ? t('insufficientPoints') 
-                              : t('purchase'))
+                              : text.purchase)
                           }
                         </span>
                       </Button>
@@ -985,7 +1036,7 @@ export default function UserCouponsPage() {
                         size="lg"
                       >
                         <QrCode className="h-5 w-5" />
-                        <span className="font-semibold">{t('showQR') || 'Show QR'}</span>
+                        <span className="font-semibold">{text.showQR}</span>
                       </Button>
                     )}
                   </div>
@@ -1035,7 +1086,7 @@ export default function UserCouponsPage() {
                   <div className="mb-4 flex items-center gap-2 text-gray-600">
                     <Calendar className="h-4 w-4" />
                     <span className="text-sm">
-                      {t('validUntil')}: {
+                      {text.validUntil}: {
                         selectedCouponImage.coupon 
                           ? formatDate(selectedCouponImage.coupon.validTo)
                           : selectedCouponImage.userCoupon?.coupon
@@ -1049,10 +1100,10 @@ export default function UserCouponsPage() {
                   {selectedCouponImage.coupon && (
                     <div className="mb-4 p-3 bg-gray-50 rounded-lg">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-600">{t('pointsRequired')}</span>
+                        <span className="text-sm font-medium text-gray-600">{text.pointsRequired}</span>
                         {selectedCouponImage.coupon.price === 0 ? (
                           <Badge className="bg-green-500 text-white">
-                            {t('free')}
+                            {text.free}
                           </Badge>
                         ) : (
                           <Badge variant="outline" className={`flex items-center gap-1.5 ${freeCouponPrice ? 'border-green-200 text-green-700' : 'border-amber-200 text-amber-700'}`}>
@@ -1081,10 +1132,10 @@ export default function UserCouponsPage() {
                         <ShoppingCart className="h-5 w-5" />
                         <span className="font-semibold">
                           {freeCouponPrice 
-                            ? t('getFree') 
+                            ? text.getFree 
                             : (selectedCouponImage.coupon && userPoints < selectedCouponImage.coupon.points 
                               ? t('insufficientPoints') 
-                              : t('purchase'))
+                              : text.purchase)
                           }
                         </span>
                       </Button>
@@ -1100,7 +1151,7 @@ export default function UserCouponsPage() {
                         size="lg"
                       >
                         <QrCode className="h-5 w-5" />
-                        <span className="font-semibold">{t('showQR') || 'Show QR'}</span>
+                        <span className="font-semibold">{text.showQR}</span>
                       </Button>
                     )}
                   </div>
