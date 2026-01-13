@@ -1043,7 +1043,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
 
           {servicesWithCoords.length === 0 && !isLoading && (
             <div className="text-center py-8 text-gray-500">
-              <p>{t('map.noServices')}</p>
+              <p>{t('pages.ServicesPage.map.noServices')}</p>
             </div>
           )}
         </div>
