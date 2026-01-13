@@ -229,12 +229,16 @@ export async function getActiveAdsForServices(serviceType?: string): Promise<Ad[
   const dbAds = await getActiveAds();
   
   // Convert database Ad format to admin Ad format (Date -> string)
-  const ads: Ad[] = dbAds.map(ad => ({
-    ...ad,
-    startDate: ad.startDate ? (typeof ad.startDate === 'string' ? ad.startDate : ad.startDate) : null,
-    endDate: ad.endDate ? (typeof ad.endDate === 'string' ? ad.endDate : ad.endDate) : null,
-    createdAt: ad.createdAt ? (ad.createdAt instanceof Date ? ad.createdAt.toISOString() : ad.createdAt.toString()) : undefined
-  }));
+  const ads: Ad[] = dbAds.map(ad => {
+    const createdAtValue = ad.createdAt instanceof Date ? ad.createdAt.toISOString() : String(ad.createdAt);
+    
+    return {
+      ...ad,
+      startDate: ad.startDate || null,
+      endDate: ad.endDate || null,
+      createdAt: createdAtValue
+    } as Ad;
+  });
   
   // Filter by serviceType if provided (could be a tag or other field)
   if (serviceType) {
@@ -286,12 +290,14 @@ export async function getAdById(id: string): Promise<Ad | null> {
     if (!dbAd) return null;
     
     // Convert database Ad format to admin Ad format (Date -> string)
+    const createdAtValue = dbAd.createdAt instanceof Date ? dbAd.createdAt.toISOString() : String(dbAd.createdAt);
+    
     return {
       ...dbAd,
-      startDate: dbAd.startDate ? (typeof dbAd.startDate === 'string' ? dbAd.startDate : dbAd.startDate) : null,
-      endDate: dbAd.endDate ? (typeof dbAd.endDate === 'string' ? dbAd.endDate : dbAd.endDate) : null,
-      createdAt: dbAd.createdAt ? (dbAd.createdAt instanceof Date ? dbAd.createdAt.toISOString() : dbAd.createdAt.toString()) : undefined
-    };
+      startDate: dbAd.startDate || null,
+      endDate: dbAd.endDate || null,
+      createdAt: createdAtValue
+    } as Ad;
   } catch (error) {
     console.error('Error fetching ad by ID:', error);
     return null;
