@@ -174,7 +174,8 @@ export default function PetProfilePage({
     });
 
     // Get breed name with proper translation (exact same logic as MyPetClient)
-    let breedDisplay = pet.breedName || pet.breed || 'Unknown Breed';
+    const unknownBreed = locale === 'he' ? 'גזע לא ידוע' : 'Unknown Breed';
+    let breedDisplay = pet.breedName || pet.breed || unknownBreed;
     console.log('PetProfilePage - initial breedDisplay:', breedDisplay);
 
     if (pet.breedId) {
@@ -184,7 +185,7 @@ export default function PetProfilePage({
         breedDisplay = locale === 'he' ? breed.he : breed.en;
       }
       console.log('PetProfilePage - breed from ID:', breedDisplay);
-    } else if (breedDisplay && breedDisplay !== 'Unknown Breed') {
+    } else if (breedDisplay && breedDisplay !== unknownBreed && breedDisplay !== 'Unknown Breed' && breedDisplay !== 'גזע לא ידוע') {
       // Try to find the breed in comprehensive data and translate it
       const breed = breedsData.find(b =>
         b.en.toLowerCase() === breedDisplay.toLowerCase() ||

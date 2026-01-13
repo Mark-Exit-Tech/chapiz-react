@@ -31,6 +31,7 @@ interface NFCScanPageProps {
 
 export default function NFCScanPage({ pet }: NFCScanPageProps) {
   const { t } = useTranslation('Pet.nfcTag');
+  const { t: tCommon } = useTranslation();
   const locale = useLocale();
   const [mobileAppLinks, setMobileAppLinks] = useState({
     androidAppUrl: '',
@@ -155,7 +156,7 @@ export default function NFCScanPage({ pet }: NFCScanPageProps) {
                 </div>
                 <div>
                   <h2 className="text-xl font-bold">{pet.name}</h2>
-                  <p className="text-gray-600">{pet.breedName || 'Unknown Breed'}</p>
+                  <p className="text-gray-600">{pet.breedName || tCommon('pages.MyPetsPage.unknownBreed')}</p>
                 </div>
               </CardTitle>
             </CardHeader>

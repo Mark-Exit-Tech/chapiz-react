@@ -61,10 +61,11 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
                 if (result.success && result.pet) {
                   console.log('Pet data from consolidated method:', result.pet);
                   // Get breed name with proper translation
-                  let breedDisplay = result.pet.breedName || result.pet.breed || 'Unknown Breed';
+                  const unknownBreed = t('pages.MyPetsPage.unknownBreed');
+                  let breedDisplay = result.pet.breedName || result.pet.breed || unknownBreed;
                   if (result.pet.breedId) {
                     breedDisplay = await getBreedNameById(result.pet.breedId, locale);
-                  } else if (breedDisplay && breedDisplay !== 'Unknown Breed') {
+                  } else if (breedDisplay && breedDisplay !== unknownBreed) {
                     // Check if breedDisplay is actually an ID (e.g., "dog-3", "cat-5")
                     if (breedDisplay.startsWith('dog-') || breedDisplay.startsWith('cat-')) {
                       // It's a legacy breed ID format, try to parse it
@@ -87,7 +88,7 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
 
                   return {
                     id: result.pet.id,
-                    name: result.pet.name || 'Unknown Pet',
+                    name: result.pet.name || t('pages.MyPetsPage.unknownPet'),
                     breed: breedDisplay,
                     image: result.pet.imageUrl || '/default-pet.png'
                   };
@@ -96,8 +97,8 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
                   // Get the pet data directly from the petDoc
                   return {
                     id: petDoc.id,
-                    name: 'Unknown Pet',
-                    breed: 'Unknown Breed',
+                    name: t('pages.MyPetsPage.unknownPet'),
+                    breed: t('pages.MyPetsPage.unknownBreed'),
                     image: '/default-pet.png'
                   };
                   /* Legacy fallback - not needed with Firebase
@@ -119,8 +120,8 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
                 console.error('Error fetching pet with consolidated method:', error);
                 return {
                   id: petDoc.id,
-                  name: 'Unknown Pet',
-                  breed: 'Unknown Breed',
+                  name: t('pages.MyPetsPage.unknownPet'),
+                  breed: t('pages.MyPetsPage.unknownBreed'),
                   image: '/default-pet.png'
                 };
               }
