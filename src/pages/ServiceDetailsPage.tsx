@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import BottomNavigation from '@/components/layout/BottomNavigation';
 import ServiceDetailsPageClient from '@/components/pages/ServiceDetailsPageClient';
+import { getBusinessById } from '@/lib/firebase/database/businesses';
 import { getAdById } from '@/lib/firebase/database/advertisements';
 import { useLocale } from '@/hooks/use-locale';
 
@@ -32,24 +33,47 @@ export default function ServiceDetailsPage() {
       }
 
       try {
-        const ad = await getAdById(id);
+        console.log(`📡 Fetching service details for ID: ${id}`);
+        
+        // Try fetching from businesses collection first
+        const business = await getBusinessById(id);
 
-        if (ad) {
+        if (business) {
+          console.log('✅ Found business:', business.name);
           setService({
-            id: ad.id,
-            title: ad.title,
-            description: ad.description,
-            content: ad.content,
-            phone: ad.phone,
-            location: ad.location,
-            tags: ad.tags,
-            imageUrl: ad.imageUrl || ad.content,
+            id: business.id,
+            title: business.name,
+            description: business.description,
+            content: business.logoUrl,
+            phone: business.phone,
+            location: business.address,
+            tags: [],
+            imageUrl: business.logoUrl,
           });
         } else {
-          setService(null);
+          // Fallback: try advertisements collection
+          console.log('⚠️ Business not found, trying advertisements collection...');
+          const ad = await getAdById(id);
+          
+          if (ad) {
+            console.log('✅ Found advertisement:', ad.title);
+            setService({
+              id: ad.id,
+              title: ad.title,
+              description: ad.description,
+              content: ad.content,
+              phone: ad.phone,
+              location: ad.location,
+              tags: ad.tags,
+              imageUrl: ad.imageUrl || ad.content,
+            });
+          } else {
+            console.warn('❌ Service not found in either collection');
+            setService(null);
+          }
         }
       } catch (error) {
-        console.error('Error fetching service:', error);
+        console.error('❌ Error fetching service:', error);
         setService(null);
       } finally {
         setLoading(false);

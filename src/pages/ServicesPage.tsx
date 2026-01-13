@@ -3,7 +3,8 @@ import BottomNavigation from '@/components/layout/BottomNavigation';
 import ServicesPageContent from '@/components/pages/servicesPage';
 import { useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { getActiveAds } from '@/lib/firebase/database/advertisements';
+import { getAllBusinesses } from '@/lib/firebase/database/businesses';
+import type { Business } from '@/lib/firebase/database/businesses';
 
 interface Ad {
   id: string;
@@ -24,6 +25,28 @@ interface Ad {
   totalReviews?: number;
 }
 
+// Convert Business to Ad format
+const convertBusinessToAd = (business: Business): Ad => {
+  return {
+    id: business.id,
+    title: business.name,
+    type: 'image',
+    content: business.logoUrl || 'https://via.placeholder.com/300x200?text=Service',
+    duration: 30,
+    status: 'active',
+    startDate: null,
+    endDate: null,
+    createdAt: business.createdAt,
+    phone: business.phone,
+    location: business.address,
+    description: business.description,
+    tags: [],
+    reviews: [],
+    averageRating: 0,
+    totalReviews: 0
+  };
+};
+
 export default function ServicesPage() {
   const [searchParams] = useSearchParams();
   const [ads, setAds] = useState<Ad[]>([]);
@@ -31,22 +54,24 @@ export default function ServicesPage() {
 
   const businessId = searchParams.get('businessId') || undefined;
 
-  // Fetch ads from Firebase
+  // Fetch businesses from Firebase and convert to Ad format
   useEffect(() => {
     const fetchAds = async () => {
       try {
-        console.log('📡 Fetching services data from Firebase...');
-        const activeAds = await getActiveAds();
+        console.log('📡 Fetching services from businesses collection...');
+        const businesses = await getAllBusinesses();
         
-        if (activeAds.length === 0) {
-          console.warn('⚠️ No active ads found in advertisements collection');
+        if (businesses.length === 0) {
+          console.warn('⚠️ No businesses found in businesses collection');
         } else {
-          console.log(`✅ Successfully loaded ${activeAds.length} services`);
+          console.log(`✅ Successfully loaded ${businesses.length} businesses from Firebase`);
         }
         
-        setAds(activeAds as Ad[]);
+        // Convert businesses to Ad format
+        const businessAds = businesses.map(convertBusinessToAd);
+        setAds(businessAds);
       } catch (error) {
-        console.error('❌ Error fetching ads:', error);
+        console.error('❌ Error fetching businesses:', error);
         setAds([]);
       } finally {
         setLoading(false);
