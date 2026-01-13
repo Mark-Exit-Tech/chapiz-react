@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, where, orderBy, limit as firestoreLimit } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, where, orderBy, limit as firestoreLimit, Timestamp } from 'firebase/firestore';
 import { db } from '../client';
 
 export interface Business {
@@ -162,19 +162,51 @@ export async function createBusiness(businessData: Omit<Business, 'id' | 'create
     try {
         const businessesRef = collection(db, BUSINESSES_COLLECTION);
         const newBusinessRef = doc(businessesRef);
-        const now = new Date();
+        const now = Timestamp.now();
         
-        const business: Business = {
-            id: newBusinessRef.id,
-            ...businessData,
+        // Prepare data for Firestore (using Timestamp)
+        const firestoreData = {
+            name: businessData.name,
+            description: businessData.description,
+            imageUrl: businessData.imageUrl || '',
+            contactInfo: businessData.contactInfo,
+            tags: businessData.tags || [],
+            filterIds: businessData.filterIds || [],
+            rating: businessData.rating || 0,
+            isActive: businessData.isActive !== undefined ? businessData.isActive : true,
+            createdBy: businessData.createdBy || 'admin',
             createdAt: now,
             updatedAt: now
         };
         
-        await setDoc(newBusinessRef, business);
+        console.log('📝 Creating business with data:', firestoreData);
+        await setDoc(newBusinessRef, firestoreData);
+        
+        // Return business with Date objects for consistency
+        const business: Business = {
+            id: newBusinessRef.id,
+            name: businessData.name,
+            description: businessData.description,
+            imageUrl: businessData.imageUrl || '',
+            contactInfo: businessData.contactInfo,
+            tags: businessData.tags || [],
+            filterIds: businessData.filterIds,
+            rating: businessData.rating,
+            isActive: businessData.isActive !== undefined ? businessData.isActive : true,
+            createdAt: now.toDate(),
+            updatedAt: now.toDate(),
+            createdBy: businessData.createdBy || 'admin'
+        };
+        
+        console.log('✅ Business created successfully:', business.id);
         return business;
     } catch (error) {
-        console.error('Error creating business:', error);
+        console.error('❌ Error creating business:', error);
+        console.error('Error details:', {
+            message: error instanceof Error ? error.message : 'Unknown error',
+            code: (error as any)?.code,
+            stack: error instanceof Error ? error.stack : undefined
+        });
         return null;
     }
 }
@@ -185,7 +217,7 @@ export async function updateBusiness(id: string, updates: Partial<Business>): Pr
         const businessRef = doc(db, BUSINESSES_COLLECTION, id);
         await updateDoc(businessRef, {
             ...updates,
-            updatedAt: new Date()
+            updatedAt: Timestamp.now()
         });
         
         const updatedDoc = await getDoc(businessRef);
@@ -206,8 +238,8 @@ export async function updateBusiness(id: string, updates: Partial<Business>): Pr
             filterIds: data.filterIds,
             rating: data.rating,
             isActive: data.isActive !== undefined ? data.isActive : true,
-            createdAt: data.createdAt || new Date(),
-            updatedAt: data.updatedAt || new Date(),
+            createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
+            updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt || Date.now()),
             createdBy: data.createdBy || '',
             logoUrl: data.logoUrl,
             website: data.website,

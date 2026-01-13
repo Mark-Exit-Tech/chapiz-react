@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import AddAdForm from '@/components/admin/AddAdForm';
 import AdsTable from '@/components/admin/AdsTable';
+import AdminLayout from '@/components/admin/AdminLayout';
 
 interface AdsPageProps {
   searchParams?: {

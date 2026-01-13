@@ -233,6 +233,8 @@ export async function getAllBusinesses() {
 
 export async function createBusiness(data: CreateBusinessData) {
   try {
+    console.log('📝 Admin action: Creating business with data:', data);
+    
     const { createBusiness: createBusinessInDB } = await import('@/lib/firebase/database/businesses');
     const business = await createBusinessInDB({
       name: data.name,
@@ -247,13 +249,16 @@ export async function createBusiness(data: CreateBusinessData) {
     });
     
     if (!business) {
-      return { success: false, error: 'Failed to create business in database' };
+      console.error('❌ Database returned null - business creation failed');
+      return { success: false, error: 'Failed to create business in database. Check console for details.' };
     }
     
+    console.log('✅ Business created successfully:', business.id);
     return { success: true, business, error: undefined };
   } catch (error) {
-    console.error('Error creating business:', error);
-    return { success: false, error: String(error) };
+    console.error('❌ Error in createBusiness admin action:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return { success: false, error: `Failed to create business: ${errorMessage}` };
   }
 }
 
