@@ -194,18 +194,61 @@ export async function getAllBusinesses() {
 }
 
 export async function createBusiness(data: CreateBusinessData) {
-  console.warn('createBusiness stub');
-  return { success: true, error: undefined };
+  try {
+    const { createBusiness: createBusinessInDB } = await import('@/lib/firebase/database/businesses');
+    const business = await createBusinessInDB({
+      name: data.name,
+      description: data.description,
+      imageUrl: data.imageUrl || '',
+      contactInfo: data.contactInfo,
+      tags: data.tags || [],
+      filterIds: data.filterIds,
+      rating: data.rating,
+      isActive: true,
+      createdBy: 'admin' // TODO: Get actual user ID from auth
+    });
+    
+    if (!business) {
+      return { success: false, error: 'Failed to create business in database' };
+    }
+    
+    return { success: true, business, error: undefined };
+  } catch (error) {
+    console.error('Error creating business:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function updateBusiness(id: string, data: UpdateBusinessData) {
-  console.warn('updateBusiness stub');
-  return { success: true, error: undefined };
+  try {
+    const { updateBusiness: updateBusinessInDB } = await import('@/lib/firebase/database/businesses');
+    const business = await updateBusinessInDB(id, data);
+    
+    if (!business) {
+      return { success: false, error: 'Failed to update business in database' };
+    }
+    
+    return { success: true, business, error: undefined };
+  } catch (error) {
+    console.error('Error updating business:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function deleteBusiness(id: string) {
-  console.warn('deleteBusiness stub');
-  return { success: true, error: undefined };
+  try {
+    const { deleteBusiness: deleteBusinessFromDB } = await import('@/lib/firebase/database/businesses');
+    const success = await deleteBusinessFromDB(id);
+    
+    if (!success) {
+      return { success: false, error: 'Failed to delete business from database' };
+    }
+    
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Error deleting business:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 // Contact info stub
@@ -579,15 +622,90 @@ export async function deleteFilter(id: string) {
 }
 
 export async function bulkDeleteBusinesses(ids: string[]) {
-  return { success: true, error: undefined };
+  try {
+    const { deleteBusiness: deleteBusinessFromDB } = await import('@/lib/firebase/database/businesses');
+    
+    // Delete all businesses in parallel
+    const deletePromises = ids.map(id => deleteBusinessFromDB(id));
+    const results = await Promise.all(deletePromises);
+    
+    // Check if all deletions were successful
+    const allSuccessful = results.every(result => result === true);
+    
+    if (!allSuccessful) {
+      return { success: false, error: 'Some businesses failed to delete' };
+    }
+    
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Error bulk deleting businesses:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function bulkUpdateBusinesses(ids: string[], data: Partial<UpdateBusinessData>) {
-  return { success: true, error: undefined };
+  try {
+    const { updateBusiness: updateBusinessInDB } = await import('@/lib/firebase/database/businesses');
+    
+    // Update all businesses in parallel
+    const updatePromises = ids.map(id => updateBusinessInDB(id, data));
+    const results = await Promise.all(updatePromises);
+    
+    // Check if all updates were successful
+    const allSuccessful = results.every(result => result !== null);
+    
+    if (!allSuccessful) {
+      return { success: false, error: 'Some businesses failed to update' };
+    }
+    
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Error bulk updating businesses:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function bulkAssignTags(ids: string[], tagsToAdd: string[], tagsToRemove?: string[]): Promise<{ success: boolean; error?: string }> {
-  return { success: true, error: undefined };
+  try {
+    const { getBusinessById, updateBusiness: updateBusinessInDB } = await import('@/lib/firebase/database/businesses');
+    
+    // Process each business
+    const updatePromises = ids.map(async (id) => {
+      const business = await getBusinessById(id);
+      if (!business) return false;
+      
+      let newTags = [...(business.tags || [])];
+      
+      // Add new tags
+      if (tagsToAdd.length > 0) {
+        tagsToAdd.forEach(tag => {
+          if (!newTags.includes(tag)) {
+            newTags.push(tag);
+          }
+        });
+      }
+      
+      // Remove tags
+      if (tagsToRemove && tagsToRemove.length > 0) {
+        newTags = newTags.filter(tag => !tagsToRemove.includes(tag));
+      }
+      
+      const result = await updateBusinessInDB(id, { tags: newTags });
+      return result !== null;
+    });
+    
+    const results = await Promise.all(updatePromises);
+    const allSuccessful = results.every(result => result === true);
+    
+    if (!allSuccessful) {
+      return { success: false, error: 'Some businesses failed to update tags' };
+    }
+    
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Error bulk assigning tags:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function deleteComment(id: string) {
