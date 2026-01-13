@@ -138,12 +138,35 @@ export default function AdminUsersPage() {
 
   const formatDate = (date: Date | undefined) => {
     if (!date) return '-';
-    const dateObj = date instanceof Date ? date : new Date(date);
-    return new Intl.DateTimeFormat(isHebrew ? 'he-IL' : 'en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    }).format(dateObj);
+    
+    try {
+      // Handle Date object or timestamp
+      let dateObj: Date;
+      
+      if (date instanceof Date) {
+        dateObj = date;
+      } else if (typeof date === 'object' && 'toDate' in date) {
+        // Firestore Timestamp
+        dateObj = (date as any).toDate();
+      } else {
+        dateObj = new Date(date);
+      }
+      
+      // Check if date is valid
+      if (isNaN(dateObj.getTime())) {
+        console.warn('Invalid date:', date);
+        return '-';
+      }
+      
+      return new Intl.DateTimeFormat(isHebrew ? 'he-IL' : 'en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      }).format(dateObj);
+    } catch (error) {
+      console.error('Error formatting date:', error, date);
+      return '-';
+    }
   };
 
   if (loading) {
