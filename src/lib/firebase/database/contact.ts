@@ -51,7 +51,15 @@ export async function getAllContactSubmissions(): Promise<ContactSubmission[]> {
         const q = query(contactRef, orderBy('createdAt', 'desc'));
         const querySnapshot = await getDocs(q);
         
-        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ContactSubmission));
+        return querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                ...data,
+                // Convert Firestore Timestamp to Date
+                createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now())
+            } as ContactSubmission;
+        });
     } catch (error) {
         console.error('Error fetching contact submissions:', error);
         return [];
