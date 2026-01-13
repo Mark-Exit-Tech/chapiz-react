@@ -237,6 +237,24 @@ export async function getAreasForDropdown(locale: 'en' | 'he' = 'en'): Promise<{
         const areasRef = collection(db, 'areas');
         const snapshot = await getDocs(areasRef);
         
+        if (snapshot.empty) {
+            // Fallback data if collection is empty
+            console.warn('Areas collection is empty, using fallback data');
+            return locale === 'he' 
+                ? [
+                    { value: 'north', label: 'צפון' },
+                    { value: 'center', label: 'מרכז' },
+                    { value: 'south', label: 'דרום' },
+                    { value: 'jerusalem', label: 'ירושלים והסביבה' }
+                  ]
+                : [
+                    { value: 'north', label: 'North' },
+                    { value: 'center', label: 'Center' },
+                    { value: 'south', label: 'South' },
+                    { value: 'jerusalem', label: 'Jerusalem Area' }
+                  ];
+        }
+        
         return snapshot.docs.map(doc => {
             const data = doc.data();
             const label = locale === 'he' ? (data.nameHe || data.name_he || data.name) : (data.nameEn || data.name_en || data.name);
@@ -256,6 +274,32 @@ export async function getCitiesForDropdown(locale: 'en' | 'he' = 'en'): Promise<
     try {
         const citiesRef = collection(db, 'cities');
         const snapshot = await getDocs(citiesRef);
+        
+        if (snapshot.empty) {
+            // Fallback data if collection is empty
+            console.warn('Cities collection is empty, using fallback data');
+            return locale === 'he'
+                ? [
+                    { value: 'tel-aviv', label: 'תל אביב' },
+                    { value: 'jerusalem', label: 'ירושלים' },
+                    { value: 'haifa', label: 'חיפה' },
+                    { value: 'rishon', label: 'ראשון לציון' },
+                    { value: 'petah-tikva', label: 'פתח תקווה' },
+                    { value: 'ashdod', label: 'אשדוד' },
+                    { value: 'netanya', label: 'נתניה' },
+                    { value: 'beer-sheva', label: 'באר שבע' }
+                  ]
+                : [
+                    { value: 'tel-aviv', label: 'Tel Aviv' },
+                    { value: 'jerusalem', label: 'Jerusalem' },
+                    { value: 'haifa', label: 'Haifa' },
+                    { value: 'rishon', label: 'Rishon LeZion' },
+                    { value: 'petah-tikva', label: 'Petah Tikva' },
+                    { value: 'ashdod', label: 'Ashdod' },
+                    { value: 'netanya', label: 'Netanya' },
+                    { value: 'beer-sheva', label: 'Beer Sheva' }
+                  ];
+        }
         
         return snapshot.docs.map(doc => {
             const data = doc.data();
@@ -277,6 +321,24 @@ export async function getAgeRangesForDropdown(locale: 'en' | 'he' = 'en'): Promi
         const ageRangesRef = collection(db, 'ageRanges');
         const snapshot = await getDocs(ageRangesRef);
         
+        if (snapshot.empty) {
+            // Fallback data if collection is empty
+            console.warn('Age ranges collection is empty, using fallback data');
+            return locale === 'he'
+                ? [
+                    { value: 'puppy', label: 'גור (0-1 שנים)' },
+                    { value: 'young', label: 'צעיר (1-3 שנים)' },
+                    { value: 'adult', label: 'בוגר (3-7 שנים)' },
+                    { value: 'senior', label: 'מבוגר (7+ שנים)' }
+                  ]
+                : [
+                    { value: 'puppy', label: 'Puppy (0-1 years)' },
+                    { value: 'young', label: 'Young (1-3 years)' },
+                    { value: 'adult', label: 'Adult (3-7 years)' },
+                    { value: 'senior', label: 'Senior (7+ years)' }
+                  ];
+        }
+        
         return snapshot.docs.map(doc => {
             const data = doc.data();
             const label = locale === 'he' ? (data.nameHe || data.name_he || data.name) : (data.nameEn || data.name_en || data.name);
@@ -296,6 +358,24 @@ export async function getWeightRangesForDropdown(locale: 'en' | 'he' = 'en'): Pr
     try {
         const weightRangesRef = collection(db, 'weightRanges');
         const snapshot = await getDocs(weightRangesRef);
+        
+        if (snapshot.empty) {
+            // Fallback data if collection is empty
+            console.warn('Weight ranges collection is empty, using fallback data');
+            return locale === 'he'
+                ? [
+                    { value: 'small', label: 'קטן (0-10 ק"ג)' },
+                    { value: 'medium', label: 'בינוני (10-25 ק"ג)' },
+                    { value: 'large', label: 'גדול (25-45 ק"ג)' },
+                    { value: 'giant', label: 'ענק (45+ ק"ג)' }
+                  ]
+                : [
+                    { value: 'small', label: 'Small (0-10 kg)' },
+                    { value: 'medium', label: 'Medium (10-25 kg)' },
+                    { value: 'large', label: 'Large (25-45 kg)' },
+                    { value: 'giant', label: 'Giant (45+ kg)' }
+                  ];
+        }
         
         return snapshot.docs.map(doc => {
             const data = doc.data();
