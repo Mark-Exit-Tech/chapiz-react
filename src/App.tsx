@@ -28,6 +28,7 @@ const AdminCouponsPage = lazy(() => import('./components/admin/AdminCouponsPage'
 const AdminBusinessesPage = lazy(() => import('./components/admin/AdminBusinessesPage'));
 const ContactSubmissionsPage = lazy(() => import('./components/admin/ContactSubmissionsPage'));
 const AdminPetsPage = lazy(() => import('./components/admin/AdminPetsPage'));
+const AdminCommentsPage = lazy(() => import('./components/admin/AdminCommentsPage'));
 const BusinessesPage = lazy(() => import('./components/admin/BusinessesPage'));
 
 // Loading component
@@ -92,6 +93,7 @@ function App() {
           <Route path="/:locale/admin/business" element={<Suspense fallback={<PageLoader />}><BusinessesPage /></Suspense>} />
           <Route path="/:locale/admin/contact-submissions" element={<Suspense fallback={<PageLoader />}><ContactSubmissionsPage /></Suspense>} />
           <Route path="/:locale/admin/pets" element={<Suspense fallback={<PageLoader />}><AdminPetsPage /></Suspense>} />
+          <Route path="/:locale/admin/comments" element={<Suspense fallback={<PageLoader />}><AdminCommentsPage /></Suspense>} />
           <Route path="/:locale/admin/settings" element={<Suspense fallback={<PageLoader />}><AdminPage /></Suspense>} />
           
           <Route path="/:locale/services" element={<Suspense fallback={<PageLoader />}><ServicesPage /></Suspense>} />

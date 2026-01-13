@@ -27,6 +27,28 @@ export default function AdsTable() {
   const [ads, setAds] = useState<Ad[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+  
+  // HARDCODED TEXT
+  const text = {
+    loading: isHebrew ? 'טוען...' : 'Loading...',
+    title: isHebrew ? 'כותרת' : 'Title',
+    type: isHebrew ? 'סוג' : 'Type',
+    image: isHebrew ? 'תמונה' : 'Image',
+    status: isHebrew ? 'סטטוס' : 'Status',
+    created: isHebrew ? 'נוצר' : 'Created',
+    noAds: isHebrew ? 'לא נמצאו מודעות' : 'No advertisements found',
+    noImage: isHebrew ? 'אין תמונה' : 'No Image',
+    statusActive: isHebrew ? 'פעיל' : 'Active',
+    statusScheduled: isHebrew ? 'מתוזמן' : 'Scheduled',
+    statusDraft: isHebrew ? 'טיוטה' : 'Draft',
+    statusInactive: isHebrew ? 'לא פעיל' : 'Inactive'
+  };
 
   useEffect(() => {
     fetchAds();
@@ -63,10 +85,10 @@ export default function AdsTable() {
 
   const getStatusBadge = (status: AdStatus) => {
     const statusConfig = {
-      active: { label: t('adsManagement.status.active'), className: 'bg-green-100 text-green-800' },
-      scheduled: { label: t('adsManagement.status.scheduled'), className: 'bg-yellow-100 text-yellow-800' },
-      draft: { label: t('adsManagement.status.draft'), className: 'bg-gray-100 text-gray-800' },
-      inactive: { label: t('adsManagement.status.inactive'), className: 'bg-red-100 text-red-800' }
+      active: { label: text.statusActive, className: 'bg-green-100 text-green-800' },
+      scheduled: { label: text.statusScheduled, className: 'bg-yellow-100 text-yellow-800' },
+      draft: { label: text.statusDraft, className: 'bg-gray-100 text-gray-800' },
+      inactive: { label: text.statusInactive, className: 'bg-red-100 text-red-800' }
     };
 
     const config = statusConfig[status] || statusConfig.draft;
@@ -82,7 +104,7 @@ export default function AdsTable() {
       <div className="flex items-center justify-center p-8">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-500">{t('loading') || 'Loading...'}</p>
+          <p className="text-gray-500">{text.loading}</p>
         </div>
       </div>
     );
@@ -102,11 +124,11 @@ export default function AdsTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('adsManagement.table.title')}</TableHead>
-              <TableHead>{t('adsManagement.table.type')}</TableHead>
-              <TableHead>{t('adsManagement.table.image')}</TableHead>
-              <TableHead>{t('adsManagement.table.status')}</TableHead>
-              <TableHead>{t('adsManagement.table.created')}</TableHead>
+              <TableHead>{text.title}</TableHead>
+              <TableHead>{text.type}</TableHead>
+              <TableHead>{text.image}</TableHead>
+              <TableHead>{text.status}</TableHead>
+              <TableHead>{text.created}</TableHead>
               <TableHead className="w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
@@ -114,7 +136,7 @@ export default function AdsTable() {
               {ads.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-8 text-gray-500">
-                    {t('adsManagement.table.noAds') || 'No advertisements found.'}
+                    {text.noAds}
                   </TableCell>
                 </TableRow>
             ) : (
@@ -135,7 +157,7 @@ export default function AdsTable() {
                       </div>
                     ) : (
                       <div className="w-16 h-10 rounded-md bg-gray-100 flex items-center justify-center">
-                        <span className="text-xs text-gray-400">No Image</span>
+                        <span className="text-xs text-gray-400">{text.noImage}</span>
                       </div>
                     )}
                   </TableCell>

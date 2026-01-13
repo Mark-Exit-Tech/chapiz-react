@@ -20,6 +20,18 @@ export default function AdsPage({ searchParams: propsSearchParams }: AdsPageProp
   const { t } = useTranslation('Admin');
   const [urlSearchParams] = useSearchParams();
   
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+  
+  // HARDCODED TEXT
+  const text = {
+    title: isHebrew ? 'ניהול מודעות' : 'Ads Management',
+    description: isHebrew ? 'נהלו וערכו את כל המודעות בפלטפורמה' : 'Manage and edit all ads on the platform'
+  };
+  
   // Use searchParams from props if provided, otherwise get from URL
   const searchParams = propsSearchParams || {
     page: urlSearchParams.get('page') || undefined,
@@ -37,10 +49,10 @@ export default function AdsPage({ searchParams: propsSearchParams }: AdsPageProp
           <AddAdForm />
             <div className="text-left rtl:text-right">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-              {t('adsManagement.title')}
+              {text.title}
             </h1>
               <p className="text-gray-600 mt-2 text-sm md:text-base">
-              {t('adsManagement.description')}
+              {text.description}
               </p>
           </div>
           </div>
