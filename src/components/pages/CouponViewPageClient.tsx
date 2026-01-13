@@ -219,7 +219,7 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
               {(coupon.startDate || coupon.endDate) && (
                 <div className="text-sm text-gray-500 mb-4">
                   {coupon.startDate && (
-                    <p>{t('startDate') || 'Start'}: {new Date(coupon.startDate).toLocaleDateString('en-GB')}</p>
+                    <p>{text.startDate}: {new Date(coupon.startDate).toLocaleDateString(isHebrew ? 'he-IL' : 'en-GB')}</p>
                   )}
                   {coupon.endDate && (
                     <p>{text.endDate}: {new Date(coupon.endDate).toLocaleDateString(isHebrew ? 'he-IL' : 'en-GB')}</p>

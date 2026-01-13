@@ -40,7 +40,7 @@ export default function CouponDetailPage() {
           const businessesResult = await getBusinesses();
           if (businessesResult && Array.isArray(businessesResult)) {
             // Filter businesses that accept this coupon
-            const businessIds = couponData.businessIds || (couponData.businessId ? [couponData.businessId] : []);
+            const businessIds = (couponData as any).businessIds || ((couponData as any).businessId ? [(couponData as any).businessId] : []);
             const relatedBusinesses = businessesResult.filter((b: any) => businessIds.includes(b.id));
             setBusinesses(relatedBusinesses);
           }
