@@ -17,7 +17,7 @@ import { Textarea } from '../ui/textarea';
 import { Separator } from '@radix-ui/react-separator';
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { getCommentsForAd, submitComment } from '@/lib/actions/admin';
 import { addToFavorites, removeFromFavorites, isAdFavorited } from '@/lib/supabase/database/favorites';
 import { useNavigate } from 'react-router-dom';

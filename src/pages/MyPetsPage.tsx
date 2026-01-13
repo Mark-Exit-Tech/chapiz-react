@@ -1,7 +1,7 @@
 import Navbar from '@/components/layout/Navbar';
 import BottomNavigation from '@/components/layout/BottomNavigation';
 import MyPetClient from '@/components/MyPetClient';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 

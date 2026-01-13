@@ -9,7 +9,7 @@ import { MapPin, Phone, Star, Send, Heart, Ticket, ArrowLeft } from 'lucide-reac
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { getCommentsForAd, submitComment } from '@/lib/actions/admin';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { addToFavorites, removeFromFavorites, isAdFavorited } from '@/lib/supabase/database/favorites';
 import { useTranslation } from 'react-i18next';
 import { useLocale } from '@/hooks/use-locale';

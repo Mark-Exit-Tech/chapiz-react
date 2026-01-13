@@ -7,7 +7,7 @@ import { fetchRandomAd } from '@/lib/actions/ads-server';
 import AdFullPage from './get-started/AdFullPage';
 import { useLocation } from 'react-router-dom';
 import { getYouTubeVideoId } from '@/lib/utils/youtube';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
 
 export default function AdDisplayManager() {
   const { pathname } = useLocation();

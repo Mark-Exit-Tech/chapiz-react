@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
 import GoogleSignupBottomSheet from './GoogleSignupBottomSheet';
 
 const GoogleSignupHandler = () => {

@@ -3,7 +3,7 @@
  * This component shows the current state of OTP codes and allows testing
  */
 
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { useState } from 'react';
 
 export default function OTPDebugger() {

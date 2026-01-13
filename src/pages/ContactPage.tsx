@@ -11,7 +11,7 @@ import Footer from '@/components/layout/Footer';
 import { useTranslation } from 'react-i18next';
 import { createContactSubmission } from '@/lib/supabase/database/contact';
 import { getContactInfo } from '@/lib/actions/admin';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { getUserFromFirestore } from '@/lib/supabase/database/users';
 
 export default function ContactPage() {

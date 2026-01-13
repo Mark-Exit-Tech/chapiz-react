@@ -14,7 +14,7 @@ import {
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { Button } from '../ui/button';
 import OptimizedImage from '@/components/OptimizedImage';
 import {

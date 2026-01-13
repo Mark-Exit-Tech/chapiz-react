@@ -4,7 +4,7 @@ import { DirectionProvider } from '@radix-ui/react-direction';
 import { Toaster } from 'react-hot-toast';
 import { useEffect } from 'react';
 import { usePathname } from '@/i18n/routing';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
 import AdDisplayManager from '@/components/AdDisplayManager';
 import InstallBanner from '@/components/InstallBanner';
 import Navbar from './Navbar';

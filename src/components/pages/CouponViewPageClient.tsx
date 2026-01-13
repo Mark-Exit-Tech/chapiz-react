@@ -10,7 +10,7 @@ import { Promo, Business } from '@/types/promo';
 import Navbar from '@/components/layout/Navbar';
 import { Card, CardContent } from '@/components/ui/card';
 import toast from 'react-hot-toast';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { markPromoAsUsed, isPromoUsed } from '@/lib/supabase/database/promos';
 import { motion } from 'framer-motion';
 import { getYouTubeEmbedUrl } from '@/lib/utils/youtube';

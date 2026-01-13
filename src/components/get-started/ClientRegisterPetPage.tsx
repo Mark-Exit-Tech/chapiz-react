@@ -11,7 +11,7 @@ import { usePetId } from '@/hooks/use-pet-id';
 import { useParams } from 'react-router-dom';
 import { createPetInFirestore } from '@/lib/supabase/database/pets';
 import { getUserFromFirestore } from '@/lib/supabase/database/users';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { getPetRegisterSchemas } from '@/utils/validation/petRegister';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';

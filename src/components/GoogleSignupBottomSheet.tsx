@@ -8,7 +8,7 @@ import { Label } from './ui/label';
 import { Input } from './ui/input';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { updateUserByUid } from '@/lib/supabase/database/users';
 import { isValidPhoneNumber } from 'libphonenumber-js';
 import PhoneInput from 'react-phone-number-input';

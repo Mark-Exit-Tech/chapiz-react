@@ -4,7 +4,7 @@ import { Gift, Ticket, PawPrint, MapPin, Mail, LogIn } from 'lucide-react';
 import { Link as RouterLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { usePathname } from '@/i18n/routing';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
 
 export default function BottomNavigation() {
   const pathname = usePathname();

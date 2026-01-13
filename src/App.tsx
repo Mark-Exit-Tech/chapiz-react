@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/FirebaseAuthContext';
 import HomePage from './pages/HomePage';
 
 // Lazy load pages - reduces initial bundle size

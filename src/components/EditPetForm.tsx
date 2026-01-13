@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { uploadPetImage } from '@/lib/supabase/storage';
 import { updatePetInFirestore } from '@/lib/supabase/database/pets';
 import { Button } from './ui/button';

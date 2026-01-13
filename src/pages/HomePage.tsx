@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { useState, useEffect, lazy, Suspense } from 'react';
 import Footer from '@/components/layout/Footer';
 import OptimizedImage from '@/components/OptimizedImage';

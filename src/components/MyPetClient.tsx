@@ -9,7 +9,7 @@ import { cn } from '../lib/utils';
 import InviteFriendsCard from './InviteFriendsCard';
 import { Button } from './ui/button';
 import { Separator } from './ui/separator';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useLocale } from '@/hooks/use-locale';
 import { getBreedNameById } from '@/lib/supabase/database/pets';
