@@ -74,8 +74,8 @@ export default function UserCouponsPage() {
     sharedSuccessfully: isHebrew ? 'שותף בהצלחה!' : 'Shared successfully!',
     linkCopied: isHebrew ? 'הלינק הועתק ללוח!' : 'Link copied to clipboard!',
     failedToShare: isHebrew ? 'נכשל בשיתוף' : 'Failed to share',
-    couponMarkedAsUsed: isHebrew ? 'השובר סומן כמשומש והועבר להיסטוריה' : 'Voucher marked as used and moved to history',
-    failedToMarkAsUsed: isHebrew ? 'נכשל בסימון השובר כמשומש' : 'Failed to mark voucher as used',
+    couponMarkedAsUsed: isHebrew ? 'הקופון סומן כמשומש והועבר להיסטוריה' : 'Coupon marked as used and moved to history',
+    failedToMarkAsUsed: isHebrew ? 'נכשל בסימון הקופון כמשומש' : 'Failed to mark coupon as used',
     shareShopTitle: isHebrew ? 'בדקו את החנות שלנו!' : 'Check out our shop!',
     shareShopText: isHebrew ? 'בדקו את החנות שלנו עם הקישור המיוחד הזה!' : 'Check out our shop with this special link!',
   };
