@@ -16,13 +16,20 @@ const InviteFriendsCard: React.FC<InviteFriendsCardProps> = ({ onClose, onShareS
   const { t } = useTranslation('components.InviteFriendsCard');
   const [shared, setShared] = useState(false);
   const iconSectionWidth = 100; // width reserved for the icon
+  
+  // Get locale from URL
+  const locale = typeof window !== 'undefined' 
+    ? window.location.pathname.split('/')[1] 
+    : 'en';
+  const isHebrew = locale === 'he';
 
   const handleShare = async () => {
     // Use the correct website URL
     const shareUrl = 'https://facepet-kappa.vercel.app';
-    const shareText = t('shareText');
+    const shareText = isHebrew ? 'בדוק את אפליקציית Chapiz לחיות!' : 'Check out Chapiz app for pets!';
+    const shareTitle = isHebrew ? 'הצטרף ל-Chapiz' : 'Join Chapiz';
     const shareData = {
-      title: t('shareTitle'),
+      title: shareTitle,
       text: shareText,
       url: shareUrl
     };
@@ -34,7 +41,7 @@ const InviteFriendsCard: React.FC<InviteFriendsCardProps> = ({ onClose, onShareS
         // Fallback: copy the full share text with URL to clipboard
         const fullShareText = `${shareText} ${shareUrl}`;
         await navigator.clipboard.writeText(fullShareText);
-        toast.success(t('linkCopied'));
+        toast.success(isHebrew ? 'הלינק הועתק ללוח!' : 'Link copied to clipboard!');
       }
       setShared(true);
       // Call the success callback to award points
@@ -47,7 +54,7 @@ const InviteFriendsCard: React.FC<InviteFriendsCardProps> = ({ onClose, onShareS
       if (onShareSuccess) {
         onShareSuccess();
       }
-      toast.error(t('shareError'));
+      toast.error(isHebrew ? 'משהו השתבש' : 'Something went wrong');
     }
   };
 
@@ -99,7 +106,7 @@ const InviteFriendsCard: React.FC<InviteFriendsCardProps> = ({ onClose, onShareS
             transition={{ duration: 0.2 }}
             className="text-primary text-lg font-bold"
           >
-            {t('shareTitle')}
+            {isHebrew ? 'הצטרף ל-Chapiz' : 'Join Chapiz'}
           </motion.div>
           {/* Subtitle with slight delay */}
           <motion.div
@@ -108,7 +115,7 @@ const InviteFriendsCard: React.FC<InviteFriendsCardProps> = ({ onClose, onShareS
             transition={{ duration: 0.2, delay: 0.1 }}
             className="text-sm text-black"
           >
-            {t('shareText')}
+            {isHebrew ? 'בדוק את אפליקציית Chapiz לחיות!' : 'Check out Chapiz app for pets!'}
           </motion.div>
         </div>
       </div>
