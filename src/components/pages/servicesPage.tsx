@@ -67,6 +67,28 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
   const [favoriteAdIds, setFavoriteAdIds] = useState<string[]>([]);
   const [filterType, setFilterType] = useState<'all' | 'favorites'>('all');
   const [isLoadingTags, setIsLoadingTags] = useState(true);
+  
+  const isHebrew = locale === 'he';
+
+  // HARDCODED TEXT - NO TRANSLATION KEYS!
+  const text = {
+    title: isHebrew ? 'שירותים' : 'Services',
+    loading: isHebrew ? 'טוען...' : 'Loading...',
+    filterByProfession: isHebrew ? 'סנן לפי מקצוע' : 'Filter by profession',
+    searchPlaceholder: isHebrew ? 'חפש שירותים...' : 'Search services...',
+    removeFilter: isHebrew ? 'הסר סינון' : 'Remove Filter',
+    filters: {
+      all: isHebrew ? 'הכל' : 'All',
+      favorites: isHebrew ? 'מועדפים' : 'Favorites',
+    },
+    tags: {
+      clearAll: isHebrew ? 'נקה הכל' : 'Clear All',
+      searchPlaceholder: isHebrew ? 'חפש תגיות...' : 'Search tags...',
+      selected: isHebrew ? '{count} תגית נבחרה' : '{count} tag selected',
+      selectedPlural: isHebrew ? '{count} תגיות נבחרו' : '{count} tags selected',
+      noTagsFound: isHebrew ? 'לא נמצאו תגיות.' : 'No tags found.',
+    }
+  };
 
   // Function to translate tags for display
   const translateTag = (tag: string): string => {
@@ -132,12 +154,12 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
   const filterChips: FilterChip[] = [
     {
       id: 'all',
-      label: t('pages.ServicesPage.filters.all'),
+      label: text.filters.all,
       active: filterType === 'all'
     },
     {
       id: 'favorites',
-      label: t('pages.ServicesPage.filters.favorites'),
+      label: text.filters.favorites,
       active: filterType === 'favorites'
     }
   ];
@@ -158,7 +180,7 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
             <div className="space-y-4">
               {/* Title and Filter Chips on Same Row */}
               <div className="mb-4 flex flex-row items-center justify-between gap-4">
-                <h1 className="text-2xl font-bold">{t('pages.ServicesPage.title')}</h1>
+                <h1 className="text-2xl font-bold">{text.title}</h1>
                 <FilterChips
                   chips={filterChips}
                   onChipClick={handleChipClick}
@@ -173,12 +195,12 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
                     tags={availableTags}
                     selectedTags={selectedTags}
                     onTagsChange={setSelectedTags}
-                    placeholder={isLoadingTags ? t('pages.ServicesPage.loading') || 'Loading...' : t('pages.ServicesPage.filterByProfession')}
-                    clearAllText="נקה הכל"
-                    searchTagsPlaceholder="חפש תגיות..."
-                    tagsSelectedText="{count} tag selected"
-                    tagsSelectedPluralText="{count} tags selected"
-                    noTagsFoundText="לא נמצאו תגיות."
+                    placeholder={isLoadingTags ? text.loading : text.filterByProfession}
+                    clearAllText={text.tags.clearAll}
+                    searchTagsPlaceholder={text.tags.searchPlaceholder}
+                    tagsSelectedText={text.tags.selected}
+                    tagsSelectedPluralText={text.tags.selectedPlural}
+                    noTagsFoundText={text.tags.noTagsFound}
                     className="w-full"
                     translateTag={translateTag}
                   />
@@ -191,7 +213,7 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
                     size={16}
                   />
                   <Input
-                    placeholder={t('pages.ServicesPage.searchPlaceholder')}
+                    placeholder={text.searchPlaceholder}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="w-full rounded-lg p-2 ltr:pl-10 rtl:pr-10 border-none focus-visible:ring-0"
@@ -209,7 +231,7 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
                     className="flex items-center gap-2 border-orange-500 text-orange-500 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-600"
                   >
                     <X className="h-4 w-4" />
-                    {t('pages.ServicesPage.removeFilter') || 'Remove Filter'}
+                    {text.removeFilter}
                   </Button>
                 </div>
               )}
