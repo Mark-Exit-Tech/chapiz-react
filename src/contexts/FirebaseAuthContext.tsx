@@ -35,6 +35,8 @@ interface AuthContextType {
   getStoredOTPCode?: () => string | null;
   getStoredDeletionOTPCode?: () => string | null;
   clearDeletionOTPCode?: () => void;
+  needsGoogleProfileCompletion?: boolean;
+  completeGoogleProfile?: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -204,6 +206,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     signOut: signOutHandler,
     resetPassword: resetPasswordHandler,
     checkEmailExists: checkEmailExistsHandler,
+    needsGoogleProfileCompletion: false,
+    completeGoogleProfile: () => {},
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
