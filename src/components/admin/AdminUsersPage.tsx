@@ -1,9 +1,210 @@
-// Stub admin component
+'use client';
+
+import { useState, useEffect } from 'react';
+import { getAllUsers, updateUser, deleteUser, type User } from '@/lib/firebase/database/users';
+import { Trash2, Edit2, Users, Shield, ShieldAlert } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@/components/ui/table';
+
 export default function AdminUsersPage() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+  
+  // HARDCODED TEXT
+  const text = {
+    title: isHebrew ? 'ניהול משתמשים' : 'Users Management',
+    description: isHebrew ? 'נהלו וערכו את כל המשתמשים בפלטפורמה' : 'Manage and edit all users on the platform',
+    loading: isHebrew ? 'טוען...' : 'Loading...',
+    noUsers: isHebrew ? 'לא נמצאו משתמשים' : 'No users found',
+    name: isHebrew ? 'שם' : 'Name',
+    email: isHebrew ? 'אימייל' : 'Email',
+    role: isHebrew ? 'תפקיד' : 'Role',
+    phone: isHebrew ? 'טלפון' : 'Phone',
+    created: isHebrew ? 'נוצר' : 'Created',
+    actions: isHebrew ? 'פעולות' : 'Actions',
+    admin: isHebrew ? 'מנהל' : 'Admin',
+    superAdmin: isHebrew ? 'מנהל על' : 'Super Admin',
+    user: isHebrew ? 'משתמש' : 'User',
+    restricted: isHebrew ? 'מוגבל' : 'Restricted',
+    delete: isHebrew ? 'מחק' : 'Delete',
+    edit: isHebrew ? 'ערוך' : 'Edit',
+    totalUsers: isHebrew ? 'סה"כ משתמשים' : 'Total Users',
+    deleteConfirm: isHebrew ? 'האם אתה בטוח שברצונך למחוק משתמש זה?' : 'Are you sure you want to delete this user?',
+    deleteSuccess: isHebrew ? 'המשתמש נמחק בהצלחה' : 'User deleted successfully',
+    deleteFailed: isHebrew ? 'נכשל במחיקת המשתמש' : 'Failed to delete user'
+  };
+
+  useEffect(() => {
+    loadUsers();
+  }, []);
+
+  const loadUsers = async () => {
+    setLoading(true);
+    try {
+      const data = await getAllUsers();
+      setUsers(data);
+    } catch (error) {
+      console.error('Error loading users:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (uid: string) => {
+    if (!confirm(text.deleteConfirm)) {
+      return;
+    }
+
+    try {
+      await deleteUser(uid);
+      alert(text.deleteSuccess);
+      setUsers(users.filter(u => u.uid !== uid));
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      alert(text.deleteFailed);
+    }
+  };
+
+  const getRoleBadge = (role: string, isRestricted?: boolean) => {
+    if (isRestricted) {
+      return (
+        <Badge className="bg-red-100 text-red-800 flex items-center gap-1">
+          <ShieldAlert className="w-3 h-3" />
+          {text.restricted}
+        </Badge>
+      );
+    }
+
+    const roleConfig: Record<string, { label: string; className: string }> = {
+      super_admin: { label: text.superAdmin, className: 'bg-purple-100 text-purple-800' },
+      admin: { label: text.admin, className: 'bg-blue-100 text-blue-800' },
+      user: { label: text.user, className: 'bg-gray-100 text-gray-800' }
+    };
+
+    const config = roleConfig[role] || roleConfig.user;
+    return (
+      <Badge className={config.className + " flex items-center gap-1"}>
+        <Shield className="w-3 h-3" />
+        {config.label}
+      </Badge>
+    );
+  };
+
+  const formatDate = (date: Date | undefined) => {
+    if (!date) return '-';
+    const dateObj = date instanceof Date ? date : new Date(date);
+    return new Intl.DateTimeFormat(isHebrew ? 'he-IL' : 'en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    }).format(dateObj);
+  };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto p-4 md:p-8">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <div className="text-gray-600">{text.loading}</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Admin Users Page</h1>
-      <p>This admin component needs to be implemented with Firebase.</p>
+    <div className="container mx-auto p-4 md:p-8">
+      <div className="space-y-6">
+        <div className="text-left rtl:text-right">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2">
+            <Users className="w-8 h-8" />
+            {text.title}
+          </h1>
+          <p className="text-gray-600 mt-2 text-sm md:text-base">
+            {text.description}
+          </p>
+          <div className="mt-4">
+            <Badge variant="outline" className="text-lg px-4 py-2">
+              {text.totalUsers}: {users.length}
+            </Badge>
+          </div>
+        </div>
+
+        {users.length === 0 ? (
+          <div className="text-center py-12">
+            <Users className="w-16 h-16 mx-auto text-gray-300 mb-4" />
+            <p className="text-gray-500">{text.noUsers}</p>
+          </div>
+        ) : (
+          <div className="bg-white shadow-md rounded-lg overflow-hidden">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{text.name}</TableHead>
+                    <TableHead>{text.email}</TableHead>
+                    <TableHead>{text.phone}</TableHead>
+                    <TableHead>{text.role}</TableHead>
+                    <TableHead>{text.created}</TableHead>
+                    <TableHead className="w-[100px]">{text.actions}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {users.map((user) => (
+                    <TableRow key={user.uid}>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          {user.profile_image || user.photoURL ? (
+                            <img 
+                              src={user.profile_image || user.photoURL} 
+                              alt={user.full_name || user.display_name || text.user}
+                              className="w-8 h-8 rounded-full"
+                            />
+                          ) : (
+                            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                              <Users className="w-4 h-4 text-gray-500" />
+                            </div>
+                          )}
+                          <span>{user.full_name || user.display_name || '-'}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>{user.phone || '-'}</TableCell>
+                      <TableCell>{getRoleBadge(user.role, user.is_restricted)}</TableCell>
+                      <TableCell>{formatDate(user.created_at)}</TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleDelete(user.uid)}
+                            className="text-red-600 hover:text-red-900"
+                            title={text.delete}
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

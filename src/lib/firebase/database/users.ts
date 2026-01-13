@@ -106,6 +106,22 @@ export async function deleteUser(uid: string): Promise<void> {
   }
 }
 
+// Get all users (admin function)
+export async function getAllUsers(): Promise<User[]> {
+  try {
+    const usersRef = collection(db, USERS_COLLECTION);
+    const querySnapshot = await getDocs(usersRef);
+    
+    return querySnapshot.docs.map(doc => ({
+      uid: doc.id,
+      ...doc.data()
+    } as User));
+  } catch (error) {
+    console.error('Error getting all users:', error);
+    return [];
+  }
+}
+
 // Check if email exists
 export async function checkEmailExists(email: string): Promise<boolean> {
   try {
