@@ -1,6 +1,6 @@
 import Navbar from '@/components/layout/Navbar';
 import BottomNavigation from '@/components/layout/BottomNavigation';
-import UserCouponsPage from '@/components/user/UserCouponsPage';
+import PromosPageClient from '@/components/pages/PromosPageClient';
 
 export default function CouponsPage() {
   return (
@@ -9,7 +9,7 @@ export default function CouponsPage() {
       <div className="hidden md:block">
         <Navbar />
       </div>
-      <UserCouponsPage />
+      <PromosPageClient />
       {/* Bottom Navigation - only visible on mobile */}
       <div className="md:hidden">
         <BottomNavigation />

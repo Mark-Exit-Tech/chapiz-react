@@ -11,6 +11,12 @@ export default function BottomNavigation() {
   const { t } = useTranslation('components');
   const { user, dbUser } = useAuth();
 
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+
   // Don't show bottom navigation on admin routes
   const isAdminRoute = pathname?.startsWith('/admin');
   if (isAdminRoute) {
@@ -36,25 +42,25 @@ export default function BottomNavigation() {
     {
       href: '/pages/my-pets',
       icon: PawPrint,
-      label: t('Navbar.bottomNav.myPets'),
+      label: isHebrew ? 'חיות המחמד שלי' : 'My Pets',
       isActive: pathname?.startsWith('/pages/my-pets'),
     },
     {
       href: '/coupons',
       icon: Ticket,
-      label: t('Navbar.bottomNav.myCoupons'),
+      label: isHebrew ? 'הקופונים שלי' : 'My Coupons',
       isActive: pathname?.startsWith('/coupons'),
     },
     {
       href: '/vouchers',
       icon: Gift,
-      label: t('Navbar.bottomNav.giftsAndVouchers'),
+      label: isHebrew ? 'מתנות ושוברים' : 'Gifts & Vouchers',
       isActive: pathname?.startsWith('/vouchers'),
     },
     {
       href: '/services',
       icon: MapPin,
-      label: t('Navbar.bottomNav.businessesNearby'),
+      label: isHebrew ? 'עסקים קרובים' : 'Businesses Nearby',
       isActive: pathname?.startsWith('/services'),
     },
   ];
