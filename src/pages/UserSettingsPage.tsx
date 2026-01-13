@@ -227,7 +227,7 @@ const ProfileContent = () => {
             fullName: u.display_name || u.full_name || '',
             phone: u.phone || '',
             address: u.address || '',
-            profileImageURL: u.photoURL || dbUser?.photoURL || '',
+            profileImageURL: u.photoURL || u.profile_image || '',
             language: locale
           }));
         }

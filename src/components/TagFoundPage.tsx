@@ -13,7 +13,7 @@ interface TagFoundPageProps {
 
 export default function TagFoundPage({ petId }: TagFoundPageProps) {
   const { t } = useTranslation('pages.TagFound');
-  const { user, loading: authLoading } = useAuth();
+  const { user, dbUser, loading: authLoading } = useAuth();
   const { petId: savedPetId, loading } = usePetId();
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);

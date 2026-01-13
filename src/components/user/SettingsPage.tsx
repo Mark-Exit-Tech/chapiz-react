@@ -317,7 +317,7 @@ export default function SettingsPage() {
           if (userResult.success && userResult.user) {
             console.log('Reloading user data after save:', userResult.user);
             const fullName = userResult.user.display_name || userResult.user.full_name || '';
-            const avatarUrl = userResult.user.photoURL || dbUser?.photoURL || '';
+            const avatarUrl = userResult.user.photoURL || userResult.user.profile_image || '';
 
             setFormData(prev => ({
               ...prev,
