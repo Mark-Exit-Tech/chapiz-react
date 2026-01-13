@@ -112,10 +112,16 @@ export async function getAllUsers(): Promise<User[]> {
     const usersRef = collection(db, USERS_COLLECTION);
     const querySnapshot = await getDocs(usersRef);
     
-    return querySnapshot.docs.map(doc => ({
-      uid: doc.id,
-      ...doc.data()
-    } as User));
+    return querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        uid: doc.id,
+        ...data,
+        // Convert Firestore Timestamps to Date objects
+        created_at: data.created_at?.toDate ? data.created_at.toDate() : (data.created_at ? new Date(data.created_at) : undefined),
+        updated_at: data.updated_at?.toDate ? data.updated_at.toDate() : (data.updated_at ? new Date(data.updated_at) : undefined)
+      } as User;
+    });
   } catch (error) {
     console.error('Error getting all users:', error);
     return [];
