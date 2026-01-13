@@ -473,7 +473,7 @@ export default function UserCouponsPage() {
       // Switch to my coupons tab
       setActiveTab('myCoupons');
     } else {
-      toast.error(t('failedToMarkAsUsed') || 'Failed to mark coupon as used');
+      toast.error(text.failedToMarkAsUsed);
     }
   };
 
@@ -1019,7 +1019,7 @@ export default function UserCouponsPage() {
                           {freeCouponPrice 
                             ? text.getFree 
                             : (selectedCouponImage.coupon && userPoints < selectedCouponImage.coupon.points 
-                              ? t('insufficientPoints') 
+                              ? text.insufficientPoints 
                               : text.purchase)
                           }
                         </span>
@@ -1134,7 +1134,7 @@ export default function UserCouponsPage() {
                           {freeCouponPrice 
                             ? text.getFree 
                             : (selectedCouponImage.coupon && userPoints < selectedCouponImage.coupon.points 
-                              ? t('insufficientPoints') 
+                              ? text.insufficientPoints 
                               : text.purchase)
                           }
                         </span>
