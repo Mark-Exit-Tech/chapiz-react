@@ -60,6 +60,8 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
     confirmUseMessage: isHebrew ? 'האם אתה בטוח שברצונך להשתמש בקופון זה? פעולה זו אינה ניתנת לביטול.' : 'Are you sure you want to use this coupon? This action cannot be undone.',
     cancel: isHebrew ? 'ביטול' : 'Cancel',
     confirm: isHebrew ? 'אישור' : 'Confirm',
+    viewCoupon: isHebrew ? 'צפייה בקופון' : 'View Coupon',
+    qrCodeDescription: isHebrew ? 'סרוק את קוד ה-QR כדי לצפות בקופון זה' : 'Scan this QR code to view this coupon',
   };
   const [isUsingCoupon, setIsUsingCoupon] = useState(false);
   const [isUsed, setIsUsed] = useState(false);
@@ -218,19 +220,33 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
               )}
               {(coupon.startDate || coupon.endDate) && (
                 <div className="text-sm text-gray-500 mb-4">
-                  {coupon.startDate && (
-                    <p>{text.startDate}: {new Date(coupon.startDate).toLocaleDateString(isHebrew ? 'he-IL' : 'en-GB')}</p>
-                  )}
-                  {coupon.endDate && (
-                    <p>{text.endDate}: {new Date(coupon.endDate).toLocaleDateString(isHebrew ? 'he-IL' : 'en-GB')}</p>
-                  )}
+                  {coupon.startDate && (() => {
+                    const date = coupon.startDate instanceof Date
+                      ? coupon.startDate
+                      : (coupon.startDate as any)?.toDate?.()
+                        ? (coupon.startDate as any).toDate()
+                        : new Date(coupon.startDate);
+                    return !isNaN(date.getTime()) && (
+                      <p>{text.startDate}: {date.toLocaleDateString(isHebrew ? 'he-IL' : 'en-GB')}</p>
+                    );
+                  })()}
+                  {coupon.endDate && (() => {
+                    const date = coupon.endDate instanceof Date
+                      ? coupon.endDate
+                      : (coupon.endDate as any)?.toDate?.()
+                        ? (coupon.endDate as any).toDate()
+                        : new Date(coupon.endDate);
+                    return !isNaN(date.getTime()) && (
+                      <p>{text.endDate}: {date.toLocaleDateString(isHebrew ? 'he-IL' : 'en-GB')}</p>
+                    );
+                  })()}
                 </div>
               )}
             </div>
 
             {/* QR Code Card */}
             <div className="mb-8">
-              <QRCodeCard url={couponUrl} />
+              <QRCodeCard url={couponUrl} title={text.viewCoupon} description={text.qrCodeDescription} />
             </div>
 
             {/* Important Information */}
