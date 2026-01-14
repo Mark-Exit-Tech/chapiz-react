@@ -1,14 +1,35 @@
-import { collection, doc, getDoc, getDocs, setDoc, deleteDoc, query, where } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, setDoc, deleteDoc, query, where, Timestamp } from 'firebase/firestore';
 import { db } from '../client';
 
 const USER_FAVORITES_COLLECTION = 'userFavorites';
+
+export interface Favorite {
+    id: string;
+    userId: string;
+    serviceId: string;
+    serviceName?: string;
+    serviceType?: string;
+    createdAt: Date;
+}
 
 /**
  * Add to favorites
  */
 export async function addToFavorites(userId: string, serviceId: string, serviceName?: string, serviceType?: string): Promise<{ success: boolean; error?: string }> {
     try {
-        console.warn('addToFavorites not yet fully implemented');
+        // Create a unique ID combining userId and serviceId
+        const favoriteId = `${userId}_${serviceId}`;
+        const favoriteRef = doc(db, USER_FAVORITES_COLLECTION, favoriteId);
+
+        await setDoc(favoriteRef, {
+            id: favoriteId,
+            userId,
+            serviceId,
+            serviceName: serviceName || '',
+            serviceType: serviceType || 'service',
+            createdAt: Timestamp.now()
+        });
+
         return { success: true };
     } catch (error) {
         console.error('Error adding to favorites:', error);
@@ -21,7 +42,9 @@ export async function addToFavorites(userId: string, serviceId: string, serviceN
  */
 export async function removeFromFavorites(userId: string, serviceId: string): Promise<{ success: boolean; error?: string }> {
     try {
-        console.warn('removeFromFavorites not yet fully implemented');
+        const favoriteId = `${userId}_${serviceId}`;
+        const favoriteRef = doc(db, USER_FAVORITES_COLLECTION, favoriteId);
+        await deleteDoc(favoriteRef);
         return { success: true };
     } catch (error) {
         console.error('Error removing from favorites:', error);
@@ -34,8 +57,10 @@ export async function removeFromFavorites(userId: string, serviceId: string): Pr
  */
 export async function isFavorited(userId: string, serviceId: string): Promise<boolean> {
     try {
-        console.warn('isFavorited not yet fully implemented');
-        return false;
+        const favoriteId = `${userId}_${serviceId}`;
+        const favoriteRef = doc(db, USER_FAVORITES_COLLECTION, favoriteId);
+        const favoriteDoc = await getDoc(favoriteRef);
+        return favoriteDoc.exists();
     } catch (error) {
         console.error('Error checking favorite:', error);
         return false;
@@ -45,10 +70,23 @@ export async function isFavorited(userId: string, serviceId: string): Promise<bo
 /**
  * Get user favorites
  */
-export async function getUserFavorites(userId: string): Promise<string[]> {
+export async function getUserFavorites(userId: string): Promise<Favorite[]> {
     try {
-        console.warn('getUserFavorites not yet fully implemented');
-        return [];
+        const favoritesRef = collection(db, USER_FAVORITES_COLLECTION);
+        const q = query(favoritesRef, where('userId', '==', userId));
+        const querySnapshot = await getDocs(q);
+
+        return querySnapshot.docs.map(docSnapshot => {
+            const data = docSnapshot.data();
+            return {
+                id: docSnapshot.id,
+                userId: data.userId,
+                serviceId: data.serviceId,
+                serviceName: data.serviceName,
+                serviceType: data.serviceType,
+                createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now())
+            } as Favorite;
+        });
     } catch (error) {
         console.error('Error fetching favorites:', error);
         return [];
@@ -56,16 +94,10 @@ export async function getUserFavorites(userId: string): Promise<string[]> {
 }
 
 /**
- * Check if ad is favorited
+ * Check if ad is favorited (alias for isFavorited)
  */
 export async function isAdFavorited(userId: string, adId: string): Promise<boolean> {
-    try {
-        console.warn('isAdFavorited not yet fully implemented');
-        return false;
-    } catch (error) {
-        console.error('Error checking ad favorite:', error);
-        return false;
-    }
+    return isFavorited(userId, adId);
 }
 
 /**
