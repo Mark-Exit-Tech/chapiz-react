@@ -19,7 +19,10 @@ const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
 const TermsPage = lazy(() => import('./pages/TermsPage'));
 const ServicesPage = lazy(() => import('./pages/ServicesPage'));
 const ServiceDetailsPage = lazy(() => import('./pages/ServiceDetailsPage'));
-const AddPetPage = lazy(() => import('./components/AddPetPage'));
+const PetPage = lazy(() => import('./pages/PetPage'));
+const EditPetPage = lazy(() => import('./pages/EditPetPage'));
+const RegisterPetPage = lazy(() => import('./pages/RegisterPetPage'));
+const AddPetRedirect = lazy(() => import('./pages/AddPetRedirect'));
 
 // Admin sub-pages
 const AdminUsersPage = lazy(() => import('./components/admin/AdminUsersPage'));
@@ -60,7 +63,6 @@ function App() {
           <Route path="/contact" element={<Navigate to={`/${currentLang}/contact`} replace />} />
           <Route path="/my-pets" element={<Navigate to={`/${currentLang}/my-pets`} replace />} />
           <Route path="/pages/my-pets" element={<Navigate to={`/${currentLang}/my-pets`} replace />} />
-          <Route path="/add-pet" element={<Navigate to={`/${currentLang}/add-pet`} replace />} />
           <Route path="/coupons" element={<Navigate to={`/${currentLang}/coupons`} replace />} />
           <Route path="/vouchers" element={<Navigate to={`/${currentLang}/vouchers`} replace />} />
           <Route path="/user/settings" element={<Navigate to={`/${currentLang}/user/settings`} replace />} />
@@ -69,9 +71,13 @@ function App() {
           <Route path="/admin" element={<Navigate to={`/${currentLang}/admin`} replace />} />
           <Route path="/admin/*" element={<Navigate to={`/${currentLang}/admin`} replace />} />
           
+          <Route path="/pet/:id" element={<Suspense fallback={<PageLoader />}><PetPage /></Suspense>} />
+          <Route path="/pet/:id/edit" element={<Suspense fallback={<PageLoader />}><EditPetPage /></Suspense>} />
+          <Route path="/pet/:id/get-started/register" element={<Suspense fallback={<PageLoader />}><RegisterPetPage /></Suspense>} />
           <Route path="/services" element={<Navigate to={`/${currentLang}/services`} replace />} />
           <Route path="/privacy" element={<Navigate to={`/${currentLang}/privacy`} replace />} />
           <Route path="/terms" element={<Navigate to={`/${currentLang}/terms`} replace />} />
+          <Route path="/add-pet" element={<Suspense fallback={<PageLoader />}><AddPetRedirect /></Suspense>} />
 
           {/* Locale-based routes */}
           <Route path="/:locale" element={<HomePage />} />
@@ -80,7 +86,10 @@ function App() {
           <Route path="/:locale/signup" element={<Suspense fallback={<PageLoader />}><SignupPage /></Suspense>} />
           <Route path="/:locale/contact" element={<Suspense fallback={<PageLoader />}><ContactPage /></Suspense>} />
           <Route path="/:locale/my-pets" element={<Suspense fallback={<PageLoader />}><MyPetsPage /></Suspense>} />
-          <Route path="/:locale/add-pet" element={<Suspense fallback={<PageLoader />}><AddPetPage /></Suspense>} />
+          <Route path="/:locale/pet/:id" element={<Suspense fallback={<PageLoader />}><PetPage /></Suspense>} />
+          <Route path="/:locale/pet/:id/edit" element={<Suspense fallback={<PageLoader />}><EditPetPage /></Suspense>} />
+          <Route path="/:locale/pet/:id/get-started/register" element={<Suspense fallback={<PageLoader />}><RegisterPetPage /></Suspense>} />
+          <Route path="/:locale/add-pet" element={<Suspense fallback={<PageLoader />}><AddPetRedirect /></Suspense>} />
           <Route path="/:locale/coupons" element={<Suspense fallback={<PageLoader />}><CouponsPage /></Suspense>} />
           <Route path="/:locale/coupons/:id" element={<Suspense fallback={<PageLoader />}><CouponDetailPage /></Suspense>} />
           <Route path="/:locale/vouchers" element={<Suspense fallback={<PageLoader />}><VouchersPage /></Suspense>} />

@@ -3,7 +3,6 @@
 
 import MyPetCard from '@/components/MyPetCard';
 import { EditIcon } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import React, { useState, useEffect } from 'react';
 import { cn } from '../lib/utils';
 import InviteFriendsCard from './InviteFriendsCard';
@@ -26,8 +25,20 @@ interface MyPetClientProps {
 }
 
 const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
-  const { t } = useTranslation();
   const locale = useLocale() as 'en' | 'he';
+  const isHebrew = locale === 'he';
+
+  // HARDCODED TEXT
+  const text = {
+    title: isHebrew ? 'החיות שלי' : 'My Pets',
+    edit: isHebrew ? 'עריכה' : 'Edit',
+    unknownBreed: isHebrew ? 'גזע לא ידוע' : 'Unknown Breed',
+    unknownPet: isHebrew ? 'חיית מחמד לא ידועה' : 'Unknown Pet',
+    loadingPets: isHebrew ? 'טוען חיות מחמד...' : 'Loading pets...',
+    noPetsYet: isHebrew ? 'עדיין אין חיות מחמד' : 'No pets yet',
+    scanToAddPet: isHebrew ? 'סרוק את תג ה-NFC כדי להוסיף חיית מחמד' : 'Scan the NFC tag to add a pet',
+  };
+
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
@@ -61,7 +72,7 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
                 if (result.success && result.pet) {
                   console.log('Pet data from consolidated method:', result.pet);
                   // Get breed name with proper translation
-                  const unknownBreed = t('pages.MyPetsPage.unknownBreed');
+                  const unknownBreed = text.unknownBreed;
                   let breedDisplay = result.pet.breedName || result.pet.breed || unknownBreed;
                   if (result.pet.breedId) {
                     breedDisplay = await getBreedNameById(result.pet.breedId, locale);
@@ -88,7 +99,7 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
 
                   return {
                     id: result.pet.id,
-                    name: result.pet.name || t('pages.MyPetsPage.unknownPet'),
+                    name: result.pet.name || text.unknownPet,
                     breed: breedDisplay,
                     image: result.pet.imageUrl || '/default-pet.png'
                   };
@@ -97,8 +108,8 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
                   // Get the pet data directly from the petDoc
                   return {
                     id: petDoc.id,
-                    name: t('pages.MyPetsPage.unknownPet'),
-                    breed: t('pages.MyPetsPage.unknownBreed'),
+                    name: text.unknownPet,
+                    breed: text.unknownBreed,
                     image: '/default-pet.png'
                   };
                   /* Legacy fallback - not needed with Firebase
@@ -120,8 +131,8 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
                 console.error('Error fetching pet with consolidated method:', error);
                 return {
                   id: petDoc.id,
-                  name: t('pages.MyPetsPage.unknownPet'),
-                  breed: t('pages.MyPetsPage.unknownBreed'),
+                  name: text.unknownPet,
+                  breed: text.unknownBreed,
                   image: '/default-pet.png'
                 };
               }
@@ -165,7 +176,7 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
     <div className="mx-auto max-w-7xl w-full px-4 md:px-6">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{t('pages.MyPetsPage.title')}</h1>
+        <h1 className="text-2xl font-bold">{text.title}</h1>
         {filteredPets.length > 0 && (
           <div className="flex items-center gap-2">
             <Button
@@ -176,7 +187,7 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
               <EditIcon
                 className={cn('h-4 w-4', isEditMode ? '' : 'text-gray-400')}
               />
-              <span className="text-sm">{t('pages.MyPetsPage.edit')}</span>
+              <span className="text-sm">{text.edit}</span>
             </Button>
           </div>
         )}
@@ -192,15 +203,15 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
       {petsLoading ? (
         <div className="flex items-center justify-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          <span className="ml-2 text-gray-600">{t('pages.MyPetsPage.loadingPets')}</span>
+          <span className="ml-2 text-gray-600">{text.loadingPets}</span>
         </div>
       ) : filteredPets.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            {t('pages.MyPetsPage.noPetsYet')}
+            {text.noPetsYet}
           </h3>
           <p className="text-gray-500 mb-6 max-w-sm">
-            {t('pages.MyPetsPage.scanToAddPet')}
+            {text.scanToAddPet}
           </p>
         </div>
       ) : (

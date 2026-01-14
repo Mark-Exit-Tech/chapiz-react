@@ -31,6 +31,11 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
   const navigate = useNavigate();
   const direction = useDirection();
 
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+
   // Fixed dimensions for consistent layout.
   const imageWidth = 100; // in pixels
   const cardHeight = 120; // in pixels, increased for better mobile display
@@ -74,7 +79,7 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
         displayBreed: breed,
         displayImage: image
       });
-      const targetUrl = `/pet/${id}?${params.toString()}`;
+      const targetUrl = `/${locale}/pet/${id}?${params.toString()}`;
       console.log('MyPetCard navigating to:', targetUrl);
       navigate(targetUrl);
     }
@@ -88,7 +93,7 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
 
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    navigate(`/pet/${id}/edit`);
+    navigate(`/${locale}/pet/${id}/edit`);
   };
 
   return (

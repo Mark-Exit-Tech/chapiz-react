@@ -6,7 +6,6 @@ import TabContent from '@/components/TabContent';
 import { Promo } from '@/types/promo';
 import { Ad } from '@/lib/actions/admin';
 import { motion } from 'framer-motion';
-import { useTranslation } from 'react-i18next';
 import { useLocale } from '@/hooks/use-locale';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -40,8 +39,35 @@ export default function PetProfilePage({
   vet?: any;
 }) {
   // Place all hook calls at the top level, unconditionally
-  const { t } = useTranslation('pages.PetProfilePage');
   const locale = useLocale();
+  const isHebrew = locale === 'he';
+
+  // HARDCODED TEXT
+  const text = {
+    labels: {
+      name: isHebrew ? 'שם' : 'Name',
+      breed: isHebrew ? 'גזע' : 'Breed',
+      gender: isHebrew ? 'מין' : 'Gender',
+      age: isHebrew ? 'גיל' : 'Age',
+      ageText: isHebrew ? 'שנים' : 'years',
+      notes: isHebrew ? 'הערות' : 'Notes',
+      contact: isHebrew ? 'טלפון' : 'Contact',
+      email: isHebrew ? 'אימייל' : 'Email',
+      address: isHebrew ? 'כתובת' : 'Address',
+      private: isHebrew ? 'פרטי' : 'Private',
+      notSpecified: isHebrew ? 'לא צוין' : 'Not specified',
+    },
+    tabs: {
+      pet: isHebrew ? 'חיית מחמד' : 'Pet',
+      owner: isHebrew ? 'בעלים' : 'Owner',
+      vet: isHebrew ? 'וטרינר' : 'Vet',
+    },
+    popup: {
+      title: isHebrew ? 'מתנה!' : 'Gift!',
+      text: isHebrew ? 'יש לך מתנה!' : 'You have a gift!',
+      buttonLabel: isHebrew ? 'קבל מתנה' : 'Get Gift',
+    },
+  };
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [showPopup, setShowPopup] = useState(false);
@@ -134,7 +160,7 @@ export default function PetProfilePage({
 
   // Helper function to translate gender
   const getGenderLabel = (genderValue: string | undefined): string => {
-    if (!genderValue) return t('labels.notSpecified');
+    if (!genderValue) return text.labels.notSpecified;
     const genders = getGenders(locale as 'en' | 'he');
     const normalizedValue = genderValue.toLowerCase().trim();
     // Try to find by value first (male/female)
@@ -205,25 +231,25 @@ export default function PetProfilePage({
   // Pet name, breed, gender, and age are always public
   const petInfo = [
     {
-      label: t('labels.name'),
+      label: text.labels.name,
       value: displayName || pet.name
     },
     {
-      label: t('labels.breed'),
+      label: text.labels.breed,
       value: getBreedDisplayName()
     },
     {
-      label: t('labels.gender'),
+      label: text.labels.gender,
       value: getGenderLabel(pet.gender)
     },
     {
-      label: t('labels.age'),
+      label: text.labels.age,
       value: pet.birthDate
-        ? computeAge(pet.birthDate) + ' ' + t('labels.ageText')
+        ? computeAge(pet.birthDate) + ' ' + text.labels.ageText
         : pet.age || ''
     },
     {
-      label: t('labels.notes'),
+      label: text.labels.notes,
       value: pet.notes || ''
     }
   ];
@@ -232,13 +258,13 @@ export default function PetProfilePage({
     ? [
       {
         // Owner name is always public
-        label: t('labels.name'),
+        label: text.labels.name,
         value: owner.fullName || owner.displayName || ''
       },
       {
-        label: t('labels.contact'),
+        label: text.labels.contact,
         value: owner.isPhonePrivate
-          ? t('labels.private')
+          ? text.labels.private
           : owner.phoneNumber || owner.phone || '',
         link: owner.isPhonePrivate
           ? undefined
@@ -247,9 +273,9 @@ export default function PetProfilePage({
             : undefined
       },
       {
-        label: t('labels.email'),
+        label: text.labels.email,
         value: owner.isEmailPrivate
-          ? t('labels.private')
+          ? text.labels.private
           : owner.email || '',
         link: owner.isEmailPrivate
           ? undefined
@@ -258,9 +284,9 @@ export default function PetProfilePage({
             : undefined
       },
       {
-        label: t('labels.address'),
+        label: text.labels.address,
         value: owner.isAddressPrivate
-          ? t('labels.private')
+          ? text.labels.private
           : owner.homeAddress || ''
       }
     ]
@@ -269,23 +295,23 @@ export default function PetProfilePage({
   const vetInfo = vet
     ? [
       {
-        label: t('labels.name'),
-        value: vet.isNamePrivate ? t('labels.private') : vet.name
+        label: text.labels.name,
+        value: vet.isNamePrivate ? text.labels.private : vet.name
       },
       {
-        label: t('labels.contact'),
+        label: text.labels.contact,
         value: vet.isPhonePrivate
-          ? t('labels.private')
+          ? text.labels.private
           : vet.phoneNumber
       },
       {
-        label: t('labels.email'),
-        value: vet.isEmailPrivate ? t('labels.private') : vet.email
+        label: text.labels.email,
+        value: vet.isEmailPrivate ? text.labels.private : vet.email
       },
       {
-        label: t('labels.address'),
+        label: text.labels.address,
         value: vet.isAddressPrivate
-          ? t('labels.private')
+          ? text.labels.private
           : vet.address
       }
     ]

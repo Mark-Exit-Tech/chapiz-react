@@ -268,6 +268,21 @@ export async function getBreedsForDropdown(locale: 'en' | 'he' = 'en'): Promise<
 
 export async function getGendersForDropdown(locale: 'en' | 'he' = 'en'): Promise<{ value: string; label: string; }[]> {
     const genders = await getAllGenders();
+
+    if (genders.length === 0) {
+        // Fallback data if collection is empty
+        console.warn('Genders collection is empty, using fallback data');
+        return locale === 'he'
+            ? [
+                { value: 'male', label: 'זכר' },
+                { value: 'female', label: 'נקבה' }
+              ]
+            : [
+                { value: 'male', label: 'Male' },
+                { value: 'female', label: 'Female' }
+              ];
+    }
+
     return genders.map(gender => ({
         value: gender.id.toString(),
         label: locale === 'he' ? gender.he : gender.en

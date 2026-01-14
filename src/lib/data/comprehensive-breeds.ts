@@ -3,6 +3,7 @@ import breedsData from '../../../breeds.json';
 
 export interface Breed {
   id: number;
+  type?: string;
   en: string;
   he: string;
 }
@@ -13,13 +14,11 @@ export interface BreedByType {
   other: Breed[];
 }
 
-// Separate breeds by type based on their ID ranges
-// Dogs: IDs 1-174 (based on breeds.json structure)
-// Cats: IDs 175-210 (includes "other" option at ID 210)
+// Separate breeds by type field from breeds.json
 export const breedsByType: BreedByType = {
-  dog: breedsData.filter(breed => breed.id >= 1 && breed.id <= 174),
-  cat: breedsData.filter(breed => breed.id >= 175 && breed.id <= 210),
-  other: breedsData.filter(breed => breed.id === 1) // "other" breed
+  dog: breedsData.filter(breed => breed.type === 'dog'),
+  cat: breedsData.filter(breed => breed.type === 'cat'),
+  other: [{ id: 0, type: 'other', en: 'Other', he: 'אחר' }]
 };
 
 // Helper function to get breeds for a specific pet type

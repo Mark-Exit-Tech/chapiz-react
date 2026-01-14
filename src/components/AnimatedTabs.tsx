@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { PawPrint, Stethoscope, User } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 
 export type TabName = 'pet' | 'owner' | 'vet';
 
@@ -15,7 +14,28 @@ const AnimatedTabs = ({
   onTabChange,
   showVetTab
 }: AnimatedTabsProps) => {
-  const { t } = useTranslation('pages.PetProfilePage');
+  // Get locale from URL - check if first path segment is a valid locale
+  const getLocaleFromUrl = () => {
+    if (typeof window === 'undefined') return 'en';
+    const pathParts = window.location.pathname.split('/');
+    const firstSegment = pathParts[1];
+    // Check if the first segment is a valid locale (he or en)
+    if (firstSegment === 'he' || firstSegment === 'en') {
+      return firstSegment;
+    }
+    // Fallback: check browser language preference
+    const browserLang = navigator.language?.split('-')[0];
+    return browserLang === 'he' ? 'he' : 'en';
+  };
+  const locale = getLocaleFromUrl();
+  const isHebrew = locale === 'he';
+
+  // HARDCODED TEXT
+  const text = {
+    pet: isHebrew ? 'חיית מחמד' : 'Pet',
+    owner: isHebrew ? 'בעלים' : 'Owner',
+    vet: isHebrew ? 'וטרינר' : 'Vet',
+  };
 
   // Build the tabs array. Only include the Vet tab if showVetTab is true.
   const baseTabs = [
@@ -24,7 +44,7 @@ const AnimatedTabs = ({
       label: (
         <div className="flex items-center gap-1">
           <PawPrint className="h-5 w-5" />
-          {t('tabs.pet')}
+          {text.pet}
         </div>
       )
     },
@@ -33,7 +53,7 @@ const AnimatedTabs = ({
       label: (
         <div className="flex items-center gap-1">
           <User className="h-5 w-5" />
-          {t('tabs.owner')}
+          {text.owner}
         </div>
       )
     }
@@ -44,7 +64,7 @@ const AnimatedTabs = ({
       label: (
         <div className="flex items-center gap-1">
           <Stethoscope className="h-5 w-5" />
-          {t('tabs.vet')}
+          {text.vet}
         </div>
       )
     });

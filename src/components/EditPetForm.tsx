@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { uploadPetImage } from '@/lib/firebase/storage';
-import { updatePetInFirestore } from '@/lib/firebase/database/pets';
+import { updatePetInFirestore, deletePet } from '@/lib/firebase/database/pets';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
@@ -12,7 +12,6 @@ import { Upload, Loader2, CheckCircle, XCircle, Save, ArrowLeft, Trash2 } from '
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { getBreedsForDropdown, getGendersForDropdown, getPetTypesForDropdown } from '@/lib/firebase/database/pets';
-import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 // Image removed;
 import GetStartedDatePicker from './get-started/ui/GetStartedDatePicker';
@@ -59,8 +58,82 @@ interface UploadProgress {
 export default function EditPetForm({ pet }: EditPetFormProps) {
   const { user, dbUser } = useAuth();
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation(['Pet']);
-  const locale = (i18n.language || 'en') as 'en' | 'he';
+
+  // Get locale from URL - check if first path segment is a valid locale
+  const getLocaleFromUrl = () => {
+    if (typeof window === 'undefined') return 'en';
+    const pathParts = window.location.pathname.split('/');
+    const firstSegment = pathParts[1];
+    if (firstSegment === 'he' || firstSegment === 'en') {
+      return firstSegment;
+    }
+    const browserLang = navigator.language?.split('-')[0];
+    return browserLang === 'he' ? 'he' : 'en';
+  };
+  const locale = getLocaleFromUrl() as 'en' | 'he';
+  const isHebrew = locale === 'he';
+
+  // HARDCODED TEXT
+  const text = {
+    edit: {
+      title: isHebrew ? 'עריכת חיית מחמד' : 'Edit Pet',
+      success: isHebrew ? 'חיית המחמד עודכנה בהצלחה' : 'Pet updated successfully',
+      error: isHebrew ? 'שגיאה בעדכון חיית המחמד' : 'Error updating pet',
+      deleteSuccess: isHebrew ? 'חיית המחמד נמחקה בהצלחה' : 'Pet deleted successfully',
+      deleteError: isHebrew ? 'שגיאה במחיקת חיית המחמד' : 'Error deleting pet',
+    },
+    form: {
+      name: isHebrew ? 'שם' : 'Name',
+      type: isHebrew ? 'סוג' : 'Type',
+      selectType: isHebrew ? 'בחר סוג' : 'Select type',
+      breed: isHebrew ? 'גזע' : 'Breed',
+      selectBreed: isHebrew ? 'בחר גזע' : 'Select breed',
+      currentPhoto: isHebrew ? 'תמונה נוכחית' : 'Current Photo',
+      changePhoto: isHebrew ? 'שנה תמונה' : 'Change Photo',
+      uploadPhoto: isHebrew ? 'העלה תמונה' : 'Upload Photo',
+      uploadPrompt: isHebrew ? 'לחץ להעלאה' : 'Click to upload',
+      imageRequirements: isHebrew ? 'PNG, JPG עד 10MB' : 'PNG, JPG up to 10MB',
+      updating: isHebrew ? 'מעדכן...' : 'Updating...',
+      birthDate: isHebrew ? 'תאריך לידה' : 'Birth Date',
+      gender: isHebrew ? 'מין' : 'Gender',
+      selectGender: isHebrew ? 'בחר מין' : 'Select gender',
+      weight: isHebrew ? 'משקל (ק"ג)' : 'Weight (kg)',
+      weightPlaceholder: isHebrew ? 'הזן משקל' : 'Enter weight',
+      notes: isHebrew ? 'הערות' : 'Notes',
+      notesPlaceholder: isHebrew ? 'הזן הערות' : 'Enter notes',
+      save: isHebrew ? 'שמור' : 'Save',
+    },
+    delete: isHebrew ? 'מחק' : 'Delete',
+    deleteConfirm: {
+      title: isHebrew ? 'מחיקת חיית מחמד' : 'Delete Pet',
+      message: isHebrew ? 'האם אתה בטוח שברצונך למחוק את חיית המחמד הזו? פעולה זו אינה ניתנת לביטול.' : 'Are you sure you want to delete this pet? This action cannot be undone.',
+      cancel: isHebrew ? 'ביטול' : 'Cancel',
+      delete: isHebrew ? 'מחק' : 'Delete',
+      deleting: isHebrew ? 'מוחק...' : 'Deleting...',
+    },
+  };
+  // Map numeric pet type IDs to string types for breed selection
+  // Only dog, cat, and other are supported
+  const petTypeIdToString: Record<string, string> = {
+    '1': 'dog',
+    '2': 'cat',
+    '3': 'other',
+    '4': 'other',
+    '5': 'other',
+    'dog': 'dog',
+    'cat': 'cat',
+    'other': 'other',
+  };
+
+  // Get the string type for breed lookup
+  const getPetTypeString = (type: string): 'dog' | 'cat' | 'other' => {
+    const typeStr = petTypeIdToString[type] || type;
+    if (typeStr === 'dog' || typeStr === 'cat') {
+      return typeStr;
+    }
+    return 'other';
+  };
+
   const [formData, setFormData] = useState<PetFormData>({
     name: pet.name || '',
     type: pet.type || '',
@@ -83,7 +156,7 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
   const [genders, setGenders] = useState<{ value: string; label: string }[]>([]);
   const [petTypes, setPetTypes] = useState<{ value: string; label: string }[]>([]);
   const [isLoadingDropdowns, setIsLoadingDropdowns] = useState(true);
-  const [breedId, setBreedId] = useState<string>('');
+  const [breedId, setBreedId] = useState<string>(pet.breedId || '');
 
   // Fetch dropdown data from database
   useEffect(() => {
@@ -110,11 +183,30 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
     fetchDropdownData();
   }, [locale]);
 
-  // Update breed ID when type or breed name changes
+  // Update breed ID when type or breed name changes (only if breedId is not already set)
   useEffect(() => {
+    // Skip if breedId is already set from pet data
+    if (breedId && !formData.breed) {
+      // If we have a breedId but no breed name, try to find the breed name
+      const petTypeStr = getPetTypeString(formData.type);
+      if (petTypeStr === 'dog' || petTypeStr === 'cat') {
+        try {
+          const localizedBreeds = getLocalizedBreedsForType(petTypeStr, locale);
+          const matchingBreed = localizedBreeds.find(breed => breed.id === breedId);
+          if (matchingBreed) {
+            setFormData(prev => ({ ...prev, breed: matchingBreed.name }));
+          }
+        } catch (error) {
+          console.error('Error finding breed name from ID:', error);
+        }
+      }
+      return;
+    }
+
     if (formData.type && formData.breed) {
       try {
-        const localizedBreeds = getLocalizedBreedsForType(formData.type as 'dog' | 'cat' | 'other', locale);
+        const petTypeStr = getPetTypeString(formData.type);
+        const localizedBreeds = getLocalizedBreedsForType(petTypeStr, locale);
         const matchingBreed = localizedBreeds.find(
           breed => breed.name.toLowerCase() === formData.breed.toLowerCase() ||
             breed.name === formData.breed
@@ -122,16 +214,16 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
         if (matchingBreed) {
           setBreedId(matchingBreed.id);
         } else {
-          setBreedId('');
+          // Don't clear breedId if breed name doesn't match - might be custom
+          if (!breedId) {
+            setBreedId('');
+          }
         }
       } catch (error) {
         console.error('Error finding breed ID:', error);
-        setBreedId('');
       }
-    } else {
-      setBreedId('');
     }
-  }, [formData.type, formData.breed, locale]);
+  }, [formData.type, formData.breed, locale, breedId]);
 
   const handleInputChange = (field: keyof PetFormData, value: string) => {
     setFormData(prev => ({
@@ -204,23 +296,17 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
 
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/pets/${pet.id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const success = await deletePet(pet.id);
 
-      if (response.ok) {
-        toast.success(t('edit.deleteSuccess'));
-        navigate('/pages/my-pets');
+      if (success) {
+        toast.success(text.edit.deleteSuccess);
+        navigate(`/${locale}/my-pets`);
       } else {
-        const errorData = await response.json();
-        toast.error(errorData.message || t('edit.deleteError'));
+        toast.error(text.edit.deleteError);
       }
     } catch (error) {
       console.error('Delete pet error:', error);
-      toast.error(t('edit.deleteError'));
+      toast.error(text.edit.deleteError);
     } finally {
       setIsDeleting(false);
       setShowDeleteConfirm(false);
@@ -255,15 +341,15 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
       console.log('Update result:', updateResult);
 
       if (updateResult.success) {
-        toast.success(t('edit.success'));
+        toast.success(text.edit.success);
         // Force refresh the page to ensure updated data is displayed
-        window.location.href = '/pages/my-pets';
+        window.location.href = `/${locale}/my-pets`;
       } else {
         throw new Error(updateResult.error || 'Failed to update pet');
       }
     } catch (error) {
       console.error('Error updating pet:', error);
-      toast.error(t('edit.error'));
+      toast.error(text.edit.error);
       setUploadProgress({ progress: 0, status: 'error' });
     } finally {
       setIsSubmitting(false);
@@ -291,7 +377,7 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                 <ArrowLeft className="h-4 w-4" />
               </Button>
               <CardTitle className="text-2xl font-bold text-gray-800">
-                {t('edit.title')}
+                {text.edit.title}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -299,14 +385,14 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                 {/* Pet Name */}
                 <div className="space-y-2">
                   <Label htmlFor="name" className="text-sm font-medium text-gray-700">
-                    {t('form.name')} *
+                    {text.form.name} *
                   </Label>
                   <Input
                     id="name"
                     type="text"
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
-                    placeholder={t('form.name')}
+                    placeholder={text.form.name}
                     required
                     className="w-full"
                   />
@@ -315,7 +401,7 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                 {/* Pet Type */}
                 <div className="space-y-2">
                   <Label htmlFor="type" className="text-sm font-medium text-gray-700">
-                    {t('form.type')} *
+                    {text.form.type} *
                   </Label>
                   <select
                     id="type"
@@ -325,7 +411,7 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                     disabled={isLoadingDropdowns}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
                   >
-                    <option value="">{isLoadingDropdowns ? 'Loading...' : t('form.selectType')}</option>
+                    <option value="">{isLoadingDropdowns ? 'Loading...' : text.form.selectType}</option>
                     {petTypes.map((type) => (
                       <option key={type.value} value={type.value}>
                         {type.label}
@@ -334,47 +420,48 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                   </select>
                 </div>
 
-                {/* Breed Selection */}
-                {formData.type && formData.type !== 'other' && (
+                {/* Breed Selection - Show autocomplete for dog/cat types */}
+                {formData.type && (getPetTypeString(formData.type) === 'dog' || getPetTypeString(formData.type) === 'cat') && (
                   <div className="space-y-2">
                     <AutocompleteBreedInput
-                      petType={formData.type as 'dog' | 'cat'}
+                      petType={getPetTypeString(formData.type) as 'dog' | 'cat'}
                       value={breedId}
                       onValueChange={(id) => {
                         setBreedId(id);
                         // Find breed name from ID
                         try {
-                          const localizedBreeds = getLocalizedBreedsForType(formData.type as 'dog' | 'cat', locale);
+                          const petTypeStr = getPetTypeString(formData.type);
+                          const localizedBreeds = getLocalizedBreedsForType(petTypeStr, locale);
                           const selectedBreed = localizedBreeds.find(breed => breed.id === id);
                           if (selectedBreed) {
-                            handleInputChange('breed', selectedBreed.name);
+                            setFormData(prev => ({ ...prev, breed: selectedBreed.name }));
                           } else {
-                            handleInputChange('breed', '');
+                            setFormData(prev => ({ ...prev, breed: '' }));
                           }
                         } catch (error) {
                           console.error('Error finding breed name:', error);
-                          handleInputChange('breed', '');
+                          setFormData(prev => ({ ...prev, breed: '' }));
                         }
                       }}
-                      placeholder={t('form.selectBreed')}
-                      label={t('form.breed')}
+                      placeholder={text.form.selectBreed}
+                      label={text.form.breed}
                       disabled={isLoadingDropdowns}
                       className="w-full"
                     />
                   </div>
                 )}
                 {/* Custom breed input for "other" type */}
-                {formData.type === 'other' && (
+                {formData.type && getPetTypeString(formData.type) === 'other' && (
                   <div className="space-y-2">
                     <Label htmlFor="breed" className="text-sm font-medium text-gray-700">
-                      {t('form.breed')}
+                      {text.form.breed}
                     </Label>
                     <Input
                       id="breed"
                       type="text"
                       value={formData.breed}
                       onChange={(e) => handleInputChange('breed', e.target.value)}
-                      placeholder={t('form.breed')}
+                      placeholder={text.form.breed}
                       disabled={isLoadingDropdowns}
                       className="w-full"
                     />
@@ -385,7 +472,7 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                 {formData.imageUrl && (
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-gray-700">
-                      {t('form.currentPhoto')}
+                      {text.form.currentPhoto}
                     </Label>
                     <div className="relative w-32 h-32 mx-auto">
                       <img
@@ -400,7 +487,7 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                 {/* Image Upload */}
                 <div className="space-y-2">
                   <Label htmlFor="image" className="text-sm font-medium text-gray-700">
-                    {formData.imageUrl ? t('form.changePhoto') : t('form.uploadPhoto')}
+                    {formData.imageUrl ? text.form.changePhoto : text.form.uploadPhoto}
                   </Label>
                   <div className="flex items-center justify-center w-full">
                     <label
@@ -410,9 +497,9 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                       <div className="flex flex-col items-center justify-center pt-5 pb-6">
                         <Upload className="w-8 h-8 mb-4 text-gray-500" />
                         <p className="mb-2 text-sm text-gray-500">
-                          <span className="font-semibold">{t('form.uploadPrompt')}</span>
+                          <span className="font-semibold">{text.form.uploadPrompt}</span>
                         </p>
-                        <p className="text-xs text-gray-500">{t('form.imageRequirements')}</p>
+                        <p className="text-xs text-gray-500">{text.form.imageRequirements}</p>
                       </div>
                       <input
                         id="image"
@@ -429,7 +516,7 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                 {uploadProgress.status === 'uploading' && (
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">{t('form.updating')}</span>
+                      <span className="text-gray-600">{text.form.updating}</span>
                       <span className="text-gray-600">{uploadProgress.progress}%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
@@ -446,7 +533,7 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
                   <div className="space-y-2">
                     <GetStartedDatePicker
-                      label={t('form.birthDate')}
+                      label={text.form.birthDate}
                       id="birthDate"
                       value={formData.birthDate}
                       maxDate={new Date()}
@@ -459,7 +546,7 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="gender" className="text-sm font-medium text-gray-700">
-                      {t('form.gender')}
+                      {text.form.gender}
                     </Label>
                     <select
                       id="gender"
@@ -468,7 +555,7 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                       disabled={isLoadingDropdowns}
                       className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
                     >
-                      <option value="">{isLoadingDropdowns ? 'Loading...' : t('form.selectGender')}</option>
+                      <option value="">{isLoadingDropdowns ? 'Loading...' : text.form.selectGender}</option>
                       {genders.map((gender) => (
                         <option key={gender.value} value={gender.value}>
                           {gender.label}
@@ -482,27 +569,27 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="weight" className="text-sm font-medium text-gray-700">
-                      {t('form.weight')}
+                      {text.form.weight}
                     </Label>
                     <Input
                       id="weight"
                       type="number"
                       value={formData.weight}
                       onChange={(e) => handleInputChange('weight', e.target.value)}
-                      placeholder={t('form.weightPlaceholder')}
+                      placeholder={text.form.weightPlaceholder}
                       className="w-full"
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="notes" className="text-sm font-medium text-gray-700">
-                      {t('form.notes')}
+                      {text.form.notes}
                     </Label>
                     <Input
                       id="notes"
                       type="text"
                       value={formData.notes}
                       onChange={(e) => handleInputChange('notes', e.target.value)}
-                      placeholder={t('form.notesPlaceholder')}
+                      placeholder={text.form.notesPlaceholder}
                       className="w-full"
                     />
                   </div>
@@ -521,7 +608,7 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                     className="bg-red-600 hover:bg-red-700 text-white"
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
-                    {t('delete')}
+                    {text.delete}
                   </Button>
 
                   {/* Save Button */}
@@ -533,12 +620,12 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                     {isSubmitting ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        {t('form.updating')}
+                        {text.form.updating}
                       </>
                     ) : (
                       <>
                         <Save className="w-4 h-4 mr-2" />
-                        {t('form.save')}
+                        {text.form.save}
                       </>
                     )}
                   </Button>
@@ -554,10 +641,10 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              {t('deleteConfirm.title')}
+              {text.deleteConfirm.title}
             </h3>
             <p className="text-gray-600 mb-6">
-              {t('deleteConfirm.message')}
+              {text.deleteConfirm.message}
             </p>
             <div className="flex justify-end space-x-3">
               <Button
@@ -565,7 +652,7 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={isDeleting}
               >
-                {t('deleteConfirm.cancel')}
+                {text.deleteConfirm.cancel}
               </Button>
               <Button
                 variant="destructive"
@@ -576,12 +663,12 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                 {isDeleting ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    {t('deleteConfirm.deleting')}
+                    {text.deleteConfirm.deleting}
                   </>
                 ) : (
                   <>
                     <Trash2 className="w-4 h-4 mr-2" />
-                    {t('deleteConfirm.delete')}
+                    {text.deleteConfirm.delete}
                   </>
                 )}
               </Button>
