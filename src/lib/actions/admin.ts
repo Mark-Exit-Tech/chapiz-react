@@ -294,21 +294,82 @@ export async function deleteBusiness(id: string) {
   }
 }
 
-// Contact info stub
+// Contact info - fetched from Firebase settings
 export async function getContactInfo() {
-  return {
-    email: 'support@facepet.club',
-    phone: '+972-50-000-0000',
-    address: 'Israel',
-    whatsapp: '+972-50-000-0000',
-    facebook: 'https://facebook.com/facepet',
-    instagram: 'https://instagram.com/facepet',
-    storeUrl: 'https://shop.facepet.club'
-  };
+  try {
+    const { getSiteSettings } = await import('@/lib/firebase/database/settings');
+    const settings = await getSiteSettings();
+
+    if (settings) {
+      return {
+        email: settings.email || '',
+        phone: settings.phone || '',
+        address: settings.address || '',
+        whatsapp: settings.whatsapp || '',
+        facebook: settings.facebook || '',
+        instagram: settings.instagram || '',
+        storeUrl: settings.storeUrl || '',
+        androidAppUrl: settings.androidAppUrl || '',
+        iosAppUrl: settings.iosAppUrl || ''
+      };
+    }
+
+    // Fallback to empty values if no settings found
+    return {
+      email: '',
+      phone: '',
+      address: '',
+      whatsapp: '',
+      facebook: '',
+      instagram: '',
+      storeUrl: '',
+      androidAppUrl: '',
+      iosAppUrl: ''
+    };
+  } catch (error) {
+    console.error('Error fetching contact info from settings:', error);
+    return {
+      email: '',
+      phone: '',
+      address: '',
+      whatsapp: '',
+      facebook: '',
+      instagram: '',
+      storeUrl: '',
+      androidAppUrl: '',
+      iosAppUrl: ''
+    };
+  }
 }
 
-// Mobile app links stub
+// Mobile app links - fetched from Firebase settings
 export async function getMobileAppLinks() {
+  try {
+    const { getSiteSettings } = await import('@/lib/firebase/database/settings');
+    const settings = await getSiteSettings();
+
+    if (settings) {
+      return {
+        iosAppUrl: settings.iosAppUrl || '',
+        androidAppUrl: settings.androidAppUrl || ''
+      };
+    }
+
+    return {
+      iosAppUrl: '',
+      androidAppUrl: ''
+    };
+  } catch (error) {
+    console.error('Error fetching mobile app links from settings:', error);
+    return {
+      iosAppUrl: '',
+      androidAppUrl: ''
+    };
+  }
+}
+
+// Legacy stub - kept for backwards compatibility
+export async function getMobileAppLinksLegacy() {
   return {
     iosAppUrl: 'https://apps.apple.com/app/facepet',
     androidAppUrl: 'https://play.google.com/store/apps/details?id=com.facepet'
@@ -1109,11 +1170,41 @@ export async function deleteComment(id: string) {
 }
 
 export async function saveContactInfo(data: any) {
-  return { success: true, error: undefined };
+  try {
+    const { saveSiteSettings } = await import('@/lib/firebase/database/settings');
+
+    // Map the form data to SiteSettings format
+    const settings = {
+      siteName: data.siteName || '',
+      email: data.email || '',
+      phone: data.phone || '',
+      address: data.address || '',
+      workHours: data.workHours || '',
+      logoUrl: data.logoUrl || '',
+      facebook: data.facebook || '',
+      instagram: data.instagram || '',
+      whatsapp: data.whatsapp || '',
+      storeUrl: data.storeUrl || '',
+      androidAppUrl: data.androidAppUrl || '',
+      iosAppUrl: data.iosAppUrl || ''
+    };
+
+    const success = await saveSiteSettings(settings as any);
+
+    if (success) {
+      return { success: true, error: undefined };
+    } else {
+      return { success: false, error: 'Failed to save settings' };
+    }
+  } catch (error) {
+    console.error('Error saving contact info:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export async function updateContactInfo(data: any) {
-  return { success: true, error: undefined };
+  // Use the same function as saveContactInfo
+  return saveContactInfo(data);
 }
 
 export async function deleteContactSubmission(id: string) {

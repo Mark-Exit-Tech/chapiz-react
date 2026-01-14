@@ -27,28 +27,62 @@ const USER_COUPONS_COLLECTION = 'userCoupons';
 const COUPONS_COLLECTION = 'coupons';
 
 /**
+ * Get user's purchase count for a specific coupon
+ */
+export async function getUserCouponPurchaseCount(userId: string, couponId: string): Promise<number> {
+    try {
+        const userCouponsRef = collection(db, USER_COUPONS_COLLECTION);
+        const q = query(
+            userCouponsRef,
+            where('userId', '==', userId),
+            where('couponId', '==', couponId)
+        );
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.size;
+    } catch (error) {
+        console.error('❌ Error getting purchase count:', error);
+        return 0;
+    }
+}
+
+/**
  * Purchase coupon
  */
 export async function purchaseCoupon(userId: string, couponId: string, points: number): Promise<{ success: boolean; error?: string }> {
     try {
         console.log('💰 Purchasing coupon:', { userId, couponId, points });
-        
+
         // Get the coupon details
         const couponRef = doc(db, COUPONS_COLLECTION, couponId);
         const couponSnap = await getDoc(couponRef);
-        
+
         if (!couponSnap.exists()) {
             console.error('❌ Coupon not found:', couponId);
             return { success: false, error: 'Coupon not found' };
         }
-        
+
         const couponData = couponSnap.data();
-        
+
+        // Check purchase limit restriction
+        const purchaseLimit = couponData.purchaseLimit;
+        if (purchaseLimit && purchaseLimit > 0) {
+            const currentPurchaseCount = await getUserCouponPurchaseCount(userId, couponId);
+            console.log(`📊 Purchase limit check: ${currentPurchaseCount}/${purchaseLimit}`);
+
+            if (currentPurchaseCount >= purchaseLimit) {
+                console.warn('❌ Purchase limit reached for this coupon');
+                return {
+                    success: false,
+                    error: `Purchase limit reached. You can only purchase this voucher ${purchaseLimit} time(s).`
+                };
+            }
+        }
+
         // Create user coupon record
         const userCouponsRef = collection(db, USER_COUPONS_COLLECTION);
         const newUserCouponRef = doc(userCouponsRef);
         const now = Timestamp.now();
-        
+
         const userCouponData = {
             userId,
             couponId,
@@ -57,10 +91,10 @@ export async function purchaseCoupon(userId: string, couponId: string, points: n
             createdAt: now.toDate().toISOString(),
             pointsSpent: points,
         };
-        
+
         await setDoc(newUserCouponRef, userCouponData);
         console.log('✅ Coupon purchased successfully:', newUserCouponRef.id);
-        
+
         return { success: true };
     } catch (error) {
         console.error('❌ Error purchasing coupon:', error);

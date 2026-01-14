@@ -11,6 +11,9 @@ export interface SiteSettings {
   facebook: string;
   instagram: string;
   whatsapp: string;
+  storeUrl?: string;
+  androidAppUrl?: string;
+  iosAppUrl?: string;
 }
 
 const SETTINGS_DOC_ID = 'site-settings';

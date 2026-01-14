@@ -18,7 +18,7 @@ import { Business } from '@/types/promo';
 import MapCard from '@/components/cards/MapCard';
 import { getUserFromFirestore } from '@/lib/firebase/database/users';
 import { addPointsToCategory, getUserPoints, deductPointsFromCategory } from '@/lib/firebase/database/points';
-import { purchaseCoupon, getActiveUserCoupons, getCouponHistory, markCouponAsUsed, UserCoupon } from '@/lib/firebase/database/coupons';
+import { purchaseCoupon, getActiveUserCoupons, getCouponHistory, markCouponAsUsed, UserCoupon, getUserCouponPurchaseCount } from '@/lib/firebase/database/coupons';
 import { useShopRedirect } from '@/hooks/use-shop-redirect';
 import toast from 'react-hot-toast';
 
@@ -78,6 +78,7 @@ export default function UserVouchersPage() {
     failedToMarkAsUsed: isHebrew ? 'נכשל בסימון השובר כמשומש' : 'Failed to mark voucher as used',
     shareShopTitle: isHebrew ? 'בדקו את החנות שלנו!' : 'Check out our shop!',
     shareShopText: isHebrew ? 'בדקו את החנות שלנו עם הקישור המיוחד הזה!' : 'Check out our shop with this special link!',
+    purchaseLimitReached: isHebrew ? 'הגעת למגבלת הרכישות עבור שובר זה' : 'You have reached the purchase limit for this voucher',
   };
   
   const navigate = useNavigate();
@@ -211,9 +212,31 @@ export default function UserVouchersPage() {
         
         console.log(`✅ Found ${validCoupons.length} valid coupons after filtering`);
         console.log('Valid coupons:', validCoupons);
-        
+
+        // Filter out coupons where user has reached purchase limit
+        let availableCoupons = validCoupons;
+        if (user) {
+          const purchaseLimitChecks = await Promise.all(
+            validCoupons.map(async (coupon) => {
+              // If no purchase limit is set, coupon is available
+              if (!coupon.purchaseLimit || coupon.purchaseLimit <= 0) {
+                return true;
+              }
+              // Check user's purchase count for this coupon
+              const purchaseCount = await getUserCouponPurchaseCount(user.uid, coupon.id);
+              const isAvailable = purchaseCount < coupon.purchaseLimit;
+              if (!isAvailable) {
+                console.log(`🚫 Hiding coupon "${coupon.name}" - purchase limit reached (${purchaseCount}/${coupon.purchaseLimit})`);
+              }
+              return isAvailable;
+            })
+          );
+          availableCoupons = validCoupons.filter((_, index) => purchaseLimitChecks[index]);
+          console.log(`✅ ${availableCoupons.length} coupons available after purchase limit check`);
+        }
+
         // Sort coupons: free vouchers (price === 0) first, then by price ascending
-        const sortedCoupons = [...validCoupons].sort((a, b) => {
+        const sortedCoupons = [...availableCoupons].sort((a, b) => {
           const aIsFree = a.price === 0;
           const bIsFree = b.price === 0;
           
@@ -496,7 +519,7 @@ export default function UserVouchersPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-8">
+      <div className="container mx-auto p-8" dir={isHebrew ? 'rtl' : 'ltr'}>
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
@@ -508,27 +531,14 @@ export default function UserVouchersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" dir={isHebrew ? 'rtl' : 'ltr'}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 pb-24 md:pb-12 max-w-7xl">
         {/* Header */}
-        <div className="mb-8 lg:mb-12 text-right">
-          <div className="flex items-start justify-between gap-4 mb-3">
-            <div className="flex-1">
+        <div className="mb-8 lg:mb-12">
           <h1 className="text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
             {text.title}
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl ml-auto">{text.description}</p>
-            </div>
-            <Button
-              onClick={handleShare}
-              variant="outline"
-              size="lg"
-              className="flex items-center gap-2 flex-shrink-0"
-            >
-              <Share2 className="h-5 w-5" />
-              {text.share}
-            </Button>
-          </div>
+          <p className="text-lg text-gray-600 max-w-2xl">{text.description}</p>
         </div>
 
         {/* User Points Section */}
@@ -543,15 +553,22 @@ export default function UserVouchersPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="text-5xl lg:text-6xl font-bold bg-gradient-to-r from-yellow-600 to-yellow-500 bg-clip-text text-transparent mb-3">
-                      {userPoints.toLocaleString()}
-                    </div>
-                    <p className="text-base text-gray-600">{text.pointsDescription}</p>
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex-1">
+                  <div className="text-5xl lg:text-6xl font-bold bg-gradient-to-r from-yellow-600 to-yellow-500 bg-clip-text text-transparent mb-3">
+                    {userPoints.toLocaleString()}
                   </div>
+                  <p className="text-base text-gray-600">{text.pointsDescription}</p>
                 </div>
+                <Button
+                  onClick={handleShare}
+                  variant="outline"
+                  size="lg"
+                  className="flex items-center gap-2 flex-shrink-0"
+                >
+                  <Share2 className="h-5 w-5" />
+                  {text.share}
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -616,7 +633,7 @@ export default function UserVouchersPage() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                     {/* Date Overlay */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm px-3 py-2">
+                    <div className="absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-sm px-3 py-2">
                       <div className="flex items-center gap-1.5 text-white text-sm font-medium">
                         <Calendar className="h-4 w-4" />
                         <span>{text.validUntil}: {formatDate(coupon.validTo)}</span>
@@ -775,7 +792,7 @@ export default function UserVouchersPage() {
                         : 'opacity-75 hover:opacity-90 border-gray-200 bg-gradient-to-br from-gray-50 to-white'
                     }`}
                   >
-                    <div className="absolute top-4 right-4 z-10" onClick={(e) => e.stopPropagation()}>
+                    <div className="absolute top-4 end-4 z-10" onClick={(e) => e.stopPropagation()}>
                       <Badge 
                         variant={isActive && !isExpired ? 'default' : isExpired ? 'destructive' : 'secondary'} 
                         className={`shadow-md ${isActive && !isExpired ? 'bg-green-500' : ''}`}
@@ -810,7 +827,7 @@ export default function UserVouchersPage() {
                           isActive && !isExpired ? 'from-black/20' : 'from-black/30'
                         } to-transparent`} />
                         {/* Date Overlay */}
-                        <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm px-3 py-2">
+                        <div className="absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-sm px-3 py-2">
                           <div className="flex items-center gap-1.5 text-white text-sm font-medium">
                             <Calendar className="h-4 w-4" />
                             <span>{text.validUntil}: {formatDate(coupon.validTo)}</span>
@@ -942,7 +959,7 @@ export default function UserVouchersPage() {
       {/* Responsive Modal: Dialog on Desktop, Drawer on Mobile */}
       {isDesktop ? (
         <Dialog open={!!selectedCouponImage} onOpenChange={(open) => !open && setSelectedCouponImage(null)}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" dir={isHebrew ? 'rtl' : 'ltr'}>
             {selectedCouponImage && (
               <>
                 <DialogHeader>
@@ -1047,7 +1064,7 @@ export default function UserVouchersPage() {
         </Dialog>
       ) : (
         <Drawer open={!!selectedCouponImage} onOpenChange={(open) => !open && setSelectedCouponImage(null)}>
-          <DrawerContent className="max-h-[85vh]">
+          <DrawerContent className="max-h-[85vh]" dir={isHebrew ? 'rtl' : 'ltr'}>
             {selectedCouponImage && (
               <>
                 <DrawerHeader className="pb-4">

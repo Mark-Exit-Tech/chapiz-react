@@ -17,6 +17,12 @@ import { getUserFromFirestore } from '@/lib/firebase/database/users';
 export default function ContactPage() {
     const { t } = useTranslation();
     const { user, dbUser } = useAuth();
+
+    // Get locale from URL for RTL support
+    const locale = typeof window !== 'undefined'
+        ? window.location.pathname.split('/')[1] || 'en'
+        : 'en';
+    const isHebrew = locale === 'he';
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -138,7 +144,7 @@ export default function ContactPage() {
     };
 
     return (
-        <div className="flex min-h-screen flex-col bg-gray-50 overflow-x-hidden">
+        <div className="flex min-h-screen flex-col bg-gray-50 overflow-x-hidden" dir={isHebrew ? 'rtl' : 'ltr'}>
             <Navbar />
 
             {/* Hero Section */}
@@ -278,35 +284,35 @@ export default function ContactPage() {
                             className="space-y-8"
                         >
                             <div>
-                                <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">{t('pages.ContactPage.contactInfo.title')}</h3>
+                                <h3 className="text-2xl font-bold text-gray-900 mb-6">{t('pages.ContactPage.contactInfo.title')}</h3>
                                 <div className="space-y-6">
-                                    <div className="flex items-center gap-4 justify-center flex-row-reverse rtl:flex-row">
-                                        <div className="bg-orange-100 p-3 rounded-full">
+                                    <div className="flex items-center gap-4">
+                                        <div className="bg-orange-100 p-3 rounded-full flex-shrink-0">
                                             <Mail className="h-6 w-6 text-orange-500" />
                                         </div>
-                                        <div className="text-center">
+                                        <div>
                                             <h4 className="font-semibold text-gray-900">{t('pages.ContactPage.contactInfo.email')}</h4>
                                             <p className="text-gray-600">{isLoadingContactInfo ? 'Loading...' : contactInfo.email}</p>
                                             <p className="text-sm text-gray-500">{t('pages.ContactPage.contactInfo.emailResponse')}</p>
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-4 justify-center flex-row-reverse rtl:flex-row">
-                                        <div className="bg-orange-100 p-3 rounded-full">
+                                    <div className="flex items-center gap-4">
+                                        <div className="bg-orange-100 p-3 rounded-full flex-shrink-0">
                                             <Phone className="h-6 w-6 text-orange-500" />
                                         </div>
-                                        <div className="text-center">
+                                        <div>
                                             <h4 className="font-semibold text-gray-900">{t('pages.ContactPage.contactInfo.phone')}</h4>
                                             <p className="text-gray-600">{isLoadingContactInfo ? 'Loading...' : contactInfo.phone}</p>
                                             <p className="text-sm text-gray-500">{t('pages.ContactPage.contactInfo.phoneHours')}</p>
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-4 justify-center flex-row-reverse rtl:flex-row">
-                                        <div className="bg-orange-100 p-3 rounded-full">
+                                    <div className="flex items-center gap-4">
+                                        <div className="bg-orange-100 p-3 rounded-full flex-shrink-0">
                                             <MapPin className="h-6 w-6 text-orange-500" />
                                         </div>
-                                        <div className="text-center">
+                                        <div>
                                             <h4 className="font-semibold text-gray-900">{t('pages.ContactPage.contactInfo.address')}</h4>
                                             <p className="text-gray-600">
                                                 {isLoadingContactInfo ? 'Loading...' : contactInfo.address.split('\n').map((line, index) => (
@@ -321,9 +327,9 @@ export default function ContactPage() {
 
                                     {/* Social Media Links */}
                                     {(contactInfo.facebook || contactInfo.instagram || contactInfo.whatsapp) && (
-                                        <div className="space-y-4">
-                                            <h4 className="font-semibold text-gray-900 text-center">{t('pages.ContactPage.contactInfo.followUs')}</h4>
-                                            <div className="flex flex-wrap gap-4 justify-center">
+                                        <div className="space-y-4 pt-4">
+                                            <h4 className="font-semibold text-gray-900">{t('pages.ContactPage.contactInfo.followUs')}</h4>
+                                            <div className="flex flex-wrap gap-4">
                                                 {contactInfo.facebook && (
                                                     <a
                                                         href={contactInfo.facebook}
