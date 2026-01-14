@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, where, orderBy } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, where, orderBy, Timestamp } from 'firebase/firestore';
 import { db } from '../client';
 
 export interface Comment {
@@ -19,10 +19,32 @@ const COMMENTS_COLLECTION = 'comments';
 export async function getCommentsForAd(adId: string): Promise<Comment[]> {
     try {
         const commentsRef = collection(db, COMMENTS_COLLECTION);
-        const q = query(commentsRef, where('adId', '==', adId), orderBy('createdAt', 'desc'));
-        const querySnapshot = await getDocs(q);
-        
-        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Comment));
+
+        // Try with orderBy first (requires composite index)
+        let querySnapshot;
+        try {
+            const q = query(commentsRef, where('adId', '==', adId), orderBy('createdAt', 'desc'));
+            querySnapshot = await getDocs(q);
+        } catch (indexError) {
+            // Fallback: query without orderBy if index doesn't exist, then sort in memory
+            console.warn('Composite index not available, falling back to client-side sorting');
+            const q = query(commentsRef, where('adId', '==', adId));
+            querySnapshot = await getDocs(q);
+        }
+
+        const comments = querySnapshot.docs.map(docSnapshot => {
+            const data = docSnapshot.data();
+            return {
+                id: docSnapshot.id,
+                ...data,
+                // Convert Firestore Timestamp to Date
+                createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
+                updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : (data.updatedAt ? new Date(data.updatedAt) : undefined)
+            } as Comment;
+        });
+
+        // Sort by createdAt descending (newest first)
+        return comments.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     } catch (error) {
         console.error('Error fetching comments for ad:', error);
         return [];
@@ -74,15 +96,22 @@ export async function createComment(commentData: Omit<Comment, 'id' | 'createdAt
     try {
         const commentsRef = collection(db, COMMENTS_COLLECTION);
         const newCommentRef = doc(commentsRef);
-        
-        const comment: Comment = {
+
+        // Use Firestore Timestamp for proper date storage
+        const firestoreData = {
+            id: newCommentRef.id,
+            ...commentData,
+            createdAt: Timestamp.now()
+        };
+
+        await setDoc(newCommentRef, firestoreData);
+
+        // Return with Date object for local use
+        return {
             id: newCommentRef.id,
             ...commentData,
             createdAt: new Date()
         };
-        
-        await setDoc(newCommentRef, comment);
-        return comment;
     } catch (error) {
         console.error('Error creating comment:', error);
         return null;
@@ -95,7 +124,7 @@ export async function updateComment(id: string, updates: Partial<Comment>): Prom
         const commentRef = doc(db, COMMENTS_COLLECTION, id);
         await updateDoc(commentRef, {
             ...updates,
-            updatedAt: new Date()
+            updatedAt: Timestamp.now()
         });
         
         const updatedDoc = await getDoc(commentRef);
