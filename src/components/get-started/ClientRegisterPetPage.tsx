@@ -182,11 +182,70 @@ export default function ClientRegisterPetPage({
     setError(null);
 
     try {
-      const result = await createPetInFirestore({
-        ...allFormData,
+      // Transform form data to match Pet interface
+      // Import breed data to get the breed name from breed ID
+      let breedName = allFormData.breed || '';
+      let breedIdForStorage = allFormData.breed || '';
+
+      // If breed is a breed ID (like "dog-3"), get the localized name
+      if (allFormData.breed && (allFormData.breed.startsWith('dog-') || allFormData.breed.startsWith('cat-'))) {
+        try {
+          const { getLocalizedBreedsForType } = await import('@/lib/data/breeds');
+          const petTypeStr = allFormData.type as 'dog' | 'cat' | 'other';
+          if (petTypeStr === 'dog' || petTypeStr === 'cat') {
+            const breeds = getLocalizedBreedsForType(petTypeStr, locale);
+            const matchingBreed = breeds.find(b => b.id === allFormData.breed);
+            if (matchingBreed) {
+              breedName = matchingBreed.name;
+            }
+          }
+        } catch (e) {
+          console.error('Error getting breed name:', e);
+        }
+      }
+
+      const petData = {
+        // Map petName to name (what Pet interface expects)
+        name: allFormData.petName || '',
+        // Store both breedId and breedName for proper display
+        breedId: breedIdForStorage,
+        breedName: breedName,
+        breed: breedName, // Fallback field
+        // Other pet details
+        type: allFormData.type || '',
+        gender: allFormData.gender || '',
+        birthDate: allFormData.birthDate ? allFormData.birthDate.toISOString() : '',
+        weight: allFormData.weight || '',
+        notes: allFormData.notes || '',
+        imageUrl: allFormData.imageUrl || '',
+        // Owner details
+        ownerFullName: allFormData.ownerFullName || '',
+        ownerPhoneNumber: allFormData.ownerPhoneNumber || '',
+        ownerEmailAddress: allFormData.ownerEmailAddress || '',
+        ownerHomeAddress: allFormData.ownerHomeAddress || '',
+        ownerCoordinates: allFormData.ownerCoordinates,
+        ownerPlaceId: allFormData.ownerPlaceId,
+        isOwnerFullNamePrivate: allFormData.isOwnerFullNamePrivate || false,
+        isOwnerPhonePrivate: allFormData.isOwnerPhonePrivate || false,
+        isOwnerEmailPrivate: allFormData.isOwnerEmailPrivate || false,
+        isOwnerAddressPrivate: allFormData.isOwnerAddressPrivate || false,
+        // Vet details
+        vetName: allFormData.vetName || '',
+        vetPhoneNumber: allFormData.vetPhoneNumber || '',
+        vetEmailAddress: allFormData.vetEmailAddress || '',
+        vetAddress: allFormData.vetAddress || '',
+        vetCoordinates: allFormData.vetCoordinates,
+        vetPlaceId: allFormData.vetPlaceId,
+        isVetNamePrivate: allFormData.isVetNamePrivate || false,
+        isVetPhonePrivate: allFormData.isVetPhonePrivate || false,
+        isVetEmailPrivate: allFormData.isVetEmailPrivate || false,
+        isVetAddressPrivate: allFormData.isVetAddressPrivate || false,
+        // User info
         userEmail: user.email || '',
         ownerId: user.uid
-      } as any);
+      };
+
+      const result = await createPetInFirestore(petData);
 
       if (result.success) {
         clearPetId();

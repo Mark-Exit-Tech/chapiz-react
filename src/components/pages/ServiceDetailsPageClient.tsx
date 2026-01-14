@@ -33,9 +33,10 @@ interface ServiceDetailsPageClientProps {
 }
 
 const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ service }) => {
-  const { t } = useTranslation('pages.ServicesPage');
+  const { t } = useTranslation('translation', { keyPrefix: 'pages.ServicesPage' });
   const navigate = useNavigate();
   const locale = useLocale();
+  const isHebrew = locale === 'he';
   const [showCommentForm, setShowCommentForm] = useState(false);
   const [userRating, setUserRating] = useState(0);
   const [commentText, setCommentText] = useState('');
@@ -106,7 +107,7 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
 
   const handleSubmitComment = async () => {
     if (!user) {
-      alert('Please log in to write a review');
+      toast.error(t('loginToReview'));
       return;
     }
 
@@ -128,29 +129,29 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
           setCommentText('');
           setShowCommentForm(false);
           await loadComments();
-          toast.success('תגובתך נשלחה בהצלחה!');
+          toast.success(t('reviewSubmitted'));
         } else {
-          toast.error('שגיאה בשליחת התגובה. אנא נסה שוב.');
+          toast.error(t('reviewSubmitError'));
         }
       } catch (error) {
         console.error('Error submitting comment:', error);
-        toast.error('שגיאה בשליחת התגובה. אנא נסה שוב.');
+        toast.error(t('reviewSubmitError'));
       } finally {
         setIsSubmittingComment(false);
       }
     } else {
-      toast.error('אנא בחר דירוג');
+      toast.error(t('pleaseSelectRating'));
     }
   };
 
   const handleToggleFavorite = async () => {
     if (!user) {
-      toast.error('Please log in to add to favorites');
+      toast.error(isHebrew ? 'יש להתחבר כדי להוסיף למועדפים' : 'Please log in to add to favorites');
       return;
     }
 
     if (!service?.id) {
-      toast.error('Service ID not available');
+      toast.error(isHebrew ? 'מזהה שירות לא זמין' : 'Service ID not available');
       return;
     }
 
@@ -161,22 +162,22 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
         const result = await removeFromFavorites(user.uid, service.id);
         if (result.success) {
           setIsFavorited(false);
-          toast.success('Removed from favorites');
+          toast.success(isHebrew ? 'הוסר מהמועדפים' : 'Removed from favorites');
         } else {
-          toast.error('Failed to remove from favorites');
+          toast.error(isHebrew ? 'שגיאה בהסרה מהמועדפים' : 'Failed to remove from favorites');
         }
       } else {
         const result = await addToFavorites(user.uid, service.id, service.title, 'service');
         if (result.success) {
           setIsFavorited(true);
-          toast.success('Added to favorites');
+          toast.success(isHebrew ? 'נוסף למועדפים' : 'Added to favorites');
         } else {
-          toast.error('Failed to add to favorites');
+          toast.error(isHebrew ? 'שגיאה בהוספה למועדפים' : 'Failed to add to favorites');
         }
       }
     } catch (error) {
       console.error('Error toggling favorite:', error);
-      toast.error('An error occurred. Please try again.');
+      toast.error(isHebrew ? 'אירעה שגיאה. נסה שוב.' : 'An error occurred. Please try again.');
     } finally {
       setIsTogglingFavorite(false);
     }
@@ -185,23 +186,23 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
   // Show error state if service is not found
   if (!service) {
     return (
-      <div className="flex flex-col h-full overflow-y-auto bg-white">
+      <div className="flex flex-col h-full overflow-y-auto bg-white" dir={isHebrew ? 'rtl' : 'ltr'}>
         <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate(-1)}
-            className="rounded-full"
+            className={cn("rounded-full", isHebrew && "rotate-180")}
           >
             <ArrowLeft size={20} />
           </Button>
         </div>
         <div className="flex-1 flex items-center justify-center p-8">
           <div className="text-center">
-            <h2 className="text-2xl font-bold mb-2">Service Not Found</h2>
-            <p className="text-gray-600 mb-4">The service you're looking for doesn't exist or has been removed.</p>
+            <h2 className="text-2xl font-bold mb-2">{t('serviceNotFound')}</h2>
+            <p className="text-gray-600 mb-4">{t('serviceNotFoundDescription')}</p>
             <Button onClick={() => navigate(`/${locale}/services`)}>
-              Back to Services
+              {t('backToServices')}
             </Button>
           </div>
         </div>
@@ -213,7 +214,7 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
   const serviceDescription = service.description || '';
 
   return (
-    <div className="flex flex-col flex-1 overflow-y-auto bg-gray-50">
+    <div className="flex flex-col flex-1 overflow-y-auto bg-gray-50" dir={isHebrew ? 'rtl' : 'ltr'}>
       {/* Header with back button */}
       <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 md:px-8 py-4">
         <div className="max-w-7xl mx-auto flex items-center gap-3">
@@ -221,8 +222,7 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
             variant="ghost"
             size="icon"
             onClick={() => navigate(-1)}
-
-            className="rounded-full mr-[21px]"
+            className={cn("rounded-full", isHebrew ? "ml-[21px] rotate-180" : "mr-[21px]")}
           >
             <ArrowLeft size={20} />
           </Button>
@@ -247,7 +247,7 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
 
               {/* Contact Information Card */}
               <div className="bg-white rounded-xl shadow-sm p-6">
-                <h4 className="font-semibold text-lg mb-4">פרטי התקשרות</h4>
+                <h4 className="font-semibold text-lg mb-4">{t('contactDetails')}</h4>
                 <div className="space-y-4">
                   {service.phone && service.phone.trim() !== '' && service.phone !== 'undefined' && service.phone !== 'null' && (
                     <div className="flex items-center gap-3">
@@ -255,8 +255,8 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
                         <Phone size={18} className="text-primary" />
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 mb-1">טלפון</p>
-                        <a href={`tel:${service.phone}`} className="text-base font-medium text-gray-900 hover:text-primary">
+                        <p className="text-xs text-gray-500 mb-1">{t('phone')}</p>
+                        <a href={`tel:${service.phone}`} className="text-base font-medium text-gray-900 hover:text-primary" dir="ltr">
                           {service.phone}
                         </a>
                       </div>
@@ -268,7 +268,7 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
                         <MapPin size={18} className="text-primary" />
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 mb-1">כתובת</p>
+                        <p className="text-xs text-gray-500 mb-1">{t('address')}</p>
                         <p className="text-base text-gray-900">{service.location}</p>
                       </div>
                     </div>
@@ -296,7 +296,7 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
                           window.open(`https://waze.com/ul?q=${encodeURIComponent(address)}`, '_blank');
                         }
                       } else {
-                        toast.error('כתובת לא זמינה');
+                        toast.error(t('addressNotAvailable'));
                       }
                     }}
                   >
@@ -305,48 +305,48 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
                       alt="Waze"
                       width={18}
                       height={18}
-                      className={cn(locale === 'he' ? 'ml-2 order-2' : 'mr-2')}
+                      className={cn(isHebrew ? 'ml-2' : 'mr-2')}
                     />
-                    <span>{t('navigation') || 'Navigation'}</span>
+                    <span>{t('navigation')}</span>
                   </Button>
                   {service.phone && service.phone.trim() !== '' && service.phone !== 'undefined' && service.phone !== 'null' && (
                     <Button
                       variant="outline"
-                      className={cn("w-full justify-start", locale === 'he' ? 'justify-end' : 'justify-start')}
+                      className="w-full justify-start"
                       onClick={() => window.open(`tel:${service.phone}`, '_self')}
                     >
-                      <Phone size={18} className={cn(locale === 'he' ? 'ml-2 order-2' : 'mr-2')} />
-                      <span>{t('call') || 'Call'}</span>
+                      <Phone size={18} className={cn(isHebrew ? 'ml-2' : 'mr-2')} />
+                      <span>{t('call')}</span>
                     </Button>
                   )}
                   <Button
                     variant="outline"
-                    className={cn("w-full justify-start", locale === 'he' ? 'justify-end' : 'justify-start')}
+                    className="w-full justify-start"
                     onClick={handleToggleFavorite}
                     disabled={isTogglingFavorite}
                   >
                     {isTogglingFavorite ? (
-                      <div className={cn("h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent", locale === 'he' ? 'ml-2 order-2' : 'mr-2')} />
+                      <div className={cn("h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent", isHebrew ? 'ml-2' : 'mr-2')} />
                     ) : isFavorited ? (
-                      <Heart size={18} className={cn("fill-current text-orange-500", locale === 'he' ? 'ml-2 order-2' : 'mr-2')} />
+                      <Heart size={18} className={cn("fill-current text-orange-500", isHebrew ? 'ml-2' : 'mr-2')} />
                     ) : (
-                      <Heart size={18} className={cn(locale === 'he' ? 'ml-2 order-2' : 'mr-2')} />
+                      <Heart size={18} className={cn(isHebrew ? 'ml-2' : 'mr-2')} />
                     )}
                     <span>{isFavorited ? t('removeFromFavorites') : t('addToFavorites')}</span>
                   </Button>
                   <Button
                     variant="outline"
-                    className={cn("w-full justify-start", locale === 'he' ? 'justify-end' : 'justify-start')}
+                    className="w-full justify-start"
                     onClick={() => {
                       if (service.id) {
                         navigate(`/${locale}/coupons?businessId=${service.id}`);
                       } else {
-                        toast.error('Business ID not available');
+                        toast.error(isHebrew ? 'מזהה עסק לא זמין' : 'Business ID not available');
                       }
                     }}
                   >
-                    <Ticket size={18} className={cn(locale === 'he' ? 'ml-2 order-2' : 'mr-2')} />
-                    <span>{t('coupons') || 'Vouchers'}</span>
+                    <Ticket size={18} className={cn(isHebrew ? 'ml-2' : 'mr-2')} />
+                    <span>{t('coupons')}</span>
                   </Button>
                 </div>
               </div>
@@ -371,7 +371,7 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
               {/* Service description */}
               {serviceDescription && serviceDescription.trim() !== '' && (
                 <div className="bg-white rounded-xl shadow-sm p-6">
-                  <h3 className="font-semibold text-lg mb-3">תיאור</h3>
+                  <h3 className="font-semibold text-lg mb-3">{t('description')}</h3>
                   <p className="text-base text-gray-700 leading-relaxed whitespace-pre-line">{serviceDescription}</p>
                 </div>
               )}
@@ -379,22 +379,22 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
               {/* Google Reviews */}
               <div className="bg-white rounded-xl shadow-sm p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-bold">ביקורות Google</h3>
+                  <h3 className="text-xl font-bold">{t('googleReviews')}</h3>
                   {user ? (
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => setShowCommentForm(!showCommentForm)}
                     >
-                      הוסף ביקורת
+                      {t('addReview')}
                     </Button>
                   ) : (
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => toast.error('עליך להתחבר כדי לכתוב ביקורת')}
+                      onClick={() => toast.error(t('loginToReview'))}
                     >
-                      הוסף ביקורת
+                      {t('addReview')}
                     </Button>
                   )}
                 </div>
@@ -402,11 +402,11 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
                 {/* Comment Form */}
                 {showCommentForm && (
                   <div className="mb-6 rounded-lg border p-6 bg-gray-50">
-                    <h4 className="font-semibold mb-3">הוסף ביקורת חדשה</h4>
+                    <h4 className="font-semibold mb-3">{t('addNewReview')}</h4>
                     <div className="space-y-3">
                       <div>
-                        <Label>דירוג</Label>
-                        <div className="flex gap-1 mt-1">
+                        <Label>{t('rating')}</Label>
+                        <div className={cn("flex gap-1 mt-1", isHebrew && "flex-row-reverse justify-end")}>
                           {[1, 2, 3, 4, 5].map((star) => (
                             <Star
                               key={star}
@@ -423,27 +423,27 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
                         </div>
                       </div>
                       <div>
-                        <Label htmlFor="comment">תגובה (אופציונלי)</Label>
+                        <Label htmlFor="comment">{t('comment')}</Label>
                         <Textarea
                           id="comment"
                           value={commentText}
                           onChange={(e) => setCommentText(e.target.value)}
-                          placeholder="שתף את החוויה שלך... (אופציונלי)"
+                          placeholder={t('commentPlaceholder')}
                           rows={3}
                           className="mt-1"
                         />
                       </div>
                       <div className="flex gap-2">
                         <Button onClick={handleSubmitComment} size="sm" disabled={isSubmittingComment}>
-                          <Send size={16} className="mr-2" />
-                          {isSubmittingComment ? 'שולח...' : 'שלח'}
+                          <Send size={16} className={cn(isHebrew ? 'ml-2' : 'mr-2')} />
+                          {isSubmittingComment ? t('submitting') : t('submit')}
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => setShowCommentForm(false)}
                         >
-                          ביטול
+                          {t('cancel')}
                         </Button>
                       </div>
                     </div>
@@ -452,7 +452,7 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
 
                 {isLoadingComments ? (
                   <div className="text-center py-8 text-gray-500">
-                    <p>טוען ביקורות...</p>
+                    <p>{t('loadingReviews')}</p>
                   </div>
                 ) : comments.length > 0 ? (
                   <div className="space-y-6">
@@ -461,19 +461,19 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
                         <div className="flex items-center gap-3 mb-3">
                           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                             <span className="text-primary font-semibold text-sm">
-                              {comment.userName.charAt(0).toUpperCase()}
+                              {comment.userName?.charAt(0).toUpperCase() || '?'}
                             </span>
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
                               <span className="font-semibold text-gray-900">{comment.userName}</span>
-                              <span className="flex items-center gap-1">
+                              <span className={cn("flex items-center gap-1", isHebrew && "flex-row-reverse")}>
                                 {[...Array(5)].map((_, i) => (
                                   <Star
                                     key={i}
                                     size={14}
                                     className={
-                                      i < comment.rating
+                                      i < (comment.rating || 0)
                                         ? 'fill-orange-400 text-orange-400'
                                         : 'fill-gray-300 text-gray-300'
                                     }
@@ -482,7 +482,7 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
                               </span>
                             </div>
                             <span className="text-xs text-gray-500">
-                              {comment.createdAt.toLocaleDateString('he-IL')}
+                              {comment.createdAt.toLocaleDateString(isHebrew ? 'he-IL' : 'en-US')}
                             </span>
                           </div>
                         </div>
@@ -494,8 +494,8 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
                   </div>
                 ) : (
                   <div className="text-center py-8 text-gray-500">
-                    <p className="mb-2">אין עדיין ביקורות עבור השירות הזה</p>
-                    <p className="text-sm">היה הראשון לכתוב ביקורת!</p>
+                    <p className="mb-2">{t('noReviews')}</p>
+                    <p className="text-sm">{t('beFirstToReview')}</p>
                   </div>
                 )}
               </div>
@@ -524,10 +524,10 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
                   window.open(`https://waze.com/ul?q=${encodeURIComponent(address)}`, '_blank');
                 }
               } else {
-                toast.error('כתובת לא זמינה');
+                toast.error(t('addressNotAvailable'));
               }
             }}
-            title={t('navigation') || 'Navigation'}
+            title={t('navigation')}
           >
             <img
               src="/icons/waze.png"
@@ -545,7 +545,7 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
                 size="icon"
                 className="focus:bg-primary transition-colors focus:text-white focus:outline-none"
                 onClick={() => window.open(`tel:${service.phone}`, '_self')}
-                title={t('call') || 'Call'}
+                title={t('call')}
               >
                 <Phone size={20} />
               </Button>
@@ -587,7 +587,7 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
                 toast.error('Business ID not available');
               }
             }}
-            title={t('coupons') || 'Vouchers'}
+            title={t('coupons')}
           >
             <Ticket size={20} />
           </Button>
