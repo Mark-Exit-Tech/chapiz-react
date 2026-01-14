@@ -102,85 +102,61 @@ const LocationAutocompleteComboSelect: React.FC<
     if (typeof window === 'undefined') return;
 
     const apiKey = googleMapsApiKey;
-    const BAD_KEY = 'AIzaSyAwzQsbG0vO0JWzOs7UAyu0upW6Xc1KL4E';
 
     if (!apiKey) {
       console.warn('❌ Google Maps API key is not configured. Client-side address search disabled.');
       return;
     }
 
-    // Aggressively remove any scripts with the wrong key
-    const allMapsScripts = document.querySelectorAll('script[src*="maps.googleapis.com"]');
-    let hasBadScript = false;
-    
-    allMapsScripts.forEach((s) => {
-      const scriptSrc = (s as HTMLScriptElement).src;
-      if (scriptSrc.includes(BAD_KEY)) {
-        console.log('🗑️ Removing script with bad API key:', scriptSrc);
-        s.remove();
-        hasBadScript = true;
-      }
-    });
-
-    // If we found a bad script, clear window.google to force fresh load
-    if (hasBadScript) {
-      console.log('🧹 Clearing cached Google Maps API');
-      delete (window as any).google;
-    }
-
-    if ((window as any).google?.maps?.places) {
-      try {
-        autocompleteServiceRef.current = new (window as any).google.maps.places.AutocompleteService();
-        setIsReady(true);
-      } catch (e) {
-        console.error('Failed to init AutocompleteService:', e);
-      }
-      return;
-    }
-
-    const existing = document.querySelector('script[data-facepet-google]') as HTMLScriptElement | null;
-    if (existing && existing.src.includes(apiKey)) {
-      // Wait a tick and try initializing
-      const init = () => {
-        if ((window as any).google?.maps?.places) {
-          try {
-            autocompleteServiceRef.current = new (window as any).google.maps.places.AutocompleteService();
-            setIsReady(true);
-          } catch (e) {
-            console.error('Failed to init AutocompleteService:', e);
-          }
-        }
-      };
-      setTimeout(init, 0);
-      return;
-    }
-
-    // Remove any existing script with wrong key
-    if (existing && !existing.src.includes(apiKey)) {
-      console.log('🗑️ Removing existing script with wrong key');
-      existing.remove();
-      delete (window as any).google;
-    }
-
-    // Create new script if none exists or if we removed the bad one
-    if (!document.querySelector('script[data-facepet-google]')) {
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async&language=${locale}`;
-      script.async = true;
-      script.defer = true;
-      script.setAttribute('data-facepet-google', 'true');
-      script.onload = () => {
+    // Function to initialize the autocomplete service
+    const initAutocomplete = () => {
+      if ((window as any).google?.maps?.places && !autocompleteServiceRef.current) {
         try {
           autocompleteServiceRef.current = new (window as any).google.maps.places.AutocompleteService();
           setIsReady(true);
+          console.log('✅ AutocompleteService initialized');
         } catch (e) {
           console.error('Failed to init AutocompleteService:', e);
         }
-      };
-      script.onerror = () => console.error('Failed to load Google Maps script');
-      document.head.appendChild(script);
-      console.log('✅ Loading Google Maps with key:', apiKey);
+      }
+    };
+
+    // If Google Maps is already loaded, initialize immediately
+    if ((window as any).google?.maps?.places) {
+      initAutocomplete();
+      return;
     }
+
+    // Check if script already exists
+    const existing = document.querySelector('script[data-facepet-google]') as HTMLScriptElement | null;
+
+    if (existing) {
+      // Script exists, wait for it to load
+      const checkReady = setInterval(() => {
+        if ((window as any).google?.maps?.places) {
+          clearInterval(checkReady);
+          initAutocomplete();
+        }
+      }, 100);
+
+      // Clean up interval after 10 seconds
+      setTimeout(() => clearInterval(checkReady), 10000);
+      return;
+    }
+
+    // Create new script
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&language=${locale}`;
+    script.async = true;
+    script.defer = true;
+    script.setAttribute('data-facepet-google', 'true');
+    script.onload = () => {
+      // Wait a bit for the places library to initialize
+      setTimeout(initAutocomplete, 100);
+    };
+    script.onerror = () => console.error('Failed to load Google Maps script');
+    document.head.appendChild(script);
+    console.log('✅ Loading Google Maps with key:', apiKey.substring(0, 10) + '...');
   }, [locale]);
 
   // Fetch predictions when the user types

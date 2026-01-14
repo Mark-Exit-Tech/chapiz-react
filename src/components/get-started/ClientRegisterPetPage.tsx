@@ -172,13 +172,19 @@ export default function ClientRegisterPetPage({
       return;
     }
 
+    if (!user) {
+      setError(text.unexpectedError);
+      toast.error(isHebrew ? 'יש להתחבר כדי לרשום חיית מחמד' : 'Please log in to register a pet');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
       const result = await createPetInFirestore({
         ...allFormData,
-        userEmail: user.email,
+        userEmail: user.email || '',
         ownerId: user.uid
       } as any);
 

@@ -124,19 +124,45 @@ export async function getPetById(id: string, withResult?: true): Promise<Pet | n
     }
 }
 
+// Helper function to recursively remove undefined values from an object
+function removeUndefinedValues(obj: any): any {
+    if (obj === null || obj === undefined) {
+        return null;
+    }
+    if (Array.isArray(obj)) {
+        return obj.map(item => removeUndefinedValues(item)).filter(item => item !== undefined);
+    }
+    if (typeof obj === 'object' && obj !== null) {
+        const cleaned: any = {};
+        for (const [key, value] of Object.entries(obj)) {
+            if (value !== undefined) {
+                const cleanedValue = removeUndefinedValues(value);
+                if (cleanedValue !== undefined) {
+                    cleaned[key] = cleanedValue;
+                }
+            }
+        }
+        return cleaned;
+    }
+    return obj;
+}
+
 // Create pet
 export async function createPetInFirestore(petData: any): Promise<{ success: boolean; petId?: string; error?: string }> {
     try {
         const petsRef = collection(db, PETS_COLLECTION);
         const newPetRef = doc(petsRef);
         const now = new Date();
-        
+
+        // Remove undefined values as Firebase doesn't accept them
+        const cleanedPetData = removeUndefinedValues(petData);
+
         const pet = {
-            ...petData,
+            ...cleanedPetData,
             createdAt: now,
             updatedAt: now
         };
-        
+
         await setDoc(newPetRef, pet);
         return { success: true, petId: newPetRef.id };
     } catch (error) {
@@ -149,16 +175,20 @@ export async function createPetInFirestore(petData: any): Promise<{ success: boo
 export async function updatePetInFirestore(id: string, updates: any): Promise<{ success: boolean; pet?: Pet; error?: string }> {
     try {
         const petRef = doc(db, PETS_COLLECTION, id);
+
+        // Remove undefined values as Firebase doesn't accept them
+        const cleanedUpdates = removeUndefinedValues(updates);
+
         await updateDoc(petRef, {
-            ...updates,
+            ...cleanedUpdates,
             updatedAt: new Date()
         });
-        
+
         const updatedDoc = await getDoc(petRef);
         if (!updatedDoc.exists()) {
             return { success: false, error: 'Pet not found after update' };
         }
-        
+
         const pet = { id: updatedDoc.id, ...updatedDoc.data() } as Pet;
         return { success: true, pet };
     } catch (error) {

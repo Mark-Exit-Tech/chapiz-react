@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { getUserFromFirestore } from '@/lib/firebase/database/users';
 import ClientRegisterPetPage from '@/components/get-started/ClientRegisterPetPage';
@@ -8,7 +8,8 @@ import BottomNavigation from '@/components/layout/BottomNavigation';
 
 export default function RegisterPetPage() {
   const { id } = useParams<{ id: string }>();
-  const { user, dbUser } = useAuth();
+  const navigate = useNavigate();
+  const { user, dbUser, loading: authLoading } = useAuth();
   const [userDetails, setUserDetails] = useState<{ fullName: string; phone: string; email: string }>({
     fullName: '',
     phone: '',
@@ -32,7 +33,18 @@ export default function RegisterPetPage() {
 
   const text = {
     loading: isHebrew ? 'טוען...' : 'Loading...',
+    loginRequired: isHebrew ? 'יש להתחבר כדי לרשום חיית מחמד' : 'Please log in to register a pet',
+    login: isHebrew ? 'התחברות' : 'Log In',
   };
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      // Store the current URL to redirect back after login
+      const currentPath = window.location.pathname;
+      navigate(`/${locale}/auth?redirect=${encodeURIComponent(currentPath)}`);
+    }
+  }, [authLoading, user, navigate, locale]);
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -65,7 +77,8 @@ export default function RegisterPetPage() {
     loadUserData();
   }, [user]);
 
-  if (loading) {
+  // Show loading while checking auth or loading user data
+  if (authLoading || loading || !user) {
     return (
       <>
         <Navbar />
