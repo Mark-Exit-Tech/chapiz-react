@@ -183,18 +183,21 @@ export default function ClientRegisterPetPage({
 
     try {
       // Transform form data to match Pet interface
+      // Cast to any for accessing dynamically added form fields
+      const formDataForBreed = allFormData as any;
+
       // Import breed data to get the breed name from breed ID
-      let breedName = allFormData.breed || '';
-      let breedIdForStorage = allFormData.breed || '';
+      let breedName = formDataForBreed.breed || '';
+      let breedIdForStorage = formDataForBreed.breed || '';
 
       // If breed is a breed ID (like "dog-3"), get the localized name
-      if (allFormData.breed && (allFormData.breed.startsWith('dog-') || allFormData.breed.startsWith('cat-'))) {
+      if (formDataForBreed.breed && (formDataForBreed.breed.startsWith('dog-') || formDataForBreed.breed.startsWith('cat-'))) {
         try {
           const { getLocalizedBreedsForType } = await import('@/lib/data/breeds');
-          const petTypeStr = allFormData.type as 'dog' | 'cat' | 'other';
+          const petTypeStr = formDataForBreed.type as 'dog' | 'cat' | 'other';
           if (petTypeStr === 'dog' || petTypeStr === 'cat') {
             const breeds = getLocalizedBreedsForType(petTypeStr, locale);
-            const matchingBreed = breeds.find(b => b.id === allFormData.breed);
+            const matchingBreed = breeds.find(b => b.id === formDataForBreed.breed);
             if (matchingBreed) {
               breedName = matchingBreed.name;
             }
@@ -204,42 +207,45 @@ export default function ClientRegisterPetPage({
         }
       }
 
+      // Cast to any for accessing dynamically added form fields
+      const formDataAny = allFormData as any;
+
       const petData = {
         // Map petName to name (what Pet interface expects)
-        name: allFormData.petName || '',
+        name: formDataAny.petName || '',
         // Store both breedId and breedName for proper display
         breedId: breedIdForStorage,
         breedName: breedName,
         breed: breedName, // Fallback field
         // Other pet details
-        type: allFormData.type || '',
-        gender: allFormData.gender || '',
-        birthDate: allFormData.birthDate ? allFormData.birthDate.toISOString() : '',
-        weight: allFormData.weight || '',
-        notes: allFormData.notes || '',
-        imageUrl: allFormData.imageUrl || '',
+        type: formDataAny.type || '',
+        gender: formDataAny.gender || '',
+        birthDate: formDataAny.birthDate ? formDataAny.birthDate.toISOString() : '',
+        weight: formDataAny.weight || '',
+        notes: formDataAny.notes || '',
+        imageUrl: formDataAny.imageUrl || '',
         // Owner details
-        ownerFullName: allFormData.ownerFullName || '',
-        ownerPhoneNumber: allFormData.ownerPhoneNumber || '',
-        ownerEmailAddress: allFormData.ownerEmailAddress || '',
-        ownerHomeAddress: allFormData.ownerHomeAddress || '',
-        ownerCoordinates: allFormData.ownerCoordinates,
-        ownerPlaceId: allFormData.ownerPlaceId,
-        isOwnerFullNamePrivate: allFormData.isOwnerFullNamePrivate || false,
-        isOwnerPhonePrivate: allFormData.isOwnerPhonePrivate || false,
-        isOwnerEmailPrivate: allFormData.isOwnerEmailPrivate || false,
-        isOwnerAddressPrivate: allFormData.isOwnerAddressPrivate || false,
+        ownerFullName: formDataAny.ownerFullName || '',
+        ownerPhoneNumber: formDataAny.ownerPhoneNumber || '',
+        ownerEmailAddress: formDataAny.ownerEmailAddress || '',
+        ownerHomeAddress: formDataAny.ownerHomeAddress || '',
+        ownerCoordinates: formDataAny.ownerCoordinates,
+        ownerPlaceId: formDataAny.ownerPlaceId,
+        isOwnerFullNamePrivate: formDataAny.isOwnerFullNamePrivate || false,
+        isOwnerPhonePrivate: formDataAny.isOwnerPhonePrivate || false,
+        isOwnerEmailPrivate: formDataAny.isOwnerEmailPrivate || false,
+        isOwnerAddressPrivate: formDataAny.isOwnerAddressPrivate || false,
         // Vet details
-        vetName: allFormData.vetName || '',
-        vetPhoneNumber: allFormData.vetPhoneNumber || '',
-        vetEmailAddress: allFormData.vetEmailAddress || '',
-        vetAddress: allFormData.vetAddress || '',
-        vetCoordinates: allFormData.vetCoordinates,
-        vetPlaceId: allFormData.vetPlaceId,
-        isVetNamePrivate: allFormData.isVetNamePrivate || false,
-        isVetPhonePrivate: allFormData.isVetPhonePrivate || false,
-        isVetEmailPrivate: allFormData.isVetEmailPrivate || false,
-        isVetAddressPrivate: allFormData.isVetAddressPrivate || false,
+        vetName: formDataAny.vetName || '',
+        vetPhoneNumber: formDataAny.vetPhoneNumber || '',
+        vetEmailAddress: formDataAny.vetEmailAddress || '',
+        vetAddress: formDataAny.vetAddress || '',
+        vetCoordinates: formDataAny.vetCoordinates,
+        vetPlaceId: formDataAny.vetPlaceId,
+        isVetNamePrivate: formDataAny.isVetNamePrivate || false,
+        isVetPhonePrivate: formDataAny.isVetPhonePrivate || false,
+        isVetEmailPrivate: formDataAny.isVetEmailPrivate || false,
+        isVetAddressPrivate: formDataAny.isVetAddressPrivate || false,
         // User info
         userEmail: user.email || '',
         ownerId: user.uid
