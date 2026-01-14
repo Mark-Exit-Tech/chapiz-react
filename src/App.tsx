@@ -22,6 +22,7 @@ const ServiceDetailsPage = lazy(() => import('./pages/ServiceDetailsPage'));
 const PetPage = lazy(() => import('./pages/PetPage'));
 const EditPetPage = lazy(() => import('./pages/EditPetPage'));
 const RegisterPetPage = lazy(() => import('./pages/RegisterPetPage'));
+const PetDonePage = lazy(() => import('./pages/PetDonePage'));
 const AddPetRedirect = lazy(() => import('./pages/AddPetRedirect'));
 
 // Admin sub-pages
@@ -74,6 +75,7 @@ function App() {
           <Route path="/pet/:id" element={<Suspense fallback={<PageLoader />}><PetPage /></Suspense>} />
           <Route path="/pet/:id/edit" element={<Suspense fallback={<PageLoader />}><EditPetPage /></Suspense>} />
           <Route path="/pet/:id/get-started/register" element={<Suspense fallback={<PageLoader />}><RegisterPetPage /></Suspense>} />
+          <Route path="/pet/:id/done" element={<Suspense fallback={<PageLoader />}><PetDonePage /></Suspense>} />
           <Route path="/services" element={<Navigate to={`/${currentLang}/services`} replace />} />
           <Route path="/privacy" element={<Navigate to={`/${currentLang}/privacy`} replace />} />
           <Route path="/terms" element={<Navigate to={`/${currentLang}/terms`} replace />} />
@@ -89,6 +91,7 @@ function App() {
           <Route path="/:locale/pet/:id" element={<Suspense fallback={<PageLoader />}><PetPage /></Suspense>} />
           <Route path="/:locale/pet/:id/edit" element={<Suspense fallback={<PageLoader />}><EditPetPage /></Suspense>} />
           <Route path="/:locale/pet/:id/get-started/register" element={<Suspense fallback={<PageLoader />}><RegisterPetPage /></Suspense>} />
+          <Route path="/:locale/pet/:id/done" element={<Suspense fallback={<PageLoader />}><PetDonePage /></Suspense>} />
           <Route path="/:locale/add-pet" element={<Suspense fallback={<PageLoader />}><AddPetRedirect /></Suspense>} />
           <Route path="/:locale/coupons" element={<Suspense fallback={<PageLoader />}><CouponsPage /></Suspense>} />
           <Route path="/:locale/coupons/:id" element={<Suspense fallback={<PageLoader />}><CouponDetailPage /></Suspense>} />
