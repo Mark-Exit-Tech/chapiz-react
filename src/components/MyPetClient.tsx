@@ -74,25 +74,56 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
                   // Get breed name with proper translation
                   const unknownBreed = text.unknownBreed;
                   let breedDisplay = result.pet.breedName || result.pet.breed || unknownBreed;
-                  if (result.pet.breedId) {
-                    breedDisplay = await getBreedNameById(result.pet.breedId, locale);
+                  const breedId = result.pet.breedId as string | number | undefined;
+                  const breedIdStr = breedId ? String(breedId) : '';
+
+                  // Handle different breedId formats
+                  if (breedIdStr) {
+                    // Check if breedId is a string like "dog-3" or "cat-5"
+                    if (breedIdStr.startsWith('dog-') || breedIdStr.startsWith('cat-')) {
+                      try {
+                        // Use local breed data for string IDs
+                        const { getLocalizedBreedsForType } = await import('@/lib/data/breeds');
+                        const petType = breedIdStr.startsWith('dog-') ? 'dog' : 'cat';
+                        const breeds = getLocalizedBreedsForType(petType, locale);
+                        const matchingBreed = breeds.find(b => b.id === breedIdStr);
+                        if (matchingBreed) {
+                          breedDisplay = matchingBreed.name;
+                        }
+                      } catch (e) {
+                        console.error('Error getting breed from local data:', e);
+                      }
+                    } else if (!isNaN(Number(breedIdStr))) {
+                      // Numeric ID - use Firebase lookup
+                      breedDisplay = await getBreedNameById(Number(breedIdStr), locale);
+                    }
                   } else if (breedDisplay && breedDisplay !== unknownBreed) {
-                    // Check if breedDisplay is actually an ID (e.g., "dog-3", "cat-5")
+                    // Check if breedDisplay itself is an ID (e.g., "dog-3", "cat-5")
                     if (breedDisplay.startsWith('dog-') || breedDisplay.startsWith('cat-')) {
-                      // It's a legacy breed ID format, try to parse it
-                      const idMatch = breedDisplay.match(/\d+/);
-                      if (idMatch) {
-                        breedDisplay = await getBreedNameById(parseInt(idMatch[0]), locale);
+                      try {
+                        const { getLocalizedBreedsForType } = await import('@/lib/data/breeds');
+                        const petType = breedDisplay.startsWith('dog-') ? 'dog' : 'cat';
+                        const breeds = getLocalizedBreedsForType(petType, locale);
+                        const matchingBreed = breeds.find(b => b.id === breedDisplay);
+                        if (matchingBreed) {
+                          breedDisplay = matchingBreed.name;
+                        }
+                      } catch (e) {
+                        console.error('Error getting breed from local data:', e);
                       }
                     } else {
                       // Try to find the breed in comprehensive data and translate it
-                      const { breedsData } = await import('@/lib/data/comprehensive-breeds');
-                      const breed = breedsData.find(b =>
-                        b.en.toLowerCase() === breedDisplay.toLowerCase() ||
-                        b.he === breedDisplay
-                      );
-                      if (breed) {
-                        breedDisplay = locale === 'he' ? breed.he : breed.en;
+                      try {
+                        const { breedsData } = await import('@/lib/data/comprehensive-breeds');
+                        const breed = breedsData.find(b =>
+                          b.en.toLowerCase() === breedDisplay.toLowerCase() ||
+                          b.he === breedDisplay
+                        );
+                        if (breed) {
+                          breedDisplay = locale === 'he' ? breed.he : breed.en;
+                        }
+                      } catch (e) {
+                        console.error('Error finding breed in comprehensive data:', e);
                       }
                     }
                   }

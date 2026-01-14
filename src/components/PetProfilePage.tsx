@@ -184,7 +184,7 @@ export default function PetProfilePage({
     return gender ? gender.label : genderValue;
   };
 
-  // Helper function to get breed display name (EXACT same logic as MyPetsClient lines 69-83)
+  // Helper function to get breed display name
   const getBreedDisplayName = (): string => {
     // If breed was passed from My Pets via URL, use it directly (already translated)
     if (displayBreed) {
@@ -199,27 +199,64 @@ export default function PetProfilePage({
       locale
     });
 
-    // Get breed name with proper translation (exact same logic as MyPetClient)
+    // Get breed name with proper translation
     const unknownBreed = locale === 'he' ? 'גזע לא ידוע' : 'Unknown Breed';
     let breedDisplay = pet.breedName || pet.breed || unknownBreed;
     console.log('PetProfilePage - initial breedDisplay:', breedDisplay);
 
-    if (pet.breedId) {
-      // Look up breed from breedsData
-      const breed = breedsData.find(b => b.id === Number(pet.breedId));
-      if (breed) {
-        breedDisplay = locale === 'he' ? breed.he : breed.en;
+    const breedId = pet.breedId;
+
+    if (breedId) {
+      // Check if breedId is a string like "dog-3" or "cat-5"
+      if (typeof breedId === 'string' && (breedId.startsWith('dog-') || breedId.startsWith('cat-'))) {
+        // Use local breed data for string IDs
+        try {
+          // Import synchronously since we're in a sync function - use dynamic require pattern
+          const { getLocalizedBreedsForType } = require('@/lib/data/breeds');
+          const petType = breedId.startsWith('dog-') ? 'dog' : 'cat';
+          const breeds = getLocalizedBreedsForType(petType, locale);
+          const matchingBreed = breeds.find((b: any) => b.id === breedId);
+          if (matchingBreed) {
+            breedDisplay = matchingBreed.name;
+          }
+        } catch (e) {
+          console.error('Error getting breed from local data:', e);
+        }
+      } else {
+        // Numeric ID - look up in breedsData
+        const numericId = typeof breedId === 'number' ? breedId : Number(breedId);
+        if (!isNaN(numericId)) {
+          const breed = breedsData.find(b => b.id === numericId);
+          if (breed) {
+            breedDisplay = locale === 'he' ? breed.he : breed.en;
+          }
+        }
       }
       console.log('PetProfilePage - breed from ID:', breedDisplay);
     } else if (breedDisplay && breedDisplay !== unknownBreed && breedDisplay !== 'Unknown Breed' && breedDisplay !== 'גזע לא ידוע') {
-      // Try to find the breed in comprehensive data and translate it
-      const breed = breedsData.find(b =>
-        b.en.toLowerCase() === breedDisplay.toLowerCase() ||
-        b.he === breedDisplay
-      );
-      console.log('PetProfilePage - breed found in data:', breed);
-      if (breed) {
-        breedDisplay = locale === 'he' ? breed.he : breed.en;
+      // Check if breedDisplay itself is an ID (e.g., "dog-3", "cat-5")
+      if (breedDisplay.startsWith('dog-') || breedDisplay.startsWith('cat-')) {
+        try {
+          const { getLocalizedBreedsForType } = require('@/lib/data/breeds');
+          const petType = breedDisplay.startsWith('dog-') ? 'dog' : 'cat';
+          const breeds = getLocalizedBreedsForType(petType, locale);
+          const matchingBreed = breeds.find((b: any) => b.id === breedDisplay);
+          if (matchingBreed) {
+            breedDisplay = matchingBreed.name;
+          }
+        } catch (e) {
+          console.error('Error getting breed from local data:', e);
+        }
+      } else {
+        // Try to find the breed in comprehensive data and translate it
+        const breed = breedsData.find(b =>
+          b.en.toLowerCase() === breedDisplay.toLowerCase() ||
+          b.he === breedDisplay
+        );
+        console.log('PetProfilePage - breed found in data:', breed);
+        if (breed) {
+          breedDisplay = locale === 'he' ? breed.he : breed.en;
+        }
       }
     }
 
