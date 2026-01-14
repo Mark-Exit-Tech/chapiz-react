@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Settings, Mail, Phone, MapPin, Clock, Image as ImageIcon, Globe, Instagram, Facebook, MessageCircle, Upload } from 'lucide-react';
+import { Settings, Mail, Phone, MapPin, Clock, Image as ImageIcon, Globe, Instagram, Facebook, MessageCircle, Upload, ShoppingBag } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -25,7 +25,8 @@ export default function AdminSettingsPage() {
     logoUrl: '',
     facebook: '',
     instagram: '',
-    whatsapp: ''
+    whatsapp: '',
+    storeUrl: ''
   });
   
   // Get locale from URL
@@ -67,7 +68,13 @@ export default function AdminSettingsPage() {
     whatsapp: isHebrew ? 'WhatsApp' : 'WhatsApp',
     whatsappPlaceholder: isHebrew ? '+972501234567' : '+972501234567',
     whatsappHelp: isHebrew ? 'מספר טלפון עם קידומת (ללא מקפים או רווחים)' : 'Phone number with country code (no dashes or spaces)',
-    
+
+    // Store Link
+    storeLink: isHebrew ? 'קישור לחנות' : 'Store Link',
+    storeUrl: isHebrew ? 'כתובת החנות' : 'Store URL',
+    storeUrlPlaceholder: isHebrew ? 'https://chapiz.store' : 'https://chapiz.store',
+    storeUrlHelp: isHebrew ? 'קישור לחנות שיופיע בכפתור "חנות צ\'אפיז" בנאבבר' : 'Link to store that will appear in the "Chapiz Store" button in navbar',
+
     save: isHebrew ? 'שמור שינויים' : 'Save Changes',
     saving: isHebrew ? 'שומר...' : 'Saving...',
     saved: isHebrew ? 'נשמר בהצלחה' : 'Saved successfully',
@@ -335,6 +342,29 @@ export default function AdminSettingsPage() {
                 />
                 <p className="text-sm text-gray-500">{text.whatsappHelp}</p>
               </div>
+            </div>
+          </div>
+
+          {/* Store Link */}
+          <div className="bg-white shadow-md rounded-lg p-6">
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <ShoppingBag className="w-5 h-5" />
+              {text.storeLink}
+            </h2>
+
+            <div className="space-y-2">
+              <Label htmlFor="storeUrl" className="flex items-center gap-2">
+                <ShoppingBag className="w-4 h-4" />
+                {text.storeUrl}
+              </Label>
+              <Input
+                id="storeUrl"
+                type="url"
+                placeholder={text.storeUrlPlaceholder}
+                value={formData.storeUrl || ''}
+                onChange={handleChange}
+              />
+              <p className="text-sm text-gray-500">{text.storeUrlHelp}</p>
             </div>
           </div>
 

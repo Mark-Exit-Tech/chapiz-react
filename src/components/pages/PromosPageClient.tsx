@@ -190,7 +190,7 @@ export default function PromosPageClient({
         </div>
         
         {promo.description && (
-          <p className="text-sm text-gray-600 mb-3 line-clamp-2">{promo.description}</p>
+          <p className="text-sm text-gray-600 mb-3 line-clamp-1">{promo.description}</p>
         )}
 
         {promo.endDate && (
@@ -236,7 +236,7 @@ export default function PromosPageClient({
 
   if (!user) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8" dir={isHebrew ? 'rtl' : 'ltr'}>
         <div className="text-center">
           <Tag className="w-16 h-16 mx-auto text-gray-300 mb-4" />
           <p className="text-gray-600">{text.pleaseSignIn}</p>
@@ -247,7 +247,7 @@ export default function PromosPageClient({
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8" dir={isHebrew ? 'rtl' : 'ltr'}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-gray-600">{text.loading}</p>
@@ -257,7 +257,7 @@ export default function PromosPageClient({
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 pb-24">
+    <div className="container mx-auto px-4 py-6 pb-24" dir={isHebrew ? 'rtl' : 'ltr'}>
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">{text.title}</h1>
         <p className="text-gray-600">{text.description}</p>

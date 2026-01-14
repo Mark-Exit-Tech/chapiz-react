@@ -10,8 +10,8 @@ import { FilterChips, FilterChip } from '../ui/filter-chips';
 import { TagsFilter } from '../ui/tags-filter';
 import { Button } from '../ui/button';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
-import { getUserFavorites, getAllAdTags } from '@/lib/firebase/database/favorites';
-import { SERVICE_TAGS_TRANSLATIONS } from '@/lib/constants/hebrew-service-tags';
+import { getUserFavorites } from '@/lib/firebase/database/favorites';
+import { HEBREW_SERVICE_TAGS, SERVICE_TAGS_TRANSLATIONS } from '@/lib/constants/hebrew-service-tags';
 import ServicesMapView from './ServicesMapView';
 
 interface Ad {
@@ -105,9 +105,8 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Load available tags
-        const tags = await getAllAdTags();
-        setAvailableTags(tags);
+        // Use predefined Hebrew service tags (same as admin panel)
+        setAvailableTags(HEBREW_SERVICE_TAGS);
         setIsLoadingTags(false);
 
         // Load user favorites if logged in

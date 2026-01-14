@@ -6,7 +6,6 @@ import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import AdminLayout from './AdminLayout';
 
 export default function AdminDashboard() {
   const { t } = useTranslation('Admin');
@@ -112,19 +111,16 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <AdminLayout>
-        <div className="container mx-auto p-8">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-lg">{text.loading}</div>
-          </div>
+      <div className="container mx-auto p-8">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-lg">{text.loading}</div>
         </div>
-      </AdminLayout>
+      </div>
     );
   }
 
   return (
-    <AdminLayout>
-      <div className="container mx-auto p-3 md:p-8">
+    <div className="container mx-auto p-3 md:p-8">
         <h1 className="mb-4 md:mb-6 text-xl md:text-3xl font-bold">{text.dashboard}</h1>
 
       {/* Top Section - Statistics Overview */}
@@ -407,6 +403,6 @@ export default function AdminDashboard() {
         </div>
         </div>
       </div>
-    </AdminLayout>
+    </div>
   );
 }

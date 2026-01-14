@@ -30,7 +30,7 @@ const Navbar = () => {
   const { t, i18n } = useTranslation();
   const { user, loading, signOut } = useAuth();
   const [isMounted, setIsMounted] = useState(false);
-  const [storeUrl, setStoreUrl] = useState('https://chapiz.store');
+  const [storeUrl, setStoreUrl] = useState('');
   const navigate = useNavigate();
   const locale = i18n.language || 'en';
 
