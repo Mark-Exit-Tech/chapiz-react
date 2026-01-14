@@ -49,10 +49,7 @@ export default function MyPetsPage() {
   if (loading || petsLoading) {
     return (
       <>
-        {/* Only show navbar on md and above */}
-        <div className="hidden md:block">
-          <Navbar />
-        </div>
+        <Navbar />
         <div className="flex grow flex-col h-[calc(100vh-64px)] md:h-[calc(100vh-64px)] pb-16 md:pb-0">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
@@ -61,7 +58,7 @@ export default function MyPetsPage() {
             </div>
           </div>
         </div>
-        {/* Only show bottom nav on mobile */}
+        {/* Bottom Navigation - only visible on mobile */}
         <div className="md:hidden">
           <BottomNavigation />
         </div>
@@ -71,15 +68,13 @@ export default function MyPetsPage() {
 
   return (
     <>
-      {/* Navbar - only visible on md and above */}
-      <div className="hidden md:block">
-        <Navbar />
-      </div>
+      {/* Navbar - visible on all screen sizes */}
+      <Navbar />
       {/* Main content with proper padding based on screen size */}
       <div className="flex grow flex-col pt-8 md:pt-8 h-[calc(100vh-60px)] md:h-[calc(100vh-64px)] pb-16 md:pb-0" style={{ overflow: 'hidden', touchAction: 'none' }}>
         <MyPetClient pets={pets} />
       </div>
-      {/* Bottom Navigation - only visible on mobile (below md) */}
+      {/* Bottom Navigation - only visible on mobile */}
       <div className="md:hidden">
         <BottomNavigation />
       </div>

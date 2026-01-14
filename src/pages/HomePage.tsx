@@ -1,4 +1,5 @@
 import Navbar from '@/components/layout/Navbar';
+import BottomNavigation from '@/components/layout/BottomNavigation';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -115,6 +116,10 @@ export default function HomePage() {
             <p className="text-gray-500">{t('pages.HomePage.loading')}</p>
           </div>
         </div>
+        {/* Bottom Navigation - only visible on mobile */}
+        <div className="md:hidden">
+          <BottomNavigation />
+        </div>
       </div>
     );
   }
@@ -128,7 +133,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex grow flex-col">
+    <div className="flex grow flex-col pb-16 md:pb-0">
       {/* Navbar */}
       <Navbar />
 
@@ -142,6 +147,11 @@ export default function HomePage() {
           onReject={handleCookieReject}
         />
       </Suspense>
+
+      {/* Bottom Navigation - only visible on mobile */}
+      <div className="md:hidden">
+        <BottomNavigation />
+      </div>
     </div>
   );
 }

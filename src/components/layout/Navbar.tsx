@@ -15,6 +15,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
+import { getContactInfo } from '@/lib/actions/admin';
 import { Button } from '../ui/button';
 import OptimizedImage from '@/components/OptimizedImage';
 import {
@@ -29,12 +30,28 @@ const Navbar = () => {
   const { t, i18n } = useTranslation();
   const { user, loading, signOut } = useAuth();
   const [isMounted, setIsMounted] = useState(false);
+  const [storeUrl, setStoreUrl] = useState('https://chapiz.store');
   const navigate = useNavigate();
   const locale = i18n.language || 'en';
 
   // Prevent hydration mismatch
   useEffect(() => {
     setIsMounted(true);
+  }, []);
+
+  // Fetch store URL from settings
+  useEffect(() => {
+    const fetchStoreUrl = async () => {
+      try {
+        const info = await getContactInfo();
+        if (info?.storeUrl) {
+          setStoreUrl(info.storeUrl);
+        }
+      } catch (error) {
+        console.error('Failed to fetch store URL:', error);
+      }
+    };
+    fetchStoreUrl();
   }, []);
 
   const handleLogout = async () => {
@@ -87,7 +104,7 @@ const Navbar = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => window.open('https://chapiz.store', '_blank')}
+                    onClick={() => storeUrl && window.open(storeUrl, '_blank')}
                     className="border-primary text-primary hover:bg-primary/10 hover:text-primary hover:border-primary flex items-center justify-center whitespace-nowrap text-xs px-2 gap-1.5 transition-colors"
                   >
                     <ShoppingBag className="h-3.5 w-3.5" />
@@ -140,7 +157,7 @@ const Navbar = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => window.open('https://chapiz.store', '_blank')}
+                    onClick={() => storeUrl && window.open(storeUrl, '_blank')}
                     className="border-primary text-primary hover:bg-primary/10 hover:text-primary hover:border-primary flex items-center justify-center whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 gap-1.5 sm:gap-2 transition-colors"
                   >
                     <ShoppingBag className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -230,7 +247,7 @@ const Navbar = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => window.open('https://chapiz.store', '_blank')}
+                    onClick={() => storeUrl && window.open(storeUrl, '_blank')}
                     className="border-primary text-primary hover:bg-primary/10 hover:text-primary hover:border-primary flex items-center justify-center whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 gap-1.5 sm:gap-2 transition-colors"
                   >
                     <ShoppingBag className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -253,7 +270,7 @@ const Navbar = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => window.open('https://chapiz.store', '_blank')}
+                    onClick={() => storeUrl && window.open(storeUrl, '_blank')}
                     className="border-primary text-primary hover:bg-primary/10 hover:text-primary hover:border-primary flex items-center justify-center whitespace-nowrap text-xs px-2 gap-1.5 transition-colors"
                   >
                     <ShoppingBag className="h-3.5 w-3.5" />
