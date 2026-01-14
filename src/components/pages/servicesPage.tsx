@@ -112,7 +112,8 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
         // Load user favorites if logged in
         if (user) {
           const favorites = await getUserFavorites(user.uid);
-          setFavoriteAdIds(favorites);
+          // Extract just the service IDs from the favorites
+          setFavoriteAdIds(favorites.map(fav => fav.serviceId));
         }
       } catch (error) {
         console.error('Error loading data:', error);
