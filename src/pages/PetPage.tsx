@@ -46,9 +46,10 @@ export default function PetPage() {
         if (petData) {
           setPet(petData);
 
-          // If pet has owner info, set it
-          if (petData.owner) {
-            setOwner(petData.owner);
+          // If pet has ownerId, we could fetch owner data if needed
+          // For now, just use the ownerId from petData
+          if (petData.ownerId) {
+            setOwner({ uid: petData.ownerId });
           }
         }
       } catch (error) {

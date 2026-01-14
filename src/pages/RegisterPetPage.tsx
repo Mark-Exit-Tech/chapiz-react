@@ -39,13 +39,13 @@ export default function RegisterPetPage() {
       try {
         setLoading(true);
 
-        if (user?.email) {
-          const userData = await getUserFromFirestore(user.email);
-          if (userData) {
+        if (user?.uid) {
+          const result = await getUserFromFirestore(user.uid);
+          if (result.success && result.user) {
             setUserDetails({
-              fullName: userData.fullName || userData.displayName || '',
-              phone: userData.phoneNumber || userData.phone || '',
-              email: userData.email || user.email || ''
+              fullName: result.user.displayName || result.user.display_name || result.user.full_name || '',
+              phone: result.user.phone || '',
+              email: result.user.email || user.email || ''
             });
           } else {
             setUserDetails({

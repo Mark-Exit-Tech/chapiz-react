@@ -31,6 +31,7 @@ interface LocationAutocompleteComboSelectProps {
   errorMessage?: string;
   placeholder?: string;
   onChange: (value: string) => void;
+  onCoordinatesChange?: (coords: { lat: number; lng: number } | null, placeId?: string) => void;
   onBlur?: () => void;
 }
 
@@ -45,6 +46,7 @@ const LocationAutocompleteComboSelect: React.FC<
   errorMessage,
   placeholder,
   onChange,
+  onCoordinatesChange,
   onBlur
 }) => {
   const { t } = useTranslation('translation', { keyPrefix: 'components.searchbar' });
@@ -62,8 +64,33 @@ const LocationAutocompleteComboSelect: React.FC<
   const [isReady, setIsReady] = useState(false);
   const googleMapsApiKey = 'AIzaSyAjx6NIRePitcFdZjH2kE0z-zSAy8etaUE';
 
-  // Keep AutocompleteService instance
+  // Keep AutocompleteService and Geocoder instances
   const autocompleteServiceRef = React.useRef<any>(null);
+  const geocoderRef = React.useRef<any>(null);
+
+  // Geocode a place_id to get coordinates
+  const geocodePlaceId = async (placeId: string): Promise<{ lat: number; lng: number } | null> => {
+    if (!geocoderRef.current) {
+      try {
+        geocoderRef.current = new (window as any).google.maps.Geocoder();
+      } catch (e) {
+        console.error('Failed to init Geocoder:', e);
+        return null;
+      }
+    }
+
+    return new Promise((resolve) => {
+      geocoderRef.current.geocode({ placeId }, (results: any[], status: string) => {
+        if (status === 'OK' && results?.[0]?.geometry?.location) {
+          const location = results[0].geometry.location;
+          resolve({ lat: location.lat(), lng: location.lng() });
+        } else {
+          console.error('Geocoding failed:', status);
+          resolve(null);
+        }
+      });
+    });
+  };
 
   // Initialize display from the provided value (address string)
   useEffect(() => {
@@ -232,12 +259,18 @@ const LocationAutocompleteComboSelect: React.FC<
                       <CommandItem
                         key={prediction.place_id}
                         value={prediction.description}
-                        onSelect={() => {
+                        onSelect={async () => {
                           // When selected: update display and return address string
                           setDisplayValue(prediction.description);
                           onChange(prediction.description);
                           setSearchQuery('');
                           setOpen(false);
+
+                          // Geocode the place_id to get coordinates
+                          if (onCoordinatesChange && prediction.place_id) {
+                            const coords = await geocodePlaceId(prediction.place_id);
+                            onCoordinatesChange(coords, prediction.place_id);
+                          }
                         }}
                       >
                         {prediction.description}

@@ -131,6 +131,10 @@ const OwnerDetailsPage = () => {
                       id="homeAddress"
                       value={field.value || ''}
                       onChange={field.onChange}
+                      onCoordinatesChange={(coords, placeId) => {
+                        setValue('ownerCoordinates', coords);
+                        setValue('ownerPlaceId', placeId);
+                      }}
                       onBlur={field.onBlur}
                       hasError={!!errors.ownerHomeAddress}
                       required
