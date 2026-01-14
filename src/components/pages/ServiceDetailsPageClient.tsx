@@ -117,9 +117,8 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
       try {
         const result = await submitComment({
           adId: service.id,
-          adTitle: service.title,
+          userId: user.uid,
           userName: dbUser?.full_name || user.email?.split('@')[0] || 'User',
-          userEmail: user.email || '',
           content: commentText.trim() || '',
           rating: userRating
         });
@@ -279,7 +278,7 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
                 <div className="hidden lg:block mt-6 pt-6 border-t border-gray-200 space-y-2">
                   <Button
                     variant="outline"
-                    className={cn("w-full justify-start", locale === 'he' ? 'justify-end' : 'justify-start')}
+                    className={cn("w-full", isHebrew ? 'flex-row-reverse justify-end' : 'justify-start')}
                     onClick={() => {
                       if (service.location) {
                         const address = service.location.trim();
@@ -312,7 +311,7 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
                   {service.phone && service.phone.trim() !== '' && service.phone !== 'undefined' && service.phone !== 'null' && (
                     <Button
                       variant="outline"
-                      className="w-full justify-start"
+                      className={cn("w-full", isHebrew ? 'flex-row-reverse justify-end' : 'justify-start')}
                       onClick={() => window.open(`tel:${service.phone}`, '_self')}
                     >
                       <Phone size={18} className={cn(isHebrew ? 'ml-2' : 'mr-2')} />
@@ -321,7 +320,7 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
                   )}
                   <Button
                     variant="outline"
-                    className="w-full justify-start"
+                    className={cn("w-full", isHebrew ? 'flex-row-reverse justify-end' : 'justify-start')}
                     onClick={handleToggleFavorite}
                     disabled={isTogglingFavorite}
                   >
@@ -336,7 +335,7 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
                   </Button>
                   <Button
                     variant="outline"
-                    className="w-full justify-start"
+                    className={cn("w-full", isHebrew ? 'flex-row-reverse justify-end' : 'justify-start')}
                     onClick={() => {
                       if (service.id) {
                         navigate(`/${locale}/coupons?businessId=${service.id}`);
