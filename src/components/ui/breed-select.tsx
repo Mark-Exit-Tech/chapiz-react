@@ -57,6 +57,19 @@ export function BreedSelect({
 }: BreedSelectProps) {
   const { t } = useTranslation('Pet');
   const locale = useLocale() as 'en' | 'he';
+  const isHebrew = locale === 'he';
+
+  const text = {
+    hebrewFilter: isHebrew ? 'סינון עברי' : 'Hebrew Filter',
+    clearSearch: isHebrew ? 'נקה חיפוש' : 'Clear search',
+    recentlySelected: isHebrew ? 'נבחרו לאחרונה' : 'Recently Selected',
+    recent: isHebrew ? 'אחרון' : 'Recent',
+    searchResults: isHebrew ? 'תוצאות חיפוש' : 'Search Results',
+    allBreeds: isHebrew ? 'כל הגזעים' : 'All Breeds',
+    exactMatch: isHebrew ? 'התאמה מדויקת' : 'Exact',
+    searchPlaceholder: isHebrew ? 'חפש גזעים...' : 'Search breeds...',
+    noBreedFound: isHebrew ? 'לא נמצא גזע.' : 'No breed found.',
+  };
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [showHebrewFilter, setShowHebrewFilter] = useState(false);
@@ -217,7 +230,7 @@ export function BreedSelect({
           <Command shouldFilter={false}>
             <div className="flex items-center border-b px-3">
               <CommandInput
-                placeholder={t('searchPlaceholder')}
+                placeholder={text.searchPlaceholder}
                 value={searchValue}
                 onValueChange={setSearchValue}
                 onKeyDown={(e) => {
@@ -251,7 +264,7 @@ export function BreedSelect({
                     "ml-2 h-8 w-8 p-0",
                     showHebrewFilter && "bg-blue-100 text-blue-700"
                   )}
-                  title={locale === 'he' ? 'סינון עברי' : 'Hebrew Filter'}
+                  title={text.hebrewFilter}
                 >
                   <Filter className="h-4 w-4" />
                 </Button>
@@ -266,7 +279,7 @@ export function BreedSelect({
                     setHebrewFilteredBreeds([]);
                   }}
                   className="ml-1 h-8 w-8 p-0 text-gray-400 hover:text-gray-600"
-                  title={locale === 'he' ? 'נקה חיפוש' : 'Clear search'}
+                  title={text.clearSearch}
                 >
                   ×
                 </Button>
@@ -292,14 +305,14 @@ export function BreedSelect({
             )}
 
             <CommandList>
-              <CommandEmpty>{t('noBreedFound')}</CommandEmpty>
+              <CommandEmpty>{text.noBreedFound}</CommandEmpty>
 
               {/* Recent selections group */}
               {recentSelections.length > 0 && !searchValue.trim() && (
                 <CommandGroup heading={
                   <div className="flex items-center gap-2 text-xs text-gray-500">
                     <Clock className="h-3 w-3" />
-                    {locale === 'he' ? 'נבחרו לאחרונה' : 'Recently Selected'}
+                    {text.recentlySelected}
                   </div>
                 }>
                   {filteredBreeds
@@ -335,7 +348,7 @@ export function BreedSelect({
                           />
                         </div>
                         <Badge variant="secondary" className="text-xs">
-                          {locale === 'he' ? 'אחרון' : 'Recent'}
+                          {text.recent}
                         </Badge>
                       </CommandItem>
                     ))}
@@ -347,7 +360,7 @@ export function BreedSelect({
                 searchValue.trim() ? (
                   <div className="flex items-center justify-between text-xs text-gray-500">
                     <span>
-                      {locale === 'he' ? 'תוצאות חיפוש' : 'Search Results'}
+                      {text.searchResults}
                     </span>
                     <Badge variant="outline" className="text-xs">
                       {filteredBreeds.length}
@@ -355,7 +368,7 @@ export function BreedSelect({
                   </div>
                 ) : (
                   <div className="text-xs text-gray-500">
-                    {locale === 'he' ? 'כל הגזעים' : 'All Breeds'}
+                    {text.allBreeds}
                   </div>
                 )
               }>
@@ -395,7 +408,7 @@ export function BreedSelect({
                       </div>
                       {searchValue.trim() && breed.score > 70 && (
                         <Badge variant="secondary" className="text-xs">
-                          {locale === 'he' ? 'התאמה מדויקת' : 'Exact'}
+                          {text.exactMatch}
                         </Badge>
                       )}
                     </CommandItem>

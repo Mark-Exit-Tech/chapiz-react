@@ -17,9 +17,14 @@ const VetDetailsPage = () => {
     formState: { errors },
     setValue
   } = useFormContext();
-  const { t } = useTranslation('pages.VetDetailsPage');
+  const { t } = useTranslation('translation', { keyPrefix: 'pages.VetDetailsPage' });
   const locale = useLocale();
+  const isHebrew = locale === 'he';
   const [isGeocodingVet, setIsGeocodingVet] = useState(false);
+
+  const text = {
+    validatingAddress: isHebrew ? 'מאמת כתובת...' : 'Validating address...',
+  };
 
   /**
    * Handle vet address selection and geocode it immediately
@@ -170,7 +175,7 @@ const VetDetailsPage = () => {
                     {isGeocodingVet && (
                       <p className="text-xs text-blue-600 flex items-center gap-1 px-3">
                         <div className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-                        Validating address...
+                        {text.validatingAddress}
                       </p>
                     )}
                   </div>

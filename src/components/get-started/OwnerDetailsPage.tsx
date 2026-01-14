@@ -20,7 +20,7 @@ const OwnerDetailsPage = () => {
     watch,
     formState: { errors } // Access validation errors
   } = useFormContext();
-  const { t } = useTranslation('pages.OwnerDetailsPage');
+  const { t } = useTranslation('translation', { keyPrefix: 'pages.OwnerDetailsPage' });
   const locale = useLocale();
 
   useEffect(() => {

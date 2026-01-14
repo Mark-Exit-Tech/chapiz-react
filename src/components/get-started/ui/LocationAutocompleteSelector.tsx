@@ -47,14 +47,19 @@ const LocationAutocompleteComboSelect: React.FC<
   onChange,
   onBlur
 }) => {
-  const { t } = useTranslation('components.searchbar');
+  const { t } = useTranslation('translation', { keyPrefix: 'components.searchbar' });
+  const locale = useLocale();
+  const isHebrew = locale === 'he';
+
+  const text = {
+    searchUnavailable: isHebrew ? 'חיפוש לא זמין' : 'Search unavailable',
+  };
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [predictions, setPredictions] = useState<Array<{ description: string; place_id: string }>>([]);
   // This state holds the description that will be displayed on the button.
   const [displayValue, setDisplayValue] = useState('');
   const [isReady, setIsReady] = useState(false);
-  const locale = useLocale();
   const googleMapsApiKey = 'AIzaSyAjx6NIRePitcFdZjH2kE0z-zSAy8etaUE';
 
   // Keep AutocompleteService instance
@@ -249,7 +254,7 @@ const LocationAutocompleteComboSelect: React.FC<
                   </CommandGroup>
                 </ScrollArea>
               ) : (
-                <CommandEmpty>{isReady ? t('noResult') : 'Search unavailable'}</CommandEmpty>
+                <CommandEmpty>{isReady ? t('noResult') : text.searchUnavailable}</CommandEmpty>
               )}
             </CommandList>
           </Command>

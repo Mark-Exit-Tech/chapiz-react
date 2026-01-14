@@ -37,7 +37,7 @@ const GetStartedSelect = ({
   disabled = false,
   placeholder
 }: GetStartedSelectProps) => {
-  const { t } = useTranslation('components.searchbar');
+  const { t } = useTranslation('translation', { keyPrefix: 'components.searchbar' });
 
   return (
     <div className="relative w-full">

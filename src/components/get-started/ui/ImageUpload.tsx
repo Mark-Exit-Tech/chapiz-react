@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { uploadPetImage } from '@/lib/firebase/storage';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
+import { useLocale } from '@/hooks/use-locale';
 import { ArrowLeftRight, Upload, X } from 'lucide-react';
 // Image removed;
 import { useRef, useState } from 'react';
@@ -37,24 +38,37 @@ const ImageUpload = ({
   const [progress, setProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
   const { user, dbUser } = useAuth();
+  const locale = useLocale();
+  const isHebrew = locale === 'he';
+
+  const text = {
+    pleaseLogin: isHebrew ? 'אנא התחברו כדי להעלות תמונות' : 'Please log in to upload images',
+    invalidFile: isHebrew ? 'אנא בחרו קובץ תמונה תקין' : 'Please select a valid image file',
+    sizeLimit: isHebrew ? 'גודל התמונה חייב להיות פחות מ-10MB' : 'Image size must be less than 10MB',
+    uploadSuccess: isHebrew ? 'התמונה הועלתה בהצלחה' : 'Image uploaded successfully',
+    uploadFailed: isHebrew ? 'ההעלאה נכשלה. אנא נסו שוב.' : 'Upload failed. Please try again.',
+    uploading: isHebrew ? 'מעלה...' : 'Uploading...',
+    replace: isHebrew ? 'החלף' : 'Replace',
+    remove: isHebrew ? 'הסר' : 'Remove',
+  };
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     if (!user) {
-      toast.error('Please log in to upload images');
+      toast.error(text.pleaseLogin);
       return;
     }
 
     // Validate file
     if (!file.type.startsWith('image/')) {
-      toast.error('Please select a valid image file');
+      toast.error(text.invalidFile);
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      toast.error('Image size must be less than 10MB');
+      toast.error(text.sizeLimit);
       return;
     }
 
@@ -80,13 +94,13 @@ const ImageUpload = ({
 
       if (result.success && result.downloadURL) {
         onFileChange(result.downloadURL);
-        toast.success('Image uploaded successfully');
+        toast.success(text.uploadSuccess);
       } else {
-        toast.error(result.error || 'Upload failed');
+        toast.error(result.error || text.uploadFailed);
       }
     } catch (error: any) {
       console.error('Upload error:', error);
-      toast.error('Upload failed. Please try again.');
+      toast.error(text.uploadFailed);
     } finally {
       setUploading(false);
       setProgress(0);
@@ -139,8 +153,8 @@ const ImageUpload = ({
                   }}
                   disabled={uploading}
                 >
-                  <ArrowLeftRight className="h-4 w-4 mr-1" />
-                  Replace
+                  <ArrowLeftRight className="h-4 w-4 ltr:mr-1 rtl:ml-1" />
+                  {text.replace}
                 </Button>
                 <Button
                   variant="ghost"
@@ -152,8 +166,8 @@ const ImageUpload = ({
                   }}
                   disabled={uploading}
                 >
-                  <X className="h-4 w-4 mr-1" />
-                  Remove
+                  <X className="h-4 w-4 ltr:mr-1 rtl:ml-1" />
+                  {text.remove}
                 </Button>
               </div>
             </div>
@@ -168,7 +182,7 @@ const ImageUpload = ({
               disabled={uploading}
             >
               <span className="w-full text-base font-medium ltr:pl-3 ltr:text-left rtl:pr-3 rtl:text-right">
-                {uploading ? 'Uploading...' : label}
+                {uploading ? text.uploading : label}
               </span>
               <img
                 src={assets.upload_figures}

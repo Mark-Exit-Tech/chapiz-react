@@ -20,6 +20,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import { useLocale } from '@/hooks/use-locale';
 import GetStartedInput from './GetStartedInput';
 
 type GetStartedPhoneInputProps = Omit<
@@ -95,7 +96,13 @@ const CountrySelect = ({
   options: countryList,
   onChange
 }: CountrySelectProps) => {
-  const { t } = useTranslation('components.searchbar');
+  const { t } = useTranslation('translation', { keyPrefix: 'components.searchbar' });
+  const locale = useLocale();
+  const isHebrew = locale === 'he';
+
+  const text = {
+    noCountryFound: isHebrew ? 'לא נמצאה מדינה.' : 'No country found.',
+  };
 
   return (
     <Popover>
@@ -123,7 +130,7 @@ const CountrySelect = ({
           <CommandInput placeholder={t('search')} />
           <CommandList>
             <ScrollArea className="max-h-44 overflow-y-auto">
-              <CommandEmpty>No country found.</CommandEmpty>
+              <CommandEmpty>{text.noCountryFound}</CommandEmpty>
               <CommandGroup>
                 {countryList.map(({ value, label }) =>
                   value ? (

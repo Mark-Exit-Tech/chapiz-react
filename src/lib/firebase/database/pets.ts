@@ -290,32 +290,18 @@ export async function getGendersForDropdown(locale: 'en' | 'he' = 'en'): Promise
 }
 
 export async function getPetTypesForDropdown(locale: 'en' | 'he' = 'en'): Promise<{ value: string; label: string; }[]> {
-    const petTypes = await getAllPetTypes();
-    
-    if (petTypes.length === 0) {
-        // Fallback data if collection is empty
-        console.warn('Pet types collection is empty, using fallback data');
-        return locale === 'he'
-            ? [
-                { value: '1', label: 'כלב' },
-                { value: '2', label: 'חתול' },
-                { value: '3', label: 'ציפור' },
-                { value: '4', label: 'ארנב' },
-                { value: '5', label: 'אחר' }
-              ]
-            : [
-                { value: '1', label: 'Dog' },
-                { value: '2', label: 'Cat' },
-                { value: '3', label: 'Bird' },
-                { value: '4', label: 'Rabbit' },
-                { value: '5', label: 'Other' }
-              ];
-    }
-    
-    return petTypes.map(petType => ({
-        value: petType.id.toString(),
-        label: locale === 'he' ? petType.he : petType.en
-    }));
+    // Only show dog, cat, and other - hardcoded for consistency
+    return locale === 'he'
+        ? [
+            { value: 'dog', label: 'כלב' },
+            { value: 'cat', label: 'חתול' },
+            { value: 'other', label: 'אחר' }
+          ]
+        : [
+            { value: 'dog', label: 'Dog' },
+            { value: 'cat', label: 'Cat' },
+            { value: 'other', label: 'Other' }
+          ];
 }
 
 // Get pet with consolidated owner

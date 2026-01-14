@@ -45,7 +45,7 @@ const GetStartedComboSelect: React.FC<GetStartedComboSelectProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   // New state to control popover open state
   const [open, setOpen] = useState(false);
-  const { t } = useTranslation('components.searchbar');
+  const { t } = useTranslation('translation', { keyPrefix: 'components.searchbar' });
 
   // Filter options based on the search query.
   const filteredOptions = useMemo(

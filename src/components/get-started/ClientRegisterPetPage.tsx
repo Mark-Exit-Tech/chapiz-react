@@ -31,7 +31,16 @@ export default function ClientRegisterPetPage({
 }) {
   const navigate = useNavigate();
   const locale = useLocale() as 'en' | 'he';
+  const isHebrew = locale === 'he';
   const { t } = useTranslation('');
+
+  const text = {
+    loading: isHebrew ? 'טוען...' : 'Loading...',
+    noPetId: isHebrew ? 'אין מזהה חיית מחמד זמין' : 'No pet ID available',
+    createError: isHebrew ? 'אירעה שגיאה ביצירת חיית המחמד שלך' : 'An error occurred while creating your pet',
+    unexpectedError: isHebrew ? 'אירעה שגיאה לא צפויה' : 'An unexpected error occurred',
+    failedCreate: isHebrew ? 'יצירת הפרופיל נכשלה' : 'Failed to create pet profile',
+  };
   const { user, dbUser } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const { petId: localStoragePetId, clearPetId } = usePetId();
@@ -157,8 +166,8 @@ export default function ClientRegisterPetPage({
 
   const handleSubmit = async (allFormData: typeof formData): Promise<void> => {
     if (!petId) {
-      setError('No pet ID available');
-      toast.error('No pet ID available');
+      setError(text.noPetId);
+      toast.error(text.noPetId);
       navigate('/pet/get-started');
       return;
     }
@@ -177,13 +186,13 @@ export default function ClientRegisterPetPage({
         clearPetId();
         navigate(`/pet/${result.petId || petId}/done`);
       } else {
-        setError(result.error || 'An error occurred while creating your pet');
-        toast.error(result.error || 'Failed to create pet profile');
+        setError(result.error || text.createError);
+        toast.error(result.error || text.failedCreate);
       }
     } catch (err) {
       console.error('Error submitting form:', err);
-      setError('An unexpected error occurred');
-      toast.error('An unexpected error occurred');
+      setError(text.unexpectedError);
+      toast.error(text.unexpectedError);
     } finally {
       setLoading(false);
     }
@@ -231,7 +240,7 @@ export default function ClientRegisterPetPage({
     return (
       <div className="flex h-full grow flex-col items-center justify-center p-4">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <span className="ml-2 text-gray-600">Loading...</span>
+        <span className="ltr:ml-2 rtl:mr-2 text-gray-600">{text.loading}</span>
       </div>
     );
   }

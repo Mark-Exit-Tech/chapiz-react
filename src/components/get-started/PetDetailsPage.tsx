@@ -25,11 +25,16 @@ const PetDetailsPage: React.FC<PetDetailsPageProps> = () => {
     setValue,
     formState: { errors }
   } = useFormContext();
-  const { t } = useTranslation('pages.PetDetailsPage');
+  const { t } = useTranslation('translation', { keyPrefix: 'pages.PetDetailsPage' });
   const locale = useLocale() as 'en' | 'he';
+  const isHebrew = locale === 'he';
   const [genders, setGenders] = useState<{ value: string; label: string }[]>([]);
   const [petTypes, setPetTypes] = useState<{ value: string; label: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const text = {
+    failedToLoadOptions: isHebrew ? 'טעינת אפשרויות הטופס נכשלה' : 'Failed to load form options',
+  };
 
   // Watch the pet type to filter breeds
   const selectedPetType = watch('type');
@@ -56,7 +61,7 @@ const PetDetailsPage: React.FC<PetDetailsPageProps> = () => {
         setPetTypes(typesData);
       } catch (error) {
         console.error('Error fetching initial dropdown data:', error);
-        toast.error('Failed to load form options');
+        toast.error(text.failedToLoadOptions);
         setGenders([]);
         setPetTypes([]);
       } finally {
