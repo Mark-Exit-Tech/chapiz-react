@@ -22,7 +22,7 @@ import { purchaseCoupon, getActiveUserCoupons, getCouponHistory, markCouponAsUse
 import { useShopRedirect } from '@/hooks/use-shop-redirect';
 import toast from 'react-hot-toast';
 
-export default function UserCouponsPage() {
+export default function UserVouchersPage() {
   const { t } = useTranslation('components.UserCoupons');
   
   // Get locale from URL or default to 'en'
@@ -34,15 +34,15 @@ export default function UserCouponsPage() {
   // HARDCODED TEXT - NO TRANSLATION KEYS!
   const text = {
     loading: isHebrew ? 'טוען...' : 'Loading...',
-    title: isHebrew ? 'קופונים' : 'Coupons',
-    description: isHebrew ? 'עיינו וקנו בקופונים באמצעות הנקודות שלכם!' : 'Browse and purchase coupons using your points!',
+    title: isHebrew ? 'שוברים' : 'Vouchers',
+    description: isHebrew ? 'עיינו וקנו בשוברים באמצעות הנקודות שלכם!' : 'Browse and purchase vouchers using your points!',
     share: isHebrew ? 'שתף' : 'Share',
     myPoints: isHebrew ? 'הנקודות שלי' : 'My Points',
-    pointsDescription: isHebrew ? 'השתמשו בנקודות שלכם כדי לקנות קופונים!' : 'Use your points to purchase coupons!',
+    pointsDescription: isHebrew ? 'השתמשו בנקודות שלכם כדי לקנות שוברים!' : 'Use your points to purchase vouchers!',
     shop: isHebrew ? 'חנות' : 'Shop',
-    myCoupons: isHebrew ? 'הקופונים שלי' : 'My Coupons',
-    availableCoupons: isHebrew ? 'קופונים זמינים' : 'Available Coupons',
-    noCoupons: isHebrew ? 'אין קופונים זמינים כרגע' : 'No coupons available at the moment',
+    myCoupons: isHebrew ? 'השוברים שלי' : 'My Vouchers',
+    availableCoupons: isHebrew ? 'שוברים זמינים' : 'Available Vouchers',
+    noCoupons: isHebrew ? 'אין שוברים זמינים כרגע' : 'No vouchers available at the moment',
     validUntil: isHebrew ? 'תקף עד' : 'Valid until',
     pointsRequired: isHebrew ? 'נקודות נדרשות' : 'Points required',
     price: isHebrew ? 'מחיר' : 'Price',
@@ -51,8 +51,8 @@ export default function UserCouponsPage() {
     purchase: isHebrew ? 'רכוש' : 'Purchase',
     insufficientPoints: isHebrew ? 'אין מספיק נקודות' : 'Insufficient Points',
     showMap: isHebrew ? 'הצג במפה' : 'Show Map',
-    noHistory: isHebrew ? 'אין קופונים' : 'No coupons yet',
-    historyDescription: isHebrew ? 'הקופונים שרכשת יופיעו כאן' : 'Coupons you purchase will appear here',
+    noHistory: isHebrew ? 'אין שוברים' : 'No vouchers yet',
+    historyDescription: isHebrew ? 'השוברים שרכשת יופיעו כאן' : 'Vouchers you purchase will appear here',
     active: isHebrew ? 'פעיל' : 'Active',
     expired: isHebrew ? 'פג תוקף' : 'Expired',
     used: isHebrew ? 'משומש' : 'Used',
@@ -64,18 +64,18 @@ export default function UserCouponsPage() {
     storeLocation: isHebrew ? 'מיקום החנות' : 'Store Location',
     noBusinessesFound: isHebrew ? 'לא נמצאו עסקים עבור שובר זה' : 'No businesses found for this voucher',
     // Toast messages
-    pleaseSignIn: isHebrew ? 'אנא התחבר כדי לרכוש קופונים' : 'Please sign in to purchase coupons',
+    pleaseSignIn: isHebrew ? 'אנא התחבר כדי לרכוש שוברים' : 'Please sign in to purchase vouchers',
     pleaseSignInShare: isHebrew ? 'אנא התחבר כדי לשתף' : 'Please sign in to share',
     failedToLoad: isHebrew ? 'נכשל בטעינת הנתונים' : 'Failed to load data',
-    purchaseSuccess: isHebrew ? 'הקופון נרכש בהצלחה!' : 'Coupon purchased successfully!',
-    failedToPurchase: isHebrew ? 'נכשל ברכישת הקופון' : 'Failed to purchase coupon',
+    purchaseSuccess: isHebrew ? 'השובר נרכש בהצלחה!' : 'Voucher purchased successfully!',
+    failedToPurchase: isHebrew ? 'נכשל ברכישת השובר' : 'Failed to purchase voucher',
     codeCopied: isHebrew ? 'הקוד הועתק ללוח!' : 'Code copied to clipboard!',
     failedToCopy: isHebrew ? 'נכשל בהעתקת הקוד' : 'Failed to copy code',
     sharedSuccessfully: isHebrew ? 'שותף בהצלחה!' : 'Shared successfully!',
     linkCopied: isHebrew ? 'הלינק הועתק ללוח!' : 'Link copied to clipboard!',
     failedToShare: isHebrew ? 'נכשל בשיתוף' : 'Failed to share',
-    couponMarkedAsUsed: isHebrew ? 'הקופון סומן כמשומש והועבר להיסטוריה' : 'Coupon marked as used and moved to history',
-    failedToMarkAsUsed: isHebrew ? 'נכשל בסימון הקופון כמשומש' : 'Failed to mark coupon as used',
+    couponMarkedAsUsed: isHebrew ? 'השובר סומן כמשומש והועבר להיסטוריה' : 'Voucher marked as used and moved to history',
+    failedToMarkAsUsed: isHebrew ? 'נכשל בסימון השובר כמשומש' : 'Failed to mark voucher as used',
     shareShopTitle: isHebrew ? 'בדקו את החנות שלנו!' : 'Check out our shop!',
     shareShopText: isHebrew ? 'בדקו את החנות שלנו עם הקישור המיוחד הזה!' : 'Check out our shop with this special link!',
   };
