@@ -2,7 +2,6 @@ import Navbar from '@/components/layout/Navbar';
 import BottomNavigation from '@/components/layout/BottomNavigation';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { useState, useEffect, lazy, Suspense } from 'react';
@@ -257,36 +256,24 @@ type AnimatedPetProps = {
   index: number;
 };
 
-// Component for pets around text section - arranged in horizontal oval
+// Component for pets around text section - arranged in horizontal oval (static, no animations)
 const AnimatedPetAroundText = ({ pet, index }: AnimatedPetProps) => {
-  const [isFalling, setIsFalling] = useState(false);
-  const [hasFallen, setHasFallen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
-  const [isIOS, setIsIOS] = useState(false);
 
   useEffect(() => {
     const checkDesktop = () => {
       setIsDesktop(window.innerWidth >= 640);
     };
 
-    const checkIOS = () => {
-      const userAgent = window.navigator.userAgent.toLowerCase();
-      setIsIOS(/iphone|ipad|ipod/.test(userAgent));
-    };
-
     checkDesktop();
-    checkIOS();
-
     window.addEventListener('resize', checkDesktop);
     return () => window.removeEventListener('resize', checkDesktop);
   }, []);
 
-  // CRITICAL: Disable on iOS to prevent crashes
-  if (!isDesktop || isIOS) {
+  // Only show on desktop
+  if (!isDesktop) {
     return null;
   }
-
-  const floorPosition = 350;
 
   // Desktop: Oval positioning
   const ovalWidth = 500;
@@ -303,91 +290,15 @@ const AnimatedPetAroundText = ({ pet, index }: AnimatedPetProps) => {
 
   const responsiveSize = pet.size;
 
-  const baseMovement = 15;
-  const floatingPath = {
-    y: [
-      0,
-      -baseMovement * 0.8 + (pet.id % 3) * 3,
-      baseMovement * 0.6 - (pet.id % 2) * 2,
-      -baseMovement * 0.4 + (pet.id % 4) * 2,
-      baseMovement * 0.3 - (pet.id % 3) * 1.5,
-      0
-    ],
-    x: [
-      0,
-      baseMovement * 0.5 + (pet.id % 2) * 2,
-      -baseMovement * 0.4 - (pet.id % 3) * 1.5,
-      baseMovement * 0.3 + (pet.id % 2) * 1.5,
-      -baseMovement * 0.2 - (pet.id % 2) * 1,
-      0
-    ],
-    rotate: [
-      0,
-      -10 + (pet.id % 3) * 4,
-      8 - (pet.id % 2) * 5,
-      -6 + (pet.id % 4) * 3,
-      5 - (pet.id % 3) * 2,
-      0
-    ],
-    scale: [
-      1,
-      1.05 + (pet.id % 3) * 0.02,
-      0.95 - (pet.id % 2) * 0.02,
-      1.03 + (pet.id % 2) * 0.015,
-      0.97 - (pet.id % 3) * 0.015,
-      1
-    ]
-  };
-
-  const fallingPath = {
-    y: floorPosition - baseY,
-    x: 0,
-    rotate: 360 + (pet.id % 2 === 0 ? 180 : 0),
-    scale: [1, 0.9, 1]
-  };
-
-  const handleTap = () => {
-    if (!isFalling && !hasFallen) {
-      setIsFalling(true);
-      setTimeout(() => {
-        setIsFalling(false);
-        setHasFallen(true);
-      }, 2000);
-    }
-  };
-
   return (
-    <motion.div
+    <div
       style={{
         position: 'absolute',
-        top: hasFallen ? `${floorPosition}px` : `calc(50% + ${baseY}px)`,
+        top: `calc(50% + ${baseY}px)`,
         left: `calc(50% + ${baseX}px)`,
         transform: 'translate(-50%, -50%)',
-        willChange: 'transform',
-        zIndex: 1,
-        cursor: 'pointer'
+        zIndex: 1
       }}
-      animate={hasFallen ? { y: 0, x: 0, rotate: 0, scale: 1 } : (isFalling ? fallingPath : floatingPath)}
-      transition={
-        isFalling
-          ? {
-            duration: 1.5,
-            ease: [0.55, 0.085, 0.68, 0.53],
-            scale: {
-              duration: 0.3,
-              delay: 1.2,
-              ease: 'easeOut'
-            }
-          }
-          : {
-            duration: 8 + (pet.id % 3) * 2,
-            ease: [0.4, 0, 0.2, 1],
-            repeat: Infinity,
-            delay: 0.2 * pet.id,
-            repeatType: 'reverse' as const
-          }
-      }
-      onTap={handleTap}
     >
       <OptimizedImage
         src={pet.src}
@@ -396,7 +307,7 @@ const AnimatedPetAroundText = ({ pet, index }: AnimatedPetProps) => {
         height={responsiveSize}
         className="object-cover"
       />
-    </motion.div>
+    </div>
   );
 };
 
@@ -418,34 +329,16 @@ const ProductHighlights = () => {
 
   return (
     <section className="mt-0 mb-0">
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        viewport={{ amount: 0.8 }}
-        className="mx-auto max-w-4xl px-4 text-center pt-0"
-      >
+      <div className="mx-auto max-w-4xl px-4 text-center pt-0">
         {/* Headline */}
-        <motion.h2
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-primary mb-4 text-4xl font-bold"
-        >
+        <h2 className="text-primary mb-4 text-4xl font-bold">
           {t('components.ProductHighlights.headline')}
-        </motion.h2>
+        </h2>
 
         {/* Subheading */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          viewport={{ once: true }}
-          className="mb-4 text-lg text-gray-700"
-        >
+        <p className="mb-4 text-lg text-gray-700">
           {t('components.ProductHighlights.subheading')}
-        </motion.p>
+        </p>
 
         {/* Statistics */}
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
@@ -459,7 +352,7 @@ const ProductHighlights = () => {
             <StatItem end={24981} label={t('components.ProductHighlights.chipsDeployed')} duration={2.5} />
           </Suspense>
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 };
@@ -471,13 +364,7 @@ type StatItemProps = {
 };
 
 const StatItem = ({ end, label, duration }: StatItemProps) => (
-  <motion.div
-    initial={{ opacity: 0, y: 30 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.6 }}
-    viewport={{ once: true }}
-    className="flex flex-col items-center"
-  >
+  <div className="flex flex-col items-center">
     <CountUp
       start={0}
       end={end}
@@ -486,5 +373,5 @@ const StatItem = ({ end, label, duration }: StatItemProps) => (
       className="text-primary text-4xl font-extrabold"
     />
     <p className="mt-2 text-xl font-semibold">{label}</p>
-  </motion.div>
+  </div>
 );
