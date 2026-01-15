@@ -60,11 +60,23 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   // Listen to auth state changes
   useEffect(() => {
+    let authTimeout: NodeJS.Timeout;
+
+    // Safety timeout: if Firebase doesn't respond in 5 seconds, stop loading anyway
+    // This prevents white screen on iOS when Firebase is slow or blocked
+    authTimeout = setTimeout(() => {
+      if (loading) {
+        console.warn('⚠️ Firebase auth timeout - continuing without auth');
+        setLoading(false);
+      }
+    }, 5000);
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      clearTimeout(authTimeout); // Cancel timeout since we got a response
       console.log('🔍 Firebase auth state changed:', firebaseUser?.email || 'No user');
-      
+
       setUser(firebaseUser);
-      
+
       if (firebaseUser) {
         // Fetch user data from Firestore
         try {
@@ -91,11 +103,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       } else {
         setDbUser(null);
       }
-      
+
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      clearTimeout(authTimeout);
+      unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {

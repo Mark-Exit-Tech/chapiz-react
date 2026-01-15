@@ -16,7 +16,8 @@ export default function CookieConsent({ onAccept, onReject }: CookieConsentProps
 
   useEffect(() => {
     // Defer cookie consent check to not block initial render
-    const timer = requestIdleCallback(() => {
+    // Use setTimeout for iOS Safari compatibility (no requestIdleCallback support)
+    const timer = setTimeout(() => {
       if (typeof window !== 'undefined') {
         try {
           const hasConsent = localStorage.getItem('cookieConsent');
@@ -29,9 +30,9 @@ export default function CookieConsent({ onAccept, onReject }: CookieConsentProps
         }
       }
       setIsInitializing(false);
-    });
+    }, 100);
 
-    return () => cancelIdleCallback(timer);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleAccept = () => {
