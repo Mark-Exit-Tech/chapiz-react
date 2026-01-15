@@ -57,6 +57,7 @@ export interface Ad {
   endDate: string | null;
   phone?: string;
   location?: string;
+  address?: string;
   description?: string;
   tags?: string[];
   area?: string;
@@ -70,6 +71,7 @@ export interface Ad {
   duration?: number;
   imageUrl?: string;
   createdAt?: string;
+  coordinates?: { lat: number; lng: number }; // Self-healing geocoded coordinates
 }
 
 // Stub functions that return empty/default values

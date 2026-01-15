@@ -277,6 +277,10 @@ export default function MapCard({ businesses = [], contactInfo, title }: MapCard
 
         businessesWithAddress.forEach((businessItem) => {
           const address = businessItem.contactInfo?.address;
+          
+          // Check if coordinates already exist (avoid unnecessary geocoding)
+          const existingCoords = (businessItem as any).coordinates || (businessItem.contactInfo as any)?.coordinates;
+          
           if (!address) {
             geocodeCount++;
             if (geocodeCount === totalBusinesses && isMountedRef.current) {
@@ -285,6 +289,50 @@ export default function MapCard({ businesses = [], contactInfo, title }: MapCard
             return;
           }
 
+          // Use existing coordinates if available
+          if (existingCoords && existingCoords.lat && existingCoords.lng) {
+            const position = { lat: existingCoords.lat, lng: existingCoords.lng };
+            
+            const marker = new window.google.maps.marker.AdvancedMarkerElement({
+              position,
+              map: mapInstance,
+              title: businessItem.name,
+            });
+
+            const phoneDisplay = businessItem.contactInfo?.phone
+              ? `<p style="margin: 0; color: #666; font-size: 14px;">Phone: ${businessItem.contactInfo.phone}</p>`
+              : '';
+            const addressDisplay = address
+              ? `<p style="margin: 0 0 8px 0; color: #666; font-size: 14px;">${address}</p>`
+              : '';
+            const infoContent = '<div style="padding: 10px; max-width: 250px;">' +
+              '<h3 style="margin: 0 0 8px 0; font-weight: bold; font-size: 16px;">' + businessItem.name + '</h3>' +
+              addressDisplay +
+              phoneDisplay +
+              '</div>';
+
+            const infoWindow = new window.google.maps.InfoWindow({
+              content: infoContent,
+            });
+
+            marker.addListener('click', () => {
+              if (!isMountedRef.current) return;
+              if (businessItem.id) {
+                navigate(`/services?businessId=${businessItem.id}`);
+              }
+            });
+
+            newMarkers.push({ marker, infoWindow });
+            bounds.extend(position);
+            
+            geocodeCount++;
+            if (geocodeCount === totalBusinesses && isMountedRef.current) {
+              finalizeMap();
+            }
+            return;
+          }
+
+          // Only geocode if no coordinates exist
           geocoder.geocode({ address }, (results, status) => {
             if (!isMountedRef.current || !mapRef.current || !mapRef.current.parentNode) {
               return;
@@ -295,6 +343,24 @@ export default function MapCard({ businesses = [], contactInfo, title }: MapCard
             if (status === 'OK' && results && results[0]) {
               const location = results[0].geometry.location;
               const position = { lat: location.lat(), lng: location.lng() };
+
+              // Self-healing: Save coordinates to database for future use
+              if (businessItem.id) {
+                (async () => {
+                  try {
+                    const { updateBusiness } = await import('@/lib/actions/admin');
+                    await updateBusiness(businessItem.id, {
+                      contactInfo: {
+                        ...businessItem.contactInfo,
+                        coordinates: position
+                      }
+                    } as any);
+                    console.log('✅ Saved coordinates for:', businessItem.name);
+                  } catch (error) {
+                    console.error('Failed to save coordinates:', error);
+                  }
+                })();
+              }
 
               const marker = new window.google.maps.marker.AdvancedMarkerElement({
                 position,

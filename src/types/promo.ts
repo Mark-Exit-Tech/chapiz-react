@@ -18,6 +18,7 @@ export interface Business {
     email: string;
     phone: string;
     address: string;
+    coordinates?: { lat: number; lng: number }; // Self-healing geocoded coordinates
   };
   tags: string[];
   filterIds?: string[]; // Filters assigned to this business
@@ -65,6 +66,7 @@ export interface CreateBusinessData {
     email: string;
     phone: string;
     address: string;
+    coordinates?: { lat: number; lng: number }; // Self-healing geocoded coordinates
   };
   tags: string[];
   filterIds?: string[]; // Filters assigned to this business

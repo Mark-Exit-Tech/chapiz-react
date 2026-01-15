@@ -523,19 +523,42 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
 
   // Geocode service address to get coordinates
   const geocodeService = async (service: Service): Promise<{ lat: number; lng: number } | null> => {
+    // Check if coordinates already exist (avoid unnecessary geocoding)
+    const existingCoords = (service as any).coordinates;
+    if (existingCoords && existingCoords.lat && existingCoords.lng) {
+      console.log('✅ Using cached coordinates for:', service.name);
+      return existingCoords;
+    }
+
     if (!geocoderRef.current) return null;
 
     const address = service.address || service.location;
     if (!address) return null;
 
+    console.log('🔍 Geocoding address for:', service.name);
     return new Promise((resolve) => {
       geocoderRef.current.geocode({ address }, (results: any[], status: any) => {
         if (status === 'OK' && results[0]) {
           const location = results[0].geometry.location;
-          resolve({
+          const coordinates = {
             lat: location.lat(),
             lng: location.lng()
-          });
+          };
+          
+          // Self-healing: Save coordinates to database for future use
+          if (service.id) {
+            (async () => {
+              try {
+                const { updateAd } = await import('@/lib/actions/admin');
+                await updateAd(service.id!, { coordinates });
+                console.log('✅ Saved coordinates for:', service.name);
+              } catch (error) {
+                console.error('❌ Failed to save coordinates:', error);
+              }
+            })();
+          }
+          
+          resolve(coordinates);
         } else {
           resolve(null);
         }
