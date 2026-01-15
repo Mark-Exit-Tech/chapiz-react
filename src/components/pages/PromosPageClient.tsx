@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import toast from 'react-hot-toast';
 import { getPromos, getBusinesses } from '@/lib/actions/admin';
 import { isPromoUsed, getUserUsedPromos, UserPromo } from '@/lib/firebase/database/promos';
+import { useTranslation } from 'react-i18next';
 
 type Promo = any;
 type Business = any;
@@ -21,18 +22,17 @@ interface PromosPageClientProps {
   initialBusinesses?: Business[];
 }
 
-export default function PromosPageClient({ 
-  initialPromos = [], 
-  business = null, 
-  initialBusinesses = [] 
+export default function PromosPageClient({
+  initialPromos = [],
+  business = null,
+  initialBusinesses = []
 }: PromosPageClientProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
-  
-  // Get locale from URL
-  const locale = typeof window !== 'undefined'
-    ? window.location.pathname.split('/')[1] || 'en'
-    : 'en';
+  const { i18n } = useTranslation();
+
+  // Get locale from i18n (works correctly on root path without locale prefix)
+  const locale = i18n.language || 'en';
   const isHebrew = locale === 'he';
   
   // HARDCODED TEXT - NO TRANSLATION KEYS!
@@ -169,10 +169,11 @@ export default function PromosPageClient({
   const availablePromos = promos.filter(promo => !usedPromoIds.has(promo.id));
 
   const renderPromoCard = (promo: Promo) => (
-    <Card 
-      key={promo.id} 
+    <Card
+      key={promo.id}
       className="overflow-hidden hover:shadow-lg transition-shadow relative cursor-pointer"
       onClick={() => handleViewQR(promo)}
+      dir={isHebrew ? 'rtl' : 'ltr'}
     >
       {promo.imageUrl && (
         <div className="relative w-full h-48">
@@ -208,7 +209,7 @@ export default function PromosPageClient({
             className="flex-1"
             size="sm"
           >
-            <QrCode className="w-4 h-4 mr-2" />
+            <QrCode className="w-4 h-4 me-2" />
             {text.viewQR}
           </Button>
           {getPromoBusinesses(promo).length > 0 && (
@@ -264,7 +265,8 @@ export default function PromosPageClient({
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6">
+        <div className="flex justify-end mb-6">
+        <TabsList className="grid max-w-md w-full grid-cols-2">
           <TabsTrigger value="available" className="flex items-center gap-2">
             <Tag className="w-4 h-4" />
             {text.availableCoupons}
@@ -274,6 +276,7 @@ export default function PromosPageClient({
             {text.usedCoupons}
           </TabsTrigger>
         </TabsList>
+        </div>
 
         <TabsContent value="available" className="mt-0">
           {availablePromos.length === 0 ? (
@@ -282,8 +285,12 @@ export default function PromosPageClient({
               <p className="text-gray-600">{text.noCoupons}</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {availablePromos.map(renderPromoCard)}
+            <div className={`flex flex-wrap gap-6 ${isHebrew ? 'flex-row-reverse' : ''}`}>
+              {availablePromos.map(promo => (
+                <div key={promo.id} className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]">
+                  {renderPromoCard(promo)}
+                </div>
+              ))}
             </div>
           )}
         </TabsContent>
@@ -295,8 +302,12 @@ export default function PromosPageClient({
               <p className="text-gray-600">{text.noUsedCoupons}</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {usedPromos.map(userPromo => userPromo.promo && renderPromoCard(userPromo.promo))}
+            <div className={`flex flex-wrap gap-6 ${isHebrew ? 'flex-row-reverse' : ''}`}>
+              {usedPromos.map(userPromo => userPromo.promo && (
+                <div key={userPromo.promo.id} className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]">
+                  {renderPromoCard(userPromo.promo)}
+                </div>
+              ))}
             </div>
           )}
         </TabsContent>

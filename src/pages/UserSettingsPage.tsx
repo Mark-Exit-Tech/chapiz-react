@@ -21,6 +21,7 @@ const ProfileContent = () => {
   const location = useLocation();
   const { t, i18n } = useTranslation();
   const locale = i18n.language || 'en';
+  const isHebrew = locale === 'he';
   const { user, dbUser, loading: authLoading, sendDeletionVerificationCode, signOut } = useAuth();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -300,7 +301,7 @@ const ProfileContent = () => {
   }
 
   return (
-    <div className="flex grow flex-col pb-16 md:pb-0 overflow-y-auto bg-gradient-to-br from-blue-50 to-indigo-100 p-4 pt-8 md:pt-12">
+    <div className="flex grow flex-col pb-16 md:pb-0 overflow-y-auto bg-gradient-to-br from-blue-50 to-indigo-100 p-4 pt-8 md:pt-12" dir={isHebrew ? 'rtl' : 'ltr'}>
       <div className="max-w-2xl mx-auto w-full">
         {/* Header */}
         <div className="mb-6">
@@ -416,8 +417,8 @@ const ProfileContent = () => {
             <div className="space-y-2">
               <Label htmlFor="phone">{t('pages.UserSettingsPage.phoneNumber')}</Label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input id="phone" value={formData.phone} onChange={(e) => handleInputChange('phone', e.target.value)} placeholder={t('pages.UserSettingsPage.phonePlaceholder')} className="pl-10" />
+                <Phone className={`absolute top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 ${isHebrew ? 'right-3' : 'left-3'}`} />
+                <Input id="phone" value={formData.phone} onChange={(e) => handleInputChange('phone', e.target.value)} placeholder={t('pages.UserSettingsPage.phonePlaceholder')} className={isHebrew ? 'pr-10' : 'pl-10'} />
               </div>
             </div>
 
@@ -467,7 +468,7 @@ const ProfileContent = () => {
         </Card>
 
         {/* Delete Account */}
-        <div className="flex justify-center md:justify-start">
+        <div className="flex justify-center md:justify-start mb-[50px]">
           <Button variant="ghost" onClick={handleDeleteAccount} disabled={deletingAccount} className="text-gray-400 hover:text-red-500 hover:bg-transparent text-sm h-auto p-0 font-normal">
             {deletingAccount ? t('pages.UserSettingsPage.deleteAccount.deleting') : t('pages.UserSettingsPage.deleteAccount.button')}
           </Button>

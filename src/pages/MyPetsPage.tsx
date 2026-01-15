@@ -71,7 +71,7 @@ export default function MyPetsPage() {
       {/* Navbar - visible on all screen sizes */}
       <Navbar />
       {/* Main content with proper padding based on screen size */}
-      <div className="flex grow flex-col pt-8 md:pt-8 h-[calc(100vh-60px)] md:h-[calc(100vh-64px)] pb-16 md:pb-0" style={{ overflow: 'hidden', touchAction: 'none' }}>
+      <div className="flex grow flex-col pt-8 md:pt-8 h-[calc(100vh-60px)] md:h-[calc(100vh-64px)] pb-16 md:pb-0 overflow-y-auto">
         <MyPetClient pets={pets} />
       </div>
       {/* Bottom Navigation - only visible on mobile */}

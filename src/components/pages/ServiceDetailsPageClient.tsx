@@ -278,7 +278,7 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
                 <div className="hidden lg:block mt-6 pt-6 border-t border-gray-200 space-y-2">
                   <Button
                     variant="outline"
-                    className={cn("w-full", isHebrew ? 'flex-row-reverse justify-end' : 'justify-start')}
+                    className="w-full justify-start"
                     onClick={() => {
                       if (service.location) {
                         const address = service.location.trim();
@@ -304,38 +304,38 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
                       alt="Waze"
                       width={18}
                       height={18}
-                      className={cn(isHebrew ? 'ml-2' : 'mr-2')}
+                      className="me-2"
                     />
                     <span>{t('navigation')}</span>
                   </Button>
                   {service.phone && service.phone.trim() !== '' && service.phone !== 'undefined' && service.phone !== 'null' && (
                     <Button
                       variant="outline"
-                      className={cn("w-full", isHebrew ? 'flex-row-reverse justify-end' : 'justify-start')}
+                      className="w-full justify-start"
                       onClick={() => window.open(`tel:${service.phone}`, '_self')}
                     >
-                      <Phone size={18} className={cn(isHebrew ? 'ml-2' : 'mr-2')} />
+                      <Phone size={18} className="me-2" />
                       <span>{t('call')}</span>
                     </Button>
                   )}
                   <Button
                     variant="outline"
-                    className={cn("w-full", isHebrew ? 'flex-row-reverse justify-end' : 'justify-start')}
+                    className="w-full justify-start"
                     onClick={handleToggleFavorite}
                     disabled={isTogglingFavorite}
                   >
                     {isTogglingFavorite ? (
-                      <div className={cn("h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent", isHebrew ? 'ml-2' : 'mr-2')} />
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent me-2" />
                     ) : isFavorited ? (
-                      <Heart size={18} className={cn("fill-current text-orange-500", isHebrew ? 'ml-2' : 'mr-2')} />
+                      <Heart size={18} className="fill-current text-orange-500 me-2" />
                     ) : (
-                      <Heart size={18} className={cn(isHebrew ? 'ml-2' : 'mr-2')} />
+                      <Heart size={18} className="me-2" />
                     )}
                     <span>{isFavorited ? t('removeFromFavorites') : t('addToFavorites')}</span>
                   </Button>
                   <Button
                     variant="outline"
-                    className={cn("w-full", isHebrew ? 'flex-row-reverse justify-end' : 'justify-start')}
+                    className="w-full justify-start"
                     onClick={() => {
                       if (service.id) {
                         navigate(`/${locale}/coupons?businessId=${service.id}`);
@@ -344,7 +344,7 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
                       }
                     }}
                   >
-                    <Ticket size={18} className={cn(isHebrew ? 'ml-2' : 'mr-2')} />
+                    <Ticket size={18} className="me-2" />
                     <span>{t('coupons')}</span>
                   </Button>
                 </div>

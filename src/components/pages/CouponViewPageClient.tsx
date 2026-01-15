@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, CheckCircle2, Share2, Trophy, Info } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Share2, Trophy, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Promo, Business } from '@/types/promo';
 import Navbar from '@/components/layout/Navbar';
@@ -161,7 +161,7 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50" dir={isHebrew ? 'rtl' : 'ltr'}>
       <Navbar />
 
       <div className="container mx-auto px-4 py-8 pb-24 md:pb-8 max-w-4xl">
@@ -172,11 +172,7 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
           onClick={() => navigate(-1)}
           className="mb-6"
         >
-          {locale === 'he' ? (
-            <ArrowRight className="h-4 w-4 mr-2" />
-          ) : (
-            <ArrowLeft className="h-4 w-4 mr-2" />
-          )}
+          <ArrowLeft className={`h-4 w-4 me-2 ${isHebrew ? 'rotate-180' : ''}`} />
           {text.back}
         </Button>
 
@@ -298,17 +294,17 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
                 >
                   {isUsingCoupon ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin me-2" />
                       {text.using}
                     </>
                   ) : isUsed ? (
                     <>
-                      <CheckCircle2 className="w-4 h-4 mr-2" />
+                      <CheckCircle2 className="w-4 h-4 me-2" />
                       {text.used}
                     </>
                   ) : (
                     <>
-                      <CheckCircle2 className="w-4 h-4 mr-2" />
+                      <CheckCircle2 className="w-4 h-4 me-2" />
                       {text.use}
                     </>
                   )}
@@ -319,7 +315,7 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
                   onClick={handleShare}
                   className="flex-1"
                 >
-                  <Share2 className="w-4 h-4 mr-2" />
+                  <Share2 className="w-4 h-4 me-2" />
                   {text.share}
                 </Button>
               </div>
@@ -349,12 +345,12 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
                   >
                     {isUsingCoupon ? (
                       <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin me-2" />
                         {text.using}
                       </>
                     ) : (
                       <>
-                        <CheckCircle2 className="w-4 h-4 mr-2" />
+                        <CheckCircle2 className="w-4 h-4 me-2" />
                         {text.confirm}
                       </>
                     )}

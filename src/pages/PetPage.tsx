@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { getPetById } from '@/lib/firebase/database/pets';
 import PetProfilePage from '@/components/PetProfilePage';
-import BottomNavigation from '@/components/layout/BottomNavigation';
 
 export default function PetPage() {
   const { id } = useParams<{ id: string }>();
@@ -64,52 +63,37 @@ export default function PetPage() {
 
   if (loading) {
     return (
-      <>
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-gray-600">{text.loading}</p>
-            </div>
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-gray-600">{text.loading}</p>
           </div>
         </div>
-        <div className="md:hidden">
-          <BottomNavigation />
-        </div>
-      </>
+      </div>
     );
   }
 
   if (!pet) {
     return (
-      <>
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">{text.notFound}</h1>
-            <button
-              onClick={() => window.history.back()}
-              className="text-primary hover:underline"
-            >
-              {text.goBack}
-            </button>
-          </div>
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">{text.notFound}</h1>
+          <button
+            onClick={() => window.history.back()}
+            className="text-primary hover:underline"
+          >
+            {text.goBack}
+          </button>
         </div>
-        <div className="md:hidden">
-          <BottomNavigation />
-        </div>
-      </>
+      </div>
     );
   }
 
   return (
-    <>
-      <PetProfilePage
-        pet={pet}
-        owner={owner}
-      />
-      <div className="md:hidden">
-        <BottomNavigation />
-      </div>
-    </>
+    <PetProfilePage
+      pet={pet}
+      owner={owner}
+    />
   );
 }

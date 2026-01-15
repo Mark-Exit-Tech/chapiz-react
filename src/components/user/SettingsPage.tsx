@@ -26,6 +26,7 @@ export default function SettingsPage() {
   const locale = typeof window !== 'undefined'
     ? window.location.pathname.split('/')[1] || 'en'
     : 'en';
+  const isHebrew = locale === 'he';
   const { user, dbUser, loading: authLoading, sendDeletionVerificationCode, signOut } = useAuth();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -422,19 +423,19 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4`} dir={isHebrew ? 'rtl' : 'ltr'}>
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-2">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 w-full md:w-auto">
               {/* Back Button */}
               <Button
                 variant="ghost"
                 onClick={handleBack}
                 className="p-2"
               >
-                <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+                <ArrowLeft className={`h-4 w-4 ${isHebrew ? 'rotate-180' : ''}`} />
               </Button>
 
               <div>
@@ -448,7 +449,7 @@ export default function SettingsPage() {
             </div>
 
             {/* Save Button */}
-            <div className="flex justify-end md:justify-start">
+            <div className={`flex ${isHebrew ? 'justify-start' : 'justify-end'}`}>
               <Button
                 onClick={() => handleSave()}
                 disabled={saving}
@@ -475,7 +476,7 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Camera className="h-5 w-5" />
-              {t('profileImage')}
+              <span>{t('profileImage')}</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -491,12 +492,6 @@ export default function SettingsPage() {
                   ) : formData.profileImageURL ? (
                     <img
                       src={formData.profileImageURL}
-                      alt="Profile"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : dbUser?.photoURL ? (
-                    <img
-                      src={dbUser.photoURL}
                       alt="Profile"
                       className="w-full h-full object-cover"
                     />
@@ -587,7 +582,7 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
-              {t('personalInfo')}
+              <span>{t('personalInfo')}</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -604,13 +599,13 @@ export default function SettingsPage() {
             <div className="space-y-2">
               <Label htmlFor="phone">{t('phoneNumber')}</Label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Phone className={`absolute top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 ${isHebrew ? 'right-3' : 'left-3'}`} />
                 <Input
                   id="phone"
                   value={formData.phone}
                   onChange={(e) => handleInputChange('phone', e.target.value)}
                   placeholder={t('phonePlaceholder')}
-                  className="pl-10"
+                  className={isHebrew ? 'pr-10' : 'pl-10'}
                 />
               </div>
             </div>
@@ -632,7 +627,7 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Globe className="h-5 w-5" />
-              {t('languageSettings')}
+              <span>{t('languageSettings')}</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -662,7 +657,7 @@ export default function SettingsPage() {
 
 
         {/* Action Buttons */}
-        <div className="flex justify-between items-center gap-4">
+        <div className="flex justify-between items-center gap-4 mb-[50px]">
           {/* Delete Account Button */}
           <Button
             variant="ghost"

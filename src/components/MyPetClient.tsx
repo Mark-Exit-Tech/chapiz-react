@@ -246,7 +246,7 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
           </p>
         </div>
       ) : (
-        <div className="flex justify-center pb-24 md:pb-8">
+        <div className="flex justify-center" style={{ paddingBottom: '50px' }}>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 w-full">
             {filteredPets.map((pet) => (
               <MyPetCard

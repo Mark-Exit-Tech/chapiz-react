@@ -69,6 +69,7 @@ export function BreedSelect({
     exactMatch: isHebrew ? 'התאמה מדויקת' : 'Exact',
     searchPlaceholder: isHebrew ? 'חפש גזעים...' : 'Search breeds...',
     noBreedFound: isHebrew ? 'לא נמצא גזע.' : 'No breed found.',
+    breedPlaceholder: isHebrew ? 'בחר גזע' : 'Select breed',
   };
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
@@ -221,7 +222,7 @@ export function BreedSelect({
               "flex-1 text-left rtl:text-right",
               !selectedBreed && !disabled ? "text-gray-500" : ""
             )}>
-              {selectedBreed ? selectedBreed.name : (disabled ? '' : (placeholder || t('placeholder')))}
+              {selectedBreed ? selectedBreed.name : (disabled ? '' : (placeholder || text.breedPlaceholder))}
             </span>
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>

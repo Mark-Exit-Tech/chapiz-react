@@ -328,7 +328,6 @@ export default function BusinessesTable() {
                 />
               </TableHead>
               <TableHead>{text.name}</TableHead>
-              <TableHead>{isHebrew ? 'תיאור' : 'Description'}</TableHead>
               <TableHead>{isHebrew ? 'תמונה' : 'Image'}</TableHead>
               <TableHead>{text.contact}</TableHead>
               <TableHead>{text.status}</TableHead>
@@ -339,7 +338,7 @@ export default function BusinessesTable() {
           <TableBody>
             {filteredBusinesses.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8 text-gray-500">
+                <TableCell colSpan={7} className="text-center py-8 text-gray-500">
                   {text.noBusinesses}
                 </TableCell>
               </TableRow>
@@ -355,10 +354,7 @@ export default function BusinessesTable() {
                       onCheckedChange={(checked) => handleSelectOne(business.id, checked as boolean)}
                     />
                   </TableCell>
-                  <TableCell className="font-medium">{business.name}</TableCell>
-                  <TableCell className="max-w-xs truncate">
-                    {business.description}
-                  </TableCell>
+                  <TableCell className="font-medium max-w-[200px] truncate">{business.name}</TableCell>
                   <TableCell>
                     {business.imageUrl ? (
                       <div className="w-10 h-10 rounded-md overflow-hidden">

@@ -23,12 +23,10 @@ import { useShopRedirect } from '@/hooks/use-shop-redirect';
 import toast from 'react-hot-toast';
 
 export default function UserVouchersPage() {
-  const { t } = useTranslation('components.UserCoupons');
-  
-  // Get locale from URL or default to 'en'
-  const locale = typeof window !== 'undefined'
-    ? window.location.pathname.split('/')[1] || 'en'
-    : 'en';
+  const { t, i18n } = useTranslation('components.UserCoupons');
+
+  // Get locale from i18n (works correctly on root path without locale prefix)
+  const locale = i18n.language || 'en';
   const isHebrew = locale === 'he';
   
   // HARDCODED TEXT - NO TRANSLATION KEYS!
@@ -553,18 +551,18 @@ export default function UserVouchersPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex-1">
-                  <div className="text-5xl lg:text-6xl font-bold bg-gradient-to-r from-yellow-600 to-yellow-500 bg-clip-text text-transparent mb-3">
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '1rem', alignItems: 'center' }}>
+                <div>
+                  <div className="text-5xl lg:text-6xl font-bold bg-gradient-to-r from-yellow-600 to-yellow-500 bg-clip-text text-transparent">
                     {userPoints.toLocaleString()}
                   </div>
-                  <p className="text-base text-gray-600">{text.pointsDescription}</p>
+                  <p className="text-base text-gray-600 mt-2">{text.pointsDescription}</p>
                 </div>
                 <Button
                   onClick={handleShare}
                   variant="outline"
                   size="lg"
-                  className="flex items-center gap-2 flex-shrink-0"
+                  style={{ alignSelf: 'center', marginTop: '-55px' }}
                 >
                   <Share2 className="h-5 w-5" />
                   {text.share}
@@ -578,7 +576,8 @@ export default function UserVouchersPage() {
       <Tabs value={activeTab} onValueChange={(value) => {
         setActiveTab(value);
       }} className="w-full">
-        <TabsList className="grid w-full max-w-md grid-cols-2 mb-8 lg:mb-10 h-12 lg:h-14 bg-gray-100/50 p-1 rounded-xl">
+        <div className="flex justify-end mb-8 lg:mb-10">
+        <TabsList className="grid max-w-md w-full grid-cols-2 h-12 lg:h-14 bg-gray-100/50 p-1 rounded-xl">
           <TabsTrigger 
             value="shop" 
             className="flex items-center gap-2 text-sm lg:text-base font-medium data-[state=active]:bg-white data-[state=active]:shadow-md transition-all rounded-lg"
@@ -594,10 +593,11 @@ export default function UserVouchersPage() {
             {text.myCoupons}
           </TabsTrigger>
         </TabsList>
+        </div>
 
         {/* Shop Tab */}
         <TabsContent value="shop" className="space-y-6">
-          <h2 className="text-3xl lg:text-4xl font-bold mb-6 lg:mb-8 text-gray-900">{text.availableCoupons}</h2>
+          <h2 className="text-3xl lg:text-4xl font-bold mb-6 lg:mb-8 text-gray-900 text-end" style={isHebrew ? { textAlign: 'right' } : {}}>{text.availableCoupons}</h2>
         {coupons.length === 0 ? (
           <div className="text-center py-16 lg:py-24 bg-white rounded-2xl border-2 border-dashed border-gray-200">
             <div className="inline-flex p-4 rounded-full bg-gray-100 mb-4">
@@ -606,11 +606,12 @@ export default function UserVouchersPage() {
             <p className="text-lg lg:text-xl text-gray-500 font-medium">{text.noCoupons}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 lg:gap-8 pb-24">
+          <div className={`flex flex-wrap gap-6 lg:gap-8 pb-24 ${isHebrew ? 'flex-row-reverse' : ''}`}>
             {coupons.map((coupon) => (
-              <Card 
-                key={coupon.id} 
+              <div key={coupon.id} className="w-full md:w-[calc(50%-12px)] xl:w-[calc(33.333%-16px)] 2xl:w-[calc(25%-18px)]">
+              <Card
                 className="relative group hover:shadow-2xl transition-all duration-300 border-2 overflow-hidden bg-white hover:border-primary/20 flex flex-col"
+                style={isHebrew ? { transform: 'scaleX(-1)' } : {}}
               >
                 {coupon.imageUrl && (
                   <div 
@@ -634,17 +635,17 @@ export default function UserVouchersPage() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                     {/* Date Overlay */}
                     <div className="absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-sm px-3 py-2">
-                      <div className="flex items-center gap-1.5 text-white text-sm font-medium">
+                      <div className="flex items-center gap-1.5 text-white text-sm font-medium" style={isHebrew ? { transform: 'scaleX(-1)', textAlign: 'right', flexDirection: 'row-reverse' } : {}}>
                         <Calendar className="h-4 w-4" />
-                        <span>{text.validUntil}: {formatDate(coupon.validTo)}</span>
+                        <span style={isHebrew ? { textAlign: 'right' } : {}}>{text.validUntil}: {formatDate(coupon.validTo)}</span>
                       </div>
                     </div>
                   </div>
                 )}
-                <CardHeader className={coupon.imageUrl ? "pb-3" : ""}>
+                <CardHeader className={coupon.imageUrl ? "pb-3" : ""} style={isHebrew ? { transform: 'scaleX(-1)', textAlign: 'right' } : {}}>
                   {!coupon.imageUrl && (
-                    <div className="flex items-start justify-between gap-3 mb-2">
-                      <CardTitle className="text-xl lg:text-2xl font-bold text-gray-900 leading-tight flex-1">
+                    <div className="flex items-start justify-between gap-3 mb-2" style={isHebrew ? { flexDirection: 'row-reverse' } : {}}>
+                      <CardTitle className="text-xl lg:text-2xl font-bold text-gray-900 leading-tight flex-1" style={isHebrew ? { textAlign: 'right' } : {}}>
                         {coupon.name}
                       </CardTitle>
                       <div className="w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5 flex-shrink-0">
@@ -653,9 +654,9 @@ export default function UserVouchersPage() {
                     </div>
                   )}
                   {/* One-row summary info */}
-                  <div className="flex items-center justify-between gap-2 text-sm">
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <span className="font-semibold text-gray-900 truncate">{coupon.name}</span>
+                  <div className="flex items-center justify-between gap-2 text-sm" style={isHebrew ? { flexDirection: 'row-reverse' } : {}}>
+                    <div className="flex items-center gap-2 flex-1 min-w-0" style={isHebrew ? { justifyContent: 'flex-end' } : {}}>
+                      <span className="font-semibold text-gray-900 truncate" style={isHebrew ? { textAlign: 'right', width: '100%' } : {}}>{coupon.name}</span>
                     </div>
                     <div className="flex items-center gap-3 flex-shrink-0">
                       {coupon.price !== 0 && (
@@ -667,13 +668,13 @@ export default function UserVouchersPage() {
                     </div>
                   </div>
                   {coupon.description && (
-                    <p className="text-sm text-gray-600 mt-2 line-clamp-2">{coupon.description}</p>
+                    <p className="text-sm text-gray-600 mt-2 line-clamp-2" style={isHebrew ? { textAlign: 'right' } : {}}>{coupon.description}</p>
                   )}
                 </CardHeader>
-                <CardContent className="space-y-4" onClick={(e) => e.stopPropagation()}>
+                <CardContent className="space-y-4" onClick={(e) => e.stopPropagation()} style={isHebrew ? { transform: 'scaleX(-1)', textAlign: 'right' } : {}}>
                   <div className="space-y-3">
-                    <div className={`flex items-center justify-between p-3 rounded-lg ${coupon.price === 0 ? 'bg-green-50' : 'bg-amber-50'}`}>
-                      <span className="text-sm font-medium text-gray-600">{text.pointsRequired}</span>
+                    <div className={`flex items-center justify-between p-3 rounded-lg ${coupon.price === 0 ? 'bg-green-50' : 'bg-amber-50'}`} style={isHebrew ? { flexDirection: 'row-reverse' } : {}}>
+                      <span className="text-sm font-medium text-gray-600" style={isHebrew ? { textAlign: 'right' } : {}}>{text.pointsRequired}</span>
                       {coupon.price === 0 ? (
                         <Badge className="bg-green-500 text-white hover:bg-green-600 px-3 py-1">
                           <span className="font-bold">{text.free}</span>
@@ -686,8 +687,8 @@ export default function UserVouchersPage() {
                       )}
                     </div>
                     {freeCouponPrice && (
-                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                        <span className="text-sm font-medium text-gray-600">{text.price}</span>
+                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg" style={isHebrew ? { flexDirection: 'row-reverse' } : {}}>
+                        <span className="text-sm font-medium text-gray-600" style={isHebrew ? { textAlign: 'right' } : {}}>{text.price}</span>
                         <Badge variant="outline" className="flex items-center gap-1.5 bg-white border-green-200 text-green-700 px-3 py-1">
                           <span className="font-semibold">{text.free}</span>
                         </Badge>
@@ -695,7 +696,7 @@ export default function UserVouchersPage() {
                     )}
                   </div>
                 </CardContent>
-                <CardFooter className="pt-4 mt-auto flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
+                <CardFooter className="pt-4 mt-auto flex flex-col gap-2" onClick={(e) => e.stopPropagation()} style={isHebrew ? { transform: 'scaleX(-1)' } : {}}>
                   <Button 
                     onClick={() => handlePurchaseCoupon(coupon)}
                     disabled={!freeCouponPrice && userPoints < coupon.points}
@@ -753,6 +754,7 @@ export default function UserVouchersPage() {
                   </Button>
                 </CardFooter>
               </Card>
+              </div>
             ))}
             </div>
           )}
@@ -760,7 +762,7 @@ export default function UserVouchersPage() {
 
         {/* My Coupons Tab */}
         <TabsContent value="myCoupons" className="space-y-6">
-          <h2 className="text-3xl lg:text-4xl font-bold mb-6 lg:mb-8 text-gray-900">{text.myCoupons}</h2>
+          <h2 className="text-3xl lg:text-4xl font-bold mb-6 lg:mb-8 text-gray-900 text-end" style={isHebrew ? { textAlign: 'right' } : {}}>{text.myCoupons}</h2>
           {couponHistory.length === 0 ? (
             <div className="text-center py-16 lg:py-24 bg-white rounded-2xl border-2 border-dashed border-gray-200">
               <div className="inline-flex p-4 rounded-full bg-gray-100 mb-4">
@@ -770,7 +772,7 @@ export default function UserVouchersPage() {
               <p className="text-sm lg:text-base text-gray-400">{text.historyDescription}</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 lg:gap-8">
+            <div className={`flex flex-wrap gap-6 lg:gap-8 ${isHebrew ? 'flex-row-reverse' : ''}`}>
               {couponHistory.map((userCoupon) => {
                 const coupon = userCoupon.coupon;
                 // Ensure status is properly set (default to 'active' if missing or invalid)
@@ -782,20 +784,22 @@ export default function UserVouchersPage() {
                 const isUsed = status === 'used';
                 const couponCode = coupon.description;
                 const isCodeCopied = copiedCode === couponCode;
-                
+
                 return (
-                  <Card 
-                    key={userCoupon.id} 
+                  <div key={userCoupon.id} className="w-full md:w-[calc(50%-12px)] xl:w-[calc(33.333%-16px)] 2xl:w-[calc(25%-18px)]">
+                  <Card
                     className={`relative group hover:shadow-xl transition-all duration-300 border-2 overflow-hidden flex flex-col ${
                       isActive && !isExpired 
                         ? 'border-green-200 hover:border-green-300 bg-gradient-to-br from-white to-green-50/30 opacity-100' 
                         : 'opacity-75 hover:opacity-90 border-gray-200 bg-gradient-to-br from-gray-50 to-white'
                     }`}
+                    style={isHebrew ? { transform: 'scaleX(-1)' } : {}}
                   >
                     <div className="absolute top-4 end-4 z-10" onClick={(e) => e.stopPropagation()}>
                       <Badge 
                         variant={isActive && !isExpired ? 'default' : isExpired ? 'destructive' : 'secondary'} 
                         className={`shadow-md ${isActive && !isExpired ? 'bg-green-500' : ''}`}
+                        style={isHebrew ? { transform: 'scaleX(-1)' } : {}}
                       >
                         {isActive && !isExpired ? text.active : isExpired ? text.expired : text.used}
                       </Badge>
@@ -828,19 +832,19 @@ export default function UserVouchersPage() {
                         } to-transparent`} />
                         {/* Date Overlay */}
                         <div className="absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-sm px-3 py-2">
-                          <div className="flex items-center gap-1.5 text-white text-sm font-medium">
+                          <div className="flex items-center gap-1.5 text-white text-sm font-medium" style={isHebrew ? { transform: 'scaleX(-1)', textAlign: 'right', flexDirection: 'row-reverse' } : {}}>
                             <Calendar className="h-4 w-4" />
-                            <span>{text.validUntil}: {formatDate(coupon.validTo)}</span>
+                            <span style={isHebrew ? { textAlign: 'right' } : {}}>{text.validUntil}: {formatDate(coupon.validTo)}</span>
                           </div>
                         </div>
                       </div>
                     )}
-                    <CardHeader className={coupon.imageUrl ? "pb-3" : "pt-6"}>
+                    <CardHeader className={coupon.imageUrl ? "pb-3" : "pt-6"} style={isHebrew ? { transform: 'scaleX(-1)', textAlign: 'right' } : {}}>
                       {!coupon.imageUrl && (
-                        <div className="flex items-start justify-between gap-3 mb-2">
+                        <div className="flex items-start justify-between gap-3 mb-2" style={isHebrew ? { flexDirection: 'row-reverse' } : {}}>
                           <CardTitle className={`text-xl lg:text-2xl font-bold leading-tight flex-1 ${
                             isActive && !isExpired ? 'text-gray-900' : 'text-gray-600'
-                          }`}>
+                          }`} style={isHebrew ? { textAlign: 'right' } : {}}>
                             {coupon.name}
                           </CardTitle>
                           <div className={`w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br flex-shrink-0 ${
@@ -855,11 +859,11 @@ export default function UserVouchersPage() {
                         </div>
                       )}
                       {/* One-row summary info */}
-                      <div className="flex items-center justify-between gap-2 text-sm">
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2 text-sm" style={isHebrew ? { flexDirection: 'row-reverse' } : {}}>
+                        <div className="flex items-center gap-2 flex-1 min-w-0" style={isHebrew ? { justifyContent: 'flex-end' } : {}}>
                           <span className={`font-semibold truncate ${
                             isActive && !isExpired ? 'text-gray-900' : 'text-gray-600'
-                          }`}>
+                          }`} style={isHebrew ? { textAlign: 'right', width: '100%' } : {}}>
                             {coupon.name}
                           </span>
                         </div>
@@ -867,20 +871,20 @@ export default function UserVouchersPage() {
                       {coupon.description && (
                         <p className={`text-sm mt-2 line-clamp-2 ${
                           isActive && !isExpired ? 'text-gray-600' : 'text-gray-500'
-                        }`}>
+                        }`} style={isHebrew ? { textAlign: 'right' } : {}}>
                           {coupon.description}
                         </p>
                       )}
                     </CardHeader>
-                    <CardContent className="space-y-4 flex-1 flex flex-col" onClick={(e) => e.stopPropagation()}>
+                    <CardContent className="space-y-4 flex-1 flex flex-col" onClick={(e) => e.stopPropagation()} style={isHebrew ? { transform: 'scaleX(-1)', textAlign: 'right' } : {}}>
                       <div className="space-y-4 flex-1">
                         {coupon.description && (
-                          <p className="text-sm text-gray-600 line-clamp-2">{coupon.description}</p>
+                          <p className="text-sm text-gray-600 line-clamp-2" style={isHebrew ? { textAlign: 'right' } : {}}>{coupon.description}</p>
                         )}
-                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg" style={isHebrew ? { flexDirection: 'row-reverse' } : {}}>
                           <span className={`text-sm font-medium ${
                             isActive && !isExpired ? 'text-gray-600' : 'text-gray-500'
-                          }`}>
+                          }`} style={isHebrew ? { textAlign: 'right' } : {}}>
                             {text.price}
                           </span>
                           <span className={`text-lg font-bold ${
@@ -893,7 +897,7 @@ export default function UserVouchersPage() {
                         </div>
                       </div>
                     </CardContent>
-                    <CardFooter className="pt-4 flex flex-col gap-2 mt-auto" onClick={(e) => e.stopPropagation()}>
+                    <CardFooter className="pt-4 flex flex-col gap-2 mt-auto" onClick={(e) => e.stopPropagation()} style={isHebrew ? { transform: 'scaleX(-1)' } : {}}>
                       <Button
                         variant="outline"
                         size="lg"
@@ -948,6 +952,7 @@ export default function UserVouchersPage() {
                       </Button>
                     </CardFooter>
                   </Card>
+                  </div>
                 );
               })}
             </div>
