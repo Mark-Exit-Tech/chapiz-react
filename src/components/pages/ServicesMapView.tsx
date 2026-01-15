@@ -566,55 +566,92 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
     });
   };
 
-  // Calculate distances for all services and sort them
+  // Calculate distances for all services and sort them with lazy loading
   const calculateDistancesAndSort = async (userLoc: { lat: number; lng: number }) => {
     setIsLoading(true);
 
-    // LIMIT geocoding to first 20 items
-    const ITEMS_TO_GEOCODE = 20;
-    const itemsToProcess = services.slice(0, ITEMS_TO_GEOCODE);
-    const geocodedResults: ServiceWithCoordinates[] = [];
+    // Lazy loading: First 10 items fast, rest progressively
+    const INITIAL_BATCH = 10;
+    const firstBatch = services.slice(0, INITIAL_BATCH);
+    const restBatch = services.slice(INITIAL_BATCH);
+    
+    console.log(`🚀 Processing first ${INITIAL_BATCH} services immediately...`);
 
-    for (let i = 0; i < itemsToProcess.length; i++) {
-      const service = itemsToProcess[i];
-
-      // Yield to main thread
-      if (i % 2 === 0) {
-        await new Promise(resolve => setTimeout(resolve, 50));
-      }
-
+    // Process first batch immediately
+    const initialResults: ServiceWithCoordinates[] = [];
+    for (const service of firstBatch) {
       const coords = await geocodeService(service);
       if (coords) {
         const distance = calculateDistance(userLoc.lat, userLoc.lng, coords.lat, coords.lng);
-        geocodedResults.push({
+        initialResults.push({
           ...service,
           coordinates: coords,
           distance
         });
       } else {
-        geocodedResults.push({ ...service });
+        initialResults.push({ ...service });
       }
     }
 
-    // Merge and Sort
-    const geocodedMap = new Map(geocodedResults.map(s => [s.id, s]));
-    const finalServices = services.map(s => geocodedMap.get(s.id) || s) as ServiceWithCoordinates[];
-
-    finalServices.sort((a, b) => {
-      // Helper to safely get distance or infinity if undefined
+    // Sort and display initial results immediately
+    initialResults.sort((a, b) => {
       const distA = a.distance !== undefined ? a.distance : Number.MAX_VALUE;
       const distB = b.distance !== undefined ? b.distance : Number.MAX_VALUE;
-
-      // If we have actual distances, sort by them
-      if (distA !== Number.MAX_VALUE || distB !== Number.MAX_VALUE) {
-        return distA - distB;
-      }
-      return 0;
+      return distA - distB;
     });
 
-    setServicesWithCoords(finalServices);
-    updateMapMarkers(geocodedResults); // Only add markers for geocoded ones
+    // Show first batch immediately
+    const geocodedMap = new Map(initialResults.map(s => [s.id, s]));
+    const initialDisplay = services.map(s => geocodedMap.get(s.id) || s) as ServiceWithCoordinates[];
+    setServicesWithCoords(initialDisplay);
+    updateMapMarkers(initialResults);
     setIsLoading(false);
+
+    console.log(`✅ First ${INITIAL_BATCH} services loaded. Lazy loading rest...`);
+
+    // Process rest batch progressively in background
+    if (restBatch.length > 0) {
+      (async () => {
+        const allResults = [...initialResults];
+        
+        for (let i = 0; i < restBatch.length; i++) {
+          // Yield to main thread every 2 items
+          if (i % 2 === 0) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+
+          const service = restBatch[i];
+          const coords = await geocodeService(service);
+          
+          if (coords) {
+            const distance = calculateDistance(userLoc.lat, userLoc.lng, coords.lat, coords.lng);
+            allResults.push({
+              ...service,
+              coordinates: coords,
+              distance
+            });
+          } else {
+            allResults.push({ ...service });
+          }
+
+          // Update display every 5 items
+          if (i % 5 === 4 || i === restBatch.length - 1) {
+            allResults.sort((a, b) => {
+              const distA = a.distance !== undefined ? a.distance : Number.MAX_VALUE;
+              const distB = b.distance !== undefined ? b.distance : Number.MAX_VALUE;
+              return distA - distB;
+            });
+
+            const updatedMap = new Map(allResults.map(s => [s.id, s]));
+            const updatedDisplay = services.map(s => updatedMap.get(s.id) || s) as ServiceWithCoordinates[];
+            setServicesWithCoords(updatedDisplay);
+            updateMapMarkers(allResults);
+          }
+        }
+        
+        console.log(`✅ All ${services.length} services processed`);
+      })();
+    }
   };
 
   // Update map markers
@@ -946,45 +983,97 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
     }
   }, [initialHighlightedServiceId, servicesWithCoords, map]);
 
-  // Geocode all services
+  // Geocode all services with lazy loading
   const geocodeAllServices = async (targetMap?: any) => {
     if (!geocoderRef.current) return;
 
     setIsLoading(true);
-    const servicesData: ServiceWithCoordinates[] = [];
 
     // Use default location (Israel center) if user location is not available
     const defaultLocation = { lat: 31.7683, lng: 35.2137 };
     const locationToUse = userLocation || defaultLocation;
 
-    for (const service of services) {
+    // Lazy loading: First 10 items fast, rest progressively
+    const INITIAL_BATCH = 10;
+    const firstBatch = services.slice(0, INITIAL_BATCH);
+    const restBatch = services.slice(INITIAL_BATCH);
+
+    console.log(`🚀 Geocoding first ${INITIAL_BATCH} services immediately...`);
+
+    // Process first batch immediately
+    const initialData: ServiceWithCoordinates[] = [];
+    for (const service of firstBatch) {
       const coords = await geocodeService(service);
       if (coords) {
-        // Calculate distance even if user location is not available (use default location)
         const distance = calculateDistance(locationToUse.lat, locationToUse.lng, coords.lat, coords.lng);
-        servicesData.push({
+        initialData.push({
           ...service,
           coordinates: coords,
           distance
         });
       } else {
-        // Include service even if geocoding fails
-        servicesData.push({
-          ...service
-        });
+        initialData.push({ ...service });
       }
     }
 
-    // Sort by distance if available
-    servicesData.sort((a, b) => {
+    // Sort and display initial results
+    initialData.sort((a, b) => {
       if (!a.distance) return 1;
       if (!b.distance) return -1;
       return a.distance - b.distance;
     });
 
-    setServicesWithCoords(servicesData);
-    updateMapMarkers(servicesData, targetMap);
+    const geocodedMap = new Map(initialData.map(s => [s.id, s]));
+    const initialDisplay = services.map(s => geocodedMap.get(s.id) || s) as ServiceWithCoordinates[];
+    setServicesWithCoords(initialDisplay);
+    updateMapMarkers(initialData, targetMap);
     setIsLoading(false);
+
+    console.log(`✅ First ${INITIAL_BATCH} services loaded. Lazy loading rest...`);
+
+    // Process rest batch progressively in background
+    if (restBatch.length > 0) {
+      (async () => {
+        const allData = [...initialData];
+
+        for (let i = 0; i < restBatch.length; i++) {
+          // Yield to main thread every 2 items
+          if (i % 2 === 0) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+
+          const service = restBatch[i];
+          const coords = await geocodeService(service);
+          
+          if (coords) {
+            const distance = calculateDistance(locationToUse.lat, locationToUse.lng, coords.lat, coords.lng);
+            allData.push({
+              ...service,
+              coordinates: coords,
+              distance
+            });
+          } else {
+            allData.push({ ...service });
+          }
+
+          // Update display every 5 items
+          if (i % 5 === 4 || i === restBatch.length - 1) {
+            allData.sort((a, b) => {
+              if (!a.distance) return 1;
+              if (!b.distance) return -1;
+              return a.distance - b.distance;
+            });
+
+            const updatedMap = new Map(allData.map(s => [s.id, s]));
+            const updatedDisplay = services.map(s => updatedMap.get(s.id) || s) as ServiceWithCoordinates[];
+            setServicesWithCoords(updatedDisplay);
+            updateMapMarkers(allData, targetMap);
+          }
+        }
+
+        console.log(`✅ All ${services.length} services processed`);
+      })();
+    }
   };
 
   // Reinitialize map when layout/container changes (e.g., mobile vs desktop refresh)

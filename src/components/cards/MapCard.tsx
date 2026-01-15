@@ -265,7 +265,7 @@ export default function MapCard({ businesses = [], contactInfo, title }: MapCard
         }
       };
 
-      // Handle multiple businesses
+      // Handle multiple businesses with lazy loading
       if (businesses.length > 0) {
         const businessesWithAddress = businesses.filter(b => b.contactInfo?.address);
         const totalBusinesses = businessesWithAddress.length;
@@ -275,7 +275,13 @@ export default function MapCard({ businesses = [], contactInfo, title }: MapCard
           businesses: businesses.map(b => ({ id: b.id, name: b.name, hasAddress: !!b.contactInfo?.address }))
         });
 
-        businessesWithAddress.forEach((businessItem) => {
+        // Lazy loading: Process first 10 immediately, rest progressively
+        const INITIAL_BATCH = 10;
+        const firstBatch = businessesWithAddress.slice(0, INITIAL_BATCH);
+        const restBatch = businessesWithAddress.slice(INITIAL_BATCH);
+
+        // Process first batch immediately
+        firstBatch.forEach((businessItem) => {
           const address = businessItem.contactInfo?.address;
           
           // Check if coordinates already exist (avoid unnecessary geocoding)
@@ -405,6 +411,144 @@ export default function MapCard({ businesses = [], contactInfo, title }: MapCard
             }
           });
         });
+
+        // Process rest of businesses progressively (lazy loading)
+        if (restBatch.length > 0) {
+          console.log(`⏳ MapCard: Lazy loading ${restBatch.length} additional businesses...`);
+          
+          // Process in small chunks to avoid blocking UI
+          const processRestBatch = async () => {
+            for (let i = 0; i < restBatch.length; i++) {
+              // Yield to main thread every 2 items
+              if (i % 2 === 0) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+              }
+
+              const businessItem = restBatch[i];
+              const address = businessItem.contactInfo?.address;
+              const existingCoords = (businessItem as any).coordinates || (businessItem.contactInfo as any)?.coordinates;
+
+              if (!address) continue;
+
+              // Use existing coordinates if available
+              if (existingCoords && existingCoords.lat && existingCoords.lng) {
+                const position = { lat: existingCoords.lat, lng: existingCoords.lng };
+                
+                if (!isMountedRef.current) return;
+
+                const marker = new window.google.maps.marker.AdvancedMarkerElement({
+                  position,
+                  map: mapInstance,
+                  title: businessItem.name,
+                });
+
+                const phoneDisplay = businessItem.contactInfo?.phone
+                  ? `<p style="margin: 0; color: #666; font-size: 14px;">Phone: ${businessItem.contactInfo.phone}</p>`
+                  : '';
+                const addressDisplay = address
+                  ? `<p style="margin: 0 0 8px 0; color: #666; font-size: 14px;">${address}</p>`
+                  : '';
+                const infoContent = '<div style="padding: 10px; max-width: 250px;">' +
+                  '<h3 style="margin: 0 0 8px 0; font-weight: bold; font-size: 16px;">' + businessItem.name + '</h3>' +
+                  addressDisplay +
+                  phoneDisplay +
+                  '</div>';
+
+                const infoWindow = new window.google.maps.InfoWindow({
+                  content: infoContent,
+                });
+
+                marker.addListener('click', () => {
+                  if (!isMountedRef.current) return;
+                  if (businessItem.id) {
+                    navigate(`/services?businessId=${businessItem.id}`);
+                  }
+                });
+
+                newMarkers.push({ marker, infoWindow });
+                bounds.extend(position);
+                continue;
+              }
+
+              // Geocode if no coordinates exist
+              if (!isMountedRef.current) return;
+              
+              try {
+                const result = await new Promise<any>((resolve) => {
+                  geocoder.geocode({ address }, (results: any, status: any) => {
+                    if (status === 'OK' && results && results[0]) {
+                      resolve(results[0]);
+                    } else {
+                      resolve(null);
+                    }
+                  });
+                });
+
+                if (result && isMountedRef.current) {
+                  const location = result.geometry.location;
+                  const position = { lat: location.lat(), lng: location.lng() };
+
+                  // Self-healing: Save coordinates
+                  if (businessItem.id) {
+                    (async () => {
+                      try {
+                        const { updateBusiness } = await import('@/lib/actions/admin');
+                        await updateBusiness(businessItem.id, {
+                          contactInfo: {
+                            ...businessItem.contactInfo,
+                            coordinates: position
+                          }
+                        } as any);
+                        console.log('✅ Saved coordinates for:', businessItem.name);
+                      } catch (error) {
+                        console.error('Failed to save coordinates:', error);
+                      }
+                    })();
+                  }
+
+                  const marker = new window.google.maps.marker.AdvancedMarkerElement({
+                    position,
+                    map: mapInstance,
+                    title: businessItem.name,
+                  });
+
+                  const phoneDisplay = businessItem.contactInfo?.phone
+                    ? `<p style="margin: 0; color: #666; font-size: 14px;">Phone: ${businessItem.contactInfo.phone}</p>`
+                    : '';
+                  const addressDisplay = address
+                    ? `<p style="margin: 0 0 8px 0; color: #666; font-size: 14px;">${address}</p>`
+                    : '';
+                  const infoContent = '<div style="padding: 10px; max-width: 250px;">' +
+                    '<h3 style="margin: 0 0 8px 0; font-weight: bold; font-size: 16px;">' + businessItem.name + '</h3>' +
+                    addressDisplay +
+                    phoneDisplay +
+                    '</div>';
+
+                  const infoWindow = new window.google.maps.InfoWindow({
+                    content: infoContent,
+                  });
+
+                  marker.addListener('click', () => {
+                    if (!isMountedRef.current) return;
+                    if (businessItem.id) {
+                      navigate(`/services?businessId=${businessItem.id}`);
+                    }
+                  });
+
+                  newMarkers.push({ marker, infoWindow });
+                  bounds.extend(position);
+                }
+              } catch (error) {
+                console.error('Error processing business:', error);
+              }
+            }
+            
+            console.log('✅ MapCard: Lazy loading complete');
+          };
+
+          // Start processing rest batch asynchronously
+          processRestBatch();
+        }
       }
       // Handle single contact info
       else if (contactInfo?.address) {
