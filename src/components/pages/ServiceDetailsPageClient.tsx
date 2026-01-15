@@ -215,7 +215,7 @@ const ServiceDetailsPageClient: React.FC<ServiceDetailsPageClientProps> = ({ ser
   return (
     <div className="flex flex-col flex-1 overflow-y-auto bg-gray-50" dir={isHebrew ? 'rtl' : 'ltr'}>
       {/* Header with back button */}
-      <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 md:px-8 py-4">
+      <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 md:px-8 py-4 md:!pr-[80px]">
         <div className="max-w-7xl mx-auto flex items-center gap-3">
           <Button
             variant="ghost"

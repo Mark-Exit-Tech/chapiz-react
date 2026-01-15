@@ -8,13 +8,11 @@ import { useAuth } from '@/contexts/FirebaseAuthContext';
 
 export default function BottomNavigation() {
   const pathname = usePathname();
-  const { t } = useTranslation('components');
+  const { t, i18n } = useTranslation('components');
   const { user, dbUser } = useAuth();
 
-  // Get locale from URL
-  const locale = typeof window !== 'undefined'
-    ? window.location.pathname.split('/')[1] || 'en'
-    : 'en';
+  // Get locale from i18n (works correctly on root path without locale prefix)
+  const locale = i18n.language || 'en';
   const isHebrew = locale === 'he';
 
   // Don't show bottom navigation on admin routes

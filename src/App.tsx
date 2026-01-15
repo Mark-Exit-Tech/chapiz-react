@@ -54,8 +54,8 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          {/* Redirect root to default language */}
-          <Route path="/" element={<Navigate to={`/${currentLang}`} replace />} />
+          {/* Root path renders HomePage directly - no redirect to avoid double reload */}
+          <Route path="/" element={<HomePage />} />
 
           {/* Redirect non-locale routes to locale routes */}
           <Route path="/auth" element={<Navigate to={`/${currentLang}/auth`} replace />} />
