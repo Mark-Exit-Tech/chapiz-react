@@ -64,8 +64,8 @@ const Navbar = () => {
     }
   };
 
-  // Show loading state during hydration
-  if (!isMounted || loading) {
+  // Show minimal navbar during hydration (don't block on auth loading)
+  if (!isMounted) {
     return (
       <nav className="bg-white border-b">
         <div className="mx-auto max-w-7xl w-full px-4 md:px-6" dir="ltr">

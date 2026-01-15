@@ -3,7 +3,6 @@ import BottomNavigation from '@/components/layout/BottomNavigation';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { useState, useEffect, lazy, Suspense } from 'react';
 import Footer from '@/components/layout/Footer';
 import OptimizedImage from '@/components/OptimizedImage';
@@ -102,26 +101,6 @@ const petCharacters = [
 export default function HomePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { loading } = useAuth();
-
-  // Show loading state while checking authentication
-  if (loading) {
-    return (
-      <div className="flex grow flex-col">
-        <Navbar />
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-gray-500">{t('pages.HomePage.loading')}</p>
-          </div>
-        </div>
-        {/* Bottom Navigation - only visible on mobile */}
-        <div className="md:hidden">
-          <BottomNavigation />
-        </div>
-      </div>
-    );
-  }
 
   const handleCookieAccept = () => {
     console.log('Cookies accepted');
