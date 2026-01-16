@@ -5,9 +5,10 @@ import LocaleSwitcher from '../LocaleSwitcher';
 
 const Footer = () => {
   const { t } = useTranslation();
+  const version = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.0.0';
 
   return (
-    <footer className="mt-auto border-t">
+    <footer className="mt-auto">
       <div className="py-8">
         <div className="flex flex-col items-center gap-6">
           {/* Useful Links Section */}
@@ -35,6 +36,11 @@ const Footer = () => {
           <div className="flex items-center justify-center gap-2 text-sm">
             <span className="opacity-90">{t('components.Footer.madeWithLove')}</span>
             <Heart className="text-primary m-1 h-4 w-4" />
+          </div>
+
+          {/* Version Display */}
+          <div className="flex items-center justify-center">
+            <span className="text-xs text-gray-500 opacity-70">v{version}</span>
           </div>
         </div>
       </div>
