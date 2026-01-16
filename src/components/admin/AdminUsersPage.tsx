@@ -21,6 +21,8 @@ import {
 } from '@/components/ui/dialog';
 import AddUserForm from '@/components/admin/AddUserForm';
 import AdminLayout from '@/components/admin/AdminLayout';
+import UserActions from '@/components/admin/UserActions';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -28,12 +30,16 @@ export default function AdminUsersPage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [userPets, setUserPets] = useState<Pet[]>([]);
   const [loadingPets, setLoadingPets] = useState(false);
+  const { dbUser } = useAuth();
   
   // Get locale from URL
   const locale = typeof window !== 'undefined'
     ? window.location.pathname.split('/')[1] || 'en'
     : 'en';
   const isHebrew = locale === 'he';
+  
+  // Check if current user is super admin
+  const isSuperAdmin = dbUser?.role === 'super_admin';
   
   // HARDCODED TEXT
   const text = {
@@ -252,7 +258,7 @@ export default function AdminUsersPage() {
                       <TableCell>{getRoleBadge(user.role, user.is_restricted)}</TableCell>
                       <TableCell>{formatDate(user.createdAt || user.created_at)}</TableCell>
                       <TableCell>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 items-center">
                           <button
                             onClick={() => handleViewUser(user)}
                             className="text-blue-600 hover:text-blue-900"
@@ -260,13 +266,14 @@ export default function AdminUsersPage() {
                           >
                             <Eye className="w-5 h-5" />
                           </button>
-                          <button
-                            onClick={() => handleDelete(user.uid)}
-                            className="text-red-600 hover:text-red-900"
-                            title={text.delete}
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
+                          <UserActions
+                            userId={user.uid}
+                            currentRole={user.role || 'user'}
+                            isSuperAdmin={user.role === 'super_admin'}
+                            isRestricted={user.is_restricted}
+                            phoneNumber={user.phone}
+                            userAddress={user.address}
+                          />
                         </div>
                       </TableCell>
                     </TableRow>
