@@ -576,7 +576,7 @@ export default function UserVouchersPage() {
       <Tabs value={activeTab} onValueChange={(value) => {
         setActiveTab(value);
       }} className="w-full">
-        <div className="flex justify-end mb-8 lg:mb-10">
+        <div className={`flex ${isHebrew ? 'justify-start' : 'justify-end'} mb-8 lg:mb-10`}>
         <TabsList className="grid max-w-md w-full grid-cols-2 h-12 lg:h-14 bg-gray-100/50 p-1 rounded-xl">
           <TabsTrigger 
             value="shop" 
