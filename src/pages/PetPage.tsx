@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { getPetById } from '@/lib/firebase/database/pets';
+import { getUserFromFirestore, getUserByEmail } from '@/lib/firebase/database/users';
 import PetProfilePage from '@/components/PetProfilePage';
 
 export default function PetPage() {
@@ -45,9 +46,46 @@ export default function PetPage() {
         if (petData) {
           setPet(petData);
 
-          // If pet has ownerId, we could fetch owner data if needed
-          // For now, just use the ownerId from petData
+          // Fetch owner data - try by ownerId first, then by userEmail
+          let ownerUser = null;
+          
           if (petData.ownerId) {
+            try {
+              const ownerResult = await getUserFromFirestore(petData.ownerId);
+              if (ownerResult.success && ownerResult.user) {
+                ownerUser = ownerResult.user;
+              }
+            } catch (error) {
+              console.error('Error fetching owner by ownerId:', error);
+            }
+          }
+          
+          // If ownerId fetch failed or doesn't exist, try by email
+          if (!ownerUser && petData.userEmail) {
+            try {
+              ownerUser = await getUserByEmail(petData.userEmail);
+            } catch (error) {
+              console.error('Error fetching owner by email:', error);
+            }
+          }
+          
+          // Map the user data to match the expected format
+          if (ownerUser) {
+            const ownerData = {
+              uid: ownerUser.uid,
+              fullName: ownerUser.displayName || ownerUser.full_name || ownerUser.display_name || ownerUser.name || '',
+              displayName: ownerUser.displayName || ownerUser.full_name || ownerUser.display_name || ownerUser.name || '',
+              phone: ownerUser.phone || '',
+              phoneNumber: ownerUser.phone || '',
+              email: ownerUser.email || '',
+              homeAddress: ownerUser.address || '',
+              isPhonePrivate: ownerUser.is_phone_private || false,
+              isEmailPrivate: ownerUser.is_email_private || false,
+              isAddressPrivate: ownerUser.is_address_private || false,
+            };
+            setOwner(ownerData);
+          } else if (petData.ownerId) {
+            // If user not found, at least set the uid
             setOwner({ uid: petData.ownerId });
           }
         }

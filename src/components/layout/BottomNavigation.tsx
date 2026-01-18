@@ -15,21 +15,28 @@ export default function BottomNavigation() {
   const locale = i18n.language || 'en';
   const isHebrew = locale === 'he';
 
+  // Strip locale prefix from pathname for checking routes
+  // pathname could be /he/services or /en/services, we want /services
+  const pathWithoutLocale = pathname?.startsWith(`/${locale}/`) 
+    ? pathname.substring(`/${locale}`.length) 
+    : pathname?.startsWith('/he/') || pathname?.startsWith('/en/')
+      ? pathname.substring(3) // Remove /he or /en
+      : pathname || '';
+
   // Don't show bottom navigation on admin routes
-  const isAdminRoute = pathname?.startsWith('/admin');
+  const isAdminRoute = pathWithoutLocale?.startsWith('/admin') || pathname?.startsWith('/admin');
   if (isAdminRoute) {
     return null;
   }
 
   // Don't show bottom navigation on detail pages
   // Check if pathname matches detail page patterns: /services/[id], /coupons/[id], /vouchers/[id], /pet/[id], /promos/[id]
-  // The usePathname from next-intl returns pathname without locale prefix
-  const isDetailPage = pathname && (
-    (pathname.startsWith('/services/') && pathname !== '/services') || // /services/[id] but not /services
-    (pathname.startsWith('/coupons/') && pathname !== '/coupons') || // /coupons/[id] but not /coupons
-    (pathname.startsWith('/vouchers/') && pathname !== '/vouchers') || // /vouchers/[id] but not /vouchers
-    (pathname.startsWith('/pet/') && pathname !== '/pet') || // /pet/[id] but not /pet
-    (pathname.startsWith('/promos/') && pathname !== '/promos') // /promos/[id] but not /promos
+  const isDetailPage = pathWithoutLocale && (
+    (pathWithoutLocale.startsWith('/services/') && pathWithoutLocale !== '/services') || // /services/[id] but not /services
+    (pathWithoutLocale.startsWith('/coupons/') && pathWithoutLocale !== '/coupons') || // /coupons/[id] but not /coupons
+    (pathWithoutLocale.startsWith('/vouchers/') && pathWithoutLocale !== '/vouchers') || // /vouchers/[id] but not /vouchers
+    (pathWithoutLocale.startsWith('/pet/') && pathWithoutLocale !== '/pet') || // /pet/[id] but not /pet
+    (pathWithoutLocale.startsWith('/promos/') && pathWithoutLocale !== '/promos') // /promos/[id] but not /promos
   );
   if (isDetailPage) {
     return null;
@@ -38,28 +45,28 @@ export default function BottomNavigation() {
   // Navigation items for logged-in users
   const loggedInNavItems = [
     {
-      href: '/pages/my-pets',
+      href: `/${locale}/pages/my-pets`,
       icon: PawPrint,
       label: isHebrew ? 'חיות המחמד שלי' : 'My Pets',
-      isActive: pathname?.startsWith('/pages/my-pets'),
+      isActive: pathWithoutLocale?.startsWith('/pages/my-pets'),
     },
     {
-      href: '/coupons',
+      href: `/${locale}/coupons`,
       icon: Ticket,
       label: isHebrew ? 'הקופונים שלי' : 'My Coupons',
-      isActive: pathname?.startsWith('/coupons'),
+      isActive: pathWithoutLocale?.startsWith('/coupons') && !pathWithoutLocale.startsWith('/coupons/'),
     },
     {
-      href: '/vouchers',
+      href: `/${locale}/vouchers`,
       icon: Gift,
       label: isHebrew ? 'מתנות ושוברים' : 'Gifts & Vouchers',
-      isActive: pathname?.startsWith('/vouchers'),
+      isActive: pathWithoutLocale?.startsWith('/vouchers') && !pathWithoutLocale.startsWith('/vouchers/'),
     },
     {
-      href: '/services',
+      href: `/${locale}/services`,
       icon: MapPin,
       label: isHebrew ? 'עסקים קרובים' : 'Businesses Nearby',
-      isActive: pathname?.startsWith('/services'),
+      isActive: pathWithoutLocale?.startsWith('/services') && !pathWithoutLocale.startsWith('/services/'),
     },
   ];
 
@@ -72,7 +79,7 @@ export default function BottomNavigation() {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-[10001] bg-white border-t-2 border-gray-300 shadow-lg md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-[10051] bg-white border-t-2 border-gray-300 shadow-lg md:hidden"
       style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 0.5rem)' }}
     >
       <nav className="flex items-center justify-around px-1 pt-2 pb-1">

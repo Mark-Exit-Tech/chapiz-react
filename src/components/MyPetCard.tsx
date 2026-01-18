@@ -141,7 +141,7 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
         }}
         transition={{ type: 'spring', stiffness: 200, damping: 10 }}
       >
-        <div className="flex h-full flex-col justify-between p-4">
+        <div className="flex h-full flex-col justify-between p-4 ltr:text-left rtl:text-right">
           <div className="text-lg font-bold">{name}</div>
           <div className="text-sm text-gray-600">{breed}</div>
         </div>
@@ -165,7 +165,7 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
               width={imageWidth}
               height={cardHeight}
               loading="lazy"
-              className="h-full w-full object-cover rounded-e-2xl bg-transparent"
+              className="h-full w-full object-cover ltr:rounded-e-2xl rtl:rounded-s-2xl bg-transparent"
               onLoad={handleImageLoad}
               onError={(e) => {
                 console.error('Failed to load pet image:', image);
@@ -173,7 +173,7 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
               }}
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-white rounded-e-2xl">
+            <div className="flex h-full w-full items-center justify-center bg-white ltr:rounded-e-2xl rtl:rounded-s-2xl">
               <div className="text-center">
                 <PawPrint className="h-8 w-8 text-gray-400 mx-auto" />
               </div>

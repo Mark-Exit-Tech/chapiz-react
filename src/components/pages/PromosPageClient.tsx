@@ -187,7 +187,6 @@ export default function PromosPageClient({
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-2 mb-2">
           <h3 className="font-semibold text-lg line-clamp-1">{promo.name}</h3>
-          <Tag className="w-5 h-5 text-primary flex-shrink-0" />
         </div>
         
         {promo.description && (
@@ -267,6 +266,19 @@ export default function PromosPageClient({
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <div className="flex justify-end mb-6">
         <TabsList className="grid max-w-md w-full grid-cols-2">
+          {isHebrew ? (
+            <>
+              <TabsTrigger value="history" className="flex items-center gap-2">
+                <History className="w-4 h-4" />
+                {text.usedCoupons}
+              </TabsTrigger>
+              <TabsTrigger value="available" className="flex items-center gap-2">
+                <Tag className="w-4 h-4" />
+                {text.availableCoupons}
+              </TabsTrigger>
+            </>
+          ) : (
+            <>
           <TabsTrigger value="available" className="flex items-center gap-2">
             <Tag className="w-4 h-4" />
             {text.availableCoupons}
@@ -275,6 +287,8 @@ export default function PromosPageClient({
             <History className="w-4 h-4" />
             {text.usedCoupons}
           </TabsTrigger>
+            </>
+          )}
         </TabsList>
         </div>
 

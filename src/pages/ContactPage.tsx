@@ -147,30 +147,31 @@ export default function ContactPage() {
         <div className="flex min-h-screen flex-col bg-gray-50 overflow-x-hidden" dir={isHebrew ? 'rtl' : 'ltr'}>
             <Navbar />
 
-            {/* Hero Section */}
-            <div className="bg-gradient-to-br from-orange-500 to-red-500 text-white py-16">
-                <div className="max-w-7xl mx-auto px-[3px] text-center">
-                    <motion.h2
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-4xl font-bold mb-4"
-                    >
-                        {t('pages.ContactPage.heroTitle')}
-                    </motion.h2>
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
-                        className="text-xl opacity-90 max-w-2xl mx-auto"
-                    >
-                        {t('pages.ContactPage.heroDescription')}
-                    </motion.p>
-                </div>
-            </div>
-
             {/* Contact Form and Info */}
-            <div className="pt-16">
-                <div className="max-w-7xl mx-auto px-[3px] flex justify-center">
+            <div className="pt-8 md:pt-16 pb-8 md:pb-0">
+                <div className="max-w-7xl mx-auto px-4 md:px-4">
+                    {/* Hero Section */}
+                    <div className="bg-gradient-to-br from-orange-500 to-red-500 text-white py-8 md:py-16 -mx-4 md:-mx-4 rounded-none md:rounded-lg mb-8 md:mb-16">
+                        <div className="text-center">
+                            <motion.h2
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="text-4xl font-bold mb-4"
+                            >
+                                {t('pages.ContactPage.heroTitle')}
+                            </motion.h2>
+                            <motion.p
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.1 }}
+                                className="text-xl opacity-90 max-w-2xl mx-auto"
+                            >
+                                {t('pages.ContactPage.heroDescription')}
+                            </motion.p>
+                        </div>
+                    </div>
+
+                    <div className="flex justify-center">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                         {/* Contact Form */}
                         <motion.div
@@ -395,6 +396,7 @@ export default function ContactPage() {
                                 </CardContent>
                             </Card>
                         </motion.div>
+                    </div>
                     </div>
                 </div>
             </div>

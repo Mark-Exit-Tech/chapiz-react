@@ -11,6 +11,7 @@ import {
   resetPassword as firebaseResetPassword,
 } from '@/lib/firebase/auth';
 import { getUserByUid, getUserByEmail, upsertUser, User as DBUser } from '@/lib/firebase/database/users';
+import { generateOTPCode } from '@/lib/otp-generator';
 
 // Function to determine user role
 const getUserRole = (email: string): 'user' | 'admin' | 'super_admin' => {
@@ -211,6 +212,72 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  const sendDeletionVerificationCodeHandler = async (email: string, userName?: string): Promise<{ success: boolean; message?: string }> => {
+    try {
+      // Generate OTP code
+      const otpCode = generateOTPCode();
+      
+      // Store code in localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('deletionOTPCode', otpCode);
+        localStorage.setItem('deletionOTPEmail', email);
+        localStorage.setItem('deletionOTPTimestamp', Date.now().toString());
+      }
+
+      // In development, log the code for testing
+      console.log('🔑 Deletion OTP Code generated:', otpCode);
+      console.log('📧 Deletion OTP Code would be sent to:', email);
+
+      // TODO: In production, send email via Firebase Functions or email service
+      // For now, return success (code is stored in localStorage and shown in console)
+      return {
+        success: true,
+        message: 'Verification code sent to your email'
+      };
+    } catch (error: any) {
+      console.error('Error sending deletion verification code:', error);
+      return {
+        success: false,
+        message: error.message || 'Failed to send verification code'
+      };
+    }
+  };
+
+  const getStoredDeletionOTPCodeHandler = (): string | null => {
+    if (typeof window === 'undefined') return null;
+    
+    try {
+      const timestamp = localStorage.getItem('deletionOTPTimestamp');
+      if (timestamp) {
+        const codeAge = Date.now() - parseInt(timestamp, 10);
+        // Codes expire after 10 minutes
+        if (codeAge > 10 * 60 * 1000) {
+          localStorage.removeItem('deletionOTPCode');
+          localStorage.removeItem('deletionOTPEmail');
+          localStorage.removeItem('deletionOTPTimestamp');
+          return null;
+        }
+      }
+      
+      return localStorage.getItem('deletionOTPCode');
+    } catch (error) {
+      console.error('Error getting stored deletion OTP code:', error);
+      return null;
+    }
+  };
+
+  const clearDeletionOTPCodeHandler = (): void => {
+    if (typeof window === 'undefined') return;
+    
+    try {
+      localStorage.removeItem('deletionOTPCode');
+      localStorage.removeItem('deletionOTPEmail');
+      localStorage.removeItem('deletionOTPTimestamp');
+    } catch (error) {
+      console.error('Error clearing deletion OTP code:', error);
+    }
+  };
+
   const value = {
     user,
     dbUser,
@@ -221,6 +288,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     signOut: signOutHandler,
     resetPassword: resetPasswordHandler,
     checkEmailExists: checkEmailExistsHandler,
+    sendDeletionVerificationCode: sendDeletionVerificationCodeHandler,
+    getStoredDeletionOTPCode: getStoredDeletionOTPCodeHandler,
+    clearDeletionOTPCode: clearDeletionOTPCodeHandler,
     needsGoogleProfileCompletion: false,
     completeGoogleProfile: () => {},
   };

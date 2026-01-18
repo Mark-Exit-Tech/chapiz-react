@@ -204,10 +204,10 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
   };
 
   return (
-    <div className="mx-auto max-w-7xl w-full px-4 md:px-6">
+    <div className="mx-auto max-w-7xl w-full px-4 md:px-6" dir={isHebrew ? 'rtl' : 'ltr'}>
       {/* Header */}
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{text.title}</h1>
+      <div className={`mb-4 flex items-center justify-between ${isHebrew ? 'flex-row-reverse' : ''}`}>
+        <h1 className={`text-2xl font-bold ${isHebrew ? 'text-right' : 'text-left'}`}>{text.title}</h1>
         {filteredPets.length > 0 && (
           <div className="flex items-center gap-2">
             <Button

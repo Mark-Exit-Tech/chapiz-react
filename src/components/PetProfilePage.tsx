@@ -407,21 +407,17 @@ export default function PetProfilePage({
       <Navbar />
 
       {/* Mobile View */}
-      <div className="md:hidden">
+      <div className="md:hidden" dir={isHebrew ? 'rtl' : 'ltr'}>
         <div className="relative overflow-hidden">
           {/* Back Button */}
-          <div className="absolute top-[36px] left-[36px] right-[36px] z-10 flex justify-start rtl:justify-end">
+          <div className={`absolute top-[36px] z-10 ${isHebrew ? 'right-[36px]' : 'left-[36px]'}`}>
             <Button
               variant="ghost"
               size="icon"
               onClick={() => navigate(-1)}
               className="bg-white/90 hover:bg-white shadow-md"
             >
-              {locale === 'he' ? (
-                <ArrowLeft className="h-5 w-5" />
-              ) : (
-                <ArrowRight className="h-5 w-5" />
-              )}
+              <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
             </Button>
           </div>
           <PetCard pet={petCardData} />
@@ -461,17 +457,13 @@ export default function PetProfilePage({
       <div className="hidden md:block min-h-screen bg-gray-50">
         <div className="mx-auto max-w-7xl w-full px-6 py-8">
           {/* Back Button */}
-          <div className="mb-6 flex justify-start rtl:justify-end">
+          <div className={`mb-6 flex ${isHebrew ? 'justify-start' : 'justify-start'}`} dir={isHebrew ? 'rtl' : 'ltr'}>
             <Button
               variant="ghost"
               size="icon"
               onClick={() => navigate(-1)}
             >
-              {locale === 'he' ? (
-                <ArrowLeft className="h-4 w-4" />
-              ) : (
-                <ArrowRight className="h-4 w-4" />
-              )}
+              <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
             </Button>
           </div>
 

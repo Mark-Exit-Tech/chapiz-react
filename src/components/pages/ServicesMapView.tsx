@@ -594,17 +594,24 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
     }
 
     // Sort and display initial results immediately
+    // Put services with coordinates and distance first, then sort by distance
     initialResults.sort((a, b) => {
+      // Services without coordinates go to the end
+      if (!a.coordinates && b.coordinates) return 1;
+      if (a.coordinates && !b.coordinates) return -1;
+      // If both have or both don't have coordinates, sort by distance
       const distA = a.distance !== undefined ? a.distance : Number.MAX_VALUE;
       const distB = b.distance !== undefined ? b.distance : Number.MAX_VALUE;
       return distA - distB;
     });
 
-    // Show first batch immediately
-    const geocodedMap = new Map(initialResults.map(s => [s.id, s]));
-    const initialDisplay = services.map(s => geocodedMap.get(s.id) || s) as ServiceWithCoordinates[];
+    // Show first batch immediately - use sorted results directly, then add remaining services
+    const initialDisplayIds = new Set(initialResults.map(s => s.id));
+    const remainingServices = services.filter(s => !initialDisplayIds.has(s.id));
+    const initialDisplay = [...initialResults, ...remainingServices] as ServiceWithCoordinates[];
     setServicesWithCoords(initialDisplay);
-    updateMapMarkers(initialResults);
+    // Only show markers for services with coordinates
+    updateMapMarkers(initialResults.filter(s => s.coordinates));
     setIsLoading(false);
 
     console.log(`✅ First ${INITIAL_BATCH} services loaded. Lazy loading rest...`);
@@ -636,16 +643,24 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
 
           // Update display every 5 items
           if (i % 5 === 4 || i === restBatch.length - 1) {
+            // Sort: services with coordinates and distance first, then sort by distance
             allResults.sort((a, b) => {
+              // Services without coordinates go to the end
+              if (!a.coordinates && b.coordinates) return 1;
+              if (a.coordinates && !b.coordinates) return -1;
+              // If both have or both don't have coordinates, sort by distance
               const distA = a.distance !== undefined ? a.distance : Number.MAX_VALUE;
               const distB = b.distance !== undefined ? b.distance : Number.MAX_VALUE;
               return distA - distB;
             });
 
-            const updatedMap = new Map(allResults.map(s => [s.id, s]));
-            const updatedDisplay = services.map(s => updatedMap.get(s.id) || s) as ServiceWithCoordinates[];
+            // Use sorted results directly, then add any remaining services that weren't processed
+            const processedIds = new Set(allResults.map(s => s.id));
+            const remainingServices = services.filter(s => !processedIds.has(s.id));
+            const updatedDisplay = [...allResults, ...remainingServices] as ServiceWithCoordinates[];
             setServicesWithCoords(updatedDisplay);
-            updateMapMarkers(allResults);
+            // Only show markers for services with coordinates
+            updateMapMarkers(allResults.filter(s => s.coordinates));
           }
         }
         
@@ -1017,16 +1032,24 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
     }
 
     // Sort and display initial results
+    // Put services with coordinates and distance first, then sort by distance
     initialData.sort((a, b) => {
-      if (!a.distance) return 1;
-      if (!b.distance) return -1;
-      return a.distance - b.distance;
+      // Services without coordinates go to the end
+      if (!a.coordinates && b.coordinates) return 1;
+      if (a.coordinates && !b.coordinates) return -1;
+      // If both have or both don't have coordinates, sort by distance
+      const distA = a.distance !== undefined ? a.distance : Number.MAX_VALUE;
+      const distB = b.distance !== undefined ? b.distance : Number.MAX_VALUE;
+      return distA - distB;
     });
 
-    const geocodedMap = new Map(initialData.map(s => [s.id, s]));
-    const initialDisplay = services.map(s => geocodedMap.get(s.id) || s) as ServiceWithCoordinates[];
+    // Use sorted results directly, then add remaining services
+    const initialDisplayIds = new Set(initialData.map(s => s.id));
+    const remainingServices = services.filter(s => !initialDisplayIds.has(s.id));
+    const initialDisplay = [...initialData, ...remainingServices] as ServiceWithCoordinates[];
     setServicesWithCoords(initialDisplay);
-    updateMapMarkers(initialData, targetMap);
+    // Only show markers for services with coordinates
+    updateMapMarkers(initialData.filter(s => s.coordinates), targetMap);
     setIsLoading(false);
 
     console.log(`✅ First ${INITIAL_BATCH} services loaded. Lazy loading rest...`);
@@ -1058,16 +1081,24 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
 
           // Update display every 5 items
           if (i % 5 === 4 || i === restBatch.length - 1) {
+            // Sort: services with coordinates and distance first, then sort by distance
             allData.sort((a, b) => {
-              if (!a.distance) return 1;
-              if (!b.distance) return -1;
-              return a.distance - b.distance;
+              // Services without coordinates go to the end
+              if (!a.coordinates && b.coordinates) return 1;
+              if (a.coordinates && !b.coordinates) return -1;
+              // If both have or both don't have coordinates, sort by distance
+              const distA = a.distance !== undefined ? a.distance : Number.MAX_VALUE;
+              const distB = b.distance !== undefined ? b.distance : Number.MAX_VALUE;
+              return distA - distB;
             });
 
-            const updatedMap = new Map(allData.map(s => [s.id, s]));
-            const updatedDisplay = services.map(s => updatedMap.get(s.id) || s) as ServiceWithCoordinates[];
+            // Use sorted results directly, then add any remaining services that weren't processed
+            const processedIds = new Set(allData.map(s => s.id));
+            const remainingServices = services.filter(s => !processedIds.has(s.id));
+            const updatedDisplay = [...allData, ...remainingServices] as ServiceWithCoordinates[];
             setServicesWithCoords(updatedDisplay);
-            updateMapMarkers(allData, targetMap);
+            // Only show markers for services with coordinates
+            updateMapMarkers(allData.filter(s => s.coordinates), targetMap);
           }
         }
 

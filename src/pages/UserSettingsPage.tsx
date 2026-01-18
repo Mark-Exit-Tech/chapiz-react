@@ -10,7 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ArrowLeft, User, Phone, Camera, Loader2, Save, Globe, Upload, CheckCircle, XCircle, LogOut } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { uploadProfileImage, testStorageConnection } from '@/lib/firebase/storage';
-import { updateUserByUid, getUserFromFirestore } from '@/lib/firebase/database/users';
+import { updateUserByUid, getUserFromFirestore, deleteUser as deleteUserFromDB } from '@/lib/firebase/database/users';
+import { getPetsByUserEmail, deletePet } from '@/lib/firebase/database/pets';
 import LocationAutocompleteComboSelect from '@/components/get-started/ui/LocationAutocompleteSelector';
 import DeletionVerificationPage from '@/components/auth/DeletionVerificationPage';
 import Navbar from '@/components/layout/Navbar';
@@ -249,30 +250,63 @@ const ProfileContent = () => {
   };
 
   const handleDeleteAccount = async () => {
-    if (!user) return;
+    if (!user || !dbUser) return;
+
+    // Confirm deletion
+    const confirmMessage = isHebrew 
+      ? 'האם אתה בטוח שברצונך למחוק את החשבון? פעולה זו לא ניתנת לביטול.'
+      : 'Are you sure you want to delete your account? This action cannot be undone.';
+    
+    if (!confirm(confirmMessage)) {
+      return;
+    }
 
     setDeletingAccount(true);
     try {
-      const userName = dbUser?.display_name || dbUser?.full_name || dbUser?.full_name || 'User';
-      const result = await sendDeletionVerificationCode(user.email!, userName);
-
-      if (result.success) {
-        toast.success(t('pages.UserSettingsPage.deleteAccount.codeSent') || 'Verification code sent to your email');
-        setShowDeletionVerification(true);
-      } else {
-        toast.error(result.message || 'Failed to send verification code');
-      }
+      // Directly delete without verification code
+      await handleVerifiedDeletion();
     } catch (error: any) {
-      console.error('Error sending deletion verification code:', error);
-      toast.error('Failed to send verification code. Please try again.');
+      console.error('Error deleting account:', error);
+      toast.error(isHebrew ? 'נכשל במחיקת החשבון' : 'Failed to delete account. Please try again.');
     } finally {
       setDeletingAccount(false);
     }
   };
 
   const handleVerifiedDeletion = async () => {
-    toast.error('Account deletion is temporarily unavailable. Please contact support.');
+    if (!user || !dbUser) return;
+
+    setDeletingAccount(true);
+    try {
+      // 1. Delete user's pets
+      const userPets = await getPetsByUserEmail(user.email!);
+      for (const pet of userPets) {
+        try {
+          await deletePet(pet.id);
+        } catch (error) {
+          console.error(`Error deleting pet ${pet.id}:`, error);
+        }
+      }
+
+      // 2. Delete user document from Firestore
+      await deleteUserFromDB(dbUser.uid);
+
+      toast.success(isHebrew ? 'החשבון נמחק בהצלחה' : 'Account deleted successfully');
+
+      // 3. Sign out user
+      await signOut();
+
+      // 4. Redirect to landing page
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1000);
+    } catch (error: any) {
+      console.error('Error deleting account:', error);
+      toast.error(isHebrew ? 'נכשל במחיקת החשבון' : 'Failed to delete account. Please try again.');
+    } finally {
+      setDeletingAccount(false);
     setShowDeletionVerification(false);
+    }
   };
 
   if (authLoading) {
@@ -310,7 +344,7 @@ const ProfileContent = () => {
               <Button variant="ghost" onClick={handleBack} className="p-2">
                 <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
               </Button>
-              <div>
+              <div className={`${isHebrew ? 'text-right' : 'text-left'}`}>
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
                   {t('pages.UserSettingsPage.title')}
                 </h1>
@@ -320,7 +354,7 @@ const ProfileContent = () => {
               </div>
             </div>
 
-            <div className="flex justify-end md:justify-start">
+            <div className="flex justify-end">
               <Button onClick={() => handleSave()} disabled={saving} className="bg-primary hover:bg-primary/90 text-white px-8">
                 {saving ? (
                   <div className="flex items-center gap-2">
@@ -443,16 +477,16 @@ const ProfileContent = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
+            <div className={`space-y-2 ${isHebrew ? 'text-right' : 'text-left'}`}>
               <Label htmlFor="language">{t('pages.UserSettingsPage.preferredLanguage')}</Label>
               <Select value={formData.language} onValueChange={handleLanguageChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder={t('pages.UserSettingsPage.selectLanguage')} />
+                <SelectTrigger className={isHebrew ? 'rtl:flex-row-reverse rtl:text-right [&>span]:rtl:text-right' : ''}>
+                  <SelectValue placeholder={t('pages.UserSettingsPage.selectLanguage')} className="rtl:text-right" />
                 </SelectTrigger>
                 <SelectContent>
                   {languages.map((lang) => (
                     <SelectItem key={lang.code} value={lang.code}>
-                      <div className="flex items-center gap-2">
+                      <div className={`flex items-center gap-2 ${isHebrew ? 'flex-row-reverse' : ''}`}>
                         <span>{lang.flag}</span>
                         <span>{lang.name}</span>
                       </div>
@@ -481,9 +515,7 @@ const ProfileContent = () => {
 export default function UserSettingsPage() {
   return (
     <>
-      <div className="hidden md:block">
         <Navbar />
-      </div>
       <ProfileContent />
       <div className="md:hidden">
         <BottomNavigation />

@@ -284,13 +284,12 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
 
             {/* Action Buttons */}
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col sm:flex-row gap-4">
                 <Button
                   variant={isUsed ? "secondary" : "default"}
                   size="lg"
                   onClick={handleUseCouponClick}
                   disabled={isUsed || isUsingCoupon}
-                  className="flex-1"
+                className="w-full"
                 >
                   {isUsingCoupon ? (
                     <>
@@ -313,12 +312,11 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
                   variant="outline"
                   size="lg"
                   onClick={handleShare}
-                  className="flex-1"
+                className="w-full"
                 >
                   <Share2 className="w-4 h-4 me-2" />
                   {text.share}
                 </Button>
-              </div>
             </div>
 
             {/* Confirmation Dialog */}

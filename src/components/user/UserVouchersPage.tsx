@@ -92,6 +92,7 @@ export default function UserVouchersPage() {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [selectedCouponImage, setSelectedCouponImage] = useState<{ imageUrl: string; name: string; description?: string; coupon?: Coupon; userCoupon?: UserCoupon } | null>(null);
   const [isDesktop, setIsDesktop] = useState(false);
+  const [activeSnapPoint, setActiveSnapPoint] = useState<number | string | null>(0.7);
   const { redirectToShop, getShopUrl } = useShopRedirect();
 
   useEffect(() => {
@@ -576,22 +577,43 @@ export default function UserVouchersPage() {
       <Tabs value={activeTab} onValueChange={(value) => {
         setActiveTab(value);
       }} className="w-full">
-        <div className={`flex ${isHebrew ? 'justify-start' : 'justify-end'} mb-8 lg:mb-10`}>
+        <div className="flex justify-end mb-8 lg:mb-10">
         <TabsList className="grid max-w-md w-full grid-cols-2 h-12 lg:h-14 bg-gray-100/50 p-1 rounded-xl">
-          <TabsTrigger 
-            value="shop" 
-            className="flex items-center gap-2 text-sm lg:text-base font-medium data-[state=active]:bg-white data-[state=active]:shadow-md transition-all rounded-lg"
-          >
-            <ShoppingCart className="h-4 w-4 lg:h-5 lg:w-5" />
-            {text.shop}
-          </TabsTrigger>
-          <TabsTrigger 
-            value="myCoupons" 
-            className="flex items-center gap-2 text-sm lg:text-base font-medium data-[state=active]:bg-white data-[state=active]:shadow-md transition-all rounded-lg"
-          >
-            <Wallet className="h-4 w-4 lg:h-5 lg:w-5" />
-            {text.myCoupons}
-          </TabsTrigger>
+          {isHebrew ? (
+            <>
+              <TabsTrigger 
+                value="myCoupons" 
+                className="flex items-center gap-2 text-sm lg:text-base font-medium data-[state=active]:bg-white data-[state=active]:shadow-md transition-all rounded-lg"
+              >
+                <Wallet className="h-4 w-4 lg:h-5 lg:w-5" />
+                {text.myCoupons}
+              </TabsTrigger>
+              <TabsTrigger 
+                value="shop" 
+                className="flex items-center gap-2 text-sm lg:text-base font-medium data-[state=active]:bg-white data-[state=active]:shadow-md transition-all rounded-lg"
+              >
+                <ShoppingCart className="h-4 w-4 lg:h-5 lg:w-5" />
+                {text.shop}
+              </TabsTrigger>
+            </>
+          ) : (
+            <>
+              <TabsTrigger 
+                value="shop" 
+                className="flex items-center gap-2 text-sm lg:text-base font-medium data-[state=active]:bg-white data-[state=active]:shadow-md transition-all rounded-lg"
+              >
+                <ShoppingCart className="h-4 w-4 lg:h-5 lg:w-5" />
+                {text.shop}
+              </TabsTrigger>
+              <TabsTrigger 
+                value="myCoupons" 
+                className="flex items-center gap-2 text-sm lg:text-base font-medium data-[state=active]:bg-white data-[state=active]:shadow-md transition-all rounded-lg"
+              >
+                <Wallet className="h-4 w-4 lg:h-5 lg:w-5" />
+                {text.myCoupons}
+              </TabsTrigger>
+            </>
+          )}
         </TabsList>
         </div>
 
@@ -619,6 +641,7 @@ export default function UserVouchersPage() {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
+                      setActiveSnapPoint(0.7); // Reset to initial snap point
                       setSelectedCouponImage({ imageUrl: coupon.imageUrl, name: coupon.name, description: coupon.description, coupon });
                     }}
                   >
@@ -812,6 +835,7 @@ export default function UserVouchersPage() {
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
+                          setActiveSnapPoint(0.7); // Reset to initial snap point
                           setSelectedCouponImage({ imageUrl: coupon.imageUrl, name: coupon.name, description: coupon.description, userCoupon });
                         }}
                       >
@@ -1068,7 +1092,23 @@ export default function UserVouchersPage() {
           </DialogContent>
         </Dialog>
       ) : (
-        <Drawer open={!!selectedCouponImage} onOpenChange={(open) => !open && setSelectedCouponImage(null)}>
+        <Drawer 
+          open={!!selectedCouponImage} 
+          onOpenChange={(open) => {
+            if (!open) {
+              setSelectedCouponImage(null);
+              setActiveSnapPoint(0.7); // Reset to initial snap point
+            }
+          }}
+          snapPoints={[0.7, 1]}
+          activeSnapPoint={activeSnapPoint}
+          setActiveSnapPoint={(snap) => {
+            if (snap !== null) {
+              setActiveSnapPoint(snap);
+            }
+          }}
+          dismissible={true}
+        >
           <DrawerContent className="max-h-[85vh]" dir={isHebrew ? 'rtl' : 'ltr'}>
             {selectedCouponImage && (
               <>
@@ -1163,20 +1203,72 @@ export default function UserVouchersPage() {
                       </Button>
                     )}
                     {selectedCouponImage.userCoupon && (
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          navigate(`/${locale}/vouchers/${selectedCouponImage.userCoupon!.id}`);
-                          setSelectedCouponImage(null);
-                        }}
-                        className="w-full border-2 flex items-center justify-center gap-2 h-12"
-                        size="lg"
-                      >
-                        <QrCode className="h-5 w-5" />
-                        <span className="font-semibold">{text.showQR}</span>
-                      </Button>
+                      <>
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            navigate(`/${locale}/vouchers/${selectedCouponImage.userCoupon!.id}`);
+                            setSelectedCouponImage(null);
+                          }}
+                          className="w-full border-2 flex items-center justify-center gap-2 h-12"
+                          size="lg"
+                        >
+                          <QrCode className="h-5 w-5" />
+                          <span className="font-semibold">{text.showQR}</span>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          className="w-full border-2 flex items-center justify-center gap-2 h-12"
+                          onClick={async () => {
+                            const coupon = selectedCouponImage.userCoupon?.coupon;
+                            if (!coupon) return;
+
+                            // Get business IDs from coupon - fetch if needed
+                            let couponToUse = coupon;
+                            
+                            // If no businessIds found, fetch the coupon to get them
+                            const hasBusinessIds = couponToUse?.businessIds && Array.isArray(couponToUse.businessIds) && couponToUse.businessIds.length > 0;
+                            const hasBusinessId = !!couponToUse?.businessId;
+                            
+                            if (!hasBusinessIds && !hasBusinessId && couponToUse?.id) {
+                              // Fetch the coupon to get businessIds
+                              const result = await getCouponById(couponToUse.id);
+                              if (result.success && result.coupon) {
+                                couponToUse = result.coupon as Coupon;
+                              }
+                            }
+                            
+                            // Parse and normalize businessIds to ensure it's always an array
+                            let businessIds: string[] = [];
+                            if (couponToUse?.businessIds) {
+                              if (Array.isArray(couponToUse.businessIds)) {
+                                businessIds = couponToUse.businessIds.filter(id => id != null && id !== '');
+                              } else if (typeof couponToUse.businessIds === 'string') {
+                                businessIds = [couponToUse.businessIds];
+                              }
+                            } else if (couponToUse?.businessId) {
+                              businessIds = [couponToUse.businessId];
+                            }
+                            
+                            setSelectedCouponImage(null);
+                            if (businessIds.length > 0) {
+                              const idsString = businessIds.join(',');
+                              navigate(`/${locale}/services?businessId=${idsString}`);
+                            } else {
+                              navigate(`/${locale}/services`);
+                            }
+                          }}
+                        >
+                          <MapPin className="h-5 w-5" />
+                          <span className="font-semibold">{text.showMap}</span>
+                        </Button>
+                      </>
                     )}
                   </div>
+                  
+                  {/* Big bottom spacer */}
+                  <div className="h-20 md:h-24" />
                 </div>
               </>
             )}

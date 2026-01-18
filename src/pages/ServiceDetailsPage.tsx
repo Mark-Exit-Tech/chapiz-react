@@ -1,7 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import Navbar from '@/components/layout/Navbar';
-import BottomNavigation from '@/components/layout/BottomNavigation';
 import ServiceDetailsPageClient from '@/components/pages/ServiceDetailsPageClient';
 import { getBusinessById } from '@/lib/firebase/database/businesses';
 import { getAdById } from '@/lib/firebase/database/advertisements';
@@ -90,7 +89,6 @@ export default function ServiceDetailsPage() {
         <div className="flex grow flex-col h-[calc(100vh-64px)] pb-16 md:pb-0 items-center justify-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
-        <BottomNavigation />
       </>
     );
   }
@@ -101,7 +99,6 @@ export default function ServiceDetailsPage() {
       <div className="flex grow flex-col h-[calc(100vh-64px)] pb-16 md:pb-0">
         <ServiceDetailsPageClient service={service} />
       </div>
-      <BottomNavigation />
     </>
   );
 }

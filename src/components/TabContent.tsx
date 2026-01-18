@@ -55,20 +55,16 @@ const renderDetails = (
   const isRTL = locale === 'he';
 
   return (
-    <Card className="mx-auto mt-4 w-[325px] border-none bg-transparent shadow-none">
+    <Card className={`mx-auto mt-4 w-[325px] border-none bg-transparent shadow-none ${isRTL ? 'rtl' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
       <CardContent className="p-0">
         <div className="space-y-0.5">
           {filtered.map((detail, index) => {
-            const valueClassName = isRTL
-              ? 'flex-1 text-lg font-medium text-black break-words text-left ml-2 rtl-desktop-right'
-              : 'flex-1 text-lg font-medium text-black break-words text-left ml-2';
-
             return (
-              <div key={index} className="flex min-h-[22px] items-start">
-                <span className="w-[76px] text-lg font-light text-gray-400 flex-shrink-0 text-right">
+              <div key={index} className={`flex min-h-[22px] items-start ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <span className={`w-[76px] text-lg font-light text-gray-400 flex-shrink-0 ${isRTL ? 'text-left' : 'text-right'}`}>
                   {detail.label}
                 </span>
-                <span className={valueClassName}>
+                <span className={`flex-1 text-lg font-medium text-black break-words ${isRTL ? 'text-right mr-2' : 'text-left ml-2'}`}>
                   {detail.link ? (
                     <a href={detail.link} className="underline">
                       {detail.value}
@@ -97,6 +93,8 @@ const renderDetails = (
 const DeletePetButton = ({ petId, onDelete }: { petId: string; onDelete: (petId: string) => void }) => {
   const { t } = useTranslation('Pet');
   const [deleting, setDeleting] = useState(false);
+  const locale = useLocale();
+  const isRTL = locale === 'he';
 
   const handleDelete = async () => {
     setDeleting(true);
@@ -116,9 +114,9 @@ const DeletePetButton = ({ petId, onDelete }: { petId: string; onDelete: (petId:
       variant="destructive"
       onClick={handleDelete}
       disabled={deleting}
-      className="w-full"
+      className={`w-full flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}
     >
-      <Trash2 className="h-4 w-4 mr-2" />
+      <Trash2 className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
       {deleting ? t('actions.deleting') : t('actions.deletePet')}
     </Button>
   );
