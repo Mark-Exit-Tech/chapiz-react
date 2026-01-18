@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { getContactInfo } from '@/lib/actions/admin';
+import { getSiteSettings } from '@/lib/firebase/database/settings';
 import { Button } from '../ui/button';
 import OptimizedImage from '@/components/OptimizedImage';
 import {
@@ -31,6 +32,7 @@ const Navbar = () => {
   const { user, loading, signOut } = useAuth();
   const [isMounted, setIsMounted] = useState(false);
   const [storeUrl, setStoreUrl] = useState('');
+  const [logoUrl, setLogoUrl] = useState('');
   const navigate = useNavigate();
   const locale = i18n.language || 'en';
 
@@ -39,19 +41,23 @@ const Navbar = () => {
     setIsMounted(true);
   }, []);
 
-  // Fetch store URL from settings
+  // Fetch store URL and logo from settings
   useEffect(() => {
-    const fetchStoreUrl = async () => {
+    const fetchSettings = async () => {
       try {
         const info = await getContactInfo();
         if (info?.storeUrl) {
           setStoreUrl(info.storeUrl);
         }
+        const settings = await getSiteSettings();
+        if (settings?.logoUrl) {
+          setLogoUrl(settings.logoUrl);
+        }
       } catch (error) {
-        console.error('Failed to fetch store URL:', error);
+        console.error('Failed to fetch settings:', error);
       }
     };
-    fetchStoreUrl();
+    fetchSettings();
   }, []);
 
   const handleLogout = async () => {
@@ -83,13 +89,27 @@ const Navbar = () => {
         <div className="flex h-14 sm:h-16 items-center justify-between flex-nowrap">
           {/* Brand / Logo */}
           <Link to="/" className="flex-shrink-0 flex items-center">
-            <OptimizedImage
-              src="/assets/Chapiz-logo"
-              alt="Chapiz"
-              width={96}
-              height={96}
-              className="h-10 sm:h-12 w-auto object-contain"
-            />
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt="Chapiz"
+                className="h-10 sm:h-12 w-auto object-contain"
+                style={{ maxHeight: '48px' }}
+                onError={(e) => {
+                  e.currentTarget.src = '/assets/Chapiz-logo.png';
+                }}
+              />
+            ) : (
+              <img
+                src="/assets/Chapiz-logo.webp"
+                alt="Chapiz"
+                className="h-10 sm:h-12 w-auto object-contain"
+                style={{ maxHeight: '48px' }}
+                onError={(e) => {
+                  e.currentTarget.src = '/assets/Chapiz-logo.png';
+                }}
+              />
+            )}
           </Link>
 
           {/* Right Side Navigation */}
