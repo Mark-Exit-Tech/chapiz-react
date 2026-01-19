@@ -454,10 +454,10 @@ export default function PetProfilePage({
       </div>
 
       {/* Desktop View */}
-      <div className="hidden md:block min-h-screen bg-gray-50">
+      <div className="hidden md:block min-h-screen bg-gray-50" dir={isHebrew ? 'rtl' : 'ltr'}>
         <div className="mx-auto max-w-7xl w-full px-6 py-8">
           {/* Back Button */}
-          <div className={`mb-6 flex ${isHebrew ? 'justify-start' : 'justify-start'}`} dir={isHebrew ? 'rtl' : 'ltr'}>
+          <div className={`mb-6 flex ${isHebrew ? 'justify-start' : 'justify-start'}`}>
             <Button
               variant="ghost"
               size="icon"
@@ -467,24 +467,10 @@ export default function PetProfilePage({
             </Button>
           </div>
 
-          {/* Main Content: Image Left, Cards Right */}
+          {/* Main Content: Description Left, Image Right (mirrored for RTL) */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left Side - Pet Image */}
-            <div className="flex flex-col">
-              <div className="sticky top-24">
-                <div className="relative w-full" style={{ height: '600px' }}>
-                  <div className="absolute inset-0 [&>div]:!mt-0 [&>div]:!px-0 [&>div>div]:!h-full [&>div>div>div]:!h-full">
-                    <PetCard pet={petCardData} />
-                  </div>
-                </div>
-              </div>
-              <div className="mt-6 flex justify-center">
-                <ShareButton />
-              </div>
-            </div>
-
-            {/* Right Side - Tabs and Content */}
-            <div className="flex flex-col">
+            {/* Description Side - Left for LTR, Right for RTL */}
+            <div className={`flex flex-col ${isHebrew ? 'lg:order-2' : 'lg:order-1'}`}>
               <div className="bg-white rounded-2xl shadow-lg flex flex-col" style={{ height: '600px' }}>
                 <div className="p-6 pb-0 flex-shrink-0">
                   <AnimatedTabs
@@ -502,6 +488,20 @@ export default function PetProfilePage({
                     vetInfo={vetInfo}
                   />
                 </div>
+              </div>
+            </div>
+
+            {/* Image Side - Right for LTR, Left for RTL */}
+            <div className={`flex flex-col ${isHebrew ? 'lg:order-1' : 'lg:order-2'}`}>
+              <div className="sticky top-24">
+                <div className="relative w-full" style={{ height: '600px' }}>
+                  <div className="absolute inset-0 [&>div]:!mt-0 [&>div]:!px-0 [&>div>div]:!h-full [&>div>div>div]:!h-full">
+                    <PetCard pet={petCardData} />
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6 flex justify-center">
+                <ShareButton />
               </div>
             </div>
           </div>

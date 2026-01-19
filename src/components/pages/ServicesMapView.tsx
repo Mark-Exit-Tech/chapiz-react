@@ -40,6 +40,7 @@ interface ServicesMapViewProps {
   headerContent?: React.ReactNode;
   mapFloatingControls?: React.ReactNode;
   initialHighlightedServiceId?: string;
+  filterType?: 'all' | 'favorites';
 }
 
 declare global {
@@ -54,7 +55,7 @@ interface ServiceWithCoordinates extends Service {
   distance?: number;
 }
 
-const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerContent, mapFloatingControls, initialHighlightedServiceId }) => {
+const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerContent, mapFloatingControls, initialHighlightedServiceId, filterType = 'all' }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const locale = useLocale();
@@ -70,8 +71,12 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
   };
   const [map, setMap] = useState<any>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [servicesWithCoords, setServicesWithCoords] = useState<ServiceWithCoordinates[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Initialize services immediately if favorites is active
+  const [servicesWithCoords, setServicesWithCoords] = useState<ServiceWithCoordinates[]>(
+    filterType === 'favorites' ? (services as ServiceWithCoordinates[]) : []
+  );
+  // Initialize loading state based on filterType - if favorites, don't show loading
+  const [isLoading, setIsLoading] = useState(filterType !== 'favorites');
   const [locationPermission, setLocationPermission] = useState<'granted' | 'denied' | 'prompt'>('prompt');
   const [hasRequestedLocation, setHasRequestedLocation] = useState(false);
   const [markers, setMarkers] = useState<any[]>([]);
@@ -100,7 +105,6 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [floatingCardPosition, setFloatingCardPosition] = useState<{ x: number; y: number } | null>(null);
-  const geocoderRef = useRef<any>(null);
   const { user, dbUser } = useAuth();
 
   // Handle window resize to update isMobile state
@@ -453,9 +457,12 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
             });
           }
 
-          // Calculate distances and sort services
-          calculateDistancesAndSort(location);
-          setIsLoading(false);
+          // Calculate distances and sort services (skip if favorites filter is active)
+          if (filterType !== 'favorites') {
+            calculateDistancesAndSort(location);
+          } else {
+            setIsLoading(false);
+          }
         },
         (error: GeolocationPositionError | null | undefined) => {
           setLocationPermission('denied');
@@ -521,81 +528,42 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
     }
   };
 
-  // Geocode service address to get coordinates
-  const geocodeService = async (service: Service): Promise<{ lat: number; lng: number } | null> => {
-    // Check if coordinates already exist (avoid unnecessary geocoding)
+  // Get coordinates from service data (already saved by admin, no geocoding needed)
+  const getServiceCoordinates = (service: Service): { lat: number; lng: number } | null => {
+    // Use coordinates that were already saved by admin
     const existingCoords = (service as any).coordinates;
     if (existingCoords && existingCoords.lat && existingCoords.lng) {
-      console.log('✅ Using cached coordinates for:', service.name);
       return existingCoords;
     }
-
-    if (!geocoderRef.current) return null;
-
-    const address = service.address || service.location;
-    if (!address) return null;
-
-    console.log('🔍 Geocoding address for:', service.name);
-    return new Promise((resolve) => {
-      geocoderRef.current.geocode({ address }, (results: any[], status: any) => {
-        if (status === 'OK' && results[0]) {
-          const location = results[0].geometry.location;
-          const coordinates = {
-            lat: location.lat(),
-            lng: location.lng()
-          };
-          
-          // Self-healing: Save coordinates to database for future use
-          if (service.id) {
-            (async () => {
-              try {
-                const { updateAd } = await import('@/lib/actions/admin');
-                await updateAd(service.id!, { coordinates });
-                console.log('✅ Saved coordinates for:', service.name);
-              } catch (error) {
-                console.error('❌ Failed to save coordinates:', error);
-              }
-            })();
-          }
-          
-          resolve(coordinates);
-        } else {
-          resolve(null);
-        }
-      });
-    });
+    return null;
   };
 
-  // Calculate distances for all services and sort them with lazy loading
-  const calculateDistancesAndSort = async (userLoc: { lat: number; lng: number }) => {
+  // Calculate distances for all services using existing coordinates (no geocoding)
+  const calculateDistancesAndSort = (userLoc: { lat: number; lng: number }) => {
+    // Skip if favorites filter is active
+    if (filterType === 'favorites') {
+      setIsLoading(false);
+      return;
+    }
+    
     setIsLoading(true);
 
-    // Lazy loading: First 10 items fast, rest progressively
-    const INITIAL_BATCH = 10;
-    const firstBatch = services.slice(0, INITIAL_BATCH);
-    const restBatch = services.slice(INITIAL_BATCH);
-    
-    console.log(`🚀 Processing first ${INITIAL_BATCH} services immediately...`);
-
-    // Process first batch immediately
-    const initialResults: ServiceWithCoordinates[] = [];
-    for (const service of firstBatch) {
-      const coords = await geocodeService(service);
+    // Use existing coordinates from database (saved by admin)
+    const servicesWithData: ServiceWithCoordinates[] = services.map(service => {
+      const coords = getServiceCoordinates(service);
       if (coords) {
         const distance = calculateDistance(userLoc.lat, userLoc.lng, coords.lat, coords.lng);
-        initialResults.push({
+        return {
           ...service,
           coordinates: coords,
           distance
-        });
-      } else {
-        initialResults.push({ ...service });
+        };
       }
-    }
+      return { ...service };
+    });
 
-    // Sort and display initial results immediately
-    // Put services with coordinates and distance first, then sort by distance
-    initialResults.sort((a, b) => {
+    // Sort: services with coordinates and distance first, then sort by distance
+    servicesWithData.sort((a, b) => {
       // Services without coordinates go to the end
       if (!a.coordinates && b.coordinates) return 1;
       if (a.coordinates && !b.coordinates) return -1;
@@ -605,68 +573,10 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
       return distA - distB;
     });
 
-    // Show first batch immediately - use sorted results directly, then add remaining services
-    const initialDisplayIds = new Set(initialResults.map(s => s.id));
-    const remainingServices = services.filter(s => !initialDisplayIds.has(s.id));
-    const initialDisplay = [...initialResults, ...remainingServices] as ServiceWithCoordinates[];
-    setServicesWithCoords(initialDisplay);
+    setServicesWithCoords(servicesWithData);
     // Only show markers for services with coordinates
-    updateMapMarkers(initialResults.filter(s => s.coordinates));
+    updateMapMarkers(servicesWithData.filter(s => s.coordinates));
     setIsLoading(false);
-
-    console.log(`✅ First ${INITIAL_BATCH} services loaded. Lazy loading rest...`);
-
-    // Process rest batch progressively in background
-    if (restBatch.length > 0) {
-      (async () => {
-        const allResults = [...initialResults];
-        
-        for (let i = 0; i < restBatch.length; i++) {
-          // Yield to main thread every 2 items
-          if (i % 2 === 0) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-          }
-
-          const service = restBatch[i];
-          const coords = await geocodeService(service);
-          
-          if (coords) {
-            const distance = calculateDistance(userLoc.lat, userLoc.lng, coords.lat, coords.lng);
-            allResults.push({
-              ...service,
-              coordinates: coords,
-              distance
-            });
-          } else {
-            allResults.push({ ...service });
-          }
-
-          // Update display every 5 items
-          if (i % 5 === 4 || i === restBatch.length - 1) {
-            // Sort: services with coordinates and distance first, then sort by distance
-            allResults.sort((a, b) => {
-              // Services without coordinates go to the end
-              if (!a.coordinates && b.coordinates) return 1;
-              if (a.coordinates && !b.coordinates) return -1;
-              // If both have or both don't have coordinates, sort by distance
-              const distA = a.distance !== undefined ? a.distance : Number.MAX_VALUE;
-              const distB = b.distance !== undefined ? b.distance : Number.MAX_VALUE;
-              return distA - distB;
-            });
-
-            // Use sorted results directly, then add any remaining services that weren't processed
-            const processedIds = new Set(allResults.map(s => s.id));
-            const remainingServices = services.filter(s => !processedIds.has(s.id));
-            const updatedDisplay = [...allResults, ...remainingServices] as ServiceWithCoordinates[];
-            setServicesWithCoords(updatedDisplay);
-            // Only show markers for services with coordinates
-            updateMapMarkers(allResults.filter(s => s.coordinates));
-          }
-        }
-        
-        console.log(`✅ All ${services.length} services processed`);
-      })();
-    }
   };
 
   // Update map markers
@@ -792,8 +702,15 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
     }
   };
 
-  // Load Google Maps script
+  // Load Google Maps script (skip if favorites filter is active)
   useEffect(() => {
+    // Don't load Google Maps if favorites is active - no need for map
+    if (filterType === 'favorites') {
+      setIsLoading(false);
+      setServicesWithCoords(services as ServiceWithCoordinates[]);
+      return;
+    }
+
     const apiKey = googleMapsApiKey;
     const BAD_KEY = 'AIzaSyAwzQsbG0vO0JWzOs7UAyu0upW6Xc1KL4E';
     let script: HTMLScriptElement | null = null;
@@ -894,7 +811,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
         delete window.initServicesMap;
       }
     };
-  }, []);
+  }, [filterType, services]);
 
   const initializeMap = (force = false) => {
     try {
@@ -935,37 +852,75 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
 
       console.log('✅ Map instance created successfully');
 
-      const geocoderInstance = new window.google.maps.Geocoder();
-      geocoderRef.current = geocoderInstance;
-
       setMap(mapInstance);
 
-      // Geocode all services and add markers
-      geocodeAllServices(mapInstance);
+      // No geocoding - just use existing coordinates from database
+      if (filterType !== 'favorites' && userLocation) {
+        calculateDistancesAndSort(userLocation);
+      } else if (filterType !== 'favorites') {
+        // Just set services without geocoding
+        setServicesWithCoords(services as ServiceWithCoordinates[]);
+        setIsLoading(false);
+      }
     } catch (error) {
       console.error('❌ Error initializing map:', error);
     }
   };
 
-  // Automatically request location when map is ready
+  // Automatically request location when map is ready (skip if favorites filter is active)
   useEffect(() => {
-    if (map && !hasRequestedLocation) {
+    if (map && !hasRequestedLocation && filterType !== 'favorites') {
       setHasRequestedLocation(true);
       // Small delay to ensure map is fully initialized
       setTimeout(() => {
         requestUserLocation();
       }, 500);
     }
-  }, [map, hasRequestedLocation]);
+  }, [map, hasRequestedLocation, filterType]);
 
-  // Update services when prop changes
+  // Immediately handle favorites filter change - run first to prevent loading delay
   useEffect(() => {
-    if (userLocation) {
-      calculateDistancesAndSort(userLocation);
+    if (filterType === 'favorites') {
+      // Set loading to false IMMEDIATELY to allow instant display (no waiting)
+      setIsLoading(false);
+      // Set services immediately (even if empty - that's fine, will update when services prop changes)
+      setServicesWithCoords(services as ServiceWithCoordinates[]);
+      // Clear map markers
+      if (map) {
+        markers.forEach(marker => marker.setMap(null));
+        setMarkers([]);
+        setMarkerInfoWindows(new Map());
+      }
+      // Stop any ongoing location requests
+      setHasRequestedLocation(true);
     } else {
-      geocodeAllServices(map);
+      // When switching away from favorites, reset loading state if needed
+      if (services.length > 0 && servicesWithCoords.length === 0) {
+        setIsLoading(true);
+      }
     }
-  }, [services]);
+  }, [filterType]); // Only depend on filterType for immediate response when switching
+
+  // Update services when prop changes (skip map loading if favorites filter is active)
+  useEffect(() => {
+    // If favorites is active, just update services immediately - NO GEOCODING AT ALL
+    if (filterType === 'favorites') {
+      // Always set loading to false immediately for favorites
+      setIsLoading(false);
+      // Update services immediately (even if empty - that's fine)
+      setServicesWithCoords(services as ServiceWithCoordinates[]);
+      return;
+    }
+
+    // Normal flow: use existing coordinates and calculate distances (no geocoding)
+    if (userLocation && filterType !== 'favorites') {
+      calculateDistancesAndSort(userLocation);
+    } else if (filterType !== 'favorites') {
+      // Just set services without coordinates/distance calculation
+      setServicesWithCoords(services as ServiceWithCoordinates[]);
+      setIsLoading(false);
+    }
+  }, [services, filterType, userLocation, map]);
 
   // Highlight services when initialHighlightedServiceId is provided and services are loaded
   useEffect(() => {
@@ -998,117 +953,12 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
     }
   }, [initialHighlightedServiceId, servicesWithCoords, map]);
 
-  // Geocode all services with lazy loading
-  const geocodeAllServices = async (targetMap?: any) => {
-    if (!geocoderRef.current) return;
-
-    setIsLoading(true);
-
-    // Use default location (Israel center) if user location is not available
-    const defaultLocation = { lat: 31.7683, lng: 35.2137 };
-    const locationToUse = userLocation || defaultLocation;
-
-    // Lazy loading: First 10 items fast, rest progressively
-    const INITIAL_BATCH = 10;
-    const firstBatch = services.slice(0, INITIAL_BATCH);
-    const restBatch = services.slice(INITIAL_BATCH);
-
-    console.log(`🚀 Geocoding first ${INITIAL_BATCH} services immediately...`);
-
-    // Process first batch immediately
-    const initialData: ServiceWithCoordinates[] = [];
-    for (const service of firstBatch) {
-      const coords = await geocodeService(service);
-      if (coords) {
-        const distance = calculateDistance(locationToUse.lat, locationToUse.lng, coords.lat, coords.lng);
-        initialData.push({
-          ...service,
-          coordinates: coords,
-          distance
-        });
-      } else {
-        initialData.push({ ...service });
-      }
-    }
-
-    // Sort and display initial results
-    // Put services with coordinates and distance first, then sort by distance
-    initialData.sort((a, b) => {
-      // Services without coordinates go to the end
-      if (!a.coordinates && b.coordinates) return 1;
-      if (a.coordinates && !b.coordinates) return -1;
-      // If both have or both don't have coordinates, sort by distance
-      const distA = a.distance !== undefined ? a.distance : Number.MAX_VALUE;
-      const distB = b.distance !== undefined ? b.distance : Number.MAX_VALUE;
-      return distA - distB;
-    });
-
-    // Use sorted results directly, then add remaining services
-    const initialDisplayIds = new Set(initialData.map(s => s.id));
-    const remainingServices = services.filter(s => !initialDisplayIds.has(s.id));
-    const initialDisplay = [...initialData, ...remainingServices] as ServiceWithCoordinates[];
-    setServicesWithCoords(initialDisplay);
-    // Only show markers for services with coordinates
-    updateMapMarkers(initialData.filter(s => s.coordinates), targetMap);
-    setIsLoading(false);
-
-    console.log(`✅ First ${INITIAL_BATCH} services loaded. Lazy loading rest...`);
-
-    // Process rest batch progressively in background
-    if (restBatch.length > 0) {
-      (async () => {
-        const allData = [...initialData];
-
-        for (let i = 0; i < restBatch.length; i++) {
-          // Yield to main thread every 2 items
-          if (i % 2 === 0) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-          }
-
-          const service = restBatch[i];
-          const coords = await geocodeService(service);
-          
-          if (coords) {
-            const distance = calculateDistance(locationToUse.lat, locationToUse.lng, coords.lat, coords.lng);
-            allData.push({
-              ...service,
-              coordinates: coords,
-              distance
-            });
-          } else {
-            allData.push({ ...service });
-          }
-
-          // Update display every 5 items
-          if (i % 5 === 4 || i === restBatch.length - 1) {
-            // Sort: services with coordinates and distance first, then sort by distance
-            allData.sort((a, b) => {
-              // Services without coordinates go to the end
-              if (!a.coordinates && b.coordinates) return 1;
-              if (a.coordinates && !b.coordinates) return -1;
-              // If both have or both don't have coordinates, sort by distance
-              const distA = a.distance !== undefined ? a.distance : Number.MAX_VALUE;
-              const distB = b.distance !== undefined ? b.distance : Number.MAX_VALUE;
-              return distA - distB;
-            });
-
-            // Use sorted results directly, then add any remaining services that weren't processed
-            const processedIds = new Set(allData.map(s => s.id));
-            const remainingServices = services.filter(s => !processedIds.has(s.id));
-            const updatedDisplay = [...allData, ...remainingServices] as ServiceWithCoordinates[];
-            setServicesWithCoords(updatedDisplay);
-            // Only show markers for services with coordinates
-            updateMapMarkers(allData.filter(s => s.coordinates), targetMap);
-          }
-        }
-
-        console.log(`✅ All ${services.length} services processed`);
-      })();
-    }
-  };
 
   // Reinitialize map when layout/container changes (e.g., mobile vs desktop refresh)
   useEffect(() => {
+    // Skip map initialization if favorites is active
+    if (filterType === 'favorites') return;
+    
     if (typeof window === 'undefined') return;
     if (!window.google) return;
     if (!mapRef.current) return;
@@ -1117,7 +967,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
     if (needsNewMap) {
       initializeMap(true);
     }
-  }, [isMobile, map]);
+  }, [isMobile, map, filterType]);
 
   // Handle service click from list
   const handleServiceClick = (service: ServiceWithCoordinates) => {
@@ -1309,63 +1159,69 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
                 <p className="text-sm font-semibold text-gray-500 text-center">{services.length} {t('pages.ServicesPage.map.servicesFound')}</p>
               </div>
               <div className="flex-1 overflow-y-auto bg-gray-50 p-4 service-cards-scroll">
-                {!isLoading && servicesWithCoords.length > 0 ? (
-                  <div className="space-y-4 pb-20">
-                    {servicesWithCoords.map((service, index) => (
-                      <div
-                        key={service.id || index}
-                        className={cn(
-                          "bg-white rounded-lg border p-3 cursor-pointer transition-all hover:shadow-md",
-                          highlightedServiceIds.includes(service.id || '') ? "border-blue-500 ring-1 ring-blue-500" : "border-gray-200"
-                        )}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleServiceClick(service);
-                        }}
-                      >
-                        <div className="flex gap-3">
-                          <div className="w-20 h-20 flex-shrink-0 bg-gray-100 flex items-center justify-center">
-                            <img
-                              src={service.image}
-                              alt={service.name}
-                              className="max-w-full max-h-full object-contain"
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-bold text-sm mb-1 truncate">{service.name}</h3>
-                            {service.description && (
-                              <p className="text-xs text-gray-500 line-clamp-2 mb-2">
-                                {service.description}
-                              </p>
-                            )}
-                            <div className="flex items-center gap-2 text-xs text-gray-500">
-                              {service.distance !== undefined ? (
-                                <span className="flex items-center gap-1 text-blue-600 font-medium">
-                                  <MapPin size={12} />
-                                  {service.distance.toFixed(1)} km
-                                </span>
-                              ) : (
-                                <span className="flex items-center gap-1 text-gray-400 font-medium">
-                                  <MapPin size={12} />
-                                  {t('pages.ServicesPage.map.distanceUnavailable') || 'Distance unavailable'}
-                                </span>
+                {!isLoading ? (
+                  servicesWithCoords.length > 0 ? (
+                    <div className="space-y-4 pb-20">
+                      {servicesWithCoords.map((service, index) => (
+                        <div
+                          key={service.id || index}
+                          className={cn(
+                            "bg-white rounded-lg border p-3 cursor-pointer transition-all hover:shadow-md",
+                            highlightedServiceIds.includes(service.id || '') ? "border-blue-500 ring-1 ring-blue-500" : "border-gray-200"
+                          )}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleServiceClick(service);
+                          }}
+                        >
+                          <div className="flex gap-3">
+                            <div className="w-20 h-20 flex-shrink-0 bg-gray-100 flex items-center justify-center">
+                              <img
+                                src={service.image}
+                                alt={service.name}
+                                className="max-w-full max-h-full object-contain"
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-bold text-sm mb-1 truncate">{service.name}</h3>
+                              {service.description && (
+                                <p className="text-xs text-gray-500 line-clamp-2 mb-2">
+                                  {service.description}
+                                </p>
                               )}
-                              {service.tags && service.tags.length > 0 && (
-                                <span className="bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">
-                                  {translateTag(service.tags[0])}
-                                  {service.tags.length > 1 && ` +${service.tags.length - 1}`}
-                                </span>
-                              )}
+                              <div className="flex items-center gap-2 text-xs text-gray-500">
+                                {service.distance !== undefined ? (
+                                  <span className="flex items-center gap-1 text-blue-600 font-medium">
+                                    <MapPin size={12} />
+                                    {service.distance.toFixed(1)} km
+                                  </span>
+                                ) : (
+                                  <span className="flex items-center gap-1 text-gray-400 font-medium">
+                                    <MapPin size={12} />
+                                    {t('pages.ServicesPage.map.distanceUnavailable') || 'Distance unavailable'}
+                                  </span>
+                                )}
+                                {service.tags && service.tags.length > 0 && (
+                                  <span className="bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">
+                                    {translateTag(service.tags[0])}
+                                    {service.tags.length > 1 && ` +${service.tags.length - 1}`}
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <p>{t('pages.ServicesPage.map.noServices')}</p>
+                    </div>
+                  )
                 ) : (
                   <div className="text-center py-8 text-gray-500">
-                    {!isLoading && <p>{t('pages.ServicesPage.map.noServices')}</p>}
+                    <p>{t('pages.ServicesPage.map.loading')}</p>
                   </div>
                 )}
               </div>

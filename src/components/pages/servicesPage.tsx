@@ -3,7 +3,7 @@
 import { Search, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLocale } from '@/hooks/use-locale';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { Input } from '../ui/input';
 import { FilterChips, FilterChip } from '../ui/filter-chips';
@@ -60,12 +60,17 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
   const { t } = useTranslation();
   const locale = useLocale();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user, dbUser } = useAuth();
   const [search, setSearch] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [favoriteAdIds, setFavoriteAdIds] = useState<string[]>([]);
-  const [filterType, setFilterType] = useState<'all' | 'favorites'>('all');
+  // Initialize filterType from URL parameter, default to 'all'
+  const [filterType, setFilterType] = useState<'all' | 'favorites'>(() => {
+    const filterParam = searchParams.get('filter');
+    return filterParam === 'favorites' ? 'favorites' : 'all';
+  });
   const [isLoadingTags, setIsLoadingTags] = useState(true);
   
   const isHebrew = locale === 'he';
@@ -101,7 +106,7 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
   // Convert ads to services
   const services = ads.map(convertAdToService);
 
-  // Load available tags and user favorites
+  // Load available tags and user favorites - prioritize favorites if filter is active
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -109,11 +114,15 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
         setAvailableTags(HEBREW_SERVICE_TAGS);
         setIsLoadingTags(false);
 
-        // Load user favorites if logged in
+        // Load user favorites if logged in - prioritize if favorites filter is active
         if (user) {
           const favorites = await getUserFavorites(user.uid);
           // Extract just the service IDs from the favorites
-          setFavoriteAdIds(favorites.map(fav => fav.serviceId));
+          const favoriteIds = favorites.map(fav => fav.serviceId);
+          setFavoriteAdIds(favoriteIds);
+          
+          // If favorites filter is active and we have favorite IDs, we're ready to show
+          // (services will be filtered immediately when ads load)
         }
       } catch (error) {
         console.error('Error loading data:', error);
@@ -122,7 +131,7 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
     };
 
     loadData();
-  }, [user]);
+  }, [user, filterType]);
 
   // Filter services based on businessId, search, tags, and favorites
   const filteredServices = services.filter((service) => {
@@ -165,17 +174,43 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
   ];
 
   const handleChipClick = (chipId: string) => {
-    setFilterType(chipId as 'all' | 'favorites');
+    const newFilterType = chipId as 'all' | 'favorites';
+    setFilterType(newFilterType);
+    // Update URL parameter
+    const newSearchParams = new URLSearchParams(searchParams);
+    if (newFilterType === 'favorites') {
+      newSearchParams.set('filter', 'favorites');
+    } else {
+      newSearchParams.delete('filter');
+    }
+    setSearchParams(newSearchParams, { replace: true });
   };
 
+  // Sync filterType with URL parameter when it changes externally
+  useEffect(() => {
+    const filterParam = searchParams.get('filter');
+    if (filterParam === 'favorites' && filterType !== 'favorites') {
+      setFilterType('favorites');
+    } else if (filterParam !== 'favorites' && filterType === 'favorites' && !filterParam) {
+      setFilterType('all');
+    }
+  }, [searchParams]);
+
+
+  // When favorites is active and we have favorite IDs but no ads yet, show empty array
+  // This prevents glitching while waiting for all businesses to load
+  const servicesToDisplay = filterType === 'favorites' && ads.length === 0 && favoriteAdIds.length > 0
+    ? []
+    : filteredServices;
 
   return (
     <>
       {/* Combined Map and List View */}
       <div className="w-full h-full">
         <ServicesMapView
-          services={filteredServices}
+          services={servicesToDisplay}
           initialHighlightedServiceId={businessId}
+          filterType={filterType}
           headerContent={
             <div className="space-y-4">
               {/* Title and Filter Chips on Same Row */}

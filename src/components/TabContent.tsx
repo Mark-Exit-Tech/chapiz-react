@@ -61,10 +61,7 @@ const renderDetails = (
           {filtered.map((detail, index) => {
             return (
               <div key={index} className={`flex min-h-[22px] items-start ${isRTL ? 'flex-row-reverse' : ''}`}>
-                <span className={`w-[76px] text-lg font-light text-gray-400 flex-shrink-0 ${isRTL ? 'text-left' : 'text-right'}`}>
-                  {detail.label}
-                </span>
-                <span className={`flex-1 text-lg font-medium text-black break-words ${isRTL ? 'text-right mr-2' : 'text-left ml-2'}`}>
+                <span className={`flex-1 text-lg font-medium text-black break-words ${isRTL ? 'text-right mr-2' : 'text-left'}`}>
                   {detail.link ? (
                     <a href={detail.link} className="underline">
                       {detail.value}
@@ -72,6 +69,9 @@ const renderDetails = (
                   ) : (
                     detail.value
                   )}
+                </span>
+                <span className={`w-[76px] text-lg font-light text-gray-400 flex-shrink-0 ${isRTL ? 'text-right' : 'text-left ml-2'}`}>
+                  {detail.label}
                 </span>
               </div>
             );
