@@ -23,10 +23,14 @@ interface Ad {
   reviews?: any[];
   averageRating?: number;
   totalReviews?: number;
+  coordinates?: { lat: number; lng: number };
 }
 
 // Convert Business to Ad format
 const convertBusinessToAd = (business: Business): Ad => {
+  // Check coordinates at root level first (most businesses have it here), then contactInfo as fallback
+  const coordinates = (business as any).coordinates || business.contactInfo?.coordinates;
+  
   return {
     id: business.id,
     title: business.name,
@@ -43,7 +47,9 @@ const convertBusinessToAd = (business: Business): Ad => {
     tags: business.tags || [],
     reviews: [],
     averageRating: business.rating || 0,
-    totalReviews: 0
+    totalReviews: 0,
+    // Pass through coordinates from business (check root level first, then contactInfo)
+    coordinates
   };
 };
 

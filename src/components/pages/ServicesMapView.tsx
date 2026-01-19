@@ -535,6 +535,10 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
     if (existingCoords && existingCoords.lat && existingCoords.lng) {
       return existingCoords;
     }
+    // Debug: log if coordinates are missing
+    if (!existingCoords) {
+      console.log('⚠️ No coordinates found for service:', service.name, service.id);
+    }
     return null;
   };
 
@@ -854,12 +858,44 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
 
       setMap(mapInstance);
 
-      // No geocoding - just use existing coordinates from database
-      if (filterType !== 'favorites' && userLocation) {
-        calculateDistancesAndSort(userLocation);
-      } else if (filterType !== 'favorites') {
-        // Just set services without geocoding
-        setServicesWithCoords(services as ServiceWithCoordinates[]);
+      // Extract coordinates and show markers immediately (even without user location)
+      if (filterType !== 'favorites' && services.length > 0) {
+        // Extract coordinates from services
+        const servicesWithData: ServiceWithCoordinates[] = services.map(service => {
+          const coords = getServiceCoordinates(service);
+          if (coords) {
+            let distance: number | undefined;
+            if (userLocation) {
+              distance = calculateDistance(userLocation.lat, userLocation.lng, coords.lat, coords.lng);
+            }
+            return {
+              ...service,
+              coordinates: coords,
+              distance
+            };
+          }
+          return { ...service };
+        });
+
+        // Sort by distance if user location is available
+        if (userLocation) {
+          servicesWithData.sort((a, b) => {
+            if (!a.coordinates && b.coordinates) return 1;
+            if (a.coordinates && !b.coordinates) return -1;
+            const distA = a.distance !== undefined ? a.distance : Number.MAX_VALUE;
+            const distB = b.distance !== undefined ? b.distance : Number.MAX_VALUE;
+            return distA - distB;
+          });
+        }
+
+        setServicesWithCoords(servicesWithData);
+        
+        // Show markers immediately (even without user location)
+        const servicesWithCoords = servicesWithData.filter(s => s.coordinates);
+        if (servicesWithCoords.length > 0) {
+          updateMapMarkers(servicesWithCoords, mapInstance);
+        }
+        
         setIsLoading(false);
       }
     } catch (error) {
@@ -912,14 +948,53 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
       return;
     }
 
-    // Normal flow: use existing coordinates and calculate distances (no geocoding)
-    if (userLocation && filterType !== 'favorites') {
-      calculateDistancesAndSort(userLocation);
-    } else if (filterType !== 'favorites') {
-      // Just set services without coordinates/distance calculation
-      setServicesWithCoords(services as ServiceWithCoordinates[]);
-      setIsLoading(false);
+    // Normal flow: extract coordinates and show markers (distance only if user location available)
+    setIsLoading(true);
+    
+    // Extract coordinates from services (already saved by admin)
+    const servicesWithData: ServiceWithCoordinates[] = services.map(service => {
+      const coords = getServiceCoordinates(service);
+      if (coords) {
+        // Calculate distance only if user location is available
+        let distance: number | undefined;
+        if (userLocation) {
+          distance = calculateDistance(userLocation.lat, userLocation.lng, coords.lat, coords.lng);
+        }
+        return {
+          ...service,
+          coordinates: coords,
+          distance
+        };
+      }
+      return { ...service };
+    });
+
+    // Debug: log how many services have coordinates
+    const servicesWithCoordsCount = servicesWithData.filter(s => s.coordinates).length;
+    console.log(`📍 Found coordinates for ${servicesWithCoordsCount} out of ${services.length} services`);
+
+    // Sort by distance if user location is available, otherwise keep original order
+    if (userLocation) {
+      servicesWithData.sort((a, b) => {
+        if (!a.coordinates && b.coordinates) return 1;
+        if (a.coordinates && !b.coordinates) return -1;
+        const distA = a.distance !== undefined ? a.distance : Number.MAX_VALUE;
+        const distB = b.distance !== undefined ? b.distance : Number.MAX_VALUE;
+        return distA - distB;
+      });
     }
+
+    setServicesWithCoords(servicesWithData);
+    
+    // Update map markers with services that have coordinates (even without user location)
+    if (map && window.google) {
+      const servicesWithCoords = servicesWithData.filter(s => s.coordinates);
+      if (servicesWithCoords.length > 0) {
+        updateMapMarkers(servicesWithCoords);
+      }
+    }
+    
+    setIsLoading(false);
   }, [services, filterType, userLocation, map]);
 
   // Highlight services when initialHighlightedServiceId is provided and services are loaded
@@ -1057,7 +1132,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
                     ) : (
                       <span className="flex items-center gap-1 text-gray-400 font-medium">
                         <MapPin size={12} />
-                        {t('map.distanceUnavailable') || 'Distance unavailable'}
+                        {t('pages.ServicesPage.map.distanceUnavailable') || 'Distance unavailable'}
                       </span>
                     )}
                     {service.tags && service.tags.length > 0 && (

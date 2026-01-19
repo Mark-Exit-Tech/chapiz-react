@@ -31,6 +31,7 @@ interface Ad {
   reviews?: any[];
   averageRating?: number;
   totalReviews?: number;
+  coordinates?: { lat: number; lng: number };
 }
 
 interface ServicesPageProps {
@@ -52,7 +53,9 @@ const convertAdToService = (ad: Ad & { imageUrl?: string }) => {
     // Use real description from the ad - if no description exists, use empty string instead of fallback
     description: ad.description || '',
     phone: ad.phone || '',
-    address: ad.location || ''
+    address: ad.location || '',
+    // Pass through coordinates from ad
+    coordinates: ad.coordinates
   };
 };
 

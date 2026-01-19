@@ -38,7 +38,7 @@ export async function getAllBusinesses(): Promise<Business[]> {
         return querySnapshot.docs.map(doc => {
             const data = doc.data();
             // Normalize data to match new interface while supporting legacy format
-            return {
+            const businessData = {
                 id: doc.id,
                 name: data.name || '',
                 description: data.description || '',
@@ -46,7 +46,9 @@ export async function getAllBusinesses(): Promise<Business[]> {
                 contactInfo: data.contactInfo || {
                     email: data.email || '',
                     phone: data.phone || '',
-                    address: data.address || ''
+                    address: data.address || '',
+                    // Include coordinates from contactInfo if they exist
+                    coordinates: data.contactInfo?.coordinates
                 },
                 tags: data.tags || [],
                 filterIds: data.filterIds,
@@ -61,7 +63,14 @@ export async function getAllBusinesses(): Promise<Business[]> {
                 phone: data.phone,
                 email: data.email,
                 address: data.address
-            } as Business;
+            } as Business & { coordinates?: { lat: number; lng: number } };
+            
+            // Add root-level coordinates if they exist (most businesses have coordinates at root level)
+            if (data.coordinates) {
+                (businessData as any).coordinates = data.coordinates;
+            }
+            
+            return businessData;
         });
     } catch (error) {
         console.error('Error fetching businesses:', error);
