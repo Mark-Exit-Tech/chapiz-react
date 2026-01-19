@@ -239,17 +239,35 @@ export default function AdminUsersPage() {
                     <TableRow key={user.uid}>
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-2">
-                          {user.profileImage || user.profile_image ? (
-                            <img 
-                              src={user.profileImage || user.profile_image} 
-                              alt={user.displayName || user.display_name || text.user}
-                              className="w-8 h-8 rounded-full"
-                            />
-                          ) : (
-                            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                              <Users className="w-4 h-4 text-gray-500" />
-                            </div>
-                          )}
+                          <div className="relative w-8 h-8">
+                            {user.profileImage || user.profile_image ? (
+                              <>
+                                <img 
+                                  src={user.profileImage || user.profile_image} 
+                                  alt={user.displayName || user.display_name || text.user}
+                                  className="w-8 h-8 rounded-full object-cover"
+                                  onError={(e) => {
+                                    // Hide broken image
+                                    e.currentTarget.style.display = 'none';
+                                    // Show fallback icon
+                                    const fallback = e.currentTarget.parentElement?.querySelector('.fallback-icon') as HTMLElement;
+                                    if (fallback) {
+                                      fallback.style.display = 'flex';
+                                    }
+                                  }}
+                                />
+                                <div 
+                                  className="fallback-icon absolute inset-0 w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center hidden"
+                                >
+                                  <Users className="w-4 h-4 text-gray-500" />
+                                </div>
+                              </>
+                            ) : (
+                              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                <Users className="w-4 h-4 text-gray-500" />
+                              </div>
+                            )}
+                          </div>
                           <span>{user.displayName || user.display_name || user.full_name || '-'}</span>
                         </div>
                       </TableCell>
@@ -296,17 +314,35 @@ export default function AdminUsersPage() {
             <div className="space-y-6">
               {/* User Info */}
               <div className="flex items-center gap-4">
-                {selectedUser.profileImage || selectedUser.profile_image ? (
-                  <img 
-                    src={selectedUser.profileImage || selectedUser.profile_image} 
-                    alt={selectedUser.displayName || text.user}
-                    className="w-16 h-16 rounded-full"
-                  />
-                ) : (
-                  <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center">
-                    <Users className="w-8 h-8 text-gray-500" />
-                  </div>
-                )}
+                <div className="relative w-16 h-16">
+                  {selectedUser.profileImage || selectedUser.profile_image ? (
+                    <>
+                      <img 
+                        src={selectedUser.profileImage || selectedUser.profile_image} 
+                        alt={selectedUser.displayName || text.user}
+                        className="w-16 h-16 rounded-full object-cover"
+                        onError={(e) => {
+                          // Hide broken image
+                          e.currentTarget.style.display = 'none';
+                          // Show fallback icon
+                          const fallback = e.currentTarget.parentElement?.querySelector('.fallback-icon') as HTMLElement;
+                          if (fallback) {
+                            fallback.style.display = 'flex';
+                          }
+                        }}
+                      />
+                      <div 
+                        className="fallback-icon absolute inset-0 w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center hidden"
+                      >
+                        <Users className="w-8 h-8 text-gray-500" />
+                      </div>
+                    </>
+                  ) : (
+                    <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center">
+                      <Users className="w-8 h-8 text-gray-500" />
+                    </div>
+                  )}
+                </div>
                 <div>
                   <h3 className="text-xl font-semibold">{selectedUser.displayName || selectedUser.display_name || '-'}</h3>
                   <p className="text-gray-600">{selectedUser.email}</p>

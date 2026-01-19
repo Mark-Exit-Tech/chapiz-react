@@ -17,6 +17,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Check, ChevronsUpDown, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLocale } from '@/hooks/use-locale';
 import React, { useState } from 'react';
 
 interface TagsFilterProps {
@@ -49,6 +50,8 @@ export function TagsFilter({
   translateTag
 }: TagsFilterProps) {
   const [open, setOpen] = useState(false);
+  const locale = useLocale();
+  const isRTL = locale === 'he';
 
   // Helper function to get display text for a tag
   const getTagDisplay = (tag: string) => {
@@ -72,7 +75,7 @@ export function TagsFilter({
   };
 
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn('space-y-2', className)} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Tags dropdown */}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
@@ -80,15 +83,23 @@ export function TagsFilter({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between"
+            className={cn("w-full justify-between", isRTL ? "flex-row-reverse text-right" : "text-left")}
           >
-            {placeholder}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <span className="truncate">{placeholder}</span>
+            <ChevronsUpDown className={cn("h-4 w-4 shrink-0 opacity-50", isRTL ? "mr-2" : "ml-2")} />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[300px] p-0" align="start" side="bottom" sideOffset={4} avoidCollisions={false}>
-          <Command>
-            <CommandInput placeholder={searchTagsPlaceholder} />
+        <PopoverContent
+          className="w-[300px] p-0"
+          align={isRTL ? "end" : "start"}
+          side="bottom"
+          sideOffset={4}
+          avoidCollisions={true}
+          collisionPadding={16}
+          dir={isRTL ? 'rtl' : 'ltr'}
+        >
+          <Command dir={isRTL ? 'rtl' : 'ltr'}>
+            <CommandInput placeholder={searchTagsPlaceholder} className={isRTL ? "text-right" : "text-left"} />
             <CommandList className="max-h-[300px] overflow-y-auto">
               <CommandEmpty>{noTagsFoundText}</CommandEmpty>
               {selectedTags.length > 0 && (
@@ -97,7 +108,7 @@ export function TagsFilter({
                     onSelect={clearAllTags}
                     className="flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
                   >
-                    <X className="mr-2 h-4 w-4" />
+                    <X className={cn("h-4 w-4", isRTL ? "ml-2" : "mr-2")} />
                     {clearAllText}
                   </CommandItem>
                 </CommandGroup>
@@ -108,17 +119,16 @@ export function TagsFilter({
                     key={tag}
                     value={translateTag ? getTagDisplay(tag) : tag}
                     onSelect={() => handleTagToggle(tag)}
-                    className="flex items-center justify-between"
+                    className="flex items-center cursor-pointer"
                   >
-                    <div className="flex items-center">
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          selectedTags.includes(tag) ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      {getTagDisplay(tag)}
-                    </div>
+                    <Check
+                      className={cn(
+                        "h-4 w-4 shrink-0",
+                        isRTL ? "ml-2" : "mr-2",
+                        selectedTags.includes(tag) ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    <span>{getTagDisplay(tag)}</span>
                   </CommandItem>
                 ))}
               </CommandGroup>

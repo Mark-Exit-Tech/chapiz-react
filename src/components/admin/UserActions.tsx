@@ -31,9 +31,11 @@ import {
 } from '@/components/ui/select';
 import { deleteUser, updateUserRole, restrictUser, unrestrictUser, addPointsToUser } from '@/lib/actions/admin';
 import { updateUserByUid } from '@/lib/firebase/database/users';
-import { MoreHorizontal, Phone, PawPrint, Coins } from 'lucide-react';
+import { MoreHorizontal, Phone, Coins, PawPrint } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { useLocale } from '@/hooks/use-locale';
+import { cn } from '@/lib/utils';
 
 export default function UserActions({
   userId,
@@ -51,6 +53,56 @@ export default function UserActions({
   userAddress?: string;
 }) {
   const { t } = useTranslation('Admin');
+  const locale = useLocale();
+  const isRTL = locale === 'he';
+  const isHebrew = locale === 'he';
+
+  // Hardcoded text - NO TRANSLATION KEYS!
+  const text = {
+    // Dropdown menu items
+    actions: isHebrew ? 'פעולות' : 'Actions',
+    viewPets: isHebrew ? 'צפה בחיות מחמד' : 'View Pets',
+    editUser: isHebrew ? 'ערוך משתמש' : 'Edit User',
+    deleteUser: isHebrew ? 'מחק משתמש' : 'Delete User',
+    addPoints: isHebrew ? 'הוסף נקודות' : 'Add Points',
+    // Edit dialog
+    editUserDescription: isHebrew ? 'נהל תפקיד משתמש, הגבלות ופרטי קשר' : 'Manage user role, restrictions, and contact information',
+    userRole: isHebrew ? 'תפקיד משתמש' : 'User Role',
+    selectRole: isHebrew ? 'בחר תפקיד' : 'Select a role',
+    phoneNumber: isHebrew ? 'מספר טלפון' : 'Phone Number',
+    enterPhone: isHebrew ? 'הזן מספר טלפון' : 'Enter phone number',
+    address: isHebrew ? 'כתובת' : 'Address',
+    enterAddress: isHebrew ? 'הזן כתובת' : 'Enter address',
+    accountStatus: isHebrew ? 'סטטוס חשבון' : 'Account Status',
+    active: isHebrew ? 'פעיל' : 'Active',
+    restricted: isHebrew ? 'מוגבל' : 'Restricted',
+    cancel: isHebrew ? 'ביטול' : 'Cancel',
+    saveChanges: isHebrew ? 'שמור שינויים' : 'Save Changes',
+    savingChanges: isHebrew ? 'שומר שינויים...' : 'Saving Changes...',
+    // Delete dialog
+    confirmDeletion: isHebrew ? 'אישור מחיקה' : 'Confirm Deletion',
+    deleteUserMessage: isHebrew ? 'האם אתה בטוח שברצונך למחוק את המשתמש הזה? פעולה זו לא ניתנת לביטול.' : 'Are you sure you want to delete this user? This action cannot be undone.',
+    // Add points dialog
+    addPointsDescription: isHebrew ? 'הוסף נקודות לחשבון המשתמש הזה. פעולה זו תירשם בהיסטוריית העסקאות.' : 'Add points to this user\'s account. This action will be logged in the transaction history.',
+    pointsAmount: isHebrew ? 'כמות נקודות' : 'Points Amount',
+    description: isHebrew ? 'תיאור' : 'Description',
+    optional: isHebrew ? 'אופציונלי' : 'Optional',
+    pointsDescriptionPlaceholder: isHebrew ? 'למשל, תגמול על הפניה, נקודות בונוס וכו\'.' : 'e.g., Reward for referral, Bonus points, etc.',
+    addingPoints: isHebrew ? 'מוסיף נקודות...' : 'Adding Points...',
+    roles: {
+      user: isHebrew ? 'משתמש' : 'User',
+      admin: isHebrew ? 'מנהל' : 'Admin',
+      superAdmin: isHebrew ? 'מנהל על' : 'Super Admin',
+    }
+  };
+
+  // Helper function to get translated role name
+  const getRoleName = (role: string): string => {
+    if (role === 'user') return text.roles.user;
+    if (role === 'admin') return text.roles.admin;
+    if (role === 'super_admin') return text.roles.superAdmin;
+    return text.selectRole;
+  };
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [newRole, setNewRole] = useState(currentRole);
@@ -264,27 +316,20 @@ export default function UserActions({
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
             <MoreHorizontal className="h-4 w-4" />
-            <span className="sr-only">{t('userActions.actions')}</span>
+            <span className="sr-only">{text.actions}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>{t('userActions.actions')}</DropdownMenuLabel>
-          <DropdownMenuItem onClick={() => {
-            setIsDropdownOpen(false);
-            navigate(`/admin/users/${userId}/pets`);
-          }}>
-            <PawPrint className="h-4 w-4 mr-2" />
-            {t('userActions.viewUser')}
-          </DropdownMenuItem>
+          <DropdownMenuLabel>{text.actions}</DropdownMenuLabel>
           <DropdownMenuItem onClick={handleOpenEditDialog}>
-            {t('userActions.editUser')}
+            {text.editUser}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => {
             setIsDropdownOpen(false);
             setIsAddPointsOpen(true);
           }}>
             <Coins className="h-4 w-4 mr-2" />
-            {t('userActions.addPoints')}
+            {text.addPoints}
           </DropdownMenuItem>
           {!isSuperAdmin && (
             <DropdownMenuItem
@@ -294,7 +339,7 @@ export default function UserActions({
               }}
               className="text-red-600 hover:text-red-700 focus:text-red-700"
             >
-              {t('userActions.deleteUser')}
+              {text.deleteUser}
             </DropdownMenuItem>
           )}
         </DropdownMenuContent>
@@ -313,8 +358,8 @@ export default function UserActions({
       >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>{t('userActions.editUser')}</DialogTitle>
-            <DialogDescription>{t('userActions.editUserDescription')}</DialogDescription>
+            <DialogTitle>{text.editUser}</DialogTitle>
+            <DialogDescription>{text.editUserDescription}</DialogDescription>
           </DialogHeader>
 
           {error && (
@@ -331,54 +376,57 @@ export default function UserActions({
             ) : (
               <>
                 {/* Role Selection */}
-                <div className="space-y-2">
-                  <Label>{t('userActions.userRole')}</Label>
+                <div className="space-y-2" dir={isRTL ? 'rtl' : 'ltr'}>
+                  <Label>{text.userRole}</Label>
                   <Select
                     value={newRole}
                     onValueChange={(value) => setNewRole(value)}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder={t('userActions.selectRole')} />
+                    <SelectTrigger className={isRTL ? 'rtl:text-right' : ''}>
+                      <SelectValue placeholder={text.selectRole}>
+                        {getRoleName(newRole)}
+                      </SelectValue>
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="user">{t('userActions.roles.user')}</SelectItem>
-                      <SelectItem value="admin">{t('userActions.roles.admin')}</SelectItem>
-                      <SelectItem value="super_admin">{t('userActions.roles.super_admin')}</SelectItem>
+                    <SelectContent dir={isRTL ? 'rtl' : 'ltr'}>
+                      <SelectItem value="user">{text.roles.user}</SelectItem>
+                      <SelectItem value="admin">{text.roles.admin}</SelectItem>
+                      <SelectItem value="super_admin">{text.roles.superAdmin}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 {/* Phone Number */}
-                <div className="space-y-2">
-                  <Label>{t('userActions.phoneNumber')}</Label>
+                <div className="space-y-2" dir={isRTL ? 'rtl' : 'ltr'}>
+                  <Label>{text.phoneNumber}</Label>
                   <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Phone className={cn("absolute top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4", isRTL ? "right-3" : "left-3")} />
                     <Input
                       type="tel"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      placeholder={t('userActions.enterPhone')}
-                      className="pl-10"
+                      placeholder={text.enterPhone}
+                      className={isRTL ? "pr-10 text-right" : "pl-10"}
                     />
                   </div>
                 </div>
 
                 {/* Address */}
-                <div className="space-y-2">
-                  <Label>{t('userActions.address')}</Label>
+                <div className="space-y-2" dir={isRTL ? 'rtl' : 'ltr'}>
+                  <Label>{text.address}</Label>
                   <div className="relative">
                     <Input
                       type="text"
                       value={currentAddress}
                       onChange={(e) => setCurrentAddress(e.target.value)}
-                      placeholder={t('userActions.enterAddress')}
+                      placeholder={text.enterAddress}
+                      className={isRTL ? "text-right" : ""}
                     />
                   </div>
                 </div>
 
                 {/* User Status */}
                 <div className="space-y-2">
-                  <Label>{t('userActions.accountStatus')}</Label>
+                  <Label>{text.accountStatus}</Label>
                   <div className="flex items-center space-x-2">
                     <Checkbox
                       checked={!isRestricted}
@@ -386,7 +434,7 @@ export default function UserActions({
                         handleRestrictionToggle(checked === true);
                       }}
                     />
-                    <span>{isRestricted ? t('userActions.restricted') : t('userActions.active')}</span>
+                    <span>{isRestricted ? text.restricted : text.active}</span>
                   </div>
                 </div>
               </>
@@ -396,10 +444,10 @@ export default function UserActions({
 
           <DialogFooter className="flex space-x-2">
             <Button variant="outline" onClick={() => setIsEditOpen(false)}>
-              {t('userActions.cancel')}
+              {text.cancel}
             </Button>
             <Button onClick={handleSaveChanges} disabled={isSubmitting || isLoading}>
-              {isSubmitting ? t('userActions.savingChanges') : t('userActions.saveChanges')}
+              {isSubmitting ? text.savingChanges : text.saveChanges}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -418,15 +466,15 @@ export default function UserActions({
       >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>{t('userActions.confirmDeletion')}</DialogTitle>
+            <DialogTitle>{text.confirmDeletion}</DialogTitle>
             <DialogDescription>
-              {t('userActions.deleteUserMessage')}
+              {text.deleteUserMessage}
             </DialogDescription>
           </DialogHeader>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDeleting(false)}>
-              {t('userActions.cancel')}
+              {text.cancel}
             </Button>
             <Button
               variant="destructive"
@@ -435,7 +483,7 @@ export default function UserActions({
                 handleDelete();
               }}
             >
-              {t('userActions.deleteUser')}
+              {text.deleteUser}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -453,11 +501,11 @@ export default function UserActions({
           setIsAddPointsOpen(open);
         }}
       >
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md" dir={isRTL ? 'rtl' : 'ltr'}>
           <DialogHeader>
-            <DialogTitle>{t('userActions.addPoints')}</DialogTitle>
+            <DialogTitle>{text.addPoints}</DialogTitle>
             <DialogDescription>
-              {t('userActions.addPointsDescription')}
+              {text.addPointsDescription}
             </DialogDescription>
           </DialogHeader>
 
@@ -469,33 +517,35 @@ export default function UserActions({
 
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
-              <Label>{t('userActions.pointsAmount')}</Label>
+              <Label>{text.pointsAmount}</Label>
               <Input
                 type="number"
                 min="1"
                 value={pointsAmount}
                 onChange={(e) => setPointsAmount(e.target.value)}
                 placeholder="100"
+                className={isRTL ? "text-right" : ""}
               />
             </div>
 
             <div className="space-y-2">
-              <Label>{t('userActions.description')} ({t('userActions.optional')})</Label>
+              <Label>{text.description} ({text.optional})</Label>
               <Textarea
                 value={pointsDescription}
                 onChange={(e) => setPointsDescription(e.target.value)}
-                placeholder={t('userActions.pointsDescriptionPlaceholder')}
+                placeholder={text.pointsDescriptionPlaceholder}
                 rows={3}
+                className={isRTL ? "text-right" : ""}
               />
             </div>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddPointsOpen(false)}>
-              {t('userActions.cancel')}
+              {text.cancel}
             </Button>
             <Button onClick={handleAddPoints} disabled={isAddingPoints}>
-              {isAddingPoints ? t('userActions.addingPoints') : t('userActions.addPoints')}
+              {isAddingPoints ? text.addingPoints : text.addPoints}
             </Button>
           </DialogFooter>
         </DialogContent>

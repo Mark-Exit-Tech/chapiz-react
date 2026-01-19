@@ -10,6 +10,7 @@ import {
   Ticket,
   Gift,
   MapPin,
+  Shield,
 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -29,7 +30,8 @@ import {
 
 const Navbar = () => {
   const { t, i18n } = useTranslation();
-  const { user, loading, signOut } = useAuth();
+  const { user, loading, signOut, dbUser } = useAuth();
+  const isAdmin = dbUser?.role === 'admin' || dbUser?.role === 'super_admin';
   const [isMounted, setIsMounted] = useState(false);
   const [storeUrl, setStoreUrl] = useState('');
   const [logoUrl, setLogoUrl] = useState('');
@@ -163,6 +165,17 @@ const Navbar = () => {
                           <span>{t('components.Navbar.contact')}</span>
                         </Link>
                       </DropdownMenuItem>
+                      {isAdmin && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem asChild>
+                            <Link to={`/${locale}/admin`} className="flex items-center">
+                              <Shield className="mr-2 h-4 w-4" />
+                              <span>{t('components.Navbar.adminPanel')}</span>
+                            </Link>
+                          </DropdownMenuItem>
+                        </>
+                      )}
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={handleLogout} className="text-primary">
                         <LogOut className="mr-2 h-4 w-4" />
@@ -242,6 +255,17 @@ const Navbar = () => {
                           <span>{t('components.Navbar.contact')}</span>
                         </Link>
                       </DropdownMenuItem>
+                      {isAdmin && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem asChild>
+                            <Link to={`/${locale}/admin`} className="flex items-center">
+                              <Shield className="mr-2 h-4 w-4" />
+                              <span>{t('components.Navbar.adminPanel')}</span>
+                            </Link>
+                          </DropdownMenuItem>
+                        </>
+                      )}
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={handleLogout} className="text-primary">
                         <LogOut className="mr-2 h-4 w-4" />
