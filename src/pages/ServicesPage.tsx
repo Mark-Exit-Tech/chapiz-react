@@ -29,8 +29,8 @@ interface Ad {
 // Convert Business to Ad format
 const convertBusinessToAd = (business: Business): Ad => {
   // Check coordinates at root level first (most businesses have it here), then contactInfo as fallback
-  const coordinates = (business as any).coordinates || business.contactInfo?.coordinates;
-  
+  const coordinates = business.coordinates || business.contactInfo?.coordinates;
+
   return {
     id: business.id,
     title: business.name,
@@ -66,13 +66,13 @@ export default function ServicesPage() {
       try {
         console.log('📡 Fetching services from businesses collection...');
         const businesses = await getAllBusinesses();
-        
+
         if (businesses.length === 0) {
           console.warn('⚠️ No businesses found in businesses collection');
         } else {
           console.log(`✅ Successfully loaded ${businesses.length} businesses from Firebase`);
         }
-        
+
         // Convert businesses to Ad format
         const businessAds = businesses.map(convertBusinessToAd);
         setAds(businessAds);

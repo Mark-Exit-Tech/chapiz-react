@@ -10,6 +10,14 @@ export interface Business {
         email: string;
         phone: string;
         address: string;
+        coordinates?: {
+            lat: number;
+            lng: number;
+        };
+    };
+    coordinates?: {
+        lat: number;
+        lng: number;
     };
     tags: string[];
     filterIds?: string[];
@@ -34,7 +42,7 @@ export async function getAllBusinesses(): Promise<Business[]> {
         const businessesRef = collection(db, BUSINESSES_COLLECTION);
         const q = query(businessesRef, orderBy('name', 'asc'));
         const querySnapshot = await getDocs(q);
-        
+
         return querySnapshot.docs.map(doc => {
             const data = doc.data();
             // Normalize data to match new interface while supporting legacy format
@@ -64,12 +72,12 @@ export async function getAllBusinesses(): Promise<Business[]> {
                 email: data.email,
                 address: data.address
             } as Business & { coordinates?: { lat: number; lng: number } };
-            
+
             // Add root-level coordinates if they exist (most businesses have coordinates at root level)
             if (data.coordinates) {
                 (businessData as any).coordinates = data.coordinates;
             }
-            
+
             return businessData;
         });
     } catch (error) {
@@ -83,12 +91,12 @@ export async function getBusinessById(id: string): Promise<Business | null> {
     try {
         const businessRef = doc(db, BUSINESSES_COLLECTION, id);
         const businessDoc = await getDoc(businessRef);
-        
+
         if (!businessDoc.exists()) {
             console.error('Business not found');
             return null;
         }
-        
+
         const data = businessDoc.data();
         // Normalize data to match new interface while supporting legacy format
         return {
@@ -128,7 +136,7 @@ export async function searchBusinesses(searchTerm: string): Promise<Business[]> 
         // This is a simplified version - you may want to use Algolia or similar
         const businessesRef = collection(db, BUSINESSES_COLLECTION);
         const querySnapshot = await getDocs(businessesRef);
-        
+
         return querySnapshot.docs
             .map(doc => {
                 const data = doc.data();
@@ -156,7 +164,7 @@ export async function searchBusinesses(searchTerm: string): Promise<Business[]> 
                     address: data.address
                 } as Business;
             })
-            .filter(business => 
+            .filter(business =>
                 business.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 business.description?.toLowerCase().includes(searchTerm.toLowerCase())
             );
@@ -172,7 +180,7 @@ export async function createBusiness(businessData: Omit<Business, 'id' | 'create
         const businessesRef = collection(db, BUSINESSES_COLLECTION);
         const newBusinessRef = doc(businessesRef);
         const now = Timestamp.now();
-        
+
         // Prepare data for Firestore (using Timestamp)
         const firestoreData = {
             name: businessData.name,
@@ -187,10 +195,10 @@ export async function createBusiness(businessData: Omit<Business, 'id' | 'create
             createdAt: now,
             updatedAt: now
         };
-        
+
         console.log('📝 Creating business with data:', firestoreData);
         await setDoc(newBusinessRef, firestoreData);
-        
+
         // Return business with Date objects for consistency
         const business: Business = {
             id: newBusinessRef.id,
@@ -206,7 +214,7 @@ export async function createBusiness(businessData: Omit<Business, 'id' | 'create
             updatedAt: now.toDate(),
             createdBy: businessData.createdBy || 'admin'
         };
-        
+
         console.log('✅ Business created successfully:', business.id);
         return business;
     } catch (error) {
@@ -228,10 +236,10 @@ export async function updateBusiness(id: string, updates: Partial<Business>): Pr
             ...updates,
             updatedAt: Timestamp.now()
         });
-        
+
         const updatedDoc = await getDoc(businessRef);
         if (!updatedDoc.exists()) return null;
-        
+
         const data = updatedDoc.data();
         return {
             id: updatedDoc.id,
@@ -280,7 +288,7 @@ export async function getBusinessesPaginated(page: number = 1, pageSize: number 
         const businessesRef = collection(db, BUSINESSES_COLLECTION);
         const q = query(businessesRef, orderBy('name', 'asc'));
         const querySnapshot = await getDocs(q);
-        
+
         const allBusinesses = querySnapshot.docs.map(doc => {
             const data = doc.data();
             return {
@@ -307,10 +315,10 @@ export async function getBusinessesPaginated(page: number = 1, pageSize: number 
                 address: data.address
             } as Business;
         });
-        
+
         const from = (page - 1) * pageSize;
         const to = from + pageSize;
-        
+
         return {
             businesses: allBusinesses.slice(from, to),
             total: allBusinesses.length
