@@ -18,8 +18,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { deletePet } from '@/lib/actions/admin';
-import { MoreHorizontal, Eye } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
 
 export default function PetActions({
@@ -30,12 +29,17 @@ export default function PetActions({
   petName: string;
 }) {
   const { t } = useTranslation('Admin.petActions');
+
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const router = useNavigate();
 
   const handleDelete = async () => {
     setIsSubmitting(true);
@@ -59,38 +63,23 @@ export default function PetActions({
   };
 
   return (
-    <div className="relative">
-      {/* Dropdown Menu */}
-      <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
-            <MoreHorizontal className="h-4 w-4" />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
-          <DropdownMenuItem
-            onClick={() => {
-              setIsDropdownOpen(false);
-              window.open(`/pet/${petId}`, '_blank');
-            }}
-            className="cursor-pointer"
-          >
-            <Eye className="mr-2 h-4 w-4" />
-            {t('view')}
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => {
-              setIsDropdownOpen(false);
-              setIsDeleting(true);
-            }}
-            className="text-red-600 hover:text-red-700 focus:text-red-700"
-          >
-            {t('delete')}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+    <>
+      {/* Actions select with native menu */}
+      <select
+        className="h-8 w-8 p-0 border-0 bg-transparent cursor-pointer appearance-none text-center"
+        onChange={(e) => {
+          const value = e.target.value;
+          if (value === 'view') window.open(`/pet/${petId}`, '_blank');
+          if (value === 'delete') setIsDeleting(true);
+          e.target.value = '';
+        }}
+        value=""
+        title={t('actions')}
+      >
+        <option value="" disabled>⋮</option>
+        <option value="view">{t('view')}</option>
+        <option value="delete">{t('delete')}</option>
+      </select>
 
       {/* Delete Confirmation Dialog */}
       <Dialog
@@ -102,7 +91,7 @@ export default function PetActions({
           setIsDeleting(open);
         }}
       >
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md" dir={isHebrew ? 'rtl' : 'ltr'}>
           <DialogHeader>
             <DialogTitle>{t('delete')}</DialogTitle>
             <DialogDescription>
@@ -130,6 +119,6 @@ export default function PetActions({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

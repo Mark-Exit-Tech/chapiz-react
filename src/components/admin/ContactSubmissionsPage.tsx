@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { getAllContactSubmissions, type ContactSubmission } from '@/lib/firebase/database/contact';
-import { Mail, Phone, User, Calendar, Eye, MessageSquare } from 'lucide-react';
+import { Mail, Phone, User, Calendar, MessageSquare } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import {
   Table,
@@ -19,6 +19,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import AdminLayout from './AdminLayout';
+import ContactSubmissionActions from './ContactSubmissionActions';
 
 export default function ContactSubmissionsPage() {
   const [submissions, setSubmissions] = useState<ContactSubmission[]>([]);
@@ -193,13 +194,19 @@ export default function ContactSubmissionsPage() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <button
-                          onClick={() => setSelectedSubmission(submission)}
-                          className="text-blue-600 hover:text-blue-900 flex items-center gap-1"
-                        >
-                          <Eye className="w-4 h-4" />
-                          {text.view}
-                        </button>
+                        <ContactSubmissionActions
+                          submissionId={submission.id}
+                          isRead={submission.read || false}
+                          submission={{
+                            id: submission.id,
+                            name: submission.name,
+                            email: submission.email,
+                            phone: submission.phoneNumber || submission.phone || '',
+                            message: submission.message || '',
+                            createdAt: submission.createdAt,
+                            isRead: submission.read || false
+                          }}
+                        />
                       </TableCell>
                     </TableRow>
                   ))}

@@ -41,6 +41,12 @@ export default function ContactSubmissionsTable({
   const { t } = useTranslation('Admin');
   const [search, setSearch] = useState(searchParams.search);
 
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+
   const formatDate = (date: Date | string | null | undefined) => {
     if (!date) return 'N/A';
     return format(new Date(date), 'dd/MM/yyyy HH:mm');
@@ -147,10 +153,10 @@ export default function ContactSubmissionsTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('contactSubmissions.table.contactInfo')}</TableHead>
-              <TableHead>{t('contactSubmissions.table.message')}</TableHead>
-              <TableHead>{t('contactSubmissions.table.status')}</TableHead>
-              <TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{t('contactSubmissions.table.contactInfo')}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{t('contactSubmissions.table.message')}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{t('contactSubmissions.table.status')}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>
                 <a href={getSortUrl('createdAt')} className="flex items-center">
                   {t('contactSubmissions.table.submitted')}
                   {searchParams.sort === 'createdAt' && (
@@ -164,7 +170,7 @@ export default function ContactSubmissionsTable({
                   )}
                 </a>
               </TableHead>
-              <TableHead className="text-right">{t('contactSubmissions.table.actions')}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : 'text-center'}>{t('contactSubmissions.table.actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -177,7 +183,7 @@ export default function ContactSubmissionsTable({
             ) : (
               submissions.map((submission) => (
                 <TableRow key={submission.id} className={!submission.isRead ? 'bg-blue-50' : ''}>
-                  <TableCell>
+                  <TableCell className={isHebrew ? 'text-right' : ''}>
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <User className="h-4 w-4 text-gray-400" />
@@ -196,12 +202,12 @@ export default function ContactSubmissionsTable({
                     </div>
                   </TableCell>
 
-                  <TableCell className="max-w-xs">
+                  <TableCell className={`max-w-xs ${isHebrew ? 'text-right' : ''}`}>
                     <div className="truncate" title={submission.message}>
                       {submission.message}
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className={isHebrew ? 'text-right' : ''}>
                     <span
                       className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
                         submission.isRead
@@ -212,8 +218,8 @@ export default function ContactSubmissionsTable({
                       {submission.isRead ? t('contactSubmissions.table.read') : t('contactSubmissions.table.unread')}
                     </span>
                   </TableCell>
-                  <TableCell>{formatDate(submission.createdAt)}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className={isHebrew ? 'text-right' : ''}>{formatDate(submission.createdAt)}</TableCell>
+                  <TableCell className={isHebrew ? 'text-right' : 'text-center'}>
                     <ContactSubmissionActions
                       submissionId={submission.id}
                       isRead={submission.isRead}

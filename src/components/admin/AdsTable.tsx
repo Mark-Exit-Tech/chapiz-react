@@ -16,6 +16,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { MoreHorizontal, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -24,9 +30,11 @@ import AdActions from './AdActions';
 
 export default function AdsTable() {
   const { t } = useTranslation('Admin');
+  const { t: tCommon } = useTranslation('common');
   const [ads, setAds] = useState<Ad[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [previewAd, setPreviewAd] = useState<Ad | null>(null);
   
   // Get locale from URL
   const locale = typeof window !== 'undefined'
@@ -47,7 +55,8 @@ export default function AdsTable() {
     statusActive: isHebrew ? 'פעיל' : 'Active',
     statusScheduled: isHebrew ? 'מתוזמן' : 'Scheduled',
     statusDraft: isHebrew ? 'טיוטה' : 'Draft',
-    statusInactive: isHebrew ? 'לא פעיל' : 'Inactive'
+    statusInactive: isHebrew ? 'לא פעיל' : 'Inactive',
+    actions: isHebrew ? 'פעולות' : 'Actions'
   };
 
   useEffect(() => {
@@ -124,12 +133,12 @@ export default function AdsTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{text.title}</TableHead>
-              <TableHead>{text.type}</TableHead>
-              <TableHead>{text.image}</TableHead>
-              <TableHead>{text.status}</TableHead>
-              <TableHead>{text.created}</TableHead>
-              <TableHead className="w-[50px]"></TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{text.title}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{text.type}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{text.image}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{text.status}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{text.created}</TableHead>
+              <TableHead className={`w-[50px] ${isHebrew ? 'text-right' : 'text-center'}`}>{text.actions}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -141,7 +150,11 @@ export default function AdsTable() {
                 </TableRow>
             ) : (
               ads.map((ad) => (
-                <TableRow key={ad.id}>
+                <TableRow
+                  key={ad.id}
+                  className="cursor-pointer hover:bg-gray-50"
+                  onClick={() => setPreviewAd(ad)}
+                >
                   <TableCell className="font-medium">{ad.title}</TableCell>
                   <TableCell>
                     <Badge variant="outline">{ad.type}</Badge>
@@ -149,8 +162,8 @@ export default function AdsTable() {
                   <TableCell>
                     {ad.content ? (
                       <div className="w-16 h-10 rounded-md overflow-hidden">
-                        <img 
-                          src={ad.content} 
+                        <img
+                          src={ad.content}
                           alt={ad.title}
                           className="w-full h-full object-cover"
                         />
@@ -161,9 +174,12 @@ export default function AdsTable() {
                       </div>
                     )}
                   </TableCell>
-                  <TableCell>{getStatusBadge(ad.status)}</TableCell>
-                  <TableCell>{formatDate(ad.createdAt)}</TableCell>
-                  <TableCell>
+                  <TableCell className={isHebrew ? 'text-right' : ''}>{getStatusBadge(ad.status)}</TableCell>
+                  <TableCell className={isHebrew ? 'text-right' : ''}>{formatDate(ad.createdAt)}</TableCell>
+                  <TableCell
+                    className={isHebrew ? 'text-right' : 'text-center'}
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <AdActions ad={ad} onDelete={fetchAds} onUpdate={fetchAds} />
                   </TableCell>
                 </TableRow>
@@ -172,6 +188,47 @@ export default function AdsTable() {
           </TableBody>
         </Table>
       </div>
+
+      {/* Preview Dialog */}
+      <Dialog open={!!previewAd} onOpenChange={(open) => !open && setPreviewAd(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          {previewAd && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-bold">{previewAd.title}</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                {/* Image */}
+                {previewAd.content && (
+                  <div className="rounded-lg overflow-hidden bg-gray-100">
+                    <img
+                      src={previewAd.content}
+                      alt={previewAd.title}
+                      className="w-full h-auto object-contain max-h-[500px] mx-auto"
+                    />
+                  </div>
+                )}
+
+                {/* Details */}
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="font-semibold text-gray-600">{text.type}: </span>
+                    <Badge variant="outline">{previewAd.type}</Badge>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-600">{text.status}: </span>
+                    {getStatusBadge(previewAd.status)}
+                  </div>
+                  <div className="col-span-2">
+                    <span className="font-semibold text-gray-600">{text.created}: </span>
+                    <span>{formatDate(previewAd.createdAt)}</span>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

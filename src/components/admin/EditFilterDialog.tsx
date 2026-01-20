@@ -26,6 +26,19 @@ interface EditFilterDialogProps {
 
 export default function EditFilterDialog({ filter, isOpen, onClose, onSuccess }: EditFilterDialogProps) {
   const { t } = useTranslation('Admin');
+
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+
+  // HARDCODED TEXT
+  const text = {
+    search: isHebrew ? 'חיפוש...' : 'Search...',
+    noAudiences: isHebrew ? 'לא נמצאו קהלים' : 'No audiences found'
+  };
+
   const [formData, setFormData] = useState({
     name: '',
     audienceIds: [] as string[]
@@ -107,7 +120,7 @@ export default function EditFilterDialog({ filter, isOpen, onClose, onSuccess }:
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px]" dir={isHebrew ? 'rtl' : 'ltr'}>
         <DialogHeader>
           <DialogTitle>{t('filterManagement.editFilter') || 'Edit Filter'}</DialogTitle>
         </DialogHeader>
@@ -138,6 +151,8 @@ export default function EditFilterDialog({ filter, isOpen, onClose, onSuccess }:
               selectedIds={formData.audienceIds}
               onSelectionChange={handleAudienceIdsChange}
               placeholder={t('filterManagement.audiencesPlaceholder') || 'Select audiences...'}
+              searchPlaceholder={text.search}
+              noOptionsText={text.noAudiences}
               disabled={loadingAudiences}
             />
           </div>

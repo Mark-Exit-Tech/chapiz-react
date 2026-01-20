@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -10,28 +9,32 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Audience } from '@/types/promo';
 import { getAudiences, updateAudience, deleteAudience } from '@/lib/actions/admin';
-import { useNavigate } from 'react-router-dom';
 import EditAudienceDialog from './EditAudienceDialog';
 
 export default function AudiencesTable() {
   const { t } = useTranslation('Admin');
-  const router = useNavigate();
   const [audiences, setAudiences] = useState<Audience[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingAudience, setEditingAudience] = useState<Audience | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+
+  // HARDCODED TEXT
+  const text = {
+    actions: isHebrew ? 'פעולות' : 'Actions',
+    edit: isHebrew ? 'ערוך' : 'Edit',
+    delete: isHebrew ? 'מחק' : 'Delete'
+  };
 
   useEffect(() => {
     fetchAudiences();
@@ -137,12 +140,12 @@ export default function AudiencesTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('audienceManagement.name')}</TableHead>
-              <TableHead>{t('audienceManagement.description')}</TableHead>
-              <TableHead>Target Criteria</TableHead>
-              <TableHead>{t('audienceManagement.status')}</TableHead>
-              <TableHead>{t('audienceManagement.createdAt')}</TableHead>
-              <TableHead className="w-[50px]"></TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{t('audienceManagement.name')}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{t('audienceManagement.description')}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>Target Criteria</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{t('audienceManagement.status')}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{t('audienceManagement.createdAt')}</TableHead>
+              <TableHead className={`w-[50px] ${isHebrew ? 'text-right' : 'text-center'}`}>{text.actions}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -155,11 +158,11 @@ export default function AudiencesTable() {
             ) : (
               audiences.map((audience) => (
                 <TableRow key={audience.id}>
-                  <TableCell className="font-medium">{audience.name}</TableCell>
-                  <TableCell className="max-w-xs truncate">
+                  <TableCell className={`font-medium ${isHebrew ? 'text-right' : ''}`}>{audience.name}</TableCell>
+                  <TableCell className={`max-w-xs truncate ${isHebrew ? 'text-right' : ''}`}>
                     {audience.description}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className={isHebrew ? 'text-right' : ''}>
                     {audience.targetCriteria.length > 0 ? (
                       <div className="flex flex-wrap gap-1">
                         {audience.targetCriteria.slice(0, 2).map((criteria, index) => (
@@ -177,38 +180,30 @@ export default function AudiencesTable() {
                       <span className="text-gray-400 text-sm">No criteria</span>
                     )}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className={isHebrew ? 'text-right' : ''}>
                     <Badge variant={audience.isActive ? 'default' : 'secondary'}>
                       {audience.isActive ? 'Active' : 'Inactive'}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-sm text-gray-500">
+                  <TableCell className={`text-sm text-gray-500 ${isHebrew ? 'text-right' : ''}`}>
                     {formatDate(audience.createdAt)}
                   </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEdit(audience)}>
-                          <Edit className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" />
-                          {t('audienceManagement.edit')}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleToggleActive(audience)}>
-                          {audience.isActive ? t('audienceManagement.deactivate') : t('audienceManagement.activate')}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => handleDelete(audience)}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" />
-                          {t('audienceManagement.delete')}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                  <TableCell className={isHebrew ? 'text-right' : 'text-center'}>
+                    <select
+                      className="h-8 w-8 p-0 border-0 bg-transparent cursor-pointer appearance-none text-center"
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === 'edit') handleEdit(audience);
+                        if (value === 'delete') handleDelete(audience);
+                        e.target.value = '';
+                      }}
+                      value=""
+                      title={text.actions}
+                    >
+                      <option value="" disabled>⋮</option>
+                      <option value="edit">{text.edit}</option>
+                      <option value="delete">{text.delete}</option>
+                    </select>
                   </TableCell>
                 </TableRow>
               ))

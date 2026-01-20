@@ -177,7 +177,7 @@ export default function AddBusinessForm() {
           {text.addNewBusiness}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto" dir={isHebrew ? 'rtl' : 'ltr'}>
         <DialogHeader>
           <DialogTitle>{text.addNewBusiness}</DialogTitle>
         </DialogHeader>

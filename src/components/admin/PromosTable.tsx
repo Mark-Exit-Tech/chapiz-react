@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -10,24 +9,30 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { MoreHorizontal, Edit, Trash2, Eye, Image, Youtube } from 'lucide-react';
+import { Youtube } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Promo, Business } from '@/types/promo';
 import { getPromos, getBusinesses, updatePromo, deletePromo } from '@/lib/actions/admin';
-import { useNavigate } from 'react-router-dom';
 import EditPromoDialog from './EditPromoDialog';
 import { getYouTubeThumbnailUrl } from '@/lib/utils/youtube';
 
 export default function PromosTable() {
   const { t } = useTranslation('Admin');
-  const router = useNavigate();
+
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+
+  // HARDCODED TEXT
+  const text = {
+    actions: isHebrew ? 'פעולות' : 'Actions',
+    edit: isHebrew ? 'ערוך' : 'Edit',
+    delete: isHebrew ? 'מחק' : 'Delete'
+  };
+
   const [promos, setPromos] = useState<Promo[]>([]);
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
@@ -168,13 +173,13 @@ export default function PromosTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('promoManagement.name')}</TableHead>
-              <TableHead>{t('promoManagement.image')}</TableHead>
-              <TableHead>{t('promoManagement.description')}</TableHead>
-              <TableHead>{t('promoManagement.business')}</TableHead>
-              <TableHead>{t('promoManagement.status')}</TableHead>
-              <TableHead>{t('promoManagement.createdAt')}</TableHead>
-              <TableHead className="w-[50px]"></TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{t('promoManagement.name')}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{t('promoManagement.image')}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{t('promoManagement.description')}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{t('promoManagement.business')}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{t('promoManagement.status')}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{t('promoManagement.createdAt')}</TableHead>
+              <TableHead className={`w-[50px] ${isHebrew ? 'text-right' : 'text-center'}`}>{text.actions}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -187,12 +192,12 @@ export default function PromosTable() {
             ) : (
               promos.map((promo) => (
                 <TableRow key={promo.id}>
-                  <TableCell className="font-medium">{promo.name}</TableCell>
-                  <TableCell>
+                  <TableCell className={`font-medium ${isHebrew ? 'text-right' : ''}`}>{promo.name}</TableCell>
+                  <TableCell className={isHebrew ? 'text-right' : ''}>
                     {promo.youtubeUrl ? (
                       <div className="relative w-16 h-10 rounded-md overflow-hidden">
-                        <img 
-                          src={getYouTubeThumbnailUrl(promo.youtubeUrl) || ''} 
+                        <img
+                          src={getYouTubeThumbnailUrl(promo.youtubeUrl) || ''}
                           alt={promo.name}
                           className="w-full h-full object-cover"
                         />
@@ -202,8 +207,8 @@ export default function PromosTable() {
                       </div>
                     ) : promo.imageUrl ? (
                       <div className="w-16 h-10 rounded-md overflow-hidden">
-                        <img 
-                          src={promo.imageUrl} 
+                        <img
+                          src={promo.imageUrl}
                           alt={promo.name}
                           className="w-full h-full object-cover"
                         />
@@ -214,10 +219,10 @@ export default function PromosTable() {
                       </div>
                     )}
                   </TableCell>
-                  <TableCell className="max-w-xs truncate">
+                  <TableCell className={`max-w-xs truncate ${isHebrew ? 'text-right' : ''}`}>
                     {promo.description}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className={isHebrew ? 'text-right' : ''}>
                     <div className="flex flex-wrap gap-1">
                       {getBusinessNames(promo).map((businessName, index) => (
                         <Badge key={index} variant="outline">
@@ -226,38 +231,30 @@ export default function PromosTable() {
                       ))}
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className={isHebrew ? 'text-right' : ''}>
                     <Badge variant={promo.isActive ? 'default' : 'secondary'}>
                     {promo.isActive ? t('status.active') : t('status.inactive')}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-sm text-gray-500">
+                  <TableCell className={`text-sm text-gray-500 ${isHebrew ? 'text-right' : ''}`}>
                     {formatDate(promo.createdAt)}
                   </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEdit(promo)}>
-                          <Edit className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" />
-                          {t('promoManagement.edit')}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleToggleActive(promo)}>
-                          {promo.isActive ? t('promoManagement.deactivate') : t('promoManagement.activate')}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => handleDelete(promo)}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" />
-                          {t('promoManagement.delete')}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                  <TableCell className={isHebrew ? 'text-right' : 'text-center'}>
+                    <select
+                      className="h-8 w-8 p-0 border-0 bg-transparent cursor-pointer appearance-none text-center"
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === 'edit') handleEdit(promo);
+                        if (value === 'delete') handleDelete(promo);
+                        e.target.value = '';
+                      }}
+                      value=""
+                      title={text.actions}
+                    >
+                      <option value="" disabled>⋮</option>
+                      <option value="edit">{text.edit}</option>
+                      <option value="delete">{text.delete}</option>
+                    </select>
                   </TableCell>
                 </TableRow>
               ))

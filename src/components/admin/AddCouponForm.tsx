@@ -16,9 +16,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { createCoupon, getBusinesses } from '@/lib/actions/admin';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import MediaUpload from '@/components/admin/MediaUpload';
-import { BusinessMultiselect } from '@/components/ui/business-multiselect';
+import { RtlMultiselect } from '@/components/ui/rtl-multiselect';
 import { Business } from '@/types/promo';
 
 export default function AddCouponForm() {
@@ -46,6 +46,8 @@ export default function AddCouponForm() {
     image: isHebrew ? 'תמונה' : 'Image',
     business: isHebrew ? 'עסק' : 'Business',
     businessPlaceholder: isHebrew ? 'בחר עסקים' : 'Select businesses',
+    search: isHebrew ? 'חיפוש...' : 'Search...',
+    noBusinesses: isHebrew ? 'לא נמצאו עסקים' : 'No businesses found',
     validFrom: isHebrew ? 'תקף מ' : 'Valid From',
     validTo: isHebrew ? 'תקף עד' : 'Valid To',
     purchaseLimit: isHebrew ? 'מגבלת רכישה' : 'Purchase Limit',
@@ -113,6 +115,13 @@ export default function AddCouponForm() {
     }));
   };
 
+  // Convert businesses to dropdown options
+  const businessOptions = useMemo(() => {
+    return businesses.map(business => ({
+      value: business.id,
+      label: business.name
+    }));
+  }, [businesses]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -193,7 +202,7 @@ export default function AddCouponForm() {
           {text.addNewCoupon}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto" dir={isHebrew ? 'rtl' : 'ltr'}>
         <DialogHeader>
           <DialogTitle>{text.addNewCoupon}</DialogTitle>
         </DialogHeader>
@@ -275,11 +284,13 @@ export default function AddCouponForm() {
 
           <div className="space-y-2">
             <Label>{text.business || 'Businesses (Optional)'}</Label>
-            <BusinessMultiselect
-              businesses={businesses}
-              selectedIds={formData.businessIds}
+            <RtlMultiselect
+              options={businessOptions}
+              selectedValues={formData.businessIds}
               onSelectionChange={handleBusinessIdsChange}
               placeholder={text.businessPlaceholder || 'Select businesses (optional)'}
+              searchPlaceholder={text.search}
+              noOptionsText={text.noBusinesses}
               disabled={loadingBusinesses}
             />
           </div>

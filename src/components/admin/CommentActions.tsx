@@ -18,8 +18,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { deleteComment } from '@/lib/actions/admin';
-import { MoreHorizontal, Trash2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { MoreHorizontal } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 
@@ -31,12 +30,17 @@ export default function CommentActions({
   content: string;
 }) {
   const { t } = useTranslation('Admin');
+
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const router = useNavigate();
 
   const handleDelete = async () => {
     setIsSubmitting(true);
@@ -62,28 +66,21 @@ export default function CommentActions({
 
 
   return (
-    <div className="relative">
-      <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
-            <MoreHorizontal className="h-4 w-4" />
-            <span className="sr-only">{t('commentActions.actions')}</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>{t('commentActions.actions')}</DropdownMenuLabel>
-          <DropdownMenuItem
-            onClick={() => {
-              setIsDropdownOpen(false);
-              setTimeout(() => setIsDeleting(true), 10);
-            }}
-            className="text-red-600 hover:text-red-700 focus:text-red-700"
-          >
-            <Trash2 className="h-4 w-4 mr-2" />
-            {t('commentActions.delete')}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+    <>
+      {/* Actions select with native menu */}
+      <select
+        className="h-8 w-8 p-0 border-0 bg-transparent cursor-pointer appearance-none text-center"
+        onChange={(e) => {
+          const value = e.target.value;
+          if (value === 'delete') setIsDeleting(true);
+          e.target.value = '';
+        }}
+        value=""
+        title={t('commentActions.actions')}
+      >
+        <option value="" disabled>⋮</option>
+        <option value="delete">{t('commentActions.delete')}</option>
+      </select>
 
       <Dialog
         open={isDeleting}
@@ -94,7 +91,7 @@ export default function CommentActions({
           setIsDeleting(open);
         }}
       >
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md" dir={isHebrew ? 'rtl' : 'ltr'}>
           <DialogHeader>
             <DialogTitle>{t('commentActions.deleteTitle')}</DialogTitle>
             <DialogDescription>
@@ -128,6 +125,6 @@ export default function CommentActions({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

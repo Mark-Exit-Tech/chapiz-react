@@ -13,48 +13,45 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { RtlMultiselect } from '@/components/ui/rtl-multiselect';
-import { updateCoupon, getBusinesses } from '@/lib/actions/admin';
-import { useTranslation } from 'react-i18next';
+import { updateVoucher, getBusinesses } from '@/lib/actions/admin';
 import { useState, useEffect, useMemo } from 'react';
-import { Coupon } from '@/types/coupon';
+import { Voucher } from '@/lib/firebase/database/vouchers';
 import { Business } from '@/types/promo';
 
-interface EditCouponDialogProps {
-  coupon: Coupon;
+interface EditVoucherDialogProps {
+  voucher: Voucher;
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }: EditCouponDialogProps) {
-  const { t } = useTranslation('Admin');
+export default function EditVoucherDialog({ voucher, isOpen, onClose, onSuccess }: EditVoucherDialogProps) {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     price: '',
     points: '',
     imageUrl: '',
-    validFrom: '',
-    validTo: '',
     businessIds: [] as string[],
-    purchaseLimit: ''
+    validFrom: '',
+    validTo: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [businesses, setBusinesses] = useState<Business[]>([]);
-  const [loadingBusinesses, setLoadingBusinesses] = useState(false);
-  
+  const [loading, setLoading] = useState(false);
+
   // Get locale from URL
   const locale = typeof window !== 'undefined'
     ? window.location.pathname.split('/')[1] || 'en'
     : 'en';
   const isHebrew = locale === 'he';
-  
+
   // HARDCODED TEXT
   const text = {
-    title: isHebrew ? 'ערוך קופון' : 'Edit Coupon',
+    title: isHebrew ? 'ערוך שובר' : 'Edit Voucher',
     name: isHebrew ? 'שם' : 'Name',
-    namePlaceholder: isHebrew ? 'הזן שם קופון' : 'Enter coupon name',
+    namePlaceholder: isHebrew ? 'הזן שם שובר' : 'Enter voucher name',
     description: isHebrew ? 'תיאור' : 'Description',
     descriptionPlaceholder: isHebrew ? 'הזן תיאור' : 'Enter description',
     price: isHebrew ? 'מחיר (0 לחינם)' : 'Price (0 for free)',
@@ -62,65 +59,64 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
     points: isHebrew ? 'נקודות' : 'Points',
     pointsPlaceholder: isHebrew ? 'הזן נקודות' : 'Enter points',
     image: isHebrew ? 'תמונה' : 'Image',
-    business: isHebrew ? 'עסק' : 'Business',
-    businessPlaceholder: isHebrew ? 'בחר עסקים' : 'Select businesses',
+    business: isHebrew ? 'עסקים' : 'Businesses',
+    businessPlaceholder: isHebrew ? 'בחר עסקים (אופציונלי)' : 'Select businesses (optional)',
     search: isHebrew ? 'חיפוש...' : 'Search...',
     noBusinesses: isHebrew ? 'לא נמצאו עסקים' : 'No businesses found',
     validFrom: isHebrew ? 'תקף מ' : 'Valid From',
     validTo: isHebrew ? 'תקף עד' : 'Valid To',
-    purchaseLimit: isHebrew ? 'מגבלת רכישה' : 'Purchase Limit',
-    purchaseLimitPlaceholder: isHebrew ? 'הזן מגבלה (אופציונלי)' : 'Enter limit (optional)',
-    purchaseLimitHelp: isHebrew ? 'מספר פעמים שמשתמש יכול לרכוש קופון זה' : 'Number of times a user can purchase this coupon',
     cancel: isHebrew ? 'ביטול' : 'Cancel',
     update: isHebrew ? 'עדכן' : 'Update',
     updating: isHebrew ? 'מעדכן...' : 'Updating...'
   };
 
   useEffect(() => {
+    if (isOpen && voucher) {
+      setFormData({
+        name: voucher.name || '',
+        description: voucher.description || '',
+        price: voucher.price?.toString() || '',
+        points: voucher.points?.toString() || '',
+        imageUrl: voucher.imageUrl || '',
+        businessIds: (voucher as any).businessIds || [],
+        validFrom: voucher.validFrom ? new Date(voucher.validFrom).toISOString().slice(0, 16) : '',
+        validTo: voucher.validTo ? new Date(voucher.validTo).toISOString().slice(0, 16) : ''
+      });
+      setError(null);
+    }
+  }, [isOpen, voucher]);
+
+  useEffect(() => {
     if (isOpen) {
       fetchBusinesses();
-      if (coupon) {
-        // Support both old businessId and new businessIds format
-        const businessIds = coupon.businessIds || (coupon.businessId ? [coupon.businessId] : []);
-
-        console.log('🔍 EditCouponDialog - Coupon data received:', {
-          couponId: coupon.id,
-          couponName: coupon.name,
-          hasBusinessId: !!coupon.businessId,
-          hasBusinessIds: !!coupon.businessIds,
-          businessId: coupon.businessId,
-          businessIds: coupon.businessIds,
-          extractedBusinessIds: businessIds
-        });
-
-        setFormData({
-          name: coupon.name || '',
-          description: coupon.description || '',
-          price: coupon.price?.toString() || '',
-          points: coupon.points?.toString() || '',
-          imageUrl: coupon.imageUrl || '',
-          validFrom: coupon.validFrom ? new Date(coupon.validFrom).toISOString().slice(0, 16) : '',
-          validTo: coupon.validTo ? new Date(coupon.validTo).toISOString().slice(0, 16) : '',
-          businessIds: businessIds,
-          purchaseLimit: coupon.purchaseLimit?.toString() || ''
-        });
-      }
     }
-  }, [isOpen, coupon]);
+  }, [isOpen]);
 
   const fetchBusinesses = async () => {
+    setLoading(true);
     try {
-      setLoadingBusinesses(true);
       const result = await getBusinesses();
       if (result.success && result.businesses) {
         setBusinesses(result.businesses);
       }
-    } catch (err) {
-      console.error('Error fetching businesses:', err);
+    } catch (error) {
+      console.error('Error fetching businesses:', error);
     } finally {
-      setLoadingBusinesses(false);
+      setLoading(false);
     }
   };
+
+  const handleBusinessIdsChange = (selectedIds: string[]) => {
+    setFormData((prev) => ({ ...prev, businessIds: selectedIds }));
+  };
+
+  // Convert businesses to dropdown options
+  const businessOptions = useMemo(() => {
+    return businesses.map(business => ({
+      value: business.id,
+      label: business.name
+    }));
+  }, [businesses]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -132,91 +128,23 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
     }));
   };
 
-  const handleBusinessIdsChange = (selectedIds: string[]) => {
-    setFormData((prev) => ({
-      ...prev,
-      businessIds: selectedIds
-    }));
-  };
-
-  // Convert businesses to dropdown options
-  const businessOptions = useMemo(() => {
-    return businesses.map(business => ({
-      value: business.id,
-      label: business.name
-    }));
-  }, [businesses]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
 
     try {
-      // Allow empty price for free vouchers (defaults to 0)
-      const price = formData.price === '' ? 0 : parseFloat(formData.price);
+      const result = await updateVoucher(voucher.id, formData);
 
-      // Default points to 0 if empty and price is 0
-      let points = parseInt(formData.points);
-      if (isNaN(points) && price === 0) {
-        points = 0;
+      if (result.success) {
+        onSuccess();
+        onClose();
+      } else {
+        setError(result.error || 'Failed to update voucher');
       }
-
-      if (isNaN(price) || price < 0) {
-        throw new Error('Please enter a valid price (0 for free vouchers)');
-      }
-
-      if (isNaN(points) || points < 0) {
-        throw new Error('Please enter valid points');
-      }
-
-      console.log('🔍 EditCouponDialog - Submitting with businessIds:', {
-        couponId: coupon.id,
-        businessIds: formData.businessIds,
-        businessIdsLength: formData.businessIds.length,
-        willSend: formData.businessIds.length > 0 ? formData.businessIds : undefined
-      });
-
-      const purchaseLimit = formData.purchaseLimit === '' ? undefined : parseInt(formData.purchaseLimit);
-      if (purchaseLimit !== undefined && (isNaN(purchaseLimit) || purchaseLimit < 1)) {
-        throw new Error('Purchase limit must be a positive number or left empty for unlimited');
-      }
-
-      const result = await updateCoupon(coupon.id, {
-        name: formData.name,
-        description: formData.description,
-        price: price,
-        points: points,
-        imageUrl: formData.imageUrl,
-        validFrom: new Date(formData.validFrom),
-        validTo: new Date(formData.validTo),
-        businessIds: formData.businessIds.length > 0 ? formData.businessIds : undefined,
-        purchaseLimit: purchaseLimit
-      });
-
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to update coupon');
-      }
-
-      // Verify the update was successful by fetching the coupon again
-      console.log('✅ Update successful, verifying saved data...');
-      const { getCouponById } = await import('@/lib/actions/admin');
-      const verifyResult = await getCouponById(coupon.id);
-      if (verifyResult.success && verifyResult.coupon) {
-        console.log('🔍 Verification - Coupon after update:', {
-          couponId: verifyResult.coupon.id,
-          hasBusinessId: !!verifyResult.coupon.businessId,
-          hasBusinessIds: !!verifyResult.coupon.businessIds,
-          businessId: verifyResult.coupon.businessId,
-          businessIds: verifyResult.coupon.businessIds
-        });
-      }
-
-      onSuccess();
-      onClose();
     } catch (err: any) {
-      console.error('Error updating coupon:', err);
-      setError(err.message || 'Failed to update coupon. Please try again.');
+      console.error('Error updating voucher:', err);
+      setError(err.message || 'Failed to update voucher');
     } finally {
       setIsSubmitting(false);
     }
@@ -224,13 +152,13 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto" dir={isHebrew ? 'rtl' : 'ltr'}>
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto" dir={isHebrew ? 'rtl' : 'ltr'}>
         <DialogHeader>
           <DialogTitle>{text.title}</DialogTitle>
         </DialogHeader>
 
         {error && (
-          <div className="mb-4 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
+          <div className="p-3 rounded bg-red-100 text-red-800 text-sm">
             {error}
           </div>
         )}
@@ -283,6 +211,7 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
                   id="points"
                   name="points"
                   type="number"
+                  min="0"
                   value={formData.points}
                   onChange={handleChange}
                   placeholder={text.pointsPlaceholder}
@@ -312,7 +241,7 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
               placeholder={text.businessPlaceholder}
               searchPlaceholder={text.search}
               noOptionsText={text.noBusinesses}
-              disabled={loadingBusinesses}
+              disabled={loading}
             />
           </div>
 
@@ -328,7 +257,6 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
                 required
               />
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="validTo">{text.validTo}</Label>
               <Input
@@ -342,24 +270,13 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="purchaseLimit">{text.purchaseLimit}</Label>
-            <Input
-              id="purchaseLimit"
-              name="purchaseLimit"
-              type="number"
-              min="1"
-              value={formData.purchaseLimit}
-              onChange={handleChange}
-              placeholder={text.purchaseLimitPlaceholder}
-            />
-            <p className="text-xs text-gray-500">
-              {text.purchaseLimitHelp}
-            </p>
-          </div>
-
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isSubmitting}
+            >
               {text.cancel}
             </Button>
             <Button type="submit" disabled={isSubmitting}>

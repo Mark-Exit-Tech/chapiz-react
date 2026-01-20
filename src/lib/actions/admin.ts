@@ -638,13 +638,70 @@ export async function deleteCoupon(id: string) {
   try {
     const { doc, deleteDoc } = await import('firebase/firestore');
     const { db } = await import('@/lib/firebase/client');
-    
+
     const couponRef = doc(db, 'coupons', id);
     await deleteDoc(couponRef);
     return { success: true, error: undefined };
   } catch (error) {
     console.error('Error deleting coupon:', error);
     return { success: false, error: String(error) };
+  }
+}
+
+export async function deleteVoucher(id: string) {
+  try {
+    const { doc, deleteDoc } = await import('firebase/firestore');
+    const { db } = await import('@/lib/firebase/client');
+
+    const voucherRef = doc(db, 'vouchers', id);
+    await deleteDoc(voucherRef);
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Error deleting voucher:', error);
+    return { success: false, error: String(error) };
+  }
+}
+
+export async function updateVoucher(id: string, data: any) {
+  try {
+    const { doc, updateDoc, Timestamp } = await import('firebase/firestore');
+    const { db } = await import('@/lib/firebase/client');
+
+    const voucherRef = doc(db, 'vouchers', id);
+
+    const updateData: any = {
+      ...data,
+      updatedAt: Timestamp.now()
+    };
+
+    // Convert date strings to Timestamps
+    if (data.validFrom) {
+      updateData.validFrom = Timestamp.fromDate(new Date(data.validFrom));
+    }
+    if (data.validTo) {
+      updateData.validTo = Timestamp.fromDate(new Date(data.validTo));
+    }
+
+    // Convert numeric fields
+    if (data.price !== undefined) {
+      updateData.price = Number(data.price);
+    }
+    if (data.points !== undefined) {
+      updateData.points = Number(data.points);
+    }
+    if (data.purchaseLimit !== undefined && data.purchaseLimit !== '') {
+      updateData.purchaseLimit = Number(data.purchaseLimit);
+    }
+
+    await updateDoc(voucherRef, updateData);
+    console.log('✅ Voucher updated successfully:', id);
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('❌ Error updating voucher:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to update voucher'
+    };
   }
 }
 

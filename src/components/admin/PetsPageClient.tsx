@@ -50,6 +50,12 @@ export default function PetsPageClient({ pets, searchParams, hideOwnerColumn = f
   const { t } = useTranslation('Admin');
   const [petsData, setPetsData] = useState(pets);
 
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+
   // Parse query parameters
   const pageParam = searchParams?.page;
   const limitParam = searchParams?.limit;
@@ -274,9 +280,9 @@ export default function PetsPageClient({ pets, searchParams, hideOwnerColumn = f
                   )}
                 </a>
               </TableHead>
-              <TableHead>{t('petsManagement.table.image')}</TableHead>
-              {!hideOwnerColumn && <TableHead>{t('petsManagement.table.ownerName')}</TableHead>}
-              <TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{t('petsManagement.table.image')}</TableHead>
+              {!hideOwnerColumn && <TableHead className={isHebrew ? 'text-right' : ''}>{t('petsManagement.table.ownerName')}</TableHead>}
+              <TableHead className={isHebrew ? 'text-right' : ''}>
                 <a href={getSortUrl('createdAt')} className="flex items-center">
                   {t('petsManagement.table.created')}
                   {sort === 'createdAt' && (
@@ -290,7 +296,7 @@ export default function PetsPageClient({ pets, searchParams, hideOwnerColumn = f
                   )}
                 </a>
               </TableHead>
-              <TableHead className="text-right">{t('petsManagement.table.actions')}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : 'text-center'}>{t('petsManagement.table.actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -349,9 +355,9 @@ export default function PetsPageClient({ pets, searchParams, hideOwnerColumn = f
                       </div>
                     )}
                   </TableCell>
-                  {!hideOwnerColumn && <TableCell className="font-medium">{pet.ownerName}</TableCell>}
-                  <TableCell>{formatDate(pet.createdAt)}</TableCell>
-                  <TableCell className="text-right">
+                  {!hideOwnerColumn && <TableCell className={`font-medium ${isHebrew ? 'text-right' : ''}`}>{pet.ownerName}</TableCell>}
+                  <TableCell className={isHebrew ? 'text-right' : ''}>{formatDate(pet.createdAt)}</TableCell>
+                  <TableCell className={isHebrew ? 'text-right' : 'text-center'}>
                     <PetActions petId={pet.id} petName={pet.name} />
                   </TableCell>
                 </TableRow>

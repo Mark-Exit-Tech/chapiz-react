@@ -14,24 +14,10 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
 import { deleteUser, updateUserRole, restrictUser, unrestrictUser, addPointsToUser } from '@/lib/actions/admin';
 import { updateUserByUid } from '@/lib/firebase/database/users';
-import { MoreHorizontal, Phone, Coins, PawPrint } from 'lucide-react';
+import { Phone, Coins } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useLocale } from '@/hooks/use-locale';
@@ -82,6 +68,7 @@ export default function UserActions({
     // Delete dialog
     confirmDeletion: isHebrew ? 'אישור מחיקה' : 'Confirm Deletion',
     deleteUserMessage: isHebrew ? 'האם אתה בטוח שברצונך למחוק את המשתמש הזה? פעולה זו לא ניתנת לביטול.' : 'Are you sure you want to delete this user? This action cannot be undone.',
+    deletingUser: isHebrew ? 'מוחק משתמש...' : 'Deleting User...',
     // Add points dialog
     addPointsDescription: isHebrew ? 'הוסף נקודות לחשבון המשתמש הזה. פעולה זו תירשם בהיסטוריית העסקאות.' : 'Add points to this user\'s account. This action will be logged in the transaction history.',
     pointsAmount: isHebrew ? 'כמות נקודות' : 'Points Amount',
@@ -104,14 +91,11 @@ export default function UserActions({
     return text.selectRole;
   };
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [newRole, setNewRole] = useState(currentRole);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [deleteConfirmation, setDeleteConfirmation] = useState(false);
   const [restrictionReason, setRestrictionReason] = useState('');
-  const [showRestrictionReasonInput, setShowRestrictionReasonInput] = useState(false);
   const [phone, setPhone] = useState(phoneNumber || '');
   const [currentAddress, setCurrentAddress] = useState(userAddress || '');
   const [isLoading, setIsLoading] = useState(false);
@@ -143,12 +127,11 @@ export default function UserActions({
     }
   };
 
-  const handleDelete = async () => {
-    if (!deleteConfirmation) {
-      setIsDeleting(true);
-      return;
-    }
+  const handleDeleteClick = () => {
+    setIsDeleting(true);
+  };
 
+  const handleConfirmDelete = async () => {
     setIsSubmitting(true);
     setError(null);
 
@@ -290,9 +273,8 @@ export default function UserActions({
     }
   };
 
-  // Handle opening the edit dialog and closing the dropdown
+  // Handle opening the edit dialog
   const handleOpenEditDialog = async () => {
-    setIsDropdownOpen(false);
     setIsLoading(true);
 
     try {
@@ -310,40 +292,25 @@ export default function UserActions({
   };
 
   return (
-    <div className="relative">
-      {/* Dropdown Menu */}
-      <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
-            <MoreHorizontal className="h-4 w-4" />
-            <span className="sr-only">{text.actions}</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>{text.actions}</DropdownMenuLabel>
-          <DropdownMenuItem onClick={handleOpenEditDialog}>
-            {text.editUser}
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => {
-            setIsDropdownOpen(false);
-            setIsAddPointsOpen(true);
-          }}>
-            <Coins className="h-4 w-4 mr-2" />
-            {text.addPoints}
-          </DropdownMenuItem>
-          {!isSuperAdmin && (
-            <DropdownMenuItem
-              onClick={() => {
-                setIsDropdownOpen(false);
-                setTimeout(() => handleDelete(), 10);
-              }}
-              className="text-red-600 hover:text-red-700 focus:text-red-700"
-            >
-              {text.deleteUser}
-            </DropdownMenuItem>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
+    <>
+      {/* Actions select with native menu */}
+      <select
+        className="h-8 px-2 border rounded bg-white cursor-pointer text-sm"
+        onChange={(e) => {
+          const value = e.target.value;
+          if (value === 'edit') handleOpenEditDialog();
+          if (value === 'points') setIsAddPointsOpen(true);
+          if (value === 'delete') handleDeleteClick();
+          e.target.value = '';
+        }}
+        value=""
+        title={text.actions}
+      >
+        <option value="" disabled>⋮ {text.actions}</option>
+        <option value="edit">{text.editUser}</option>
+        <option value="points">{text.addPoints}</option>
+        {!isSuperAdmin && <option value="delete">{text.deleteUser}</option>}
+      </select>
 
       {/* Edit Role Dialog - completely separate from dropdown */}
       <Dialog
@@ -356,7 +323,7 @@ export default function UserActions({
           setIsEditOpen(open);
         }}
       >
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md" dir={isRTL ? 'rtl' : 'ltr'}>
           <DialogHeader>
             <DialogTitle>{text.editUser}</DialogTitle>
             <DialogDescription>{text.editUserDescription}</DialogDescription>
@@ -378,21 +345,16 @@ export default function UserActions({
                 {/* Role Selection */}
                 <div className="space-y-2" dir={isRTL ? 'rtl' : 'ltr'}>
                   <Label>{text.userRole}</Label>
-                  <Select
+                  <select
                     value={newRole}
-                    onValueChange={(value) => setNewRole(value)}
+                    onChange={(e) => setNewRole(e.target.value)}
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
                   >
-                    <SelectTrigger className={isRTL ? 'rtl:text-right' : ''}>
-                      <SelectValue placeholder={text.selectRole}>
-                        {getRoleName(newRole)}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent dir={isRTL ? 'rtl' : 'ltr'}>
-                      <SelectItem value="user">{text.roles.user}</SelectItem>
-                      <SelectItem value="admin">{text.roles.admin}</SelectItem>
-                      <SelectItem value="super_admin">{text.roles.superAdmin}</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <option value="">{text.selectRole}</option>
+                    <option value="user">{text.roles.user}</option>
+                    <option value="admin">{text.roles.admin}</option>
+                    <option value="super_admin">{text.roles.superAdmin}</option>
+                  </select>
                 </div>
 
                 {/* Phone Number */}
@@ -458,13 +420,12 @@ export default function UserActions({
         open={isDeleting}
         onOpenChange={(open) => {
           if (!open) {
-            setDeleteConfirmation(false);
             setError(null);
           }
           setIsDeleting(open);
         }}
       >
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md" dir={isRTL ? 'rtl' : 'ltr'}>
           <DialogHeader>
             <DialogTitle>{text.confirmDeletion}</DialogTitle>
             <DialogDescription>
@@ -472,18 +433,22 @@ export default function UserActions({
             </DialogDescription>
           </DialogHeader>
 
+          {error && (
+            <div className="mb-4 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
+              {error}
+            </div>
+          )}
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDeleting(false)}>
               {text.cancel}
             </Button>
             <Button
               variant="destructive"
-              onClick={() => {
-                setDeleteConfirmation(true);
-                handleDelete();
-              }}
+              onClick={handleConfirmDelete}
+              disabled={isSubmitting}
             >
-              {text.deleteUser}
+              {isSubmitting ? text.deletingUser : text.deleteUser}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -551,6 +516,6 @@ export default function UserActions({
         </DialogContent>
       </Dialog>
 
-    </div>
+    </>
   );
 }

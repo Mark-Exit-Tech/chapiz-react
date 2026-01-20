@@ -34,7 +34,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     navigation: {
       dashboard: isHebrew ? 'לוח בקרה' : 'Dashboard',
       manageAds: isHebrew ? 'ניהול מודעות' : 'Manage Ads',
-      managePromos: isHebrew ? 'ניהול מבצעים' : 'Manage Promos',
+      managePromos: isHebrew ? 'ניהול קופונים' : 'Manage Promos',
       manageCoupons: isHebrew ? 'ניהול שוברים' : 'Manage Coupons',
       manageBusinesses: isHebrew ? 'ניהול עסקים' : 'Manage Businesses',
       manageComments: isHebrew ? 'ניהול תגובות' : 'Manage Comments',
@@ -117,7 +117,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen relative">
+    <div className="flex flex-col md:flex-row min-h-screen relative" dir={isHebrew ? 'rtl' : 'ltr'}>
       {/* Mobile Navigation */}
       <div className="md:hidden">
         <AdminTopNav

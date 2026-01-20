@@ -21,6 +21,19 @@ import { Audience } from '@/types/promo';
 
 export default function AddFilterForm() {
   const { t } = useTranslation('Admin');
+
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+
+  // HARDCODED TEXT
+  const text = {
+    search: isHebrew ? 'חיפוש...' : 'Search...',
+    noAudiences: isHebrew ? 'לא נמצאו קהלים' : 'No audiences found'
+  };
+
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -117,7 +130,7 @@ export default function AddFilterForm() {
           {t('filterManagement.addNewFilter') || 'Add New Filter'}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px]" dir={isHebrew ? 'rtl' : 'ltr'}>
         <DialogHeader>
           <DialogTitle>{t('filterManagement.addNewFilter') || 'Add New Filter'}</DialogTitle>
         </DialogHeader>
@@ -148,6 +161,8 @@ export default function AddFilterForm() {
               selectedIds={formData.audienceIds}
               onSelectionChange={handleAudienceIdsChange}
               placeholder={t('filterManagement.audiencesPlaceholder') || 'Select audiences...'}
+              searchPlaceholder={text.search}
+              noOptionsText={text.noAudiences}
               disabled={loadingAudiences}
             />
           </div>

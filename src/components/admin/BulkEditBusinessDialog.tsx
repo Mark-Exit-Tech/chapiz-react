@@ -110,7 +110,7 @@ export default function BulkEditBusinessDialog({
 
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
-            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto" dir={isHebrew ? 'rtl' : 'ltr'}>
                 <DialogHeader className="text-center pr-8">
                     <DialogTitle className="text-center">
                         {text.title}

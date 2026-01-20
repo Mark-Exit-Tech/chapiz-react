@@ -28,6 +28,19 @@ interface EditPromoDialogProps {
 
 export default function EditPromoDialog({ promo, isOpen, onClose, onSuccess }: EditPromoDialogProps) {
   const { t } = useTranslation('Admin');
+
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+
+  // HARDCODED TEXT
+  const text = {
+    search: isHebrew ? 'חיפוש...' : 'Search...',
+    noBusinesses: isHebrew ? 'לא נמצאו עסקים' : 'No businesses found'
+  };
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -129,7 +142,7 @@ export default function EditPromoDialog({ promo, isOpen, onClose, onSuccess }: E
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto" dir={isHebrew ? 'rtl' : 'ltr'}>
         <DialogHeader>
           <DialogTitle>{t('dialogs.editPromo.title')}</DialogTitle>
         </DialogHeader>
@@ -185,6 +198,8 @@ export default function EditPromoDialog({ promo, isOpen, onClose, onSuccess }: E
               selectedIds={formData.businessIds}
               onSelectionChange={handleBusinessIdsChange}
               placeholder={t('promoManagement.businessPlaceholder') || 'Select businesses (optional)'}
+              searchPlaceholder={text.search}
+              noOptionsText={text.noBusinesses}
               disabled={loading}
             />
           </div>

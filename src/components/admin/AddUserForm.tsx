@@ -11,13 +11,6 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -143,7 +136,7 @@ export default function AddUserForm() {
           {text.addUser}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto" dir={isHebrew ? 'rtl' : 'ltr'}>
         <DialogHeader>
           <DialogTitle>{text.title}</DialogTitle>
         </DialogHeader>
@@ -197,47 +190,35 @@ export default function AddUserForm() {
 
           <div className="space-y-2">
             <Label htmlFor="role">{text.role}</Label>
-            <Select
+            <select
+              id="role"
               name="role"
               value={formData.role}
-              onValueChange={(value) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  role: value as 'user' | 'admin' | 'super_admin'
-                }))
-              }
+              onChange={handleChange}
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+              required
             >
-              <SelectTrigger>
-                <SelectValue placeholder={text.selectRole} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="user">{text.user}</SelectItem>
-                <SelectItem value="admin">{text.admin}</SelectItem>
-                <SelectItem value="super_admin">{text.superAdmin}</SelectItem>
-              </SelectContent>
-            </Select>
+              <option value="">{text.selectRole}</option>
+              <option value="user">{text.user}</option>
+              <option value="admin">{text.admin}</option>
+              <option value="super_admin">{text.superAdmin}</option>
+            </select>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="language">Language / שפה</Label>
-            <Select
+            <select
+              id="language"
               name="language"
               value={formData.language}
-              onValueChange={(value) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  language: value as 'en' | 'he'
-                }))
-              }
+              onChange={handleChange}
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+              required
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Select language" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="he">עברית (Hebrew)</SelectItem>
-                <SelectItem value="en">English</SelectItem>
-              </SelectContent>
-            </Select>
+              <option value="">Select language</option>
+              <option value="he">עברית (Hebrew)</option>
+              <option value="en">English</option>
+            </select>
           </div>
 
           <DialogFooter>

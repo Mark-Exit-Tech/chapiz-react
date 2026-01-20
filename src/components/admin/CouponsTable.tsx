@@ -10,18 +10,9 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { MoreHorizontal, Edit, Trash2, Eye, Image } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { Coupon } from '@/types/coupon';
 import { getCoupons, updateCoupon, deleteCoupon, getBusinesses } from '@/lib/actions/admin';
-import { useNavigate } from 'react-router-dom';
 import EditCouponDialog from './EditCouponDialog';
 import { Business } from '@/types/promo';
 import {
@@ -32,8 +23,6 @@ import {
 } from '@/components/ui/dialog';
 
 export default function CouponsTable() {
-  const { t } = useTranslation('Admin');
-  const router = useNavigate();
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,7 +30,7 @@ export default function CouponsTable() {
   const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [previewCoupon, setPreviewCoupon] = useState<Coupon | null>(null);
-  
+
   // Get locale from URL
   const locale = typeof window !== 'undefined'
     ? window.location.pathname.split('/')[1] || 'en'
@@ -70,7 +59,8 @@ export default function CouponsTable() {
     active: isHebrew ? 'פעיל' : 'Active',
     inactive: isHebrew ? 'לא פעיל' : 'Inactive',
     deleteConfirm: isHebrew ? 'האם אתה בטוח שברצונך למחוק קופון זה?' : 'Are you sure you want to delete this coupon?',
-    close: isHebrew ? 'סגור' : 'Close'
+    close: isHebrew ? 'סגור' : 'Close',
+    actions: isHebrew ? 'פעולות' : 'Actions'
   };
 
   useEffect(() => {
@@ -247,15 +237,15 @@ export default function CouponsTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{text.name}</TableHead>
-              <TableHead>{text.description}</TableHead>
-              <TableHead>{text.business || 'Business'}</TableHead>
-              <TableHead>{text.price}</TableHead>
-              <TableHead>{text.points}</TableHead>
-              <TableHead>{text.image}</TableHead>
-              <TableHead>{text.validPeriod}</TableHead>
-              <TableHead>{text.status}</TableHead>
-              <TableHead className="w-[50px]"></TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{text.name}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{text.description}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{text.business || 'Business'}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{text.price}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{text.points}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{text.image}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{text.validPeriod}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{text.status}</TableHead>
+              <TableHead className={`w-[50px] ${isHebrew ? 'text-right' : 'text-center'}`}>{text.actions}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -267,14 +257,18 @@ export default function CouponsTable() {
               </TableRow>
             ) : (
               coupons.map((coupon) => (
-                <TableRow key={coupon.id}>
-                  <TableCell className="font-medium">
+                <TableRow
+                  key={coupon.id}
+                  className="cursor-pointer hover:bg-gray-50"
+                  onClick={() => setPreviewCoupon(coupon)}
+                >
+                  <TableCell className={`font-medium ${isHebrew ? 'text-right' : ''}`}>
                     {coupon.name}
                   </TableCell>
-                  <TableCell className="max-w-xs truncate">
+                  <TableCell className={`max-w-xs truncate ${isHebrew ? 'text-right' : ''}`}>
                     {coupon.description}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className={isHebrew ? 'text-right' : ''}>
                     <div className="flex flex-wrap gap-1">
                       {getBusinessNames(coupon).map((businessName, index) => (
                         <Badge key={index} variant="outline">
@@ -283,20 +277,17 @@ export default function CouponsTable() {
                       ))}
                     </div>
                   </TableCell>
-                  <TableCell>{formatPrice(coupon.price)}</TableCell>
-                  <TableCell>
+                  <TableCell className={isHebrew ? 'text-right' : ''}>{formatPrice(coupon.price)}</TableCell>
+                  <TableCell className={isHebrew ? 'text-right' : ''}>
                     <Badge variant="outline">
                       {coupon.points} pts
                     </Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className={isHebrew ? 'text-right' : ''}>
                     {coupon.imageUrl ? (
-                      <div 
-                        className="w-10 h-10 rounded-md overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
-                        onClick={() => setPreviewCoupon(coupon)}
-                      >
-                        <img 
-                          src={coupon.imageUrl} 
+                      <div className="w-10 h-10 rounded-md overflow-hidden">
+                        <img
+                          src={coupon.imageUrl}
                           alt={coupon.name}
                           className="w-full h-full object-cover"
                         />
@@ -307,47 +298,36 @@ export default function CouponsTable() {
                       </div>
                     )}
                   </TableCell>
-                  <TableCell className="text-sm">
+                  <TableCell className={`text-sm ${isHebrew ? 'text-right' : ''}`}>
                     <div className="space-y-1">
                       <div>From: {formatDate(coupon.validFrom)}</div>
                       <div>To: {formatDate(coupon.validTo)}</div>
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className={isHebrew ? 'text-right' : ''}>
                     <Badge variant={coupon.isActive ? 'default' : 'secondary'}>
                       {coupon.isActive ? 'Active' : 'Inactive'}
                     </Badge>
                   </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        {coupon.imageUrl && (
-                          <DropdownMenuItem onClick={() => setPreviewCoupon(coupon)}>
-                            <Eye className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" />
-                            {t('couponsManagement.preview') || 'Preview'}
-                          </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem onClick={() => handleEdit(coupon)}>
-                          <Edit className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" />
-                          {t('couponsManagement.edit')}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleToggleActive(coupon)}>
-                          {coupon.isActive ? t('couponsManagement.deactivate') : t('couponsManagement.activate')}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleDelete(coupon)}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" />
-                          {t('couponsManagement.delete')}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                  <TableCell
+                    className={isHebrew ? 'text-right' : 'text-center'}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <select
+                      className="h-8 w-8 p-0 border-0 bg-transparent cursor-pointer appearance-none text-center"
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === 'edit') handleEdit(coupon);
+                        if (value === 'delete') handleDelete(coupon);
+                        e.target.value = '';
+                      }}
+                      value=""
+                      title={text.actions}
+                    >
+                      <option value="" disabled>⋮</option>
+                      <option value="edit">{text.edit}</option>
+                      <option value="delete">{text.delete}</option>
+                    </select>
                   </TableCell>
                 </TableRow>
               ))

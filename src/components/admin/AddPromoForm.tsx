@@ -24,6 +24,19 @@ import { Business } from '@/types/promo';
 export default function AddPromoForm() {
   const { t } = useTranslation('Admin');
   const { t: commonT } = useTranslation('common');
+
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+
+  // HARDCODED TEXT
+  const text = {
+    search: isHebrew ? 'חיפוש...' : 'Search...',
+    noBusinesses: isHebrew ? 'לא נמצאו עסקים' : 'No businesses found'
+  };
+
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -132,7 +145,7 @@ export default function AddPromoForm() {
           {t('promoManagement.addNewPromo')}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto" dir={isHebrew ? 'rtl' : 'ltr'}>
         <DialogHeader>
           <DialogTitle>{t('promoManagement.addNewPromo')}</DialogTitle>
         </DialogHeader>
@@ -188,6 +201,8 @@ export default function AddPromoForm() {
               selectedIds={formData.businessIds}
               onSelectionChange={handleBusinessIdsChange}
               placeholder={t('promoManagement.businessPlaceholder') || 'Select businesses (optional)'}
+              searchPlaceholder={text.search}
+              noOptionsText={text.noBusinesses}
               disabled={loading}
             />
           </div>

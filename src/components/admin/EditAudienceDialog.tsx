@@ -25,6 +25,13 @@ interface EditAudienceDialogProps {
 
 export default function EditAudienceDialog({ audience, isOpen, onClose, onSuccess }: EditAudienceDialogProps) {
   const { t } = useTranslation('Admin');
+
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+
   const [formData, setFormData] = useState({
     name: ''
   });
@@ -106,7 +113,7 @@ export default function EditAudienceDialog({ audience, isOpen, onClose, onSucces
   
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px]" dir={isHebrew ? 'rtl' : 'ltr'}>
         <DialogHeader>
           <DialogTitle>{t('dialogs.editAudience.title')}</DialogTitle>
         </DialogHeader>

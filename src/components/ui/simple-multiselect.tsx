@@ -99,7 +99,7 @@ export function SimpleMultiselect({
                 <Badge
                   key={option.value}
                   variant="secondary"
-                  className="mr-1 mb-1 cursor-pointer"
+                  className="ltr:mr-1 rtl:ml-1 mb-1 cursor-pointer"
                   onClick={(e) => removeOption(option.value, e)}
                   onMouseDown={(e) => e.stopPropagation()}
                 >
@@ -107,7 +107,7 @@ export function SimpleMultiselect({
                   <span
                     role="button"
                     tabIndex={0}
-                    className="ml-1 rounded-full hover:bg-secondary-foreground/20 inline-flex items-center justify-center p-0.5"
+                    className="ltr:ml-1 rtl:mr-1 rounded-full hover:bg-secondary-foreground/20 inline-flex items-center justify-center p-0.5"
                     onClick={(e) => removeOption(option.value, e)}
                     onMouseDown={(e) => e.stopPropagation()}
                     onKeyDown={(e) => {
@@ -124,7 +124,7 @@ export function SimpleMultiselect({
               ))
             )}
           </div>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronsUpDown className="ltr:ml-2 rtl:mr-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
@@ -148,7 +148,7 @@ export function SimpleMultiselect({
                   >
                     <Check
                       className={cn(
-                        "mr-2 h-4 w-4",
+                        "ltr:mr-2 rtl:ml-2 h-4 w-4",
                         isSelected ? "opacity-100" : "opacity-0"
                       )}
                     />

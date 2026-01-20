@@ -194,7 +194,7 @@ export default function EditBusinessDialog({ business, isOpen, onClose, onSucces
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto" dir={isHebrew ? 'rtl' : 'ltr'}>
         <DialogHeader className="text-center pr-8">
           <DialogTitle className="text-center">{text.title}</DialogTitle>
         </DialogHeader>

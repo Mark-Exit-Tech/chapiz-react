@@ -19,6 +19,13 @@ import { useState } from 'react';
 
 export default function AddAudienceForm() {
   const { t } = useTranslation('Admin');
+
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: ''
@@ -81,7 +88,7 @@ export default function AddAudienceForm() {
           {t('audienceManagement.addNewAudience')}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px]" dir={isHebrew ? 'rtl' : 'ltr'}>
         <DialogHeader>
           <DialogTitle>{t('audienceManagement.addNewAudience')}</DialogTitle>
         </DialogHeader>

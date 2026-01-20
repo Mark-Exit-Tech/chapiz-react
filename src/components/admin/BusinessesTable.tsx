@@ -10,36 +10,27 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { MoreHorizontal, Edit, Trash2, Mail, Phone, MapPin, Image, Filter, X, Tags } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog';
+import { Mail, Phone, MapPin, Tags, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Business, Filter as FilterType } from '@/types/promo';
+import { Business } from '@/types/promo';
 import {
   getBusinesses,
   updateBusiness,
   deleteBusiness,
-  getFilters,
   bulkDeleteBusinesses,
   bulkUpdateBusinesses,
   bulkAssignTags
 } from '@/lib/actions/admin';
 import EditBusinessDialog from './EditBusinessDialog';
 import BulkEditBusinessDialog from './BulkEditBusinessDialog';
-import { useMemo } from 'react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 
 export default function BusinessesTable() {
   const { t } = useTranslation('Admin');
@@ -50,6 +41,7 @@ export default function BusinessesTable() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isBulkEditOpen, setIsBulkEditOpen] = useState(false);
+  const [previewBusiness, setPreviewBusiness] = useState<Business | null>(null);
   
   // Get locale from URL
   const locale = typeof window !== 'undefined'
@@ -77,6 +69,7 @@ export default function BusinessesTable() {
     actions: isHebrew ? 'פעולות' : 'Actions',
     active: isHebrew ? 'פעיל' : 'Active',
     inactive: isHebrew ? 'לא פעיל' : 'Inactive',
+    view: isHebrew ? 'צפה' : 'View',
     edit: isHebrew ? 'ערוך' : 'Edit',
     delete: isHebrew ? 'מחק' : 'Delete',
     confirmDelete: isHebrew ? 'למחוק את {name}?' : 'Delete {name}?',
@@ -135,8 +128,13 @@ export default function BusinessesTable() {
     setEditingBusiness(null);
   };
 
+  const handleView = (business: Business) => {
+    setPreviewBusiness(business);
+  };
+
   const handleDelete = async (business: Business) => {
-    if (!confirm(`Are you sure you want to delete the business "${business.name}"?`)) {
+    const confirmMessage = text.confirmDelete.replace('{name}', business.name);
+    if (!confirm(confirmMessage)) {
       return;
     }
 
@@ -144,11 +142,13 @@ export default function BusinessesTable() {
       const result = await deleteBusiness(business.id);
       if (result.success) {
         setBusinesses(prev => prev.filter(b => b.id !== business.id));
+        // Clear selection if deleted business was selected
+        setSelectedIds(prev => prev.filter(id => id !== business.id));
       } else {
-        setError(result.error || 'Failed to delete business');
+        setError(result.error || (isHebrew ? 'שגיאה במחיקת עסק' : 'Failed to delete business'));
       }
     } catch (err) {
-      setError('Failed to delete business');
+      setError(isHebrew ? 'שגיאה במחיקת עסק' : 'Failed to delete business');
       console.error(err);
     }
   };
@@ -327,12 +327,12 @@ export default function BusinessesTable() {
                   onCheckedChange={handleSelectAll}
                 />
               </TableHead>
-              <TableHead>{text.name}</TableHead>
-              <TableHead>{isHebrew ? 'תמונה' : 'Image'}</TableHead>
-              <TableHead>{text.contact}</TableHead>
-              <TableHead>{text.status}</TableHead>
-              <TableHead>{text.created}</TableHead>
-              <TableHead className="w-[50px]"></TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{text.name}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{isHebrew ? 'תמונה' : 'Image'}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{text.contact}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{text.status}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{text.created}</TableHead>
+              <TableHead className={`w-[50px] ${isHebrew ? 'text-right' : 'text-center'}`}>{text.actions}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -346,16 +346,17 @@ export default function BusinessesTable() {
               filteredBusinesses.map((business) => (
                 <TableRow
                   key={business.id}
-                  className={selectedIds.includes(business.id) ? 'bg-blue-50' : ''}
+                  className={`cursor-pointer hover:bg-gray-50 ${selectedIds.includes(business.id) ? 'bg-blue-50' : ''}`}
+                  onClick={() => setPreviewBusiness(business)}
                 >
-                  <TableCell>
+                  <TableCell onClick={(e) => e.stopPropagation()}>
                     <Checkbox
                       checked={selectedIds.includes(business.id)}
                       onCheckedChange={(checked) => handleSelectOne(business.id, checked as boolean)}
                     />
                   </TableCell>
-                  <TableCell className="font-medium max-w-[200px] truncate">{business.name}</TableCell>
-                  <TableCell>
+                  <TableCell className={`font-medium max-w-[200px] truncate ${isHebrew ? 'text-right' : ''}`}>{business.name}</TableCell>
+                  <TableCell className={isHebrew ? 'text-right' : ''}>
                     {business.imageUrl ? (
                       <div className="w-10 h-10 rounded-md overflow-hidden">
                         <img
@@ -370,7 +371,7 @@ export default function BusinessesTable() {
                       </div>
                     )}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className={isHebrew ? 'text-right' : ''}>
                     <div className="space-y-1 text-sm">
                       <div className="flex items-center gap-1">
                         <Mail className="h-3 w-3 text-gray-400" />
@@ -386,38 +387,33 @@ export default function BusinessesTable() {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className={isHebrew ? 'text-right' : ''}>
                     <Badge variant={business.isActive ? 'default' : 'secondary'}>
                       {business.isActive ? 'Active' : 'Inactive'}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-sm text-gray-500">
+                  <TableCell className={`text-sm text-gray-500 ${isHebrew ? 'text-right' : ''}`}>
                     {formatDate(business.createdAt)}
                   </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEdit(business)}>
-                          <Edit className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" />
-                          {text.edit}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleToggleActive(business)}>
-                          {business.isActive ? text.inactive : text.active}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleDelete(business)}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" />
-                          {text.delete}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                  <TableCell
+                    className={isHebrew ? 'text-right' : 'text-center'}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <select
+                      className="h-8 w-8 p-0 border-0 bg-transparent cursor-pointer appearance-none text-center"
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === 'edit') handleEdit(business);
+                        if (value === 'delete') handleDelete(business);
+                        e.target.value = '';
+                      }}
+                      value=""
+                      title={text.actions}
+                    >
+                      <option value="" disabled>⋮</option>
+                      <option value="edit">{text.edit}</option>
+                      <option value="delete">{text.delete}</option>
+                    </select>
                   </TableCell>
                 </TableRow>
               ))
@@ -444,6 +440,85 @@ export default function BusinessesTable() {
         selectedCount={selectedIds.length}
         onApply={handleBulkEditTags}
       />
+
+      {/* Preview Dialog */}
+      <Dialog open={!!previewBusiness} onOpenChange={(open) => !open && setPreviewBusiness(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          {previewBusiness && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-bold">{previewBusiness.name}</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                {/* Image */}
+                {previewBusiness.imageUrl && (
+                  <div className="rounded-lg overflow-hidden bg-gray-100">
+                    <img
+                      src={previewBusiness.imageUrl}
+                      alt={previewBusiness.name}
+                      className="w-full h-auto object-contain max-h-[400px] mx-auto"
+                    />
+                  </div>
+                )}
+
+                {/* Description */}
+                {previewBusiness.description && (
+                  <div>
+                    <p className="text-base text-gray-700">{previewBusiness.description}</p>
+                  </div>
+                )}
+
+                {/* Contact Information */}
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">{text.contact}</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Mail className="h-4 w-4 text-gray-400" />
+                      <span>{previewBusiness.contactInfo.email}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Phone className="h-4 w-4 text-gray-400" />
+                      <span>{previewBusiness.contactInfo.phone}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-gray-400" />
+                      <span>{previewBusiness.contactInfo.address}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Details */}
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="font-semibold text-gray-600">{text.status}: </span>
+                    <Badge variant={previewBusiness.isActive ? 'default' : 'secondary'}>
+                      {previewBusiness.isActive ? text.active : text.inactive}
+                    </Badge>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-600">{text.created}: </span>
+                    <span>{formatDate(previewBusiness.createdAt)}</span>
+                  </div>
+                </div>
+
+                {/* Tags */}
+                {previewBusiness.tags && previewBusiness.tags.length > 0 && (
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">{text.tags}</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {previewBusiness.tags.map((tag, index) => (
+                        <Badge key={index} variant="outline">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

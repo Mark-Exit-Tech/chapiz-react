@@ -226,12 +226,12 @@ export default function AdminUsersPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>{text.name}</TableHead>
-                    <TableHead>{text.email}</TableHead>
-                    <TableHead>{text.phone}</TableHead>
-                    <TableHead>{text.role}</TableHead>
-                    <TableHead>{text.created}</TableHead>
-                    <TableHead className="w-[100px]">{text.actions}</TableHead>
+                    <TableHead className={isHebrew ? 'text-right' : ''}>{text.name}</TableHead>
+                    <TableHead className={isHebrew ? 'text-right' : ''}>{text.email}</TableHead>
+                    <TableHead className={isHebrew ? 'text-right' : ''}>{text.phone}</TableHead>
+                    <TableHead className={isHebrew ? 'text-right' : ''}>{text.role}</TableHead>
+                    <TableHead className={isHebrew ? 'text-right' : ''}>{text.created}</TableHead>
+                    <TableHead className={`w-[100px] ${isHebrew ? 'text-right' : 'text-center'}`}>{text.actions}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -271,12 +271,12 @@ export default function AdminUsersPage() {
                           <span>{user.displayName || user.display_name || user.full_name || '-'}</span>
                         </div>
                       </TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>{user.phone || '-'}</TableCell>
-                      <TableCell>{getRoleBadge(user.role, user.is_restricted)}</TableCell>
-                      <TableCell>{formatDate(user.createdAt || user.created_at)}</TableCell>
-                      <TableCell>
-                        <div className="flex gap-2 items-center">
+                      <TableCell className={isHebrew ? 'text-right' : ''}>{user.email}</TableCell>
+                      <TableCell className={isHebrew ? 'text-right' : ''}>{user.phone || '-'}</TableCell>
+                      <TableCell className={isHebrew ? 'text-right' : ''}>{getRoleBadge(user.role, user.is_restricted)}</TableCell>
+                      <TableCell className={isHebrew ? 'text-right' : ''}>{formatDate(user.createdAt || user.created_at)}</TableCell>
+                      <TableCell className={isHebrew ? 'text-right' : 'text-center'}>
+                        <div className={`flex gap-2 items-center ${isHebrew ? 'justify-start' : 'justify-center'}`}>
                           <button
                             onClick={() => handleViewUser(user)}
                             className="text-blue-600 hover:text-blue-900"

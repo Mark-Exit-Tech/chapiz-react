@@ -25,6 +25,8 @@ interface AudienceMultiselectProps {
   selectedIds: string[];
   onSelectionChange: (selectedIds: string[]) => void;
   placeholder?: string;
+  searchPlaceholder?: string;
+  noOptionsText?: string;
   className?: string;
   disabled?: boolean;
 }
@@ -34,6 +36,8 @@ export function AudienceMultiselect({
   selectedIds,
   onSelectionChange,
   placeholder = 'Select audiences...',
+  searchPlaceholder = 'Search...',
+  noOptionsText = 'No audiences found.',
   className,
   disabled = false
 }: AudienceMultiselectProps) {
@@ -91,7 +95,7 @@ export function AudienceMultiselect({
                 <Badge
                   key={audience.id}
                   variant="secondary"
-                  className="mr-1 mb-1 cursor-pointer"
+                  className="ltr:mr-1 rtl:ml-1 mb-1 cursor-pointer"
                   onClick={(e) => removeAudience(audience.id, e)}
                   onMouseDown={(e) => e.stopPropagation()}
                 >
@@ -99,7 +103,7 @@ export function AudienceMultiselect({
                   <span
                     role="button"
                     tabIndex={0}
-                    className="ml-1 rounded-full hover:bg-secondary-foreground/20 inline-flex items-center justify-center p-0.5"
+                    className="ltr:ml-1 rtl:mr-1 rounded-full hover:bg-secondary-foreground/20 inline-flex items-center justify-center p-0.5"
                     onClick={(e) => removeAudience(audience.id, e)}
                     onMouseDown={(e) => e.stopPropagation()}
                     onKeyDown={(e) => {
@@ -116,18 +120,18 @@ export function AudienceMultiselect({
               ))
             )}
           </div>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronsUpDown className="ltr:ml-2 rtl:mr-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
         <Command>
           <CommandInput
-            placeholder="Search audiences..."
+            placeholder={searchPlaceholder}
             value={searchQuery}
             onValueChange={setSearchQuery}
           />
           <CommandList>
-            <CommandEmpty>No audiences found.</CommandEmpty>
+            <CommandEmpty>{noOptionsText}</CommandEmpty>
             <CommandGroup>
               {filteredAudiences.map((audience) => {
                 const isSelected = selectedIds.includes(audience.id);
@@ -140,7 +144,7 @@ export function AudienceMultiselect({
                   >
                     <Check
                       className={cn(
-                        "mr-2 h-4 w-4",
+                        "ltr:mr-2 rtl:ml-2 h-4 w-4",
                         isSelected ? "opacity-100" : "opacity-0"
                       )}
                     />

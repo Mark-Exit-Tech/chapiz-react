@@ -192,7 +192,7 @@ export default function AdminSettingsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email" className="flex items-center gap-2">
+                <Label htmlFor="email" className="flex items-center ltr:gap-2 rtl:gap-2 rtl:flex-row-reverse">
                   <Mail className="w-4 h-4" />
                   {text.email}
                 </Label>
@@ -206,21 +206,26 @@ export default function AdminSettingsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone" className="flex items-center gap-2">
+                <Label htmlFor="phone" className="flex items-center ltr:gap-2 rtl:gap-2 rtl:flex-row-reverse">
                   <Phone className="w-4 h-4" />
                   {text.phone}
                 </Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder={text.phonePlaceholder}
-                  value={formData.phone}
-                  onChange={handleChange}
-                />
+                <div className="relative" dir={isHebrew ? 'rtl' : 'ltr'}>
+                  <Phone className="absolute top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 ltr:left-3 rtl:right-3" />
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder={text.phonePlaceholder}
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className="ltr:pl-10 rtl:pr-10"
+                    dir={isHebrew ? 'rtl' : 'ltr'}
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="address" className="flex items-center gap-2">
+                <Label htmlFor="address" className="flex items-center ltr:gap-2 rtl:gap-2 rtl:flex-row-reverse">
                   <MapPin className="w-4 h-4" />
                   {text.address}
                 </Label>
@@ -234,7 +239,7 @@ export default function AdminSettingsPage() {
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="workHours" className="flex items-center gap-2">
+                <Label htmlFor="workHours" className="flex items-center ltr:gap-2 rtl:gap-2 rtl:flex-row-reverse">
                   <Clock className="w-4 h-4" />
                   {text.workHours}
                 </Label>
@@ -301,7 +306,7 @@ export default function AdminSettingsPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="facebook" className="flex items-center gap-2">
+                <Label htmlFor="facebook" className="flex items-center ltr:gap-2 rtl:gap-2 rtl:flex-row-reverse">
                   <Facebook className="w-4 h-4" />
                   {text.facebook}
                 </Label>
@@ -315,7 +320,7 @@ export default function AdminSettingsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="instagram" className="flex items-center gap-2">
+                <Label htmlFor="instagram" className="flex items-center ltr:gap-2 rtl:gap-2 rtl:flex-row-reverse">
                   <Instagram className="w-4 h-4" />
                   {text.instagram}
                 </Label>
@@ -329,17 +334,22 @@ export default function AdminSettingsPage() {
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="whatsapp" className="flex items-center gap-2">
+                <Label htmlFor="whatsapp" className="flex items-center ltr:gap-2 rtl:gap-2 rtl:flex-row-reverse">
                   <MessageCircle className="w-4 h-4" />
                   {text.whatsapp}
                 </Label>
-                <Input
-                  id="whatsapp"
-                  type="tel"
-                  placeholder={text.whatsappPlaceholder}
-                  value={formData.whatsapp}
-                  onChange={handleChange}
-                />
+                <div className="relative" dir={isHebrew ? 'rtl' : 'ltr'}>
+                  <MessageCircle className="absolute top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 ltr:left-3 rtl:right-3" />
+                  <Input
+                    id="whatsapp"
+                    type="tel"
+                    placeholder={text.whatsappPlaceholder}
+                    value={formData.whatsapp}
+                    onChange={handleChange}
+                    className="ltr:pl-10 rtl:pr-10"
+                    dir={isHebrew ? 'rtl' : 'ltr'}
+                  />
+                </div>
                 <p className="text-sm text-gray-500">{text.whatsappHelp}</p>
               </div>
             </div>
@@ -353,7 +363,7 @@ export default function AdminSettingsPage() {
             </h2>
 
             <div className="space-y-2">
-              <Label htmlFor="storeUrl" className="flex items-center gap-2">
+              <Label htmlFor="storeUrl" className="flex items-center ltr:gap-2 rtl:gap-2 rtl:flex-row-reverse">
                 <ShoppingBag className="w-4 h-4" />
                 {text.storeUrl}
               </Label>

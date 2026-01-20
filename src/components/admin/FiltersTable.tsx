@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -10,14 +9,7 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Filter, Audience } from '@/types/promo';
 import { getFilters, updateFilter, deleteFilter, getAudiences } from '@/lib/actions/admin';
@@ -31,6 +23,19 @@ export default function FiltersTable() {
   const [error, setError] = useState<string | null>(null);
   const [editingFilter, setEditingFilter] = useState<Filter | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  // Get locale from URL
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en'
+    : 'en';
+  const isHebrew = locale === 'he';
+
+  // HARDCODED TEXT
+  const text = {
+    actions: isHebrew ? 'פעולות' : 'Actions',
+    edit: isHebrew ? 'ערוך' : 'Edit',
+    delete: isHebrew ? 'מחק' : 'Delete'
+  };
 
   useEffect(() => {
     fetchData();
@@ -150,11 +155,11 @@ export default function FiltersTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('filterManagement.name') || 'Name'}</TableHead>
-              <TableHead>{t('filterManagement.audiences') || 'Audiences'}</TableHead>
-              <TableHead>{t('filterManagement.status') || 'Status'}</TableHead>
-              <TableHead>{t('filterManagement.createdAt') || 'Created At'}</TableHead>
-              <TableHead className="w-[50px]"></TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{t('filterManagement.name') || 'Name'}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{t('filterManagement.audiences') || 'Audiences'}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{t('filterManagement.status') || 'Status'}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{t('filterManagement.createdAt') || 'Created At'}</TableHead>
+              <TableHead className={`w-[50px] ${isHebrew ? 'text-right' : 'text-center'}`}>{text.actions}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -169,8 +174,8 @@ export default function FiltersTable() {
                 const audienceNames = getAudienceNames(filter.audienceIds);
                 return (
                   <TableRow key={filter.id}>
-                    <TableCell className="font-medium">{filter.name}</TableCell>
-                    <TableCell>
+                    <TableCell className={`font-medium ${isHebrew ? 'text-right' : ''}`}>{filter.name}</TableCell>
+                    <TableCell className={isHebrew ? 'text-right' : ''}>
                       {audienceNames.length > 0 ? (
                         <div className="flex flex-wrap gap-1">
                           {audienceNames.slice(0, 3).map((name, index) => (
@@ -188,38 +193,30 @@ export default function FiltersTable() {
                         <span className="text-gray-400 text-sm">No audiences</span>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className={isHebrew ? 'text-right' : ''}>
                       <Badge variant={filter.isActive ? 'default' : 'secondary'}>
                         {filter.isActive ? 'Active' : 'Inactive'}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-sm text-gray-500">
+                    <TableCell className={`text-sm text-gray-500 ${isHebrew ? 'text-right' : ''}`}>
                       {formatDate(filter.createdAt)}
                     </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleEdit(filter)}>
-                            <Edit className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" />
-                            {t('filterManagement.edit') || 'Edit'}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleToggleActive(filter)}>
-                            {filter.isActive ? (t('filterManagement.deactivate') || 'Deactivate') : (t('filterManagement.activate') || 'Activate')}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleDelete(filter)}
-                            className="text-red-600"
-                          >
-                            <Trash2 className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" />
-                            {t('filterManagement.delete') || 'Delete'}
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                    <TableCell className={isHebrew ? 'text-right' : 'text-center'}>
+                      <select
+                        className="h-8 w-8 p-0 border-0 bg-transparent cursor-pointer appearance-none text-center"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value === 'edit') handleEdit(filter);
+                          if (value === 'delete') handleDelete(filter);
+                          e.target.value = '';
+                        }}
+                        value=""
+                        title={text.actions}
+                      >
+                        <option value="" disabled>⋮</option>
+                        <option value="edit">{text.edit}</option>
+                        <option value="delete">{text.delete}</option>
+                      </select>
                     </TableCell>
                   </TableRow>
                 );

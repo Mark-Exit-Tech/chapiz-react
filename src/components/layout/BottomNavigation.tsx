@@ -45,15 +45,15 @@ export default function BottomNavigation() {
   // Navigation items for logged-in users
   const loggedInNavItems = [
     {
-      href: `/${locale}/pages/my-pets`,
+      href: `/${locale}/my-pets`,
       icon: PawPrint,
       label: isHebrew ? 'חיות המחמד שלי' : 'My Pets',
-      isActive: pathWithoutLocale?.startsWith('/pages/my-pets'),
+      isActive: pathWithoutLocale?.startsWith('/my-pets'),
     },
     {
       href: `/${locale}/coupons`,
       icon: Ticket,
-      label: isHebrew ? 'הקופונים שלי' : 'My Coupons',
+      label: isHebrew ? 'קופונים' : 'Coupons',
       isActive: pathWithoutLocale?.startsWith('/coupons') && !pathWithoutLocale.startsWith('/coupons/'),
     },
     {

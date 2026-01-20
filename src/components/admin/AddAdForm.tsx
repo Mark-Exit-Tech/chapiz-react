@@ -22,7 +22,7 @@ import { useState, useEffect } from 'react';
 import { HEBREW_SERVICE_TAGS } from '@/lib/constants/hebrew-service-tags';
 import { getPetTypesForDropdown, getBreedsForDropdown, getAreasForDropdown, getCitiesForDropdown, getAgeRangesForDropdown, getWeightRangesForDropdown } from '@/lib/firebase/database/pets';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { SimpleMultiselect } from '@/components/ui/simple-multiselect';
+import { RtlMultiselect } from '@/components/ui/rtl-multiselect';
 import { getYouTubeEmbedUrl } from '@/lib/utils/youtube';
 
 export default function AddAdForm() {
@@ -65,6 +65,7 @@ export default function AddAdForm() {
     weight: isHebrew ? 'משקל' : 'Weight',
     weightPlaceholder: isHebrew ? 'בחר משקל' : 'Select weight',
     tags: isHebrew ? 'תגיות' : 'Tags',
+    serviceTags: isHebrew ? 'תגיות שירות' : 'Service Tags',
     createAd: isHebrew ? 'צור מודעה' : 'Create Ad',
     creating: isHebrew ? 'יוצר...' : 'Creating...',
     cancel: isHebrew ? 'ביטול' : 'Cancel',
@@ -259,7 +260,7 @@ export default function AddAdForm() {
           {text.addNewAd}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto" dir={isHebrew ? 'rtl' : 'ltr'}>
         <DialogHeader>
           <DialogTitle>{text.addNewAdvertisement}</DialogTitle>
         </DialogHeader>
@@ -401,25 +402,25 @@ export default function AddAdForm() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="area">{text.area}</Label>
-              <Select value={formData.area} onValueChange={(value) => {
-                setFormData((prev) => ({ ...prev, area: value }));
-              }}>
-                <SelectTrigger>
-                  <SelectValue placeholder={text.areaPlaceholder} />
-                </SelectTrigger>
-                <SelectContent>
-                  {areas.map((area) => (
-                    <SelectItem key={area.value} value={area.value}>
-                      {area.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <select
+                id="area"
+                name="area"
+                value={formData.area}
+                onChange={handleChange}
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+              >
+                <option value="">{text.areaPlaceholder}</option>
+                {areas.map((area) => (
+                  <option key={area.value} value={area.value}>
+                    {area.label}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="city">{text.city}</Label>
-              <SimpleMultiselect
+              <RtlMultiselect
                 options={cities}
                 selectedValues={formData.city}
                 onSelectionChange={(values) => {
@@ -435,49 +436,48 @@ export default function AddAdForm() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="petType">{text.petType}</Label>
-              <Select value={formData.petType} onValueChange={(value) => {
-                setFormData((prev) => ({ ...prev, petType: value, breed: '' }));
-              }}>
-                <SelectTrigger>
-                  <SelectValue placeholder={text.petTypePlaceholder} />
-                </SelectTrigger>
-                <SelectContent>
-                  {petTypes.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <select
+                id="petType"
+                name="petType"
+                value={formData.petType}
+                onChange={(e) => {
+                  setFormData((prev) => ({ ...prev, petType: e.target.value, breed: '' }));
+                }}
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+              >
+                <option value="">{text.petTypePlaceholder}</option>
+                {petTypes.map((type) => (
+                  <option key={type.value} value={type.value}>
+                    {type.label}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="breed">{text.breed}</Label>
-              <Select
+              <select
+                id="breed"
+                name="breed"
                 value={formData.breed}
-                onValueChange={(value) => {
-                  setFormData((prev) => ({ ...prev, breed: value }));
-                }}
+                onChange={handleChange}
                 disabled={!formData.petType}
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <SelectTrigger>
-                  <SelectValue placeholder={text.breedPlaceholder} />
-                </SelectTrigger>
-                <SelectContent>
-                  {breeds.map((breed) => (
-                    <SelectItem key={breed.value} value={breed.value}>
-                      {breed.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <option value="">{text.breedPlaceholder}</option>
+                {breeds.map((breed) => (
+                  <option key={breed.value} value={breed.value}>
+                    {breed.label}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="ageRange">{text.ageRange}</Label>
-              <SimpleMultiselect
+              <RtlMultiselect
                 options={ageRanges}
                 selectedValues={formData.ageRange}
                 onSelectionChange={(values) => {
@@ -491,7 +491,7 @@ export default function AddAdForm() {
 
             <div className="space-y-2">
               <Label htmlFor="weight">{text.weight}</Label>
-              <SimpleMultiselect
+              <RtlMultiselect
                 options={weightRanges}
                 selectedValues={formData.weight}
                 onSelectionChange={(values) => {
@@ -509,7 +509,7 @@ export default function AddAdForm() {
 
             {/* Predefined Hebrew Service Tags */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-600">{tCommon('serviceTags')}</Label>
+              <Label className="text-sm font-medium text-gray-600">{text.serviceTags}</Label>
               <div className="flex flex-wrap gap-2">
                 {HEBREW_SERVICE_TAGS.map((tag, index) => (
                   <button

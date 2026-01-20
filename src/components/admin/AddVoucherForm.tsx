@@ -12,10 +12,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { RtlMultiselect } from '@/components/ui/rtl-multiselect';
 import { Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import MediaUpload from '@/components/admin/MediaUpload';
-import { createVoucher } from '@/lib/actions/admin';
+import { createVoucher, getBusinesses } from '@/lib/actions/admin';
+import { Business } from '@/types/promo';
 
 export default function AddVoucherForm() {
   const [isOpen, setIsOpen] = useState(false);
@@ -38,6 +40,10 @@ export default function AddVoucherForm() {
     points: isHebrew ? 'נקודות' : 'Points',
     pointsPlaceholder: isHebrew ? 'הזן נקודות' : 'Enter points',
     image: isHebrew ? 'תמונה' : 'Image',
+    business: isHebrew ? 'עסקים' : 'Businesses',
+    businessPlaceholder: isHebrew ? 'בחר עסקים (אופציונלי)' : 'Select businesses (optional)',
+    search: isHebrew ? 'חיפוש...' : 'Search...',
+    noBusinesses: isHebrew ? 'לא נמצאו עסקים' : 'No businesses found',
     validFrom: isHebrew ? 'תקף מ' : 'Valid From',
     validTo: isHebrew ? 'תקף עד' : 'Valid To',
     createVoucher: isHebrew ? 'צור שובר' : 'Create Voucher',
@@ -52,10 +58,45 @@ export default function AddVoucherForm() {
     price: '',
     points: '',
     imageUrl: '',
+    businessIds: [] as string[],
     validFrom: '',
     validTo: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [businesses, setBusinesses] = useState<Business[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchBusinesses();
+    }
+  }, [isOpen]);
+
+  const fetchBusinesses = async () => {
+    setLoading(true);
+    try {
+      const result = await getBusinesses();
+      if (result.success && result.businesses) {
+        setBusinesses(result.businesses);
+      }
+    } catch (error) {
+      console.error('Error fetching businesses:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBusinessIdsChange = (selectedIds: string[]) => {
+    setFormData((prev) => ({ ...prev, businessIds: selectedIds }));
+  };
+
+  // Convert businesses to dropdown options
+  const businessOptions = useMemo(() => {
+    return businesses.map(business => ({
+      value: business.id,
+      label: business.name
+    }));
+  }, [businesses]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -85,6 +126,7 @@ export default function AddVoucherForm() {
           price: '',
           points: '',
           imageUrl: '',
+          businessIds: [],
           validFrom: '',
           validTo: ''
         });
@@ -118,7 +160,7 @@ export default function AddVoucherForm() {
           {text.addNewVoucher}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto" dir={isHebrew ? 'rtl' : 'ltr'}>
         <DialogHeader>
           <DialogTitle>{text.addNewVoucher}</DialogTitle>
         </DialogHeader>
@@ -189,6 +231,19 @@ export default function AddVoucherForm() {
                 setFormData((prev) => ({ ...prev, imageUrl: filePath }));
               }}
               className="w-1/5"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>{text.business}</Label>
+            <RtlMultiselect
+              options={businessOptions}
+              selectedValues={formData.businessIds}
+              onSelectionChange={handleBusinessIdsChange}
+              placeholder={text.businessPlaceholder}
+              searchPlaceholder={text.search}
+              noOptionsText={text.noBusinesses}
+              disabled={loading}
             />
           </div>
 

@@ -36,7 +36,7 @@ import { useLocale } from '@/hooks/use-locale';
 import { useState, useEffect } from 'react';
 import { HEBREW_SERVICE_TAGS } from '@/lib/constants/hebrew-service-tags';
 import { getPetTypesForDropdown, getBreedsForDropdown, getAreasForDropdown, getCitiesForDropdown, getAgeRangesForDropdown, getWeightRangesForDropdown } from '@/lib/firebase/database/pets';
-import { SimpleMultiselect } from '@/components/ui/simple-multiselect';
+import { RtlMultiselect } from '@/components/ui/rtl-multiselect';
 
 interface AdActionsProps {
   ad: Ad;
@@ -45,9 +45,54 @@ interface AdActionsProps {
 }
 
 export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
-  const { t } = useTranslation('Admin');
   const { t: tCommon } = useTranslation('common');
   const locale = useLocale() as 'en' | 'he';
+  const isHebrew = locale === 'he';
+
+  // HARDCODED TEXT
+  const text = {
+    actions: isHebrew ? 'פעולות' : 'Actions',
+    edit: isHebrew ? 'עריכה' : 'Edit',
+    delete: isHebrew ? 'מחיקה' : 'Delete',
+    title: isHebrew ? 'כותרת' : 'Title',
+    description: isHebrew ? 'תיאור' : 'Description',
+    descriptionPlaceholder: isHebrew ? 'הזן תיאור למודעה' : 'Enter ad description',
+    phoneNumber: isHebrew ? 'מספר טלפון' : 'Phone Number',
+    phonePlaceholder: isHebrew ? 'הזן מספר טלפון' : 'Enter phone number',
+    location: isHebrew ? 'מיקום' : 'Location',
+    locationPlaceholder: isHebrew ? 'הזן מיקום' : 'Enter location',
+    area: isHebrew ? 'אזור' : 'Area',
+    areaPlaceholder: isHebrew ? 'בחר אזור' : 'Select area',
+    city: isHebrew ? 'עיר' : 'City',
+    cityPlaceholder: isHebrew ? 'בחר עיר' : 'Select city',
+    petType: isHebrew ? 'סוג חיה' : 'Pet Type',
+    petTypePlaceholder: isHebrew ? 'בחר סוג חיה' : 'Select pet type',
+    breed: isHebrew ? 'גזע' : 'Breed',
+    breedPlaceholder: isHebrew ? 'בחר גזע' : 'Select breed',
+    ageRange: isHebrew ? 'טווח גיל' : 'Age Range',
+    ageRangePlaceholder: isHebrew ? 'בחר טווח גיל' : 'Select age range',
+    weight: isHebrew ? 'משקל' : 'Weight',
+    weightPlaceholder: isHebrew ? 'בחר משקל' : 'Select weight',
+    tags: isHebrew ? 'תגיות' : 'Tags',
+    serviceTags: isHebrew ? 'תגיות שירות' : 'Service Tags',
+    mediaType: isHebrew ? 'סוג מדיה' : 'Media Type',
+    image: isHebrew ? 'תמונה' : 'Image',
+    video: isHebrew ? 'וידאו' : 'Video',
+    youtube: isHebrew ? 'יוטיוב' : 'YouTube',
+    youtubeUrl: isHebrew ? 'קישור יוטיוב' : 'YouTube URL',
+    youtubeUrlHelp: isHebrew ? 'הזן את קישור הסרטון מיוטיוב' : 'Enter the YouTube video URL',
+    content: isHebrew ? 'תוכן' : 'Content',
+    cancel: isHebrew ? 'ביטול' : 'Cancel',
+    updateAd: isHebrew ? 'עדכן מודעה' : 'Update Ad',
+    updating: isHebrew ? 'מעדכן...' : 'Updating...',
+    confirmDeletion: isHebrew ? 'אישור מחיקה' : 'Confirm Deletion',
+    deleteMessage: isHebrew ? 'האם אתה בטוח שברצונך למחוק מודעה זו? פעולה זו אינה ניתנת לביטול.' : 'Are you sure you want to delete this ad? This action cannot be undone.',
+    deleteAd: isHebrew ? 'מחק מודעה' : 'Delete Ad',
+    deleting: isHebrew ? 'מוחק...' : 'Deleting...',
+    search: isHebrew ? 'חיפוש...' : 'Search...',
+    noOptions: isHebrew ? 'לא נמצאו אפשרויות' : 'No options found'
+  };
+
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState(false);
@@ -100,13 +145,47 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
     weight: ad.weight || []
   });
 
+  // Load functions
+  const loadPetTypes = async () => {
+    const types = await getPetTypesForDropdown(locale);
+    setPetTypes(types);
+  };
 
+  const loadBreeds = async (petType: string) => {
+    const breedList = await getBreedsForDropdown(locale);
+    setBreeds(breedList);
+  };
 
+  const loadAreas = async () => {
+    const areaList = await getAreasForDropdown(locale);
+    setAreas(areaList);
+  };
+
+  const loadCities = async () => {
+    const cityList = await getCitiesForDropdown(locale);
+    setCities(cityList);
+  };
+
+  const loadAgeRanges = async () => {
+    const ageRangeList = await getAgeRangesForDropdown(locale);
+    setAgeRanges(ageRangeList);
+  };
+
+  const loadWeightRanges = async () => {
+    const weightRangeList = await getWeightRangesForDropdown(locale);
+    setWeightRanges(weightRangeList);
+  };
+
+  // Effects
   useEffect(() => {
     if (isEditOpen) {
       loadPetTypes();
+      loadAreas();
+      loadCities();
+      loadAgeRanges();
+      loadWeightRanges();
     }
-  }, [isEditOpen]);
+  }, [isEditOpen, locale]);
 
   useEffect(() => {
     if (formData.petType) {
@@ -142,16 +221,6 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
       });
     }
   }, [isEditOpen, ad]);
-
-  const loadPetTypes = async () => {
-    const types = await getPetTypesForDropdown(locale);
-    setPetTypes(types);
-  };
-
-  const loadBreeds = async (petType: string) => {
-    const breedList = await getBreedsForDropdown(locale);
-    setBreeds(breedList);
-  };
 
 
   const handleChange = (
@@ -265,28 +334,23 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
   };
 
   return (
-    <div className="relative">
-      {/* Dropdown Menu */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
-            <MoreHorizontal className="h-4 w-4" />
-            <span className="sr-only">{t('adActions.actions')}</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>{t('adActions.actions')}</DropdownMenuLabel>
-          <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
-            {t('adActions.edit')}
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => setIsDeleting(true)}
-            className="text-red-600 hover:text-red-700 focus:text-red-700"
-          >
-            {t('adActions.delete')}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+    <>
+      {/* Actions Button with native select */}
+      <select
+        className="h-8 w-8 p-0 border-0 bg-transparent cursor-pointer appearance-none text-center"
+        onChange={(e) => {
+          const value = e.target.value;
+          if (value === 'edit') setIsEditOpen(true);
+          if (value === 'delete') setIsDeleting(true);
+          e.target.value = '';
+        }}
+        value=""
+        title={text.actions}
+      >
+        <option value="" disabled>⋮</option>
+        <option value="edit">{text.edit}</option>
+        <option value="delete">{text.delete}</option>
+      </select>
 
       {/* Edit Ad Dialog */}
       <Dialog
@@ -323,9 +387,9 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
           setIsEditOpen(open);
         }}
       >
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto" dir={isHebrew ? 'rtl' : 'ltr'}>
           <DialogHeader>
-            <DialogTitle>{t('adActions.edit')}</DialogTitle>
+            <DialogTitle>{text.edit}</DialogTitle>
           </DialogHeader>
 
           {error && (
@@ -336,7 +400,7 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
 
           <form onSubmit={handleUpdate} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="title">{t('adActions.title')}</Label>
+              <Label htmlFor="title">{text.title}</Label>
               <Input
                 id="title"
                 name="title"
@@ -347,147 +411,152 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">{t('adActions.description')}</Label>
+              <Label htmlFor="description">{text.description}</Label>
               <Textarea
                 id="description"
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
-                placeholder={t('adActions.descriptionPlaceholder')}
+                placeholder={text.descriptionPlaceholder}
                 rows={3}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="phone">{t('adActions.phoneNumber')}</Label>
+                <Label htmlFor="phone">{text.phoneNumber}</Label>
                 <Input
                   id="phone"
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder={t('adActions.phonePlaceholder')}
+                  placeholder={text.phonePlaceholder}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="location">{t('adActions.location')}</Label>
+                <Label htmlFor="location">{text.location}</Label>
                 <Input
                   id="location"
                   name="location"
                   value={formData.location}
                   onChange={handleChange}
-                  placeholder={t('adActions.locationPlaceholder')}
+                  placeholder={text.locationPlaceholder}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="area">{t('adActions.area')}</Label>
-                <Select value={formData.area} onValueChange={(value) => {
-                  setFormData((prev) => ({ ...prev, area: value }));
-                }}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('adActions.areaPlaceholder')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {areas.map((area) => (
-                      <SelectItem key={area.value} value={area.value}>
-                        {area.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="area">{text.area}</Label>
+                <select
+                  id="area"
+                  name="area"
+                  value={formData.area}
+                  onChange={handleChange}
+                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                >
+                  <option value="">{text.areaPlaceholder}</option>
+                  {areas.map((area) => (
+                    <option key={area.value} value={area.value}>
+                      {area.label}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="city">{t('adActions.city')}</Label>
-                <SimpleMultiselect
+                <Label htmlFor="city">{text.city}</Label>
+                <RtlMultiselect
                   options={cities}
                   selectedValues={formData.city}
                   onSelectionChange={(values) => {
                     setFormData((prev) => ({ ...prev, city: values }));
                   }}
-                  placeholder={t('adActions.cityPlaceholder')}
+                  placeholder={text.cityPlaceholder}
+                  searchPlaceholder={text.search}
+                  noOptionsText={text.noOptions}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="petType">{t('adActions.petType')}</Label>
-                <Select value={formData.petType} onValueChange={(value) => {
-                  setFormData((prev) => ({ ...prev, petType: value, breed: '' }));
-                }}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('adActions.petTypePlaceholder')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {petTypes.map((type) => (
-                      <SelectItem key={type.value} value={type.value}>
-                        {type.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="petType">{text.petType}</Label>
+                <select
+                  id="petType"
+                  name="petType"
+                  value={formData.petType}
+                  onChange={(e) => {
+                    setFormData((prev) => ({ ...prev, petType: e.target.value, breed: '' }));
+                  }}
+                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                >
+                  <option value="">{text.petTypePlaceholder}</option>
+                  {petTypes.map((type) => (
+                    <option key={type.value} value={type.value}>
+                      {type.label}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="breed">{t('adActions.breed')}</Label>
-                <Select
+                <Label htmlFor="breed">{text.breed}</Label>
+                <select
+                  id="breed"
+                  name="breed"
                   value={formData.breed}
-                  onValueChange={(value) => {
-                    setFormData((prev) => ({ ...prev, breed: value }));
-                  }}
+                  onChange={handleChange}
                   disabled={!formData.petType}
+                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('adActions.breedPlaceholder')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {breeds.map((breed) => (
-                      <SelectItem key={breed.value} value={breed.value}>
-                        {breed.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  <option value="">{text.breedPlaceholder}</option>
+                  {breeds.map((breed) => (
+                    <option key={breed.value} value={breed.value}>
+                      {breed.label}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="ageRange">{t('adActions.ageRange')}</Label>
-                <SimpleMultiselect
+                <Label htmlFor="ageRange">{text.ageRange}</Label>
+                <RtlMultiselect
                   options={ageRanges}
                   selectedValues={formData.ageRange}
                   onSelectionChange={(values) => {
                     setFormData((prev) => ({ ...prev, ageRange: values }));
                   }}
-                  placeholder={t('adActions.ageRangePlaceholder')}
+                  placeholder={text.ageRangePlaceholder}
+                  searchPlaceholder={text.search}
+                  noOptionsText={text.noOptions}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="weight">{t('adActions.weight')}</Label>
-                <SimpleMultiselect
+                <Label htmlFor="weight">{text.weight}</Label>
+                <RtlMultiselect
                   options={weightRanges}
                   selectedValues={formData.weight}
                   onSelectionChange={(values) => {
                     setFormData((prev) => ({ ...prev, weight: values }));
                   }}
-                  placeholder={t('adActions.weightPlaceholder')}
+                  placeholder={text.weightPlaceholder}
+                  searchPlaceholder={text.search}
+                  noOptionsText={text.noOptions}
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="tags">{t('adActions.tags')}</Label>
+              <Label htmlFor="tags">{text.tags}</Label>
 
               {/* Predefined Hebrew Service Tags */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-600">{tCommon('serviceTags')}</Label>
+                <Label className="text-sm font-medium text-gray-600">{text.serviceTags}</Label>
                 <div className="flex flex-wrap gap-2">
                   {HEBREW_SERVICE_TAGS.map((tag, index) => (
                     <button
@@ -523,7 +592,7 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
             </div>
 
             <div className="space-y-2">
-              <Label>{t('adActions.mediaType') || 'Media Type'}</Label>
+              <Label>{text.mediaType}</Label>
               <div className="flex gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -533,7 +602,7 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
                     onChange={(e) => setMediaType(e.target.value as 'image' | 'video' | 'youtube')}
                     className="cursor-pointer"
                   />
-                  <span>{t('adActions.image') || 'Image'}</span>
+                  <span>{text.image}</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -543,7 +612,7 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
                     onChange={(e) => setMediaType(e.target.value as 'image' | 'video' | 'youtube')}
                     className="cursor-pointer"
                   />
-                  <span>{t('adActions.video') || 'Video'}</span>
+                  <span>{text.video}</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -553,14 +622,14 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
                     onChange={(e) => setMediaType(e.target.value as 'image' | 'video' | 'youtube')}
                     className="cursor-pointer"
                   />
-                  <span>{t('adActions.youtube') || 'YouTube'}</span>
+                  <span>{text.youtube}</span>
                 </label>
               </div>
             </div>
 
             {mediaType === 'youtube' ? (
               <div className="space-y-2">
-                <Label htmlFor="youtubeUrl">{t('adActions.youtubeUrl') || 'YouTube URL'}</Label>
+                <Label htmlFor="youtubeUrl">{text.youtubeUrl}</Label>
                 <Input
                   id="youtubeUrl"
                   name="youtubeUrl"
@@ -571,7 +640,7 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
                   required
                 />
                 <p className="text-sm text-gray-500">
-                  {t('adActions.youtubeUrlHelp') || 'Enter a YouTube video URL'}
+                  {text.youtubeUrlHelp}
                 </p>
                 {formData.youtubeUrl && getYouTubeEmbedUrl(formData.youtubeUrl) && (
                   <div className="mt-4 rounded-md overflow-hidden border">
@@ -589,7 +658,7 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
               </div>
             ) : (
               <div className="space-y-2">
-                <Label htmlFor="content">{t('adActions.content')}</Label>
+                <Label htmlFor="content">{text.content}</Label>
                 <MediaUpload
                   type={mediaType}
                   value={formData.content}
@@ -608,10 +677,10 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
                 variant="outline"
                 onClick={() => setIsEditOpen(false)}
               >
-                {t('adActions.cancel')}
+                {text.cancel}
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? t('adActions.updating') : t('adActions.updateAd')}
+                {isSubmitting ? text.updating : text.updateAd}
               </Button>
             </DialogFooter>
           </form>
@@ -629,11 +698,11 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
           setIsDeleting(open);
         }}
       >
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md" dir={isHebrew ? 'rtl' : 'ltr'}>
           <DialogHeader>
-            <DialogTitle>{t('adActions.confirmDeletion')}</DialogTitle>
+            <DialogTitle>{text.confirmDeletion}</DialogTitle>
             <DialogDescription>
-              {t('adActions.deleteMessage')}
+              {text.deleteMessage}
             </DialogDescription>
           </DialogHeader>
 
@@ -645,7 +714,7 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDeleting(false)}>
-              {t('adActions.cancel')}
+              {text.cancel}
             </Button>
             <Button
               variant="destructive"
@@ -655,11 +724,11 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
               }}
               disabled={isSubmitting}
             >
-              {isSubmitting ? t('adActions.deleting') : t('adActions.deleteAd')}
+              {isSubmitting ? text.deleting : text.deleteAd}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

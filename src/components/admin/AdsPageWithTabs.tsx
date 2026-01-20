@@ -45,7 +45,7 @@ export default function AdsPage({ searchParams: propsSearchParams }: AdsPageProp
 
   return (
     <AdminLayout>
-      <div className="container mx-auto p-4 md:p-8">
+      <div className="container mx-auto p-4 md:p-8" dir={isHebrew ? 'rtl' : 'ltr'}>
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 rtl:flex-row-reverse">
             <AddAdForm />
