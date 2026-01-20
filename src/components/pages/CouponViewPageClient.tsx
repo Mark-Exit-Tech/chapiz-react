@@ -9,10 +9,12 @@ import Navbar from '@/components/layout/Navbar';
 import { Card, CardContent } from '@/components/ui/card';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
-import { markPromoAsUsed, isPromoUsed } from '@/lib/firebase/database/promos';
+import { getUserCouponByIds, markCouponAsUsed } from '@/lib/firebase/database/coupons';
 import { motion } from 'framer-motion';
 import { getYouTubeEmbedUrl } from '@/lib/utils/youtube';
 import QRCodeCard from '@/components/cards/QRCodeCard';
+import MapCard from '@/components/cards/MapCard';
+import confetti from 'canvas-confetti';
 import {
   Dialog,
   DialogContent,
@@ -65,6 +67,8 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
   };
   const [isUsingCoupon, setIsUsingCoupon] = useState(false);
   const [isUsed, setIsUsed] = useState(false);
+  const [isPurchased, setIsPurchased] = useState(false);
+  const [userCouponId, setUserCouponId] = useState<string | null>(null);
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
@@ -79,28 +83,57 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
     }
   }, [locale, coupon.id, business]);
 
-  // Check if coupon is already used
+  // Check if coupon is purchased and used
   useEffect(() => {
-    const checkUsed = async () => {
+    const checkCouponStatus = async () => {
       if (user) {
-        const used = await isPromoUsed(user.uid, coupon.id);
-        setIsUsed(used);
+        const result = await getUserCouponByIds(user.uid, coupon.id);
+        setIsPurchased(result.purchased);
+        setIsUsed(result.isUsed || false);
+        if (result.userCouponId) {
+          setUserCouponId(result.userCouponId);
+        }
       }
     };
-    checkUsed();
+    checkCouponStatus();
   }, [user, coupon.id]);
 
 
-  const handleUseCouponClick = () => {
+  const handleUseCouponClick = async () => {
     if (!user) {
-      toast.error('Please sign in to use coupons');
-      navigate('/login');
+      toast.error(isHebrew ? 'יש להתחבר כדי להשתמש בקופון' : 'Please sign in to use coupons');
+      navigate(`/${locale}/login`);
       return;
     }
 
     if (isUsed) {
-      toast.error('This coupon has already been used');
+      toast.error(isHebrew ? 'הקופון כבר נוצל' : 'This coupon has already been used');
       return;
+    }
+
+    // For promotional coupons, auto-create userCoupon first if not already claimed
+    if (!isPurchased) {
+      try {
+        const { purchaseCoupon } = await import('@/lib/firebase/database/coupons');
+        const result = await purchaseCoupon(user.uid, coupon.id, 0);
+
+        if (result.success) {
+          // Refresh coupon status
+          const statusResult = await getUserCouponByIds(user.uid, coupon.id);
+          setIsPurchased(statusResult.purchased);
+          setIsUsed(statusResult.isUsed || false);
+          if (statusResult.userCouponId) {
+            setUserCouponId(statusResult.userCouponId);
+          }
+        } else {
+          toast.error(result.error || (isHebrew ? 'נכשל בקבלת הקופון' : 'Failed to get coupon'));
+          return;
+        }
+      } catch (error) {
+        console.error('Error auto-claiming coupon:', error);
+        toast.error(isHebrew ? 'שגיאה בקבלת הקופון' : 'Error getting coupon');
+        return;
+      }
     }
 
     setShowConfirmDialog(true);
@@ -111,25 +144,38 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
     setIsUsingCoupon(true);
 
     try {
-      const result = await markPromoAsUsed(user.uid, coupon.id);
+      if (!userCouponId) {
+        toast.error(isHebrew ? 'שגיאה: לא נמצא מזהה קופון' : 'Error: Coupon ID not found');
+        return;
+      }
+
+      const result = await markCouponAsUsed(userCouponId);
 
       if (result.success) {
         setIsUsed(true);
         setShowSuccessAnimation(true);
+
+        // Trigger confetti animation
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+
         toast.success(text.promoUsed);
 
         // Hide animation and redirect after 2 seconds
         setTimeout(() => {
           setShowSuccessAnimation(false);
-          // Redirect back to coupons list
-          navigate(`/${locale}/coupons${business ? `?businessId=${business.id}` : ''}`);
+          // Redirect back to coupons page
+          navigate(`/${locale}/coupons`);
         }, 2000);
       } else {
-        toast.error(result.error || 'Failed to mark coupon as used');
+        toast.error(result.error || (isHebrew ? 'שגיאה בסימון קופון כמשומש' : 'Failed to mark coupon as used'));
       }
     } catch (error) {
       console.error('Error using coupon:', error);
-      toast.error('Failed to use coupon');
+      toast.error(isHebrew ? 'שגיאה בשימוש בקופון' : 'Failed to use coupon');
     } finally {
       setIsUsingCoupon(false);
     }
@@ -240,26 +286,49 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
               )}
             </div>
 
-            {/* QR Code Card */}
-            <div className="mb-8">
-              <QRCodeCard url={couponUrl} title={text.viewCoupon} description={text.qrCodeDescription} />
-            </div>
+            {/* Used Status Message */}
+            {isUsed && (
+              <div className="mb-8 p-4 bg-gray-100 border border-gray-300 rounded-lg text-center">
+                <p className="text-sm text-gray-700 font-semibold">
+                  {isHebrew ? 'קופון זה כבר נוצל' : 'This coupon has already been used'}
+                </p>
+              </div>
+            )}
 
-            {/* Important Information */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
-              <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                <div className="flex-1">
-                  <p className="text-sm text-blue-900 font-medium mb-1">
-                    {text.importantInfo}
-                  </p>
-                  <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
-                    <li>{text.couponUsageInfo}</li>
-                    <li>{text.oneTimeUse}</li>
-                  </ul>
+            {/* QR Code Card - Only show if not used */}
+            {!isUsed && (
+              <div className="mb-8">
+                <QRCodeCard url={couponUrl} title={text.viewCoupon} description={text.qrCodeDescription} />
+              </div>
+            )}
+
+            {/* Important Information - Only show if not used */}
+            {!isUsed && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+                <div className="flex items-start gap-3">
+                  <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-sm text-blue-900 font-medium mb-1">
+                      {text.importantInfo}
+                    </p>
+                    <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
+                      <li>{text.couponUsageInfo}</li>
+                      <li>{text.oneTimeUse}</li>
+                    </ul>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
+
+            {/* Map showing where coupon can be used */}
+            {businesses.length > 0 && (
+              <div className="mb-8">
+                <MapCard
+                  businesses={businesses}
+                  title={isHebrew ? 'איפה ניתן להשתמש בקופון' : 'Where to Use This Coupon'}
+                />
+              </div>
+            )}
 
             {/* Success Animation - Prize Icon */}
             {showSuccessAnimation && (
@@ -281,6 +350,7 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
                 </motion.div>
               </motion.div>
             )}
+
 
             {/* Action Buttons */}
             <div className="flex flex-col gap-4">

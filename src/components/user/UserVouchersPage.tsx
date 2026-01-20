@@ -212,11 +212,30 @@ export default function UserVouchersPage() {
         console.log(`✅ Found ${validCoupons.length} valid coupons after filtering`);
         console.log('Valid coupons:', validCoupons);
 
-        // Filter out coupons where user has reached purchase limit
+        // Filter out coupons where user has reached purchase limit or already has an active/used voucher
         let availableCoupons = validCoupons;
         if (user) {
+          // First get user's coupon history to check for active/used vouchers
+          const historyResult = await getCouponHistory(user.uid);
+          const userActiveCouponIds = new Set<string>();
+
+          if (historyResult.success && historyResult.coupons) {
+            // Collect IDs of coupons user already has (active or used)
+            historyResult.coupons.forEach(uc => {
+              if (uc.status === 'active' || uc.status === 'used') {
+                userActiveCouponIds.add(uc.couponId);
+              }
+            });
+          }
+
           const purchaseLimitChecks = await Promise.all(
             validCoupons.map(async (coupon) => {
+              // Hide if user already has this voucher (active or used)
+              if (userActiveCouponIds.has(coupon.id)) {
+                console.log(`🚫 Hiding coupon "${coupon.name}" - user already has this voucher`);
+                return false;
+              }
+
               // If no purchase limit is set, coupon is available
               if (!coupon.purchaseLimit || coupon.purchaseLimit <= 0) {
                 return true;
@@ -231,7 +250,7 @@ export default function UserVouchersPage() {
             })
           );
           availableCoupons = validCoupons.filter((_, index) => purchaseLimitChecks[index]);
-          console.log(`✅ ${availableCoupons.length} coupons available after purchase limit check`);
+          console.log(`✅ ${availableCoupons.length} coupons available after filtering`);
         }
 
         // Sort coupons: free vouchers (price === 0) first, then by price ascending
@@ -306,7 +325,7 @@ export default function UserVouchersPage() {
           setFreeCouponPrice(false);
         }
 
-        // Fetch all purchased coupons for history (active + inactive)
+        // Fetch all purchased coupons for history (active only, exclude used)
         const historyResult = await getCouponHistory(user.uid);
         if (historyResult.success && historyResult.coupons) {
           // Convert ISO strings back to Date objects
@@ -320,32 +339,32 @@ export default function UserVouchersPage() {
             purchasedAt: new Date(uc.purchasedAt as any),
             usedAt: uc.usedAt ? new Date(uc.usedAt as any) : undefined
           }));
-          
-          // Filter out expired vouchers (past validTo date) unless they're already marked as used
+
+          // Filter to show only active vouchers (not used, not expired)
           const now = new Date();
-          const validCoupons = allCoupons.filter(uc => {
-            // Keep used coupons in history
-            if (uc.status === 'used') return true;
-            // Keep coupons that are explicitly marked as expired
-            if (uc.status === 'expired') return true;
+          const activeCoupons = allCoupons.filter(uc => {
+            // Exclude used coupons
+            if (uc.status === 'used') return false;
+            // Exclude expired coupons
+            if (uc.status === 'expired') return false;
             // Filter out coupons that are past their validTo date
             const validTo = new Date(uc.coupon.validTo);
             return validTo >= now;
           });
-          
+
           // Sort: free vouchers first, then by purchasedAt descending (newest first)
-          validCoupons.sort((a, b) => {
+          activeCoupons.sort((a, b) => {
             const aIsFree = a.coupon.price === 0;
             const bIsFree = b.coupon.price === 0;
-            
+
             // Free vouchers come first
             if (aIsFree && !bIsFree) return -1;
             if (!aIsFree && bIsFree) return 1;
-            
+
             // If both are free or both are paid, sort by purchasedAt descending (newest first)
             return b.purchasedAt.getTime() - a.purchasedAt.getTime();
           });
-          setCouponHistory(validCoupons);
+          setCouponHistory(activeCoupons);
         }
       }
     } catch (error) {

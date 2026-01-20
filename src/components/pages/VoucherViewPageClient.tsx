@@ -1,17 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, ShoppingCart, Share2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useLocale } from '@/hooks/use-locale';
-import { UserCoupon } from '@/lib/firebase/database/coupons';
+import { UserCoupon, markCouponAsUsed } from '@/lib/firebase/database/coupons';
 import Navbar from '@/components/layout/Navbar';
 import { Card, CardContent } from '@/components/ui/card';
 import toast from 'react-hot-toast';
-import { useShopRedirect } from '@/hooks/use-shop-redirect';
 import QRCodeCard from '@/components/cards/QRCodeCard';
+import confetti from 'canvas-confetti';
 
 
 interface VoucherViewPageClientProps {
@@ -19,26 +18,26 @@ interface VoucherViewPageClientProps {
 }
 
 export default function VoucherViewPageClient({ userCoupon }: VoucherViewPageClientProps) {
-  const { t } = useTranslation('components.UserCoupons');
   const navigate = useNavigate();
   const locale = useLocale();
   const isHebrew = locale === 'he';
   const coupon = userCoupon.coupon;
-  const { redirectToShop } = useShopRedirect();
-  const [shopUrl, setShopUrl] = useState<string>('');
   const [voucherUrl, setVoucherUrl] = useState<string>('');
   const [isMounted, setIsMounted] = useState(false);
-  
+  const [isUsingVoucher, setIsUsingVoucher] = useState(false);
+
   // HARDCODED TEXT - NO TRANSLATION KEYS!
   const text = {
-    codeCopied: isHebrew ? 'קוד השובר הועתק ללוח!' : 'Voucher code copied to clipboard!',
-    failedToCopy: isHebrew ? 'נכשל בהעתקת הקוד' : 'Failed to copy code',
     sharedSuccessfully: isHebrew ? 'שותף בהצלחה!' : 'Shared successfully!',
     linkCopied: isHebrew ? 'הלינק הועתק ללוח!' : 'Link copied to clipboard!',
     back: isHebrew ? 'חזור' : 'Back',
+    viewCoupon: isHebrew ? 'צפייה בשובר' : 'View Voucher',
     qrCodeDescription: isHebrew ? 'סרקו את קוד ה-QR הזה כדי לצפות בשובר' : 'Scan this QR code to view this voucher',
     useVoucher: isHebrew ? 'השתמש בשובר' : 'Use Voucher',
+    using: isHebrew ? 'משתמש...' : 'Using...',
     share: isHebrew ? 'שתף' : 'Share',
+    couponMarkedAsUsed: isHebrew ? 'השובר סומן כמשומש' : 'Voucher marked as used',
+    failedToMarkAsUsed: isHebrew ? 'נכשל בסימון השובר כמשומש' : 'Failed to mark voucher as used',
   };
 
   useEffect(() => {
@@ -49,37 +48,35 @@ export default function VoucherViewPageClient({ userCoupon }: VoucherViewPageCli
     }
   }, [locale, userCoupon.id]);
 
-  useEffect(() => {
-    const fetchContactData = async () => {
-      const { getContactInfo } = await import('@/lib/actions/admin');
-      const info = await getContactInfo();
-      if (info?.storeUrl) {
-        setShopUrl(info.storeUrl);
+  const handleUse = async () => {
+    if (isUsingVoucher) return; // Prevent double submission
+
+    setIsUsingVoucher(true);
+
+    try {
+      // Mark the coupon as used
+      const result = await markCouponAsUsed(userCoupon.id);
+      if (result.success) {
+        // Trigger confetti animation
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+
+        toast.success(text.couponMarkedAsUsed);
+        // Navigate back to vouchers page after a short delay
+        setTimeout(() => {
+          navigate(`/${locale}/vouchers`);
+        }, 1500);
+      } else {
+        toast.error(text.failedToMarkAsUsed);
+        setIsUsingVoucher(false); // Re-enable button on error
       }
-    };
-    fetchContactData();
-  }, []);
-
-
-  const handleUse = () => {
-    const couponCode = coupon.description; // The coupon code is stored in description
-
-    // Copy the code first
-    if (couponCode) {
-      navigator.clipboard.writeText(couponCode).then(() => {
-        toast.success(text.codeCopied);
-      }).catch(() => {
-        toast.error(text.failedToCopy);
-      });
+    } catch (error) {
+      toast.error(text.failedToMarkAsUsed);
+      setIsUsingVoucher(false); // Re-enable button on error
     }
-
-    // Then redirect to shop with the coupon code
-    if (!shopUrl) {
-      toast.error(isHebrew ? 'כתובת החנות לא הוגדרה. אנא צרו קשר עם התמיכה.' : 'Shop URL is not configured. Please contact support.');
-      return;
-    }
-
-    redirectToShop(shopUrl, couponCode, undefined, true);
   };
 
   const handleShare = async () => {
@@ -108,7 +105,7 @@ export default function VoucherViewPageClient({ userCoupon }: VoucherViewPageCli
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50" dir={isHebrew ? 'rtl' : 'ltr'}>
       <Navbar />
 
       <div className="container mx-auto px-4 py-8 pb-24 md:pb-8 max-w-4xl">
@@ -120,9 +117,9 @@ export default function VoucherViewPageClient({ userCoupon }: VoucherViewPageCli
           className="mb-6"
         >
           {locale === 'he' ? (
-            <ArrowRight className="h-4 w-4 mr-2" />
+            <ArrowRight className="h-4 w-4 me-2" />
           ) : (
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="h-4 w-4 me-2" />
           )}
           {text.back}
         </Button>
@@ -146,36 +143,64 @@ export default function VoucherViewPageClient({ userCoupon }: VoucherViewPageCli
               {coupon.description && (
                 <p className="text-gray-600 mb-4">{coupon.description}</p>
               )}
+              {userCoupon.status === 'used' && (
+                <div className="mt-4 p-3 bg-gray-100 border border-gray-300 rounded-lg">
+                  <p className="text-sm text-gray-700 font-semibold">
+                    {isHebrew ? 'שובר זה כבר נוצל' : 'This voucher has already been used'}
+                  </p>
+                  {userCoupon.usedAt && (
+                    <p className="text-xs text-gray-600 mt-1">
+                      {isHebrew ? 'נוצל בתאריך: ' : 'Used on: '}
+                      {new Date(userCoupon.usedAt).toLocaleDateString(isHebrew ? 'he-IL' : 'en-US')}
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
 
-            {/* QR Code Card */}
-            <div className="mb-8">
-              <QRCodeCard
-                url={voucherUrl}
-                description={text.qrCodeDescription}
-              />
-            </div>
+            {/* QR Code Card - Only show if not used */}
+            {userCoupon.status !== 'used' && (
+              <div className="mb-8">
+                <QRCodeCard
+                  url={voucherUrl}
+                  title={text.viewCoupon}
+                  description={text.qrCodeDescription}
+                />
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button
-                variant="default"
-                size="lg"
-                onClick={handleUse}
-                className="flex-1"
-              >
-                <ShoppingCart className="w-4 h-4 mr-2" />
-                {t('use') || 'Use'}
-              </Button>
+              {userCoupon.status !== 'used' && (
+                <Button
+                  variant="default"
+                  size="lg"
+                  onClick={handleUse}
+                  className="flex-1"
+                  disabled={isUsingVoucher}
+                >
+                  {isUsingVoucher ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin me-2" />
+                      {text.using}
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart className="w-4 h-4 me-2" />
+                      {text.useVoucher}
+                    </>
+                  )}
+                </Button>
+              )}
               <Button
                 variant="outline"
                 size="lg"
                 onClick={handleShare}
-                className="flex-1"
+                className={userCoupon.status === 'used' ? 'w-full' : 'flex-1'}
                 disabled={!isMounted || !voucherUrl}
               >
-                <Share2 className="w-4 h-4 mr-2" />
-                {t('share') || 'Share'}
+                <Share2 className="w-4 h-4 me-2" />
+                {text.share}
               </Button>
             </div>
           </CardContent>

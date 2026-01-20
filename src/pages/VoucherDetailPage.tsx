@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getCouponById, getBusinesses } from '@/lib/actions/admin';
-import CouponViewPageClient from '@/components/pages/CouponViewPageClient';
+import { getUserCouponById } from '@/lib/firebase/database/coupons';
+import VoucherViewPageClient from '@/components/pages/VoucherViewPageClient';
 import Navbar from '@/components/layout/Navbar';
 import BottomNavigation from '@/components/layout/BottomNavigation';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
 
-export default function CouponDetailPage() {
+export default function VoucherDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const [coupon, setCoupon] = useState<any>(null);
-  const [businesses, setBusinesses] = useState<any[]>([]);
+  const { user } = useAuth();
+  const [userCoupon, setUserCoupon] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   // Get locale from URL
@@ -19,41 +20,58 @@ export default function CouponDetailPage() {
 
   const text = {
     loading: isHebrew ? 'טוען...' : 'Loading...',
-    notFound: isHebrew ? 'קופון לא נמצא' : 'Coupon not found',
+    notFound: isHebrew ? 'שובר לא נמצא' : 'Voucher not found',
     goBack: isHebrew ? 'חזור' : 'Go Back',
+    pleaseSignIn: isHebrew ? 'יש להתחבר כדי לצפות בשובר' : 'Please sign in to view voucher',
   };
 
   useEffect(() => {
     const loadData = async () => {
-      if (!id) return;
+      if (!id || !user) {
+        setLoading(false);
+        return;
+      }
 
       try {
         setLoading(true);
 
-        // Load coupon from coupons collection (not promos)
-        const couponResult = await getCouponById(id);
+        // Load user coupon
+        const userCouponData = await getUserCouponById(id);
 
-        if (couponResult.success && couponResult.coupon) {
-          setCoupon(couponResult.coupon);
-
-          // Load businesses
-          const businessesResult = await getBusinesses();
-          if (businessesResult.success && businessesResult.businesses) {
-            // Filter businesses that accept this coupon
-            const businessIds = couponResult.coupon.businessIds || (couponResult.coupon.businessId ? [couponResult.coupon.businessId] : []);
-            const relatedBusinesses = businessesResult.businesses.filter((b: any) => businessIds.includes(b.id));
-            setBusinesses(relatedBusinesses);
-          }
+        if (userCouponData) {
+          setUserCoupon(userCouponData);
         }
       } catch (error) {
-        console.error('Error loading coupon:', error);
+        console.error('Error loading voucher:', error);
       } finally {
         setLoading(false);
       }
     };
 
     loadData();
-  }, [id]);
+  }, [id, user]);
+
+  if (!user) {
+    return (
+      <>
+        <Navbar />
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">
+            <p className="text-gray-600 mb-4">{text.pleaseSignIn}</p>
+            <button
+              onClick={() => window.history.back()}
+              className="text-primary hover:underline"
+            >
+              {text.goBack}
+            </button>
+          </div>
+        </div>
+        <div className="md:hidden">
+          <BottomNavigation />
+        </div>
+      </>
+    );
+  }
 
   if (loading) {
     return (
@@ -74,7 +92,7 @@ export default function CouponDetailPage() {
     );
   }
 
-  if (!coupon) {
+  if (!userCoupon) {
     return (
       <>
         <Navbar />
@@ -98,11 +116,7 @@ export default function CouponDetailPage() {
 
   return (
     <>
-      <CouponViewPageClient 
-        coupon={coupon} 
-        business={null}
-        businesses={businesses}
-      />
+      <VoucherViewPageClient userCoupon={userCoupon} />
       <div className="md:hidden">
         <BottomNavigation />
       </div>

@@ -238,8 +238,44 @@ export async function markCouponAsUsed(userCouponId: string): Promise<{ success:
  */
 export async function getUserCouponById(userCouponId: string): Promise<UserCoupon | null> {
     try {
-        console.warn('getUserCouponById not yet fully implemented');
-        return null;
+        const userCouponRef = doc(db, USER_COUPONS_COLLECTION, userCouponId);
+        const userCouponSnap = await getDoc(userCouponRef);
+
+        if (!userCouponSnap.exists()) {
+            return null;
+        }
+
+        const data = userCouponSnap.data();
+        const couponRef = doc(db, COUPONS_COLLECTION, data.couponId);
+        const couponSnap = await getDoc(couponRef);
+
+        if (!couponSnap.exists()) {
+            return null;
+        }
+
+        const couponData = couponSnap.data();
+
+        return {
+            id: userCouponSnap.id,
+            userId: data.userId,
+            couponId: data.couponId,
+            status: data.status || 'active',
+            createdAt: data.createdAt,
+            purchasedAt: data.purchasedAt?.toDate ? data.purchasedAt.toDate() : new Date(data.purchasedAt),
+            usedAt: data.usedAt?.toDate ? data.usedAt.toDate() : undefined,
+            coupon: {
+                id: couponSnap.id,
+                name: couponData.name || '',
+                description: couponData.description || '',
+                price: couponData.price || 0,
+                points: couponData.points || 0,
+                validFrom: couponData.validFrom?.toDate ? couponData.validFrom.toDate() : new Date(couponData.validFrom),
+                validTo: couponData.validTo?.toDate ? couponData.validTo.toDate() : new Date(couponData.validTo),
+                imageUrl: couponData.imageUrl,
+                businessId: couponData.businessId,
+                businessIds: couponData.businessIds,
+            }
+        };
     } catch (error) {
         console.error('Error fetching user coupon:', error);
         return null;
@@ -256,5 +292,38 @@ export async function getCouponById(couponId: string): Promise<any> {
     } catch (error) {
         console.error('Error fetching coupon:', error);
         return null;
+    }
+}
+
+/**
+ * Check if user has purchased a specific coupon and get the userCoupon ID
+ */
+export async function getUserCouponByIds(userId: string, couponId: string): Promise<{ purchased: boolean; userCouponId?: string; isUsed?: boolean }> {
+    try {
+        const userCouponsRef = collection(db, USER_COUPONS_COLLECTION);
+        const q = query(
+            userCouponsRef,
+            where('userId', '==', userId),
+            where('couponId', '==', couponId)
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            return { purchased: false };
+        }
+
+        // Get the first userCoupon (there should only be one per user per coupon in most cases)
+        const userCouponDoc = querySnapshot.docs[0];
+        const data = userCouponDoc.data();
+
+        return {
+            purchased: true,
+            userCouponId: userCouponDoc.id,
+            isUsed: data.status === 'used' || !!data.usedAt
+        };
+    } catch (error) {
+        console.error('❌ Error checking user coupon:', error);
+        return { purchased: false };
     }
 }

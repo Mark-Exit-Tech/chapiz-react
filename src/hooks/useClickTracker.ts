@@ -14,15 +14,6 @@ export function useClickTracker() {
     const lastClickTimeRef = useRef<number>(0);
     const isTrackingRef = useRef<boolean>(true);
 
-    // Return disabled state if user is not authenticated
-    if (!user) {
-        return {
-            clickCount: 0,
-            shouldShowAd: false,
-            resetAdFlag: () => { }
-        };
-    }
-
     // Check if we're on a pet profile page (disable click tracking here)
     const isPetProfilePage = pathname?.match(/\/pet\/[^\/]+$/) !== null;
     // Check if we're on an admin page (disable click tracking here)
@@ -44,6 +35,9 @@ export function useClickTracker() {
 
     // Track all clicks globally
     useEffect(() => {
+        // Don't track if user is not authenticated
+        if (!user) return;
+
         const handleClick = (event: MouseEvent) => {
             // Skip tracking on pet profile pages (they have their own mandatory ad)
             // Also skip tracking on admin pages
@@ -106,7 +100,7 @@ export function useClickTracker() {
         return () => {
             document.removeEventListener('click', handleClick, true);
         };
-    }, [isPetProfilePage, isAdminPage]);
+    }, [isPetProfilePage, isAdminPage, user]);
 
     const resetAdFlag = useCallback(() => {
         setShouldShowAd(false);

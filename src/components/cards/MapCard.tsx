@@ -324,7 +324,7 @@ export default function MapCard({ businesses = [], contactInfo, title }: MapCard
             marker.addListener('click', () => {
               if (!isMountedRef.current) return;
               if (businessItem.id) {
-                navigate(`/services?businessId=${businessItem.id}`);
+                navigate(`/${locale}/services?businessId=${businessItem.id}`);
               }
             });
 

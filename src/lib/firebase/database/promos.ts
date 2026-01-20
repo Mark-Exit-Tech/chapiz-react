@@ -44,10 +44,46 @@ export async function purchasePromo(userId: string, promoId: string): Promise<{ 
  */
 export async function markPromoAsUsed(userId: string, promoId: string): Promise<{ success: boolean; error?: string }> {
     try {
-        console.warn('markPromoAsUsed not yet fully implemented');
-        return { success: false, error: 'Not yet implemented' };
+        console.log('✔️ Marking promo as used:', { userId, promoId });
+
+        // Create or update user promo record
+        const userPromosRef = collection(db, USER_PROMOS_COLLECTION);
+        const q = query(
+            userPromosRef,
+            where('userId', '==', userId),
+            where('promoId', '==', promoId)
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            // Create new record if doesn't exist
+            const newUserPromoRef = doc(userPromosRef);
+            const now = new Date();
+
+            await setDoc(newUserPromoRef, {
+                userId,
+                promoId,
+                usedAt: now.toISOString(),
+                createdAt: now.toISOString()
+            });
+
+            console.log('✅ Promo marked as used (new record created)');
+        } else {
+            // Update existing record
+            const userPromoDoc = querySnapshot.docs[0];
+            const now = new Date();
+
+            await updateDoc(doc(db, USER_PROMOS_COLLECTION, userPromoDoc.id), {
+                usedAt: now.toISOString()
+            });
+
+            console.log('✅ Promo marked as used (existing record updated)');
+        }
+
+        return { success: true };
     } catch (error) {
-        console.error('Error marking promo as used:', error);
+        console.error('❌ Error marking promo as used:', error);
         return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
 }
@@ -57,10 +93,30 @@ export async function markPromoAsUsed(userId: string, promoId: string): Promise<
  */
 export async function isPromoUsed(userId: string, promoId: string): Promise<boolean> {
     try {
-        console.warn('isPromoUsed not yet fully implemented');
+        const userPromosRef = collection(db, USER_PROMOS_COLLECTION);
+        const q = query(
+            userPromosRef,
+            where('userId', '==', userId),
+            where('promoId', '==', promoId)
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            return false;
+        }
+
+        // Check if any of the records have a usedAt field
+        for (const docSnap of querySnapshot.docs) {
+            const data = docSnap.data();
+            if (data.usedAt) {
+                return true;
+            }
+        }
+
         return false;
     } catch (error) {
-        console.error('Error checking promo status:', error);
+        console.error('❌ Error checking promo status:', error);
         return false;
     }
 }

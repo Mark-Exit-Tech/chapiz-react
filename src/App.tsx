@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AuthProvider } from './contexts/FirebaseAuthContext';
+import AdDisplayManager from './components/AdDisplayManager';
 import HomePage from './pages/HomePage';
 
 // Lazy load pages - reduces initial bundle size
@@ -13,6 +14,7 @@ const MyPetsPage = lazy(() => import('./pages/MyPetsPage'));
 const CouponsPage = lazy(() => import('./pages/CouponsPage'));
 const CouponDetailPage = lazy(() => import('./pages/CouponDetailPage'));
 const VouchersPage = lazy(() => import('./pages/VouchersPage'));
+const VoucherDetailPage = lazy(() => import('./pages/VoucherDetailPage'));
 const UserSettingsPage = lazy(() => import('./pages/UserSettingsPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
@@ -53,6 +55,7 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <AdDisplayManager />
         <Routes>
           {/* Root path renders HomePage directly - no redirect to avoid double reload */}
           <Route path="/" element={<HomePage />} />
@@ -96,6 +99,7 @@ function App() {
           <Route path="/:locale/coupons" element={<Suspense fallback={<PageLoader />}><CouponsPage /></Suspense>} />
           <Route path="/:locale/coupons/:id" element={<Suspense fallback={<PageLoader />}><CouponDetailPage /></Suspense>} />
           <Route path="/:locale/vouchers" element={<Suspense fallback={<PageLoader />}><VouchersPage /></Suspense>} />
+          <Route path="/:locale/vouchers/:id" element={<Suspense fallback={<PageLoader />}><VoucherDetailPage /></Suspense>} />
           <Route path="/:locale/user/settings" element={<Suspense fallback={<PageLoader />}><UserSettingsPage /></Suspense>} />
           
           {/* Admin routes */}

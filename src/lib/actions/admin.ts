@@ -709,8 +709,34 @@ export async function updateVoucher(id: string, data: any) {
 // TODO: Rewrite all admin functions to use Firebase
 
 export async function getRandomActiveAd(): Promise<Ad | null> {
-  console.warn('getRandomActiveAd is a stub - needs Firebase implementation');
-  return null;
+  try {
+    const { getActiveAds } = await import('@/lib/firebase/database/advertisements');
+    const activeAds = await getActiveAds();
+
+    if (activeAds.length === 0) {
+      console.log('[getRandomActiveAd] No active ads available');
+      return null;
+    }
+
+    // Get a random ad from the active ads
+    const randomIndex = Math.floor(Math.random() * activeAds.length);
+    const randomAd = activeAds[randomIndex];
+
+    console.log('[getRandomActiveAd] Selected random ad:', randomAd.id, randomAd.title);
+
+    // Convert database Ad format to admin Ad format (Date -> string)
+    const ad: Ad = {
+      ...randomAd,
+      startDate: randomAd.startDate || null,
+      endDate: randomAd.endDate || null,
+      createdAt: randomAd.createdAt instanceof Date ? randomAd.createdAt.toISOString() : String(randomAd.createdAt)
+    };
+
+    return ad;
+  } catch (error) {
+    console.error('[getRandomActiveAd] Error fetching random ad:', error);
+    return null;
+  }
 }
 
 export async function getActiveAdsForServices(serviceType?: string): Promise<Ad[]> {

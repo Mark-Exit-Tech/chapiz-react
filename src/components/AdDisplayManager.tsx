@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useClickTracker } from '../hooks/useClickTracker';
-import { usePetId } from '@/hooks/use-pet-id';
 import { fetchRandomAd } from '@/lib/actions/ads-server';
 import AdFullPage from './get-started/AdFullPage';
 import { useLocation } from 'react-router-dom';
@@ -11,17 +10,11 @@ import { useAuth } from '@/contexts/FirebaseAuthContext';
 
 export default function AdDisplayManager() {
   const { pathname } = useLocation();
-  const { user, dbUser } = useAuth();
+  const { user } = useAuth();
   const { shouldShowAd, resetAdFlag } = useClickTracker();
-  const { petId } = usePetId();
   const [ad, setAd] = useState<any | null>(null);
   const [showAd, setShowAd] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  // Don't show ads for non-authenticated users
-  if (!user) {
-    return null;
-  }
 
   // Check if we're on a pet profile page (don't show click-based ads here)
   const isPetProfilePage = pathname?.match(/\/pet\/[^\/]+$/) !== null;
@@ -30,12 +23,15 @@ export default function AdDisplayManager() {
 
   // Debug logging
   useEffect(() => {
-    console.log('[AdDisplayManager] State:', { shouldShowAd, petId, showAd, isLoading });
-  }, [shouldShowAd, petId, showAd, isLoading]);
+    console.log('[AdDisplayManager] State:', { shouldShowAd, showAd, isLoading });
+  }, [shouldShowAd, showAd, isLoading]);
 
-  // Fetch promo when we should show an ad and pet exists
+  // Fetch promo when we should show an ad
   useEffect(() => {
     const fetchPromo = async () => {
+      // Don't show ads for non-authenticated users
+      if (!user) return;
+
       // Don't show click-based ads on pet profile pages (they have their own mandatory ad)
       // Also don't show ads on admin pages
       if (isPetProfilePage || isAdminPage) {
@@ -43,16 +39,10 @@ export default function AdDisplayManager() {
         return;
       }
 
-      console.log('[AdDisplayManager] Checking conditions:', { shouldShowAd, petId, showAd, isLoading, isPetProfilePage });
+      console.log('[AdDisplayManager] Checking conditions:', { shouldShowAd, showAd, isLoading, isPetProfilePage });
 
-      // Check if petId exists in localStorage (might be set but not loaded yet)
-      const storedPetId = typeof window !== 'undefined' ? localStorage.getItem('petId') : null;
-      const hasPetId = petId || storedPetId;
-
-      console.log('[AdDisplayManager] Pet ID check:', { petId, storedPetId, hasPetId });
-
-      // Only show ads if pet details exist (petId is set in localStorage or state)
-      if (shouldShowAd && hasPetId && !showAd && !isLoading) {
+      // Show ads for all authenticated users (removed petId requirement)
+      if (shouldShowAd && !showAd && !isLoading) {
         console.log('[AdDisplayManager] Fetching ad...');
         setIsLoading(true);
         try {
@@ -81,14 +71,11 @@ export default function AdDisplayManager() {
         } finally {
           setIsLoading(false);
         }
-      } else if (shouldShowAd && !hasPetId) {
-        console.log('[AdDisplayManager] Should show ad but no petId found in localStorage or state');
-        resetAdFlag();
       }
     };
 
     fetchPromo();
-  }, [shouldShowAd, petId, showAd, isLoading, resetAdFlag, isPetProfilePage, isAdminPage]);
+  }, [shouldShowAd, showAd, isLoading, resetAdFlag, isPetProfilePage, isAdminPage, user]);
 
   const handleAdClose = () => {
     setShowAd(false);
@@ -102,6 +89,11 @@ export default function AdDisplayManager() {
       console.error('[AdDisplayManager] Error resetting click count:', error);
     }
   };
+
+  // Don't show ads for non-authenticated users
+  if (!user) {
+    return null;
+  }
 
   // Show ad if we have an ad with content
   if (showAd && ad && ad.content) {
