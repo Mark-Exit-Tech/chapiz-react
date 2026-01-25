@@ -27,9 +27,17 @@ i18n
     .use(initReactI18next) // Pass i18n instance to react-i18next
     .init({
         resources: {
-            en: { translation: enTranslations },
-            he: { translation: heTranslations },
+            en: {
+                translation: enTranslations,
+                Admin: (enTranslations as Record<string, unknown>).Admin ?? {},
+            },
+            he: {
+                translation: heTranslations,
+                Admin: (heTranslations as Record<string, unknown>).Admin ?? {},
+            },
         },
+        ns: ['translation', 'Admin'],
+        defaultNS: 'translation',
         fallbackLng: 'en',
         supportedLngs: supportedLanguages,
 
