@@ -13,22 +13,28 @@ const PopoverAnchor = PopoverPrimitive.Anchor;
 
 const PopoverContent = React.forwardRef<
   React.ElementRef<typeof PopoverPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
->(({ className, align = 'center', sideOffset = 4, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content> & { dir?: 'ltr' | 'rtl' }
+>(({ className, align = 'center', sideOffset = 4, dir, ...props }, ref) => {
   const internalRef = React.useRef<HTMLDivElement>(null);
   const [isRTL, setIsRTL] = React.useState(false);
 
   React.useEffect(() => {
+    // Use explicit dir prop if provided
+    if (dir) {
+      setIsRTL(dir === 'rtl');
+      return;
+    }
+
     // Check if we're in an RTL context
     const checkRTL = () => {
       let element = internalRef.current?.parentElement;
       while (element) {
-        const dir = element.getAttribute('dir');
-        if (dir === 'rtl') {
+        const elementDir = element.getAttribute('dir');
+        if (elementDir === 'rtl') {
           setIsRTL(true);
           return;
         }
-        if (dir === 'ltr') {
+        if (elementDir === 'ltr') {
           setIsRTL(false);
           return;
         }
@@ -40,7 +46,7 @@ const PopoverContent = React.forwardRef<
     };
 
     checkRTL();
-  }, []);
+  }, [dir]);
 
   // Override align based on RTL detection if align is explicitly 'start'
   const finalAlign = align === 'start' && isRTL ? 'end' : align;
@@ -58,6 +64,7 @@ const PopoverContent = React.forwardRef<
         }}
         align={finalAlign}
         sideOffset={sideOffset}
+        dir={dir || (isRTL ? 'rtl' : 'ltr')}
         className={cn(
           'bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-72 rounded-md border p-4 shadow-md outline-hidden',
           className
