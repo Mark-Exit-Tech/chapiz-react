@@ -33,6 +33,7 @@ interface TagsFilterProps {
   noTagsFoundText?: string;
   className?: string;
   translateTag?: (tag: string) => string; // Function to translate tags for display
+  dir?: 'ltr' | 'rtl'; // Explicit direction override
 }
 
 export function TagsFilter({
@@ -47,11 +48,13 @@ export function TagsFilter({
   selectedText = "Selected",
   noTagsFoundText = "No tags found.",
   className,
-  translateTag
+  translateTag,
+  dir
 }: TagsFilterProps) {
   const [open, setOpen] = useState(false);
   const locale = useLocale();
-  const isRTL = locale === 'he';
+  // Use explicit dir prop if provided, otherwise detect from locale
+  const isRTL = dir ? dir === 'rtl' : (locale === 'he' || locale?.startsWith('he'));
 
   // Helper function to get display text for a tag
   const getTagDisplay = (tag: string) => {

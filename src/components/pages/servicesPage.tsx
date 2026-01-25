@@ -241,6 +241,7 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
                     noTagsFoundText={text.tags.noTagsFound}
                     className="w-full"
                     translateTag={translateTag}
+                    dir={isHebrew ? 'rtl' : 'ltr'}
                   />
                 </div>
 

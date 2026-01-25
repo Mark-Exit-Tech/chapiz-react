@@ -11,16 +11,34 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { UserPlus } from 'lucide-react';
-import { useAuth } from '@/contexts/FirebaseAuthContext';
+import { sendSignInLinkToEmail } from 'firebase/auth';
+import { auth } from '@/lib/firebase/client';
 
-// TODO: Implement with Firebase
-const sendUserInvitationByAdmin = async (data: any): Promise<{ success: boolean; error?: string; warning?: string }> => {
-  console.warn('sendUserInvitationByAdmin not yet implemented with Firebase');
-  return { success: true, warning: 'Function not yet implemented with Firebase' };
+// Send email invite using Firebase Auth magic link
+const sendUserInvitationByAdmin = async (data: { email: string }): Promise<{ success: boolean; error?: string }> => {
+  try {
+    const actionCodeSettings = {
+      // URL to redirect to after email link is clicked
+      url: `${window.location.origin}/he/auth/finish-signup`,
+      handleCodeInApp: true,
+    };
+
+    await sendSignInLinkToEmail(auth, data.email, actionCodeSettings);
+
+    // Store email in localStorage so we can use it when user clicks the link
+    window.localStorage.setItem('emailForSignIn', data.email);
+
+    console.log('✅ Invitation email sent to:', data.email);
+    return { success: true };
+  } catch (error: any) {
+    console.error('❌ Error sending invitation:', error);
+    return {
+      success: false,
+      error: error.message || 'Failed to send invitation email'
+    };
+  }
 };
 
 export default function AddUserForm() {

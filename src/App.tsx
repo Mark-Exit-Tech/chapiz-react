@@ -9,6 +9,7 @@ import HomePage from './pages/HomePage';
 const AuthPage = lazy(() => import('./pages/AuthPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const SignupPage = lazy(() => import('./pages/SignupPage'));
+const FinishSignupPage = lazy(() => import('./components/auth/FinishSignupPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const MyPetsPage = lazy(() => import('./pages/MyPetsPage'));
 const CouponsPage = lazy(() => import('./pages/CouponsPage'));
@@ -89,6 +90,7 @@ function App() {
           <Route path="/:locale/auth" element={<Suspense fallback={<PageLoader />}><AuthPage /></Suspense>} />
           <Route path="/:locale/login" element={<Suspense fallback={<PageLoader />}><LoginPage /></Suspense>} />
           <Route path="/:locale/signup" element={<Suspense fallback={<PageLoader />}><SignupPage /></Suspense>} />
+          <Route path="/:locale/auth/finish-signup" element={<Suspense fallback={<PageLoader />}><FinishSignupPage /></Suspense>} />
           <Route path="/:locale/contact" element={<Suspense fallback={<PageLoader />}><ContactPage /></Suspense>} />
           <Route path="/:locale/my-pets" element={<Suspense fallback={<PageLoader />}><MyPetsPage /></Suspense>} />
           <Route path="/:locale/pet/:id" element={<Suspense fallback={<PageLoader />}><PetPage /></Suspense>} />
