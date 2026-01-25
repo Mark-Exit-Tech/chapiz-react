@@ -35,14 +35,12 @@ i18n
 
         // Language detection options
         detection: {
-            // Order of detection methods
             order: ['path', 'localStorage', 'navigator'],
-            // Keys to look for in localStorage
             lookupLocalStorage: 'i18nextLng',
-            // Cache user language
             caches: ['localStorage'],
-            // Don't cache on server side
             excludeCacheFor: ['cimode'],
+            // Extract locale from first path segment: /he/admin -> 'he', /en/admin -> 'en'
+            lookupFromPathIndex: 0,
         },
 
         interpolation: {

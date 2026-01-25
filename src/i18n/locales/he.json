@@ -181,6 +181,12 @@
     },
     "unauthorizedMessage": "אין לך הרשאה לגשת לדף זה.",
     "goBack": "חזור",
+    "signIn": "התחבר",
+    "roles": {
+      "user": "משתמש",
+      "admin": "מנהל",
+      "super_admin": "מנהל על"
+    },
     "navigation": {
       "dashboard": "לוח בקרה",
       "manageAds": "נהל פרסומות",

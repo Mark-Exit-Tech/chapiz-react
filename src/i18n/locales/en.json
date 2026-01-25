@@ -178,6 +178,12 @@
     "unauthorized": "Unauthorized Access",
     "unauthorizedMessage": "You don't have permission to access this page.",
     "goBack": "Go Back",
+    "signIn": "Sign In",
+    "roles": {
+      "user": "User",
+      "admin": "Admin",
+      "super_admin": "Super Admin"
+    },
     "common": {
       "cancel": "Cancel"
     },
