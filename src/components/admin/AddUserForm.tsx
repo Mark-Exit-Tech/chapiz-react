@@ -24,6 +24,8 @@ const sendUserInvitationByAdmin = async (data: { email: string; locale: string }
 
     const inviteUrl = `${window.location.origin}/${data.locale}/signup`;
 
+    console.log('📧 Sending invitation to:', data.email, 'with URL:', inviteUrl);
+
     const result = await sendInviteEmail({
       email: data.email,
       inviteUrl,
@@ -34,9 +36,43 @@ const sendUserInvitationByAdmin = async (data: { email: string; locale: string }
     return { success: true };
   } catch (error: any) {
     console.error('❌ Error sending invitation:', error);
+    
+    // Extract detailed error information from Firebase function errors
+    let errorMessage = 'Failed to send invitation email';
+    
+    if (error?.code) {
+      // Firebase function error codes
+      switch (error.code) {
+        case 'functions/invalid-argument':
+          errorMessage = error.message || 'Invalid email address';
+          break;
+        case 'functions/internal':
+          errorMessage = error.message || 'Server error. Please try again later or contact support.';
+          break;
+        case 'functions/permission-denied':
+          errorMessage = 'You do not have permission to send invitations';
+          break;
+        case 'functions/unavailable':
+          errorMessage = 'Service temporarily unavailable. Please try again later.';
+          break;
+        default:
+          errorMessage = error.message || error.details || 'Failed to send invitation email';
+      }
+    } else if (error?.message) {
+      errorMessage = error.message;
+    }
+
+    // Log full error details for debugging
+    console.error('Error details:', {
+      code: error?.code,
+      message: error?.message,
+      details: error?.details,
+      stack: error?.stack
+    });
+
     return {
       success: false,
-      error: error.message || 'Failed to send invitation email'
+      error: errorMessage
     };
   }
 };
@@ -70,9 +106,17 @@ export default function AddUserForm() {
     setIsSubmitting(true);
     setError(null);
 
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError(isHebrew ? 'כתובת אימייל לא תקינה' : 'Invalid email address');
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const result = await sendUserInvitationByAdmin({
-        email,
+        email: email.trim().toLowerCase(),
         locale
       });
 

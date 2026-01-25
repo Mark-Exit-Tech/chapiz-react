@@ -1,13 +1,27 @@
 import * as functions from 'firebase-functions';
 import { Resend } from 'resend';
 
-const resend = new Resend('re_4B3FSDoU_GjgVXh2vLWks6VzuQvfnvaBf');
+// Get Resend API key from environment variables or fallback to hardcoded (for development)
+const resendApiKey = process.env.RESEND_API_KEY || 're_4B3FSDoU_GjgVXh2vLWks6VzuQvfnvaBf';
+const resend = new Resend(resendApiKey);
 
-export const sendInviteEmail = functions.https.onCall(async (request) => {
-  const { email, inviteUrl, locale } = request.data;
+export const sendInviteEmail = functions.https.onCall(async (data, context) => {
+  const { email, inviteUrl, locale } = data;
 
+  // Validate required fields
   if (!email) {
     throw new functions.https.HttpsError('invalid-argument', 'Email is required');
+  }
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    throw new functions.https.HttpsError('invalid-argument', 'Invalid email format');
+  }
+
+  // Validate inviteUrl
+  if (!inviteUrl || typeof inviteUrl !== 'string') {
+    throw new functions.https.HttpsError('invalid-argument', 'Invalid invite URL');
   }
 
   const isHebrew = locale === 'he';
@@ -39,6 +53,8 @@ export const sendInviteEmail = functions.https.onCall(async (request) => {
   `;
 
   try {
+    console.log('Attempting to send email:', { email, locale, inviteUrl: inviteUrl.substring(0, 50) + '...' });
+
     const { data, error } = await resend.emails.send({
       from: 'Chapiz <noreply@chapiz.co.il>',
       to: [email],
@@ -47,14 +63,28 @@ export const sendInviteEmail = functions.https.onCall(async (request) => {
     });
 
     if (error) {
-      console.error('Resend error:', error);
-      throw new functions.https.HttpsError('internal', error.message);
+      console.error('Resend API error:', JSON.stringify(error, null, 2));
+      const errorMessage = error.message || 'Failed to send email';
+      throw new functions.https.HttpsError('internal', errorMessage);
     }
 
-    console.log('Email sent successfully:', data);
+    console.log('Email sent successfully:', { messageId: data?.id, email });
     return { success: true, messageId: data?.id };
   } catch (error: any) {
-    console.error('Error sending email:', error);
-    throw new functions.https.HttpsError('internal', error.message || 'Failed to send email');
+    console.error('Error sending email:', {
+      name: error?.name,
+      message: error?.message,
+      code: error?.code,
+      stack: error?.stack
+    });
+
+    // If it's already a Firebase HttpsError, re-throw it
+    if (error?.code && error.code.startsWith('functions/')) {
+      throw error;
+    }
+
+    // Otherwise, wrap it in an HttpsError
+    const errorMessage = error?.message || 'Failed to send email. Please check Resend configuration and verify the sender email is verified.';
+    throw new functions.https.HttpsError('internal', errorMessage);
   }
 });
