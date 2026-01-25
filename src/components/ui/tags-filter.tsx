@@ -86,11 +86,11 @@ export function TagsFilter({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className={cn("w-full justify-between", isRTL ? "text-right" : "text-left")}
+            className="w-full justify-between ltr:text-left rtl:text-right"
             style={{ direction: isRTL ? 'rtl' : 'ltr' }}
           >
             <span className="truncate">{placeholder}</span>
-            <ChevronsUpDown className={cn("h-4 w-4 shrink-0 opacity-50", isRTL ? "ml-2" : "ml-2")} />
+            <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50 ltr:ml-2 rtl:mr-2" />
           </Button>
         </PopoverTrigger>
         <PopoverContent
@@ -104,16 +104,16 @@ export function TagsFilter({
           style={{ direction: isRTL ? 'rtl' : 'ltr' }}
         >
           <Command dir={isRTL ? 'rtl' : 'ltr'}>
-            <CommandInput placeholder={searchTagsPlaceholder} className={isRTL ? "text-right" : "text-left"} />
+            <CommandInput placeholder={searchTagsPlaceholder} className="ltr:text-left rtl:text-right" />
             <CommandList className="max-h-[300px] overflow-y-auto">
               <CommandEmpty>{noTagsFoundText}</CommandEmpty>
               {selectedTags.length > 0 && (
                 <CommandGroup>
                   <CommandItem
                     onSelect={clearAllTags}
-                    className={cn("flex items-center text-muted-foreground hover:text-foreground cursor-pointer", isRTL ? "flex-row-reverse justify-center" : "justify-center")}
+                    className="flex items-center text-muted-foreground hover:text-foreground cursor-pointer justify-center"
                   >
-                    <X className={cn("h-4 w-4", isRTL ? "ltr:mr-2 rtl:ml-2" : "mr-2")} />
+                    <X className="h-4 w-4 ltr:mr-2 rtl:ml-2" />
                     {clearAllText}
                   </CommandItem>
                 </CommandGroup>
@@ -124,16 +124,15 @@ export function TagsFilter({
                     key={tag}
                     value={translateTag ? getTagDisplay(tag) : tag}
                     onSelect={() => handleTagToggle(tag)}
-                    className={cn("flex items-center cursor-pointer", isRTL ? "flex-row-reverse" : "")}
+                    className="flex items-center cursor-pointer"
                   >
                     <Check
                       className={cn(
-                        "h-4 w-4 shrink-0",
-                        isRTL ? "ltr:mr-2 rtl:ml-2" : "mr-2",
+                        "h-4 w-4 shrink-0 ltr:mr-2 rtl:ml-2",
                         selectedTags.includes(tag) ? "opacity-100" : "opacity-0"
                       )}
                     />
-                    <span className={isRTL ? "text-right" : "text-left"}>{getTagDisplay(tag)}</span>
+                    <span>{getTagDisplay(tag)}</span>
                   </CommandItem>
                 ))}
               </CommandGroup>
