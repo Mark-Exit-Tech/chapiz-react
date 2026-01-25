@@ -16,7 +16,7 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const { user, loading } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   // Get locale from URL or default to 'en'
   const locale = typeof window !== 'undefined'
@@ -26,6 +26,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [roleLoading, setRoleLoading] = useState(true);
+
+  // Sync i18n language to URL locale so admin nav translations match /he/ or /en/
+  useEffect(() => {
+    if ((locale === 'he' || locale === 'en') && i18n.language !== locale) {
+      i18n.changeLanguage(locale);
+    }
+  }, [locale, i18n]);
 
   useEffect(() => {
     const checkUserRole = async () => {
