@@ -226,9 +226,23 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
               </div>
 
               {/* Search Bar and Filter Row */}
-              <div className="flex flex-row gap-3">
-                {/* Tags Filter */}
-                <div className="w-[200px] shrink-0">
+              <div className="flex flex-col sm:flex-row gap-3">
+                {/* Search Bar - Full width on mobile, grows on desktop */}
+                <div className="relative h-9 grow rounded-lg bg-white border border-gray-200 order-1 sm:order-2">
+                  <Search
+                    className="absolute top-1/2 -translate-y-1/2 transform text-gray-400 ltr:left-3 rtl:right-3 pointer-events-none"
+                    size={16}
+                  />
+                  <Input
+                    placeholder={text.searchPlaceholder}
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full h-full rounded-lg p-2 ltr:pl-10 rtl:pr-10 border-none focus-visible:ring-0"
+                  />
+                </div>
+
+                {/* Tags Filter - Full width on mobile, fixed width on desktop */}
+                <div className="w-full sm:w-[200px] shrink-0 order-2 sm:order-1">
                   <TagsFilter
                     tags={availableTags}
                     selectedTags={selectedTags}
@@ -241,20 +255,6 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
                     noTagsFoundText={text.tags.noTagsFound}
                     className="w-full"
                     translateTag={translateTag}
-                  />
-                </div>
-
-                {/* Search Bar */}
-                <div className="relative h-9 grow rounded-lg bg-white border border-gray-200">
-                  <Search
-                    className="absolute top-1/2 -translate-y-1/2 transform text-gray-400 ltr:left-3 rtl:right-3"
-                    size={16}
-                  />
-                  <Input
-                    placeholder={text.searchPlaceholder}
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="w-full rounded-lg p-2 ltr:pl-10 rtl:pr-10 border-none focus-visible:ring-0"
                   />
                 </div>
               </div>
