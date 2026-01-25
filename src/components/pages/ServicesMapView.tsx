@@ -716,91 +716,64 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
     }
 
     const apiKey = googleMapsApiKey;
-    const BAD_KEY = 'AIzaSyAwzQsbG0vO0JWzOs7UAyu0upW6Xc1KL4E';
     let script: HTMLScriptElement | null = null;
     let checkInterval: NodeJS.Timeout | null = null;
     let timeoutId: NodeJS.Timeout | null = null;
 
     const loadGoogleMaps = () => {
-      // Aggressively remove any scripts with the wrong key
-      const allMapsScripts = document.querySelectorAll('script[src*="maps.googleapis.com"]');
-      let hasBadScript = false;
-
-      allMapsScripts.forEach((s) => {
-        const scriptSrc = (s as HTMLScriptElement).src;
-        if (scriptSrc.includes(BAD_KEY)) {
-          console.log('🗑️ Removing script with bad API key:', scriptSrc);
-          s.remove();
-          hasBadScript = true;
-        }
-      });
-
-      // If we found a bad script, clear window.google to force fresh load
-      if (hasBadScript) {
-        console.log('🧹 Clearing cached Google Maps API');
-        delete (window as any).google;
-        delete (window as any).initServicesMap;
-      }
-
-      // Check if script already exists with correct key
-      const existingScript = document.querySelector('script[data-services-map]') as HTMLScriptElement;
-      if (existingScript && existingScript.src.includes(apiKey)) {
-        if (window.google && window.google.maps) {
-          initializeMap();
-        } else {
-          // Wait for script to load
-          checkInterval = setInterval(() => {
-            if (window.google && window.google.maps) {
-              if (checkInterval) clearInterval(checkInterval);
-              initializeMap();
-            }
-          }, 100);
-
-          timeoutId = setTimeout(() => {
-            if (checkInterval) clearInterval(checkInterval);
-          }, 5000);
-        }
+      // If Google Maps is already loaded, use it directly
+      if (window.google && window.google.maps && window.google.maps.Map) {
+        console.log('✅ ServicesMapView: Google Maps already loaded, using existing instance');
+        initializeMap();
         return;
       }
 
-      // Remove any existing script with wrong key
-      if (existingScript && !existingScript.src.includes(apiKey)) {
-        console.log('🗑️ Removing existing script with wrong key');
-        existingScript.remove();
-        delete (window as any).google;
-        delete (window as any).initServicesMap;
+      // Check if any Google Maps script is already loading
+      const existingScript = document.querySelector('script[src*="maps.googleapis.com/maps/api/js"]') as HTMLScriptElement;
+      if (existingScript) {
+        console.log('⏳ ServicesMapView: Google Maps script already exists, waiting for it to load...');
+        // Wait for it to load by polling
+        checkInterval = setInterval(() => {
+          if (window.google && window.google.maps && window.google.maps.Map) {
+            if (checkInterval) clearInterval(checkInterval);
+            console.log('✅ ServicesMapView: Google Maps finished loading');
+            initializeMap();
+          }
+        }, 100);
+
+        timeoutId = setTimeout(() => {
+          if (checkInterval) clearInterval(checkInterval);
+          if (!window.google || !window.google.maps) {
+            console.error('Google Maps failed to load within timeout');
+          }
+        }, 10000);
+        return;
       }
 
+      // No script exists, load it fresh (without callback to avoid conflicts)
+      console.log('📍 ServicesMapView: Loading Google Maps script...');
       script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,marker&loading=async&callback=initServicesMap`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,marker`;
       script.async = true;
       script.defer = true;
-      script.setAttribute('data-services-map', 'true');
 
-      // Wrapper function to ensure google.maps is fully loaded
-      window.initServicesMap = () => {
-        console.log('🗺️ Google Maps callback triggered');
-        
-        // Double-check that google.maps is available
+      // Poll for Google Maps to be ready instead of using callback
+      checkInterval = setInterval(() => {
         if (window.google && window.google.maps && window.google.maps.Map) {
-          console.log('✅ Google Maps API fully loaded');
+          if (checkInterval) clearInterval(checkInterval);
+          console.log('✅ ServicesMapView: Google Maps loaded successfully');
           initializeMap();
-        } else {
-          console.error('❌ Google Maps API loaded but Map constructor not available');
-          // Retry after a short delay
-          setTimeout(() => {
-            if (window.google && window.google.maps && window.google.maps.Map) {
-              console.log('✅ Google Maps API ready on retry');
-              initializeMap();
-            } else {
-              console.error('❌ Google Maps API still not ready after retry');
-            }
-          }, 500);
         }
-      };
-      
+      }, 100);
+
+      timeoutId = setTimeout(() => {
+        if (checkInterval) clearInterval(checkInterval);
+        if (!window.google || !window.google.maps) {
+          console.error('Google Maps failed to load');
+        }
+      }, 10000);
+
       document.head.appendChild(script);
-      console.log('✅ Loading Google Maps with key:', apiKey);
     };
 
     loadGoogleMaps();
@@ -809,11 +782,6 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
       // Clean up interval and timeout to prevent memory leaks
       if (checkInterval) clearInterval(checkInterval);
       if (timeoutId) clearTimeout(timeoutId);
-
-      // Cleanup callback
-      if (window.initServicesMap) {
-        delete window.initServicesMap;
-      }
     };
   }, [filterType, services]);
 

@@ -64,7 +64,7 @@ const GetStartedComboSelect: React.FC<GetStartedComboSelectProps> = ({
       <label
         htmlFor={id}
         className={cn(
-          'absolute top-2.5 left-3 w-fit text-sm text-gray-500 transition-all duration-200 ease-in-out rtl:right-3',
+          'absolute top-2.5 left-3 rtl:left-auto rtl:right-3 w-fit text-sm text-gray-500 transition-all duration-200 ease-in-out',
           value && value > 0
             ? 'text-primary -top-6 text-sm font-medium'
             : 'top-2.5 text-gray-500',
@@ -89,7 +89,7 @@ const GetStartedComboSelect: React.FC<GetStartedComboSelectProps> = ({
             )}
             onClick={() => setOpen(true)}
           >
-            <span className="font-normal">
+            <span className="font-normal text-start">
               {selectOptions.find((option) => option.id === (value || 0))?.label || ''}
             </span>
             <ChevronDown className="h-4! w-4! opacity-50" />
@@ -121,7 +121,7 @@ const GetStartedComboSelect: React.FC<GetStartedComboSelectProps> = ({
                         <div className="grow" />
                         <Check
                           className={cn(
-                            'ml-auto',
+                            'ms-auto',
                             option.id === value ? 'opacity-100' : 'opacity-0'
                           )}
                           size={16}

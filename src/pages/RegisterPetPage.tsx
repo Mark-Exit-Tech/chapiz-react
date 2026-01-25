@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { getUserFromFirestore } from '@/lib/firebase/database/users';
 import ClientRegisterPetPage from '@/components/get-started/ClientRegisterPetPage';
@@ -9,6 +10,7 @@ import BottomNavigation from '@/components/layout/BottomNavigation';
 export default function RegisterPetPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { i18n } = useTranslation();
   const { user, dbUser, loading: authLoading } = useAuth();
   const [userDetails, setUserDetails] = useState<{ fullName: string; phone: string; email: string }>({
     fullName: '',
@@ -29,7 +31,23 @@ export default function RegisterPetPage() {
     return browserLang === 'he' ? 'he' : 'en';
   };
   const locale = getLocaleFromUrl();
-  const isHebrew = locale === 'he';
+  // Check both URL locale and i18n language for RTL
+  const isHebrew = locale === 'he' || i18n.language === 'he';
+
+  // Sync i18n language with URL locale and set document direction
+  useEffect(() => {
+    // Sync i18n language with URL
+    if (i18n.language !== locale) {
+      i18n.changeLanguage(locale);
+    }
+    // Set document direction for RTL support
+    document.documentElement.dir = locale === 'he' ? 'rtl' : 'ltr';
+    document.documentElement.lang = locale;
+    return () => {
+      document.documentElement.dir = 'ltr';
+      document.documentElement.lang = 'en';
+    };
+  }, [locale, i18n]);
 
   const text = {
     loading: isHebrew ? 'טוען...' : 'Loading...',
@@ -80,9 +98,9 @@ export default function RegisterPetPage() {
   // Show loading while checking auth or loading user data
   if (authLoading || loading || !user) {
     return (
-      <>
+      <div dir={isHebrew ? 'rtl' : 'ltr'} className="min-h-screen flex flex-col">
         <Navbar />
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8 flex-1">
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
@@ -93,21 +111,22 @@ export default function RegisterPetPage() {
         <div className="md:hidden">
           <BottomNavigation />
         </div>
-      </>
+      </div>
     );
   }
 
   return (
-    <>
+    <div dir={isHebrew ? 'rtl' : 'ltr'} className="min-h-screen flex flex-col">
       <Navbar />
       <ClientRegisterPetPage
         genders={[]}
         breeds={[]}
         userDetails={userDetails}
+        locale={locale}
       />
       <div className="md:hidden">
         <BottomNavigation />
       </div>
-    </>
+    </div>
   );
 }

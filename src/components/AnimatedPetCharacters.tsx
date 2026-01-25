@@ -100,25 +100,29 @@ const AnimatedPetCharacters: React.FC = () => {
             left: `calc(50% - ${pet.right}px)`,
             willChange: isMobile ? 'auto' : 'transform'
           }}
-          initial={{ opacity: 0 }}
-          animate={isMobile ? { opacity: 1 } : {
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{
             opacity: 1,
-            y: [0, 2, 0, 2, 0], // Floating effect
-            rotate: [0, -3, 3, -3, 0], // Reduced rotation for better performance
-            transition: {
-              opacity: { duration: 0.5 },
-              y: {
-                duration: 6,
-                ease: 'easeInOut',
-                repeat: Infinity,
-                delay: 0.1 * pet.id
-              },
-              rotate: {
-                duration: 6,
-                ease: 'easeInOut',
-                repeat: Infinity,
-                delay: 0.1 * pet.id
-              }
+            scale: 1,
+            y: isMobile ? [0, -4, 0] : [0, -6, 0],
+            rotate: isMobile ? [0, -2, 2, 0] : [0, -3, 3, -3, 0],
+          }}
+          transition={{
+            opacity: { duration: 0.5, delay: 0.1 * pet.id },
+            scale: { duration: 0.5, delay: 0.1 * pet.id, type: 'spring', stiffness: 200 },
+            y: {
+              duration: isMobile ? 4 : 6,
+              ease: 'easeInOut',
+              repeat: Infinity,
+              repeatType: 'reverse',
+              delay: 0.2 * pet.id
+            },
+            rotate: {
+              duration: isMobile ? 5 : 6,
+              ease: 'easeInOut',
+              repeat: Infinity,
+              repeatType: 'reverse',
+              delay: 0.2 * pet.id
             }
           }}
         />

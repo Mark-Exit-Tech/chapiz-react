@@ -71,9 +71,18 @@ export default function PromosPageClient({
         const couponsResult = await getCoupons();
         let activeCoupons: Coupon[] = [];
         if (couponsResult.success && couponsResult.coupons) {
-          // Filter to only show active coupons
-          activeCoupons = couponsResult.coupons.filter((c: Coupon) => c.isActive);
-          console.log('✅ Loaded active coupons:', activeCoupons.length);
+          const now = new Date();
+          // Filter to only show active coupons that are not expired
+          activeCoupons = couponsResult.coupons.filter((c: Coupon) => {
+            if (!c.isActive) return false;
+            // Check if coupon is expired
+            if (c.validTo) {
+              const validTo = new Date(c.validTo);
+              if (validTo < now) return false;
+            }
+            return true;
+          });
+          console.log('✅ Loaded active non-expired coupons:', activeCoupons.length);
         } else {
           console.error('Failed to load coupons:', couponsResult.error);
         }

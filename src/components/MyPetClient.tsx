@@ -3,6 +3,7 @@
 
 import MyPetCard from '@/components/MyPetCard';
 import { EditIcon } from 'lucide-react';
+import { motion } from 'framer-motion';
 import React, { useState, useEffect } from 'react';
 import { cn } from '../lib/utils';
 import InviteFriendsCard from './InviteFriendsCard';
@@ -247,18 +248,47 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
         </div>
       ) : (
         <div className="flex justify-center" style={{ paddingBottom: '50px' }}>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 w-full">
-            {filteredPets.map((pet) => (
-              <MyPetCard
+          <motion.div
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 w-full"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.1
+                }
+              }
+            }}
+          >
+            {filteredPets.map((pet, index) => (
+              <motion.div
                 key={pet.id}
-                id={pet.id}
-                name={pet.name}
-                breed={pet.breed}
-                image={pet.image}
-                isEditMode={isEditMode}
-              />
+                variants={{
+                  hidden: { opacity: 0, y: 20, scale: 0.95 },
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    transition: {
+                      type: 'spring',
+                      stiffness: 300,
+                      damping: 24
+                    }
+                  }
+                }}
+              >
+                <MyPetCard
+                  id={pet.id}
+                  name={pet.name}
+                  breed={pet.breed}
+                  image={pet.image}
+                  isEditMode={isEditMode}
+                />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       )}
     </div>

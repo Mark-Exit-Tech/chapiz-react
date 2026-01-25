@@ -23,14 +23,17 @@ import BackButton from './ui/BackButton';
 export default function ClientRegisterPetPage({
   genders,
   breeds,
-  userDetails
+  userDetails,
+  locale: localeProp
 }: {
   genders: { id: number; labels: { en: string; he: string } }[];
   breeds: { id: number; labels: { en: string; he: string } }[];
   userDetails: { fullName: string; phone: string; email: string };
+  locale?: string;
 }) {
   const navigate = useNavigate();
-  const locale = useLocale() as 'en' | 'he';
+  const localeFromHook = useLocale() as string;
+  const locale = (localeProp || localeFromHook || 'en') as 'en' | 'he';
   const isHebrew = locale === 'he';
   const { t } = useTranslation('');
 
@@ -255,7 +258,7 @@ export default function ClientRegisterPetPage({
 
       if (result.success) {
         clearPetId();
-        navigate(`/pet/${result.petId || petId}/done`);
+        navigate(`/${locale}/pet/${result.petId || petId}/done`);
       } else {
         setError(result.error || text.createError);
         toast.error(result.error || text.failedCreate);
@@ -287,7 +290,7 @@ export default function ClientRegisterPetPage({
     setFormData((prev) => ({ ...prev, ...currentData }));
 
     if (currentStep === 0) {
-      navigate('/pages/my-pets');
+      navigate(`/${locale}/my-pets`);
     } else {
       setCurrentStep((prev) => prev - 1);
     }
@@ -322,7 +325,9 @@ export default function ClientRegisterPetPage({
         onSubmit={methods.handleSubmit(handleNext)}
         className="flex h-full grow flex-col p-4"
       >
-        <BackButton handleBack={handleBack} />
+        <div className="flex w-full justify-start">
+          <BackButton handleBack={handleBack} />
+        </div>
         <div className="grow">{StepComponent}</div>
         <div className="flex w-full flex-row items-center justify-between">
           <GetStartedProgressDots

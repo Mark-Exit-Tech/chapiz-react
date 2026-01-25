@@ -26,8 +26,8 @@ const VetDetailsPage = () => {
       <Card className="border-none bg-transparent shadow-none">
         <CardContent className="space-y-10 px-0 pt-8">
           {/* Vet Name - Can be private */}
-          <div className="flex items-center gap-2">
-            <div className="flex-grow">
+          <div className="flex items-center gap-2 ">
+            <div className="flex-grow min-w-0">
               <Controller
                 name="vetName"
                 control={control}
@@ -56,8 +56,8 @@ const VetDetailsPage = () => {
           </div>
 
           {/* Phone Number - Can be private */}
-          <div className="flex items-center gap-2">
-            <div className="flex-grow">
+          <div className="flex items-center gap-2 ">
+            <div className="flex-grow min-w-0">
               <Controller
                 name="vetPhoneNumber"
                 control={control}
@@ -88,8 +88,8 @@ const VetDetailsPage = () => {
           </div>
 
           {/* Email - Can be private */}
-          <div className="flex items-center gap-2">
-            <div className="flex-grow">
+          <div className="flex items-center gap-2 ">
+            <div className="flex-grow min-w-0">
               <Controller
                 name="vetEmailAddress"
                 control={control}
@@ -118,8 +118,8 @@ const VetDetailsPage = () => {
           </div>
 
           {/* Address - Can be private */}
-          <div className="flex items-center gap-2">
-            <div className="flex-grow overflow-auto">
+          <div className="flex items-center gap-2 ">
+            <div className="flex-grow min-w-0 overflow-auto">
               <Controller
                 name="vetAddress"
                 control={control}

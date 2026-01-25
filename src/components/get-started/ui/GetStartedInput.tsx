@@ -28,7 +28,7 @@ const GetStartedInput = ({
       <label
         htmlFor={id}
         className={cn(
-          'absolute top-2.5 left-3 w-fit text-sm text-gray-500 transition-all duration-200 ease-in-out rtl:right-3',
+          'absolute top-2.5 left-3 rtl:left-auto rtl:right-3 w-fit text-sm text-gray-500 transition-all duration-200 ease-in-out',
           props.value
             ? 'text-primary -top-6 text-sm font-medium'
             : 'top-2.5 text-gray-500',
@@ -45,11 +45,11 @@ const GetStartedInput = ({
         {...props}
         value={props.value || ''}
         className={cn(
-          'h-10 rounded border-gray-300 bg-white',
+          'h-10 rounded border-gray-300 bg-white text-start',
           hasError ? 'border-red-800' : '',
           isPasswordField ? 'ltr:pr-10 rtl:pl-10' : '',
           isPhoneField
-            ? 'lrt:text-left ltr:rounded-s ltr:rounded-e-none rtl:rounded-s-none rtl:rounded-e rtl:text-right'
+            ? 'ltr:text-left ltr:rounded-s ltr:rounded-e-none rtl:rounded-s-none rtl:rounded-e rtl:text-right'
             : ''
         )}
         type={

@@ -1,6 +1,6 @@
 'use client';
 
-import { useDirection } from '@radix-ui/react-direction';
+import { useLocale } from '@/hooks/use-locale';
 import { motion } from 'framer-motion';
 import { ArrowRight, Pencil, PawPrint } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -29,12 +29,8 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
   console.log('Image URL starts with http:', image?.startsWith('http'));
   console.log('Image URL starts with https:', image?.startsWith('https'));
   const navigate = useNavigate();
-  const direction = useDirection();
-
-  // Get locale from URL
-  const locale = typeof window !== 'undefined'
-    ? window.location.pathname.split('/')[1] || 'en'
-    : 'en';
+  const locale = (useLocale() as string) || 'en';
+  const isRTL = locale === 'he';
 
   // Fixed dimensions for consistent layout.
   const imageWidth = 100; // in pixels
@@ -97,44 +93,43 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
   };
 
   return (
-    <div
+    <motion.div
       onClick={handleCardClick}
       className={cn(
-        `bg-white relative h-[120px] w-full cursor-pointer rounded-2xl shadow-md transition duration-200 hover:shadow-lg active:shadow-lg overflow-hidden`
+        `bg-white relative h-[120px] w-full cursor-pointer rounded-2xl shadow-md overflow-hidden`
       )}
+      whileHover={{ scale: 1.02, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)' }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
     >
-      {/* Options Panel (revealed in edit mode) */}
-      <div
-        className={cn(
-          'absolute top-0 bottom-0 z-10 flex items-center justify-evenly gap-1 rounded-s-2xl p-2.5 ltr:left-0 rtl:right-0'
-        )}
-        style={{ width: `${optionsPanelWidth}px` }}
-      >
-        <Button
-          variant={'secondary'}
-          onClick={handleEdit}
-          className="h-[70%] w-full font-medium shadow-none"
+      {/* Options Panel (revealed in edit mode only) */}
+      {isEditMode && (
+        <div
+          className={cn(
+            'absolute top-0 bottom-0 z-10 flex items-center justify-evenly gap-1 rounded-s-2xl p-2.5 ltr:left-0 rtl:right-0 overflow-hidden'
+          )}
+          style={{ width: `${optionsPanelWidth}px` }}
         >
-          <Pencil className="h-6 w-6" />
-        </Button>
-        {/* <Separator orientation="vertical" className="h-[70%] bg-white/60" />
-        <Button
-          variant={'secondary'}
-          onClick={handleDelete}
-          className="h-[70%] w-3 font-medium shadow-none hover:bg-white/20 active:bg-white/20"
-        >
-          <Trash2 className="h-6 w-6" />
-        </Button> */}
-      </div>
+          <Button
+            variant="secondary"
+            onClick={handleEdit}
+            className="h-[70%] min-w-0 w-full font-medium shadow-none flex-shrink-0"
+          >
+            <Pencil className="h-6 w-6 shrink-0" />
+          </Button>
+        </div>
+      )}
 
       {/* Animated Text / Info Container */}
       <motion.div
         className="absolute top-0 bottom-0 z-10 rounded-2xl bg-white shadow-xs ltr:left-0 rtl:right-0"
-        initial={{ width: '100%', x: 0 }}
+        initial={false}
         animate={{
-          width: `calc(100% - ${imageWidth}px - 10px)`, // Always leave space for image
+          width: isEditMode
+            ? `calc(100% - ${imageWidth}px - 10px - ${optionsPanelWidth}px)`
+            : `calc(100% - ${imageWidth}px - 10px)`,
           x: isEditMode
-            ? direction === 'rtl'
+            ? isRTL
               ? -optionsPanelWidth
               : optionsPanelWidth
             : 0
@@ -181,7 +176,7 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

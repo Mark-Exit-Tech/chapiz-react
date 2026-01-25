@@ -45,7 +45,7 @@ const GetStartedSelect = ({
       <label
         htmlFor={id}
         className={cn(
-          'absolute top-2.5 left-3 w-fit text-sm text-gray-500 transition-all duration-200 ease-in-out rtl:right-3',
+          'absolute top-2.5 left-3 rtl:left-auto rtl:right-3 w-fit text-sm text-gray-500 transition-all duration-200 ease-in-out',
           value && value.length > 0
             ? 'text-primary -top-6 text-sm font-medium'
             : 'top-2.5 text-gray-500',
@@ -66,12 +66,12 @@ const GetStartedSelect = ({
         <SelectTrigger
           id={id}
           className={cn(
-            'h-10 border-gray-300 bg-white text-base',
+            'h-10 border-gray-300 bg-white text-base text-start',
             hasError ? 'border-red-800' : '',
             disabled ? 'opacity-50 cursor-not-allowed' : ''
           )}
         >
-          <SelectValue className="rtl:text-right">
+          <SelectValue className="text-start">
             {selectOptions.find((option) => option.value === value)?.label || placeholder || ''}
           </SelectValue>
         </SelectTrigger>

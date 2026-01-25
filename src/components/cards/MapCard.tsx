@@ -56,7 +56,6 @@ export default function MapCard({ businesses = [], contactInfo, title }: MapCard
 
     const loadGoogleMaps = () => {
       const apiKey = googleMapsApiKey;
-      const BAD_KEY = 'AIzaSyAwzQsbG0vO0JWzOs7UAyu0upW6Xc1KL4E';
 
       if (!apiKey) {
         console.error('❌ Google Maps API key is not configured');
@@ -64,120 +63,77 @@ export default function MapCard({ businesses = [], contactInfo, title }: MapCard
         return;
       }
 
-      // Aggressively remove any scripts with the wrong key
-      const allMapsScripts = document.querySelectorAll('script[src*="maps.googleapis.com"]');
-      let hasBadScript = false;
-
-      allMapsScripts.forEach((s) => {
-        const scriptSrc = (s as HTMLScriptElement).src;
-        if (scriptSrc.includes(BAD_KEY)) {
-          console.log('🗑️ Removing script with bad API key:', scriptSrc);
-          s.remove();
-          hasBadScript = true;
-        }
-      });
-
-      // If we found a bad script, clear window.google to force fresh load
-      if (hasBadScript) {
-        console.log('🧹 Clearing cached Google Maps API');
-        delete (window as any).google;
-        delete (window as any).initMapCard;
-      }
-
-      if (window.google && window.google.maps) {
+      // If Google Maps is already loaded, use it directly
+      if (window.google && window.google.maps && window.google.maps.Map) {
+        console.log('✅ MapCard: Google Maps already loaded, using existing instance');
         initializeMap();
         return;
       }
 
-      // Check if script already exists with correct key
-      const existingGlobalScript = document.querySelector('script[src*="maps.googleapis.com"]') as HTMLScriptElement;
-      if (existingGlobalScript && existingGlobalScript.src.includes(apiKey)) {
-        if (window.google && window.google.maps) {
-          initializeMap();
-        } else {
-          intervalRef.current = setInterval(() => {
-            if (window.google && window.google.maps && isMountedRef.current) {
-              if (intervalRef.current) {
-                clearInterval(intervalRef.current);
-                intervalRef.current = null;
-              }
-              initializeMap();
-            }
-          }, 100);
-
-          timeoutRef.current = setTimeout(() => {
+      // Check if any Google Maps script is already loading
+      const existingScript = document.querySelector('script[src*="maps.googleapis.com/maps/api/js"]') as HTMLScriptElement;
+      if (existingScript) {
+        console.log('⏳ MapCard: Google Maps script already exists, waiting for it to load...');
+        // Wait for it to load by polling
+        intervalRef.current = setInterval(() => {
+          if (window.google && window.google.maps && window.google.maps.Map && isMountedRef.current) {
             if (intervalRef.current) {
               clearInterval(intervalRef.current);
               intervalRef.current = null;
             }
-            if (!window.google || !window.google.maps) {
-              console.error('Google Maps failed to load');
-              if (isMountedRef.current) {
-                setMapLoaded(true);
-              }
-            }
-          }, 5000);
-        }
-        return;
-      }
-
-      // Remove any existing script with wrong key
-      if (existingGlobalScript && !existingGlobalScript.src.includes(apiKey)) {
-        console.log('🗑️ Removing existing script with wrong key');
-        existingGlobalScript.remove();
-        delete (window as any).google;
-        delete (window as any).initMapCard;
-      }
-
-      const existingScript = document.querySelector('script[data-map-card]') as HTMLScriptElement;
-      if (existingScript && existingScript.src.includes(apiKey)) {
-        if (window.google && window.google.maps) {
-          if (isMountedRef.current) {
+            console.log('✅ MapCard: Google Maps finished loading');
             initializeMap();
           }
-        } else {
-          intervalRef.current = setInterval(() => {
-            if (window.google && window.google.maps && isMountedRef.current) {
-              if (intervalRef.current) {
-                clearInterval(intervalRef.current);
-                intervalRef.current = null;
-              }
-              initializeMap();
-            }
-          }, 100);
+        }, 100);
 
-          timeoutRef.current = setTimeout(() => {
-            if (intervalRef.current) {
-              clearInterval(intervalRef.current);
-              intervalRef.current = null;
+        timeoutRef.current = setTimeout(() => {
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
+          if (!window.google || !window.google.maps) {
+            console.error('Google Maps failed to load within timeout');
+            if (isMountedRef.current) {
+              setMapLoaded(true);
             }
-          }, 5000);
-        }
+          }
+        }, 10000);
         return;
       }
 
-      // Remove any existing script with wrong key
-      if (existingScript && !existingScript.src.includes(apiKey)) {
-        console.log('🗑️ Removing existing script with wrong key');
-        existingScript.remove();
-        delete (window as any).google;
-        delete (window as any).initMapCard;
-      }
-
+      // No script exists, load it fresh (without callback to avoid conflicts)
+      console.log('📍 MapCard: Loading Google Maps script...');
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,marker&callback=initMapCard`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,marker`;
       script.async = true;
       script.defer = true;
-      script.setAttribute('data-map-card', 'true');
 
       scriptRef.current = script;
-      initCallbackRef.current = initializeMap;
 
-      window.initMapCard = () => {
-        if (isMountedRef.current && initCallbackRef.current) {
-          initCallbackRef.current();
+      // Poll for Google Maps to be ready instead of using callback
+      intervalRef.current = setInterval(() => {
+        if (window.google && window.google.maps && window.google.maps.Map && isMountedRef.current) {
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
+          console.log('✅ MapCard: Google Maps loaded successfully');
+          initializeMap();
         }
-      };
+      }, 100);
+
+      timeoutRef.current = setTimeout(() => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+        if (!window.google || !window.google.maps) {
+          console.error('Google Maps failed to load');
+          if (isMountedRef.current) {
+            setMapLoaded(true);
+          }
+        }
+      }, 10000);
 
       if (isMountedRef.current && document.head) {
         document.head.appendChild(script);
@@ -185,6 +141,10 @@ export default function MapCard({ businesses = [], contactInfo, title }: MapCard
 
       script.onerror = () => {
         console.error('Failed to load Google Maps script');
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
         setMapLoaded(true);
       };
     };

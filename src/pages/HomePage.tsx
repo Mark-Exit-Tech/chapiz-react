@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, lazy, Suspense } from 'react';
+import { motion } from 'framer-motion';
 import Footer from '@/components/layout/Footer';
 import OptimizedImage from '@/components/OptimizedImage';
 
@@ -235,7 +236,7 @@ type AnimatedPetProps = {
   index: number;
 };
 
-// Component for pets around text section - arranged in horizontal oval (static, no animations)
+// Component for pets around text section - arranged in horizontal oval with floating animations
 const AnimatedPetAroundText = ({ pet, index }: AnimatedPetProps) => {
   const [isDesktop, setIsDesktop] = useState(false);
 
@@ -270,13 +271,38 @@ const AnimatedPetAroundText = ({ pet, index }: AnimatedPetProps) => {
   const responsiveSize = pet.size;
 
   return (
-    <div
+    <motion.div
       style={{
         position: 'absolute',
         top: `calc(50% + ${baseY}px)`,
         left: `calc(50% + ${baseX}px)`,
         transform: 'translate(-50%, -50%)',
         zIndex: 1
+      }}
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{
+        opacity: 1,
+        scale: 1,
+        y: [0, -8, 0],
+        rotate: [0, -3, 3, 0],
+      }}
+      transition={{
+        opacity: { duration: 0.5, delay: 0.1 * index },
+        scale: { duration: 0.5, delay: 0.1 * index, type: 'spring', stiffness: 200 },
+        y: {
+          duration: 4 + index * 0.5,
+          ease: 'easeInOut',
+          repeat: Infinity,
+          repeatType: 'reverse',
+          delay: 0.2 * index
+        },
+        rotate: {
+          duration: 5 + index * 0.3,
+          ease: 'easeInOut',
+          repeat: Infinity,
+          repeatType: 'reverse',
+          delay: 0.15 * index
+        }
       }}
     >
       <OptimizedImage
@@ -286,20 +312,48 @@ const AnimatedPetAroundText = ({ pet, index }: AnimatedPetProps) => {
         height={responsiveSize}
         className="object-cover"
       />
-    </div>
+    </motion.div>
   );
 };
 
-// Simple animated pet component for mobile
+// Animated pet component for mobile with floating effect
 const AnimatedPetSimple = ({ pet, size }: { pet: Pet; size: number }) => {
   return (
-    <OptimizedImage
-      src={pet.src}
-      alt={pet.alt}
-      width={size}
-      height={size}
-      className="object-contain"
-    />
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{
+        opacity: 1,
+        scale: 1,
+        y: [0, -5, 0],
+        rotate: [0, -2, 2, 0],
+      }}
+      transition={{
+        opacity: { duration: 0.4, delay: 0.1 * pet.id },
+        scale: { duration: 0.4, delay: 0.1 * pet.id, type: 'spring', stiffness: 200 },
+        y: {
+          duration: 3 + pet.id * 0.3,
+          ease: 'easeInOut',
+          repeat: Infinity,
+          repeatType: 'reverse',
+          delay: 0.15 * pet.id
+        },
+        rotate: {
+          duration: 4 + pet.id * 0.2,
+          ease: 'easeInOut',
+          repeat: Infinity,
+          repeatType: 'reverse',
+          delay: 0.1 * pet.id
+        }
+      }}
+    >
+      <OptimizedImage
+        src={pet.src}
+        alt={pet.alt}
+        width={size}
+        height={size}
+        className="object-contain"
+      />
+    </motion.div>
   );
 };
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, CheckCircle2, Share2, Trophy, Info } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Share2, Trophy, Info, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Promo, Business } from '@/types/promo';
 import Navbar from '@/components/layout/Navbar';
@@ -13,7 +13,6 @@ import { getUserCouponByIds, markCouponAsUsed } from '@/lib/firebase/database/co
 import { motion } from 'framer-motion';
 import { getYouTubeEmbedUrl } from '@/lib/utils/youtube';
 import QRCodeCard from '@/components/cards/QRCodeCard';
-import MapCard from '@/components/cards/MapCard';
 import confetti from 'canvas-confetti';
 import {
   Dialog,
@@ -64,6 +63,7 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
     confirm: isHebrew ? 'אישור' : 'Confirm',
     viewCoupon: isHebrew ? 'צפייה בקופון' : 'View Coupon',
     qrCodeDescription: isHebrew ? 'סרוק את קוד ה-QR כדי לצפות בקופון זה' : 'Scan this QR code to view this coupon',
+    showOnMap: isHebrew ? 'הצג במפה' : 'Show on Map',
   };
   const [isUsingCoupon, setIsUsingCoupon] = useState(false);
   const [isUsed, setIsUsed] = useState(false);
@@ -320,16 +320,6 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
               </div>
             )}
 
-            {/* Map showing where coupon can be used */}
-            {businesses.length > 0 && (
-              <div className="mb-8">
-                <MapCard
-                  businesses={businesses}
-                  title={isHebrew ? 'איפה ניתן להשתמש בקופון' : 'Where to Use This Coupon'}
-                />
-              </div>
-            )}
-
             {/* Success Animation - Prize Icon */}
             {showSuccessAnimation && (
               <motion.div
@@ -359,7 +349,7 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
                   size="lg"
                   onClick={handleUseCouponClick}
                   disabled={isUsed || isUsingCoupon}
-                className="w-full"
+                  className="w-full"
                 >
                   {isUsingCoupon ? (
                     <>
@@ -378,15 +368,36 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
                     </>
                   )}
                 </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={handleShare}
-                className="w-full"
-                >
-                  <Share2 className="w-4 h-4 me-2" />
-                  {text.share}
-                </Button>
+                <div className="flex gap-4">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={handleShare}
+                    className="flex-1"
+                  >
+                    <Share2 className="w-4 h-4 me-2" />
+                    {text.share}
+                  </Button>
+                  {businesses.length > 0 && (
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="flex-1"
+                      onClick={() => {
+                        const businessIds = businesses.map(b => b.id).filter(Boolean);
+                        if (businessIds.length > 0) {
+                          const idsString = businessIds.join(',');
+                          navigate(`/${locale}/services?businessId=${idsString}`);
+                        } else {
+                          navigate(`/${locale}/services`);
+                        }
+                      }}
+                    >
+                      <MapPin className="w-4 h-4 me-2" />
+                      {text.showOnMap}
+                    </Button>
+                  )}
+                </div>
             </div>
 
             {/* Confirmation Dialog */}

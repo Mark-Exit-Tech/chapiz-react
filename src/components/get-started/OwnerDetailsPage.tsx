@@ -55,8 +55,8 @@ const OwnerDetailsPage = () => {
           />
 
           {/* Phone Number - Can be private */}
-          <div className="flex items-center gap-2">
-            <div className="flex-grow">
+          <div className="flex items-center gap-2 ">
+            <div className="flex-grow min-w-0">
               <Controller
                 name="ownerPhoneNumber"
                 control={control}
@@ -90,8 +90,8 @@ const OwnerDetailsPage = () => {
           </div>
 
           {/* Email - Can be private */}
-          <div className="flex items-center gap-2">
-            <div className="flex-grow">
+          <div className="flex items-center gap-2 ">
+            <div className="flex-grow min-w-0">
               <Controller
                 name="ownerEmailAddress"
                 control={control}
@@ -120,8 +120,8 @@ const OwnerDetailsPage = () => {
 
           {/* Address - Can be private */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="flex-grow overflow-auto">
+            <div className="flex items-center gap-2 ">
+              <div className="flex-grow min-w-0 overflow-auto">
                 <Controller
                   name="ownerHomeAddress"
                   control={control}

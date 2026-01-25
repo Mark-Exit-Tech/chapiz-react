@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send, CheckCircle, Facebook, Instagram, MessageCircle } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import BottomNavigation from '@/components/layout/BottomNavigation';
 import { useTranslation } from 'react-i18next';
 import { createContactSubmission } from '@/lib/firebase/database/contact';
 import { getContactInfo } from '@/lib/actions/admin';
@@ -144,12 +145,16 @@ export default function ContactPage() {
     };
 
     return (
-        <div className="flex min-h-screen flex-col bg-gray-50 overflow-x-hidden" dir={isHebrew ? 'rtl' : 'ltr'}>
-            <Navbar />
+        <div className="min-h-screen bg-gray-50 flex flex-col" dir={isHebrew ? 'rtl' : 'ltr'}>
+            {/* Fixed Navbar - always visible at top */}
+            <header className="fixed top-0 left-0 right-0 z-50">
+                <Navbar />
+            </header>
 
-            {/* Contact Form and Info */}
-            <div className="pt-8 md:pt-16 pb-8 md:pb-0">
-                <div className="max-w-7xl mx-auto px-4 md:px-4">
+            {/* Scrollable content - pt for top navbar, pb-16 on mobile for bottom nav */}
+            <main className="flex-1 pt-14 sm:pt-16 overflow-y-auto overflow-x-hidden pb-16 md:pb-0">
+                <div className="pt-8 md:pt-16 pb-8 md:pb-12">
+                    <div className="max-w-7xl mx-auto px-4 md:px-4">
                     <div className="flex justify-center">
                         <div className="w-full max-w-6xl">
                             {/* Hero Section */}
@@ -400,11 +405,17 @@ export default function ContactPage() {
                             </div>
                         </div>
                     </div>
+                    </div>
                 </div>
-            </div>
 
-            {/* Footer */}
-            <Footer />
+                {/* Footer - inside scroll area */}
+                <Footer />
+            </main>
+
+            {/* Bottom Navigation - fixed, top layer (mobile only) */}
+            <div className="md:hidden">
+                <BottomNavigation />
+            </div>
         </div>
     );
 }
