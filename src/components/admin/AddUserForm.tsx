@@ -13,24 +13,24 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
 import { UserPlus } from 'lucide-react';
-import { sendSignInLinkToEmail } from 'firebase/auth';
-import { auth } from '@/lib/firebase/client';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import { app } from '@/lib/firebase/client';
 
-// Send email invite using Firebase Auth magic link
-const sendUserInvitationByAdmin = async (data: { email: string }): Promise<{ success: boolean; error?: string }> => {
+// Send email invite using Resend via Cloud Function
+const sendUserInvitationByAdmin = async (data: { email: string; locale: string }): Promise<{ success: boolean; error?: string }> => {
   try {
-    const actionCodeSettings = {
-      // URL to redirect to after email link is clicked
-      url: `${window.location.origin}/he/auth/finish-signup`,
-      handleCodeInApp: true,
-    };
+    const functions = getFunctions(app);
+    const sendInviteEmail = httpsCallable(functions, 'sendInviteEmail');
 
-    await sendSignInLinkToEmail(auth, data.email, actionCodeSettings);
+    const inviteUrl = `${window.location.origin}/${data.locale}/signup`;
 
-    // Store email in localStorage so we can use it when user clicks the link
-    window.localStorage.setItem('emailForSignIn', data.email);
+    const result = await sendInviteEmail({
+      email: data.email,
+      inviteUrl,
+      locale: data.locale
+    });
 
-    console.log('✅ Invitation email sent to:', data.email);
+    console.log('✅ Invitation email sent to:', data.email, result);
     return { success: true };
   } catch (error: any) {
     console.error('❌ Error sending invitation:', error);
@@ -42,28 +42,17 @@ const sendUserInvitationByAdmin = async (data: { email: string }): Promise<{ suc
 };
 
 export default function AddUserForm() {
-  const { t } = useTranslation('Admin');
-  const { user, dbUser } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
-    role: 'user' as 'user' | 'admin' | 'super_admin',
-    language: 'he' as 'en' | 'he'
-  });
+  const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const router = useNavigate();
-  
   // Get locale from URL
   const locale = typeof window !== 'undefined'
-    ? window.location.pathname.split('/')[1] || 'en'
-    : 'en';
+    ? window.location.pathname.split('/')[1] || 'he'
+    : 'he';
   const isHebrew = locale === 'he';
-  
+
   // HARDCODED TEXT
   const text = {
     addUser: isHebrew ? 'שלח הזמנה' : 'Send Invite',
@@ -72,28 +61,19 @@ export default function AddUserForm() {
     cancel: isHebrew ? 'ביטול' : 'Cancel',
     sending: isHebrew ? 'שולח...' : 'Sending...',
     sendInvite: isHebrew ? 'שלח הזמנה' : 'Send Invite',
-    error: isHebrew ? 'שגיאה בשליחת הזמנה' : 'Error sending invite'
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value
-    }));
+    error: isHebrew ? 'שגיאה בשליחת הזמנה' : 'Error sending invite',
+    success: isHebrew ? 'הזמנה נשלחה בהצלחה!' : 'Invitation sent successfully!'
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
-    setSuccessMessage(null);
 
     try {
       const result = await sendUserInvitationByAdmin({
-        email: formData.email
+        email,
+        locale
       });
 
       if (!result.success) {
@@ -103,35 +83,14 @@ export default function AddUserForm() {
       }
 
       // Reset form and close
-      setFormData({
-        fullName: '',
-        email: '',
-        phone: '',
-        role: 'user',
-        language: 'he'
-      });
+      setEmail('');
       setIsOpen(false);
 
-      // Show success message
-      if (result.warning) {
-        console.log('⚠️', result.warning);
-        setSuccessMessage(isHebrew
-          ? `הזמנה נשלחה לאימייל הניהול. ${result.warning}`
-          : `Invitation sent to admin fallback email. ${result.warning}`);
-      } else {
-        console.log('✅ Invitation email sent to:', formData.email);
-        setSuccessMessage(isHebrew
-          ? `הזמנה נשלחה בהצלחה ל-${formData.email}!`
-          : `Invitation sent successfully to ${formData.email}!`);
-      }
-
-      // Refresh the page
-      window.location.reload();
+      // Show success alert
+      alert(text.success);
     } catch (err: any) {
-      // Handle unexpected errors
       console.error('Unexpected error in form submission:', err);
-      const errorMessage = err?.message || err?.errorInfo?.message || text.error;
-      setError(errorMessage);
+      setError(err?.message || text.error);
     } finally {
       setIsSubmitting(false);
     }
@@ -156,12 +115,6 @@ export default function AddUserForm() {
           </div>
         )}
 
-        {successMessage && (
-          <div className="mb-4 rounded border border-green-400 bg-green-100 px-4 py-3 text-green-700">
-            {successMessage}
-          </div>
-        )}
-
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">{text.email}</Label>
@@ -169,9 +122,10 @@ export default function AddUserForm() {
               id="email"
               name="email"
               type="email"
-              value={formData.email}
-              onChange={handleChange}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
+              dir="ltr"
             />
           </div>
 
