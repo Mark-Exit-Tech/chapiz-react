@@ -86,7 +86,7 @@ export default function FinishSignupPage() {
 
   if (loading && !needsEmail) {
     return (
-      <MainLayout>
+      <MainLayout direction={isHebrew ? 'rtl' : 'ltr'}>
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
@@ -98,7 +98,7 @@ export default function FinishSignupPage() {
   }
 
   return (
-    <MainLayout>
+    <MainLayout direction={isHebrew ? 'rtl' : 'ltr'}>
       <div className="flex items-center justify-center min-h-[60vh] p-4">
         <div className="w-full max-w-md space-y-6">
           <h1 className="text-2xl font-bold text-center">{text.title}</h1>
