@@ -9,35 +9,15 @@ interface AdminBottomNavProps {
 }
 
 export default function AdminBottomNav({ locale }: AdminBottomNavProps) {
-    const { t } = useTranslation('Admin');
+    const { t } = useTranslation();
     const location = useLocation();
     const pathname = location.pathname;
 
     const navItems = [
-        {
-            href: `/${locale}/admin`,
-            icon: LayoutDashboard,
-            label: t('navigation.dashboard'),
-            isActive: pathname === `/${locale}/admin`,
-        },
-        {
-            href: `/${locale}/admin/ads`,
-            icon: AppWindow,
-            label: t('navigation.manageAds'),
-            isActive: pathname?.startsWith(`/${locale}/admin/ads`),
-        },
-        {
-            href: `/${locale}/admin/users`,
-            icon: Users,
-            label: t('navigation.manageUsers'),
-            isActive: pathname?.startsWith(`/${locale}/admin/users`),
-        },
-        {
-            href: `/${locale}/admin/settings`,
-            icon: Settings,
-            label: t('navigation.settings'),
-            isActive: pathname?.startsWith(`/${locale}/admin/settings`),
-        },
+        { href: `/${locale}/admin`, icon: LayoutDashboard, label: t('Admin.navigation.dashboard'), isActive: pathname === `/${locale}/admin` },
+        { href: `/${locale}/admin/ads`, icon: AppWindow, label: t('Admin.navigation.manageAds'), isActive: pathname?.startsWith(`/${locale}/admin/ads`) },
+        { href: `/${locale}/admin/users`, icon: Users, label: t('Admin.navigation.manageUsers'), isActive: pathname?.startsWith(`/${locale}/admin/users`) },
+        { href: `/${locale}/admin/settings`, icon: Settings, label: t('Admin.navigation.settings'), isActive: pathname?.startsWith(`/${locale}/admin/settings`) },
     ];
 
     return (

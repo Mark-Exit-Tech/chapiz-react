@@ -13,55 +13,19 @@ interface AdminTopNavProps {
 }
 
 export default function AdminTopNav({ userEmail, userRole, locale }: AdminTopNavProps) {
-    const { t } = useTranslation('Admin');
+    const { t } = useTranslation();
     const [menuOpen, setMenuOpen] = useState(false);
 
     const navItems = [
-        {
-            href: `/${locale}/admin`,
-            icon: LayoutDashboard,
-            label: t('navigation.dashboard'),
-        },
-        {
-            href: `/${locale}/admin/ads`,
-            icon: AppWindow,
-            label: t('navigation.manageAds'),
-        },
-        {
-            href: `/${locale}/admin/users`,
-            icon: Users,
-            label: t('navigation.manageUsers'),
-        },
-        {
-            href: `/${locale}/admin/settings`,
-            icon: Settings,
-            label: t('navigation.settings'),
-        },
-        {
-            href: `/${locale}/admin/comments`,
-            icon: MessageSquare,
-            label: t('navigation.manageComments'),
-        },
-        {
-            href: `/${locale}/admin/contact-submissions`,
-            icon: Mail,
-            label: t('navigation.contactSubmissions'),
-        },
-        {
-            href: `/${locale}/admin/coupons`,
-            icon: Megaphone,
-            label: t('navigation.managePromos'),
-        },
-        {
-            href: `/${locale}/admin/vouchers`,
-            icon: Ticket,
-            label: t('navigation.manageCoupons'),
-        },
-        {
-            href: `/${locale}/admin/business`,
-            icon: Building2,
-            label: t('navigation.manageBusinesses'),
-        },
+        { href: `/${locale}/admin`, icon: LayoutDashboard, label: t('Admin.navigation.dashboard') },
+        { href: `/${locale}/admin/ads`, icon: AppWindow, label: t('Admin.navigation.manageAds') },
+        { href: `/${locale}/admin/users`, icon: Users, label: t('Admin.navigation.manageUsers') },
+        { href: `/${locale}/admin/settings`, icon: Settings, label: t('Admin.navigation.settings') },
+        { href: `/${locale}/admin/comments`, icon: MessageSquare, label: t('Admin.navigation.manageComments') },
+        { href: `/${locale}/admin/contact-submissions`, icon: Mail, label: t('Admin.navigation.contactSubmissions') },
+        { href: `/${locale}/admin/coupons`, icon: Megaphone, label: t('Admin.navigation.managePromos') },
+        { href: `/${locale}/admin/vouchers`, icon: Ticket, label: t('Admin.navigation.manageCoupons') },
+        { href: `/${locale}/admin/business`, icon: Building2, label: t('Admin.navigation.manageBusinesses') },
     ];
 
     return (
