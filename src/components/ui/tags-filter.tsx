@@ -86,11 +86,11 @@ export function TagsFilter({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className={cn("w-full justify-between", isRTL ? "flex-row-reverse text-right" : "text-left")}
+            className={cn("w-full justify-between", isRTL ? "text-right" : "text-left")}
             style={{ direction: isRTL ? 'rtl' : 'ltr' }}
           >
             <span className="truncate">{placeholder}</span>
-            <ChevronsUpDown className={cn("h-4 w-4 shrink-0 opacity-50", isRTL ? "ltr:ml-2 rtl:mr-2" : "ml-2")} />
+            <ChevronsUpDown className={cn("h-4 w-4 shrink-0 opacity-50", isRTL ? "ml-2" : "ml-2")} />
           </Button>
         </PopoverTrigger>
         <PopoverContent
