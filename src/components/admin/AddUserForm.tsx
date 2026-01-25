@@ -48,22 +48,13 @@ export default function AddUserForm() {
   
   // HARDCODED TEXT
   const text = {
-    addUser: isHebrew ? 'הוסף משתמש' : 'Add User',
-    title: isHebrew ? 'הוסף משתמש חדש' : 'Add New User',
-    fullName: isHebrew ? 'שם מלא' : 'Full Name',
+    addUser: isHebrew ? 'שלח הזמנה' : 'Send Invite',
+    title: isHebrew ? 'שלח הזמנה באימייל' : 'Send Email Invite',
     email: isHebrew ? 'אימייל' : 'Email',
-    phone: isHebrew ? 'טלפון' : 'Phone',
-    role: isHebrew ? 'תפקיד' : 'Role',
-    selectRole: isHebrew ? 'בחר תפקיד' : 'Select Role',
-    user: isHebrew ? 'משתמש' : 'User',
-    admin: isHebrew ? 'מנהל' : 'Admin',
-    superAdmin: isHebrew ? 'מנהל על' : 'Super Admin',
-    language: isHebrew ? 'שפה' : 'Language',
-    selectLanguage: isHebrew ? 'בחר שפה' : 'Select Language',
     cancel: isHebrew ? 'ביטול' : 'Cancel',
-    creating: isHebrew ? 'יוצר...' : 'Creating...',
-    createUser: isHebrew ? 'צור משתמש' : 'Create User',
-    error: isHebrew ? 'שגיאה ביצירת משתמש' : 'Error creating user'
+    sending: isHebrew ? 'שולח...' : 'Sending...',
+    sendInvite: isHebrew ? 'שלח הזמנה' : 'Send Invite',
+    error: isHebrew ? 'שגיאה בשליחת הזמנה' : 'Error sending invite'
   };
 
   const handleChange = (
@@ -84,11 +75,7 @@ export default function AddUserForm() {
 
     try {
       const result = await sendUserInvitationByAdmin({
-        fullName: formData.fullName,
-        email: formData.email,
-        phone: formData.phone,
-        role: formData.role,
-        language: formData.language
+        email: formData.email
       });
 
       if (!result.success) {
@@ -110,10 +97,14 @@ export default function AddUserForm() {
       // Show success message
       if (result.warning) {
         console.log('⚠️', result.warning);
-        setSuccessMessage(`Invitation email sent to admin fallback email. ${result.warning}`);
+        setSuccessMessage(isHebrew
+          ? `הזמנה נשלחה לאימייל הניהול. ${result.warning}`
+          : `Invitation sent to admin fallback email. ${result.warning}`);
       } else {
         console.log('✅ Invitation email sent to:', formData.email);
-        setSuccessMessage(`Invitation email sent successfully to ${formData.email}!`);
+        setSuccessMessage(isHebrew
+          ? `הזמנה נשלחה בהצלחה ל-${formData.email}!`
+          : `Invitation sent successfully to ${formData.email}!`);
       }
 
       // Refresh the page
@@ -155,17 +146,6 @@ export default function AddUserForm() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="fullName">{text.fullName}</Label>
-            <Input
-              id="fullName"
-              name="fullName"
-              value={formData.fullName}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
             <Label htmlFor="email">{text.email}</Label>
             <Input
               id="email"
@@ -177,50 +157,6 @@ export default function AddUserForm() {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="phone">{text.phone}</Label>
-            <Input
-              id="phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="role">{text.role}</Label>
-            <select
-              id="role"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-              required
-            >
-              <option value="">{text.selectRole}</option>
-              <option value="user">{text.user}</option>
-              <option value="admin">{text.admin}</option>
-              <option value="super_admin">{text.superAdmin}</option>
-            </select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="language">Language / שפה</Label>
-            <select
-              id="language"
-              name="language"
-              value={formData.language}
-              onChange={handleChange}
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-              required
-            >
-              <option value="">Select language</option>
-              <option value="he">עברית (Hebrew)</option>
-              <option value="en">English</option>
-            </select>
-          </div>
-
           <DialogFooter>
             <Button
               type="button"
@@ -230,7 +166,7 @@ export default function AddUserForm() {
               {text.cancel}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? text.creating : text.createUser}
+              {isSubmitting ? text.sending : text.sendInvite}
             </Button>
           </DialogFooter>
         </form>
