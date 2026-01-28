@@ -516,8 +516,9 @@ export async function createCoupon(data: CreateCouponData) {
       updatedAt: Timestamp.now(),
       createdBy: 'admin'
     };
-    if (data.stock !== undefined && data.stock !== '' && !isNaN(Number(data.stock))) {
-      couponData.stock = Math.max(0, Number(data.stock));
+    const stockVal = (data as { stock?: number | string }).stock;
+    if (stockVal !== undefined && stockVal !== null && String(stockVal).trim() !== '' && !isNaN(Number(stockVal))) {
+      couponData.stock = Math.max(0, Number(stockVal));
     }
     
     const couponsRef = collection(db, 'coupons');
@@ -683,9 +684,10 @@ export async function updateCoupon(id: string, data: UpdateCouponData) {
     if (data.validTo) {
       updateData.validTo = Timestamp.fromDate(new Date(data.validTo));
     }
-    if (data.stock !== undefined && data.stock !== '') {
-      updateData.stock = Math.max(0, Number(data.stock));
-    } else if (data.stock === '' || (data as any).hasOwnProperty('stock')) {
+    const stockVal = (data as { stock?: number | string }).stock;
+    if (stockVal !== undefined && stockVal !== null && String(stockVal).trim() !== '') {
+      updateData.stock = Math.max(0, Number(stockVal));
+    } else if ((data as any).hasOwnProperty('stock')) {
       updateData.stock = undefined;
     }
     

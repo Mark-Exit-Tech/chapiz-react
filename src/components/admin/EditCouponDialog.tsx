@@ -31,7 +31,6 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    price: '',
     imageUrl: '',
     stock: '',
     validFrom: '',
@@ -57,8 +56,6 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
     namePlaceholder: isHebrew ? 'הזן שם קופון' : 'Enter coupon name',
     description: isHebrew ? 'תיאור' : 'Description',
     descriptionPlaceholder: isHebrew ? 'הזן תיאור' : 'Enter description',
-    price: isHebrew ? 'מחיר (0 לחינם)' : 'Price (0 for free)',
-    pricePlaceholder: isHebrew ? 'הזן מחיר' : 'Enter price',
     image: isHebrew ? 'תמונה' : 'Image',
     business: isHebrew ? 'עסק' : 'Business',
     businessPlaceholder: isHebrew ? 'בחר עסקים' : 'Select businesses',
@@ -177,17 +174,18 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
       }
 
       const stock = formData.stock.trim() === '' ? undefined : Math.max(0, parseInt(formData.stock, 10));
+      const purchaseLimitVal = formData.purchaseLimit.trim() === '' ? undefined : Math.max(0, parseInt(formData.purchaseLimit, 10));
       const result = await updateCoupon(coupon.id, {
         name: formData.name,
         description: formData.description,
-        price: price,
-        points: points,
+        price: 0,
+        points: 0,
         imageUrl: formData.imageUrl,
         stock: isNaN(stock as number) ? undefined : stock,
         validFrom: new Date(formData.validFrom),
         validTo: new Date(formData.validTo),
         businessIds: formData.businessIds.length > 0 ? formData.businessIds : undefined,
-        purchaseLimit: purchaseLimit
+        purchaseLimit: purchaseLimitVal
       });
 
       if (!result.success) {
@@ -255,35 +253,6 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
               rows={3}
               required
             />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="price">{text.price}</Label>
-              <Input
-                id="price"
-                name="price"
-                type="number"
-                step="0.01"
-                min="0"
-                value={formData.price}
-                onChange={handleChange}
-                placeholder={text.pricePlaceholder}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="points">{text.points}</Label>
-              <Input
-                id="points"
-                name="points"
-                type="number"
-                min="0"
-                value={formData.points}
-                onChange={handleChange}
-                placeholder={text.pointsPlaceholder}
-              />
-            </div>
           </div>
 
           <div className="space-y-2">
