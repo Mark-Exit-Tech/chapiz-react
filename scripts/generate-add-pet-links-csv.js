@@ -11,11 +11,11 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const COUNT = 1000;
+const COUNT = 3000;
 const BASE_URL = process.env.BASE_URL || 'https://tag.chapiz.co.il';
 const LOCALE = process.env.LOCALE || 'he'; // he or en
 const OUT_DIR = path.join(__dirname, '..');
-const OUT_FILE = path.join(OUT_DIR, 'add-pet-links-1000.csv');
+const OUT_FILE = path.join(OUT_DIR, 'add-pet-links-3000.csv');
 
 const rows = [];
 rows.push('#,Tag ID,Pet link');

@@ -923,6 +923,7 @@
       "createAccountAndRegister": "צור חשבון ורשום חיית מחמד",
       "alreadyHaveAccount": "כבר יש לך חשבון? התחבר",
       "processing": "מעבד...",
+      "loading": "טוען...",
       "goBack": "חזור"
     },
     "TermsAndConditionsPage": {

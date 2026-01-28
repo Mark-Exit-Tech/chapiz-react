@@ -907,6 +907,7 @@
       "createAccountAndRegister": "Create Account & Register Pet",
       "alreadyHaveAccount": "Already have an account? Sign in",
       "processing": "Processing...",
+      "loading": "Loading...",
       "goBack": "Go Back"
     },
     "TermsAndConditionsPage": {
