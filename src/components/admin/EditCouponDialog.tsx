@@ -73,7 +73,9 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
     purchaseLimitHelp: isHebrew ? 'מספר פעמים שמשתמש יכול לרכוש קופון זה' : 'Number of times a user can purchase this coupon',
     cancel: isHebrew ? 'ביטול' : 'Cancel',
     update: isHebrew ? 'עדכן' : 'Update',
-    updating: isHebrew ? 'מעדכן...' : 'Updating...'
+    updating: isHebrew ? 'מעדכן...' : 'Updating...',
+    errorValidToPast: isHebrew ? 'תאריך "תקף עד" לא יכול להיות בעבר' : 'Valid To date cannot be in the past',
+    errorValidToBeforeFrom: isHebrew ? '"תקף עד" חייב להיות ביום או אחרי "תקף מ"' : 'Valid To must be on or after Valid From'
   };
 
   useEffect(() => {
@@ -180,6 +182,16 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
       const purchaseLimit = formData.purchaseLimit === '' ? undefined : parseInt(formData.purchaseLimit);
       if (purchaseLimit !== undefined && (isNaN(purchaseLimit) || purchaseLimit < 1)) {
         throw new Error('Purchase limit must be a positive number or left empty for unlimited');
+      }
+
+      const now = new Date();
+      const validFrom = formData.validFrom ? new Date(formData.validFrom) : null;
+      const validTo = formData.validTo ? new Date(formData.validTo) : null;
+      if (validTo && validTo.getTime() < now.getTime()) {
+        throw new Error(text.errorValidToPast);
+      }
+      if (validFrom && validTo && validTo.getTime() < validFrom.getTime()) {
+        throw new Error(text.errorValidToBeforeFrom);
       }
 
       const result = await updateCoupon(coupon.id, {

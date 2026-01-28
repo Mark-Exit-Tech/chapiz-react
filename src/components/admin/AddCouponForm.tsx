@@ -57,7 +57,10 @@ export default function AddCouponForm() {
     creating: isHebrew ? 'יוצר...' : 'Creating...',
     cancel: isHebrew ? 'ביטול' : 'Cancel',
     clickToUpload: isHebrew ? 'לחץ להעלאת תמונה' : 'Click to upload image',
-    fileFormats: isHebrew ? 'PNG, JPG, GIF עד 10MB' : 'PNG, JPG, GIF up to 10MB'
+    fileFormats: isHebrew ? 'PNG, JPG, GIF עד 10MB' : 'PNG, JPG, GIF up to 10MB',
+    errorValidFromPast: isHebrew ? 'תאריך "תקף מ" לא יכול להיות בעבר' : 'Valid From date cannot be in the past',
+    errorValidToPast: isHebrew ? 'תאריך "תקף עד" לא יכול להיות בעבר' : 'Valid To date cannot be in the past',
+    errorValidToBeforeFrom: isHebrew ? '"תקף עד" חייב להיות ביום או אחרי "תקף מ"' : 'Valid To must be on or after Valid From'
   };
   
   const [formData, setFormData] = useState({
@@ -151,6 +154,19 @@ export default function AddCouponForm() {
       const purchaseLimit = formData.purchaseLimit === '' ? undefined : parseInt(formData.purchaseLimit);
       if (purchaseLimit !== undefined && (isNaN(purchaseLimit) || purchaseLimit < 1)) {
         throw new Error('Purchase limit must be a positive number or left empty for unlimited');
+      }
+
+      const now = new Date();
+      const validFrom = formData.validFrom ? new Date(formData.validFrom) : null;
+      const validTo = formData.validTo ? new Date(formData.validTo) : null;
+      if (validFrom && validFrom.getTime() < now.getTime()) {
+        throw new Error(text.errorValidFromPast);
+      }
+      if (validTo && validTo.getTime() < now.getTime()) {
+        throw new Error(text.errorValidToPast);
+      }
+      if (validFrom && validTo && validTo.getTime() < validFrom.getTime()) {
+        throw new Error(text.errorValidToBeforeFrom);
       }
 
       const result = await createCoupon({

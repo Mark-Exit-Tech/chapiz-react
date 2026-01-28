@@ -53,7 +53,10 @@ export default function AddVoucherForm({ onSuccess }: AddVoucherFormProps) {
     createVoucher: isHebrew ? 'צור שובר' : 'Create Voucher',
     creating: isHebrew ? 'יוצר...' : 'Creating...',
     cancel: isHebrew ? 'ביטול' : 'Cancel',
-    comingSoon: isHebrew ? 'בפיתוח - יתאפשר בקרוב' : 'Under Development - Coming Soon'
+    comingSoon: isHebrew ? 'בפיתוח - יתאפשר בקרוב' : 'Under Development - Coming Soon',
+    errorValidFromPast: isHebrew ? 'תאריך "תקף מ" לא יכול להיות בעבר' : 'Valid From date cannot be in the past',
+    errorValidToPast: isHebrew ? 'תאריך "תקף עד" לא יכול להיות בעבר' : 'Valid To date cannot be in the past',
+    errorValidToBeforeFrom: isHebrew ? '"תקף עד" חייב להיות ביום או אחרי "תקף מ"' : 'Valid To must be on or after Valid From'
   };
   
   const [formData, setFormData] = useState({
@@ -117,6 +120,24 @@ export default function AddVoucherForm({ onSuccess }: AddVoucherFormProps) {
     setIsSubmitting(true);
 
     try {
+      const now = new Date();
+      const validFrom = formData.validFrom ? new Date(formData.validFrom) : null;
+      const validTo = formData.validTo ? new Date(formData.validTo) : null;
+      if (validFrom && validFrom.getTime() < now.getTime()) {
+        alert(text.errorValidFromPast);
+        setIsSubmitting(false);
+        return;
+      }
+      if (validTo && validTo.getTime() < now.getTime()) {
+        alert(text.errorValidToPast);
+        setIsSubmitting(false);
+        return;
+      }
+      if (validFrom && validTo && validTo.getTime() < validFrom.getTime()) {
+        alert(text.errorValidToBeforeFrom);
+        setIsSubmitting(false);
+        return;
+      }
       const result = await createVoucher(formData);
       
       if (result.success) {

@@ -44,6 +44,7 @@ export default function AdminVouchersPage() {
     status: isHebrew ? 'סטטוס' : 'Status',
     active: isHebrew ? 'פעיל' : 'Active',
     inactive: isHebrew ? 'לא פעיל' : 'Inactive',
+    expired: isHebrew ? 'פג תוקף' : 'Expired',
     free: isHebrew ? 'חינם' : 'Free',
     actions: isHebrew ? 'פעולות' : 'Actions',
     edit: isHebrew ? 'ערוך' : 'Edit',
@@ -72,6 +73,11 @@ export default function AdminVouchersPage() {
       month: 'short',
       day: 'numeric'
     }).format(date);
+  };
+
+  const isVoucherExpired = (v: Voucher) => {
+    const validTo = v.validTo instanceof Date ? v.validTo : new Date(v.validTo);
+    return validTo.getTime() < Date.now();
   };
 
   const handleEdit = (voucher: Voucher) => {
@@ -229,9 +235,15 @@ export default function AdminVouchersPage() {
                         {formatDate(voucher.validTo)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge className={voucher.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
-                          {voucher.isActive ? text.active : text.inactive}
-                        </Badge>
+                        {isVoucherExpired(voucher) ? (
+                          <Badge className="bg-amber-100 text-amber-800">
+                            {text.expired}
+                          </Badge>
+                        ) : (
+                          <Badge className={voucher.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
+                            {voucher.isActive ? text.active : text.inactive}
+                          </Badge>
+                        )}
                       </td>
                       <td
                         className={`px-6 py-4 whitespace-nowrap ${isHebrew ? 'text-right' : 'text-center'}`}
@@ -323,9 +335,13 @@ export default function AdminVouchersPage() {
                   </div>
                   <div>
                     <span className="font-semibold text-gray-600">{text.status}: </span>
-                    <Badge className={previewVoucher.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
-                      {previewVoucher.isActive ? text.active : text.inactive}
-                    </Badge>
+                    {isVoucherExpired(previewVoucher) ? (
+                      <Badge className="bg-amber-100 text-amber-800">{text.expired}</Badge>
+                    ) : (
+                      <Badge className={previewVoucher.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
+                        {previewVoucher.isActive ? text.active : text.inactive}
+                      </Badge>
+                    )}
                   </div>
                 </div>
               </div>

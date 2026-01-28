@@ -67,7 +67,9 @@ export default function EditVoucherDialog({ voucher, isOpen, onClose, onSuccess 
     validTo: isHebrew ? 'תקף עד' : 'Valid To',
     cancel: isHebrew ? 'ביטול' : 'Cancel',
     update: isHebrew ? 'עדכן' : 'Update',
-    updating: isHebrew ? 'מעדכן...' : 'Updating...'
+    updating: isHebrew ? 'מעדכן...' : 'Updating...',
+    errorValidToPast: isHebrew ? 'תאריך "תקף עד" לא יכול להיות בעבר' : 'Valid To date cannot be in the past',
+    errorValidToBeforeFrom: isHebrew ? '"תקף עד" חייב להיות ביום או אחרי "תקף מ"' : 'Valid To must be on or after Valid From'
   };
 
   useEffect(() => {
@@ -134,6 +136,19 @@ export default function EditVoucherDialog({ voucher, isOpen, onClose, onSuccess 
     setError(null);
 
     try {
+      const now = new Date();
+      const validFrom = formData.validFrom ? new Date(formData.validFrom) : null;
+      const validTo = formData.validTo ? new Date(formData.validTo) : null;
+      if (validTo && validTo.getTime() < now.getTime()) {
+        setError(text.errorValidToPast);
+        setIsSubmitting(false);
+        return;
+      }
+      if (validFrom && validTo && validTo.getTime() < validFrom.getTime()) {
+        setError(text.errorValidToBeforeFrom);
+        setIsSubmitting(false);
+        return;
+      }
       const result = await updateVoucher(voucher.id, formData);
 
       if (result.success) {

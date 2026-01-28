@@ -58,6 +58,7 @@ export default function CouponsTable() {
     deactivate: isHebrew ? 'השבת' : 'Deactivate',
     active: isHebrew ? 'פעיל' : 'Active',
     inactive: isHebrew ? 'לא פעיל' : 'Inactive',
+    expired: isHebrew ? 'פג תוקף' : 'Expired',
     deleteConfirm: isHebrew ? 'האם אתה בטוח שברצונך למחוק קופון זה?' : 'Are you sure you want to delete this coupon?',
     close: isHebrew ? 'סגור' : 'Close',
     actions: isHebrew ? 'פעולות' : 'Actions'
@@ -80,6 +81,11 @@ export default function CouponsTable() {
     } catch (err) {
       console.error('Error fetching businesses:', err);
     }
+  };
+
+  const isCouponExpired = (c: Coupon) => {
+    const validTo = c.validTo instanceof Date ? c.validTo : new Date(c.validTo as any);
+    return validTo.getTime() < Date.now();
   };
 
   const fetchCoupons = async () => {
@@ -295,9 +301,15 @@ export default function CouponsTable() {
                     </div>
                   </TableCell>
                   <TableCell className={isHebrew ? 'text-right' : ''}>
-                    <Badge variant={coupon.isActive ? 'default' : 'secondary'}>
-                      {coupon.isActive ? 'Active' : 'Inactive'}
-                    </Badge>
+                    {isCouponExpired(coupon) ? (
+                      <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200">
+                        {text.expired}
+                      </Badge>
+                    ) : (
+                      <Badge variant={coupon.isActive ? 'default' : 'secondary'}>
+                        {coupon.isActive ? text.active : text.inactive}
+                      </Badge>
+                    )}
                   </TableCell>
                   <TableCell
                     className={isHebrew ? 'text-right' : 'text-center'}
@@ -385,9 +397,15 @@ export default function CouponsTable() {
                   </div>
                   <div>
                     <span className="font-semibold text-gray-600">{text.status}: </span>
-                    <Badge variant={previewCoupon.isActive ? 'default' : 'secondary'}>
-                      {previewCoupon.isActive ? 'Active' : 'Inactive'}
-                    </Badge>
+                    {isCouponExpired(previewCoupon) ? (
+                      <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200">
+                        {text.expired}
+                      </Badge>
+                    ) : (
+                      <Badge variant={previewCoupon.isActive ? 'default' : 'secondary'}>
+                        {previewCoupon.isActive ? text.active : text.inactive}
+                      </Badge>
+                    )}
                   </div>
                 </div>
 

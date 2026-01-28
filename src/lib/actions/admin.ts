@@ -458,8 +458,38 @@ export async function createAd(data: any) {
   }
 }
 
+/** Validate voucher/coupon dates: no past dates, validTo >= validFrom */
+function validateVoucherCouponDates(validFrom: Date | string, validTo: Date | string, isCreate: boolean): string | null {
+  const from = new Date(validFrom);
+  const to = new Date(validTo);
+  if (isNaN(from.getTime()) || isNaN(to.getTime())) {
+    return 'Valid From and Valid To must be valid dates';
+  }
+  const now = new Date();
+  if (isCreate) {
+    if (from.getTime() < now.getTime()) {
+      return 'Valid From date cannot be in the past';
+    }
+    if (to.getTime() < now.getTime()) {
+      return 'Valid To date cannot be in the past';
+    }
+  } else {
+    if (to.getTime() < now.getTime()) {
+      return 'Valid To date cannot be in the past';
+    }
+  }
+  if (to.getTime() < from.getTime()) {
+    return 'Valid To must be on or after Valid From';
+  }
+  return null;
+}
+
 export async function createCoupon(data: CreateCouponData) {
   try {
+    const err = validateVoucherCouponDates(data.validFrom, data.validTo, true);
+    if (err) {
+      return { success: false, error: err, couponId: undefined };
+    }
     const { collection, addDoc, Timestamp } = await import('firebase/firestore');
     const { db } = await import('@/lib/firebase/client');
     
@@ -498,6 +528,10 @@ export async function createCoupon(data: CreateCouponData) {
 // Create Voucher (same as coupon but in vouchers collection)
 export async function createVoucher(data: any) {
   try {
+    const err = validateVoucherCouponDates(data.validFrom, data.validTo, true);
+    if (err) {
+      return { success: false, error: err, voucherId: undefined };
+    }
     const { collection, addDoc, Timestamp } = await import('firebase/firestore');
     const { db } = await import('@/lib/firebase/client');
     
@@ -613,6 +647,17 @@ export async function getCouponById(id: string) {
 
 export async function updateCoupon(id: string, data: UpdateCouponData) {
   try {
+    if (data.validFrom != null && data.validTo != null) {
+      const err = validateVoucherCouponDates(data.validFrom, data.validTo, false);
+      if (err) {
+        return { success: false, error: err };
+      }
+    } else if (data.validTo != null) {
+      const to = new Date(data.validTo);
+      if (to.getTime() < Date.now()) {
+        return { success: false, error: 'Valid To date cannot be in the past' };
+      }
+    }
     const { doc, updateDoc, Timestamp } = await import('firebase/firestore');
     const { db } = await import('@/lib/firebase/client');
     
@@ -667,6 +712,17 @@ export async function deleteVoucher(id: string) {
 
 export async function updateVoucher(id: string, data: any) {
   try {
+    if (data.validFrom != null && data.validTo != null) {
+      const err = validateVoucherCouponDates(data.validFrom, data.validTo, false);
+      if (err) {
+        return { success: false, error: err };
+      }
+    } else if (data.validTo != null) {
+      const to = new Date(data.validTo);
+      if (to.getTime() < Date.now()) {
+        return { success: false, error: 'Valid To date cannot be in the past' };
+      }
+    }
     const { doc, updateDoc, Timestamp } = await import('firebase/firestore');
     const { db } = await import('@/lib/firebase/client');
 
