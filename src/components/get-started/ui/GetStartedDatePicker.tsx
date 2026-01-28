@@ -16,8 +16,8 @@ import {
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
 import { useState } from 'react';
+import { useLocale } from '@/hooks/use-locale';
 
 interface GetStartedDatePickerProps {
   label: string;
@@ -37,6 +37,8 @@ const GetStartedDatePicker = ({
   onChange,
   ...props
 }: GetStartedDatePickerProps) => {
+  const locale = useLocale() as string;
+  const isRTL = locale === 'he';
   const parsedDate =
     value && !isNaN(Date.parse(value)) ? new Date(value) : new Date();
 
@@ -73,7 +75,8 @@ const GetStartedDatePicker = ({
       <label
         htmlFor={id}
         className={cn(
-          'absolute top-2.5 left-3 w-fit text-sm text-black transition-all duration-200 ease-in-out rtl:right-3',
+          'absolute top-2.5 w-fit text-sm text-black transition-all duration-200 ease-in-out',
+          isRTL ? 'right-3 left-auto' : 'left-3',
           value
             ? 'text-black -top-6 text-sm font-medium'
             : 'top-2.5 text-black'
@@ -89,13 +92,15 @@ const GetStartedDatePicker = ({
           <Button
             variant="outline"
             {...props}
-            className="h-10 w-full justify-between border-gray-300 bg-white px-3 text-base font-normal hover:bg-white"
+            className={cn(
+              "h-10 w-full justify-start border-gray-300 bg-white px-3 text-base font-normal hover:bg-white",
+              isRTL && "justify-end"
+            )}
           >
-            <span>{value ? format(parsedDate!, 'dd/MM/yyyy') : ''}</span>
-            <CalendarIcon className="opacity-50" strokeWidth={1.5} />
+            <span className={cn(isRTL && "text-right")}>{value ? format(parsedDate!, 'dd/MM/yyyy') : ''}</span>
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="flex w-auto p-0" align="start">
+        <PopoverContent className="flex w-auto p-0" align="start" dir={isRTL ? 'rtl' : 'ltr'}>
           <Calendar
             mode="single"
             captionLayout="dropdown"

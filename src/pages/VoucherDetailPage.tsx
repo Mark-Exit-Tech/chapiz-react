@@ -1,18 +1,20 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getUserCouponById } from '@/lib/firebase/database/coupons';
+import { getUserVoucherById, getVoucherById } from '@/lib/firebase/database/vouchers';
 import VoucherViewPageClient from '@/components/pages/VoucherViewPageClient';
+import VoucherShopViewClient from '@/components/pages/VoucherShopViewClient';
 import Navbar from '@/components/layout/Navbar';
 import BottomNavigation from '@/components/layout/BottomNavigation';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
+import type { UserVoucher, Voucher } from '@/lib/firebase/database/vouchers';
 
 export default function VoucherDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
-  const [userCoupon, setUserCoupon] = useState<any>(null);
+  const [userVoucher, setUserVoucher] = useState<UserVoucher | null>(null);
+  const [catalogVoucher, setCatalogVoucher] = useState<Voucher | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Get locale from URL
   const locale = typeof window !== 'undefined'
     ? window.location.pathname.split('/')[1] || 'en'
     : 'en';
@@ -27,19 +29,23 @@ export default function VoucherDetailPage() {
 
   useEffect(() => {
     const loadData = async () => {
-      if (!id || !user) {
+      if (!id) {
         setLoading(false);
         return;
       }
 
       try {
         setLoading(true);
-
-        // Load user coupon
-        const userCouponData = await getUserCouponById(id);
-
-        if (userCouponData) {
-          setUserCoupon(userCouponData);
+        const userVoucherData = user ? await getUserVoucherById(id) : null;
+        if (userVoucherData) {
+          setUserVoucher(userVoucherData);
+          setCatalogVoucher(null);
+          return;
+        }
+        const voucherData = await getVoucherById(id);
+        if (voucherData) {
+          setCatalogVoucher(voucherData);
+          setUserVoucher(null);
         }
       } catch (error) {
         console.error('Error loading voucher:', error);
@@ -50,28 +56,6 @@ export default function VoucherDetailPage() {
 
     loadData();
   }, [id, user]);
-
-  if (!user) {
-    return (
-      <>
-        <Navbar />
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <p className="text-gray-600 mb-4">{text.pleaseSignIn}</p>
-            <button
-              onClick={() => window.history.back()}
-              className="text-primary hover:underline"
-            >
-              {text.goBack}
-            </button>
-          </div>
-        </div>
-        <div className="md:hidden">
-          <BottomNavigation />
-        </div>
-      </>
-    );
-  }
 
   if (loading) {
     return (
@@ -92,21 +76,21 @@ export default function VoucherDetailPage() {
     );
   }
 
-  if (!userCoupon) {
+  if (userVoucher) {
     return (
       <>
-        <Navbar />
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">{text.notFound}</h1>
-            <button
-              onClick={() => window.history.back()}
-              className="text-primary hover:underline"
-            >
-              {text.goBack}
-            </button>
-          </div>
+        <VoucherViewPageClient userVoucher={userVoucher} />
+        <div className="md:hidden">
+          <BottomNavigation />
         </div>
+      </>
+    );
+  }
+
+  if (catalogVoucher) {
+    return (
+      <>
+        <VoucherShopViewClient voucher={catalogVoucher} />
         <div className="md:hidden">
           <BottomNavigation />
         </div>
@@ -116,7 +100,18 @@ export default function VoucherDetailPage() {
 
   return (
     <>
-      <VoucherViewPageClient userCoupon={userCoupon} />
+      <Navbar />
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">{text.notFound}</h1>
+          <button
+            onClick={() => window.history.back()}
+            className="text-primary hover:underline"
+          >
+            {text.goBack}
+          </button>
+        </div>
+      </div>
       <div className="md:hidden">
         <BottomNavigation />
       </div>

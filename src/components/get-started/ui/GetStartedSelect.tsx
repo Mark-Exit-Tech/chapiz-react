@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import { useLocale } from '@/hooks/use-locale';
 
 interface GetStartedSelectProps {
   label: string;
@@ -38,6 +39,8 @@ const GetStartedSelect = ({
   placeholder
 }: GetStartedSelectProps) => {
   const { t } = useTranslation('translation', { keyPrefix: 'components.searchbar' });
+  const locale = useLocale() as string;
+  const isHebrew = locale === 'he';
 
   return (
     <div className="relative w-full">
@@ -45,7 +48,8 @@ const GetStartedSelect = ({
       <label
         htmlFor={id}
         className={cn(
-          'absolute top-2.5 left-3 rtl:left-auto rtl:right-3 w-fit text-sm text-gray-500 transition-all duration-200 ease-in-out',
+          'absolute top-2.5 w-fit text-sm text-gray-500 transition-all duration-200 ease-in-out',
+          isHebrew ? 'right-3 left-auto' : 'left-3',
           value && value.length > 0
             ? 'text-primary -top-6 text-sm font-medium'
             : 'top-2.5 text-gray-500',
@@ -57,7 +61,7 @@ const GetStartedSelect = ({
         {required ? '*' : ''}
       </label>
 
-      {/* Select Component */}
+      {/* Select Component - arrow on LEFT in Hebrew, text on RIGHT */}
       <Select
         value={value || ''}
         onValueChange={(newValue) => onChange(newValue)}
@@ -66,12 +70,13 @@ const GetStartedSelect = ({
         <SelectTrigger
           id={id}
           className={cn(
-            'h-10 border-gray-300 bg-white text-base text-start',
+            'h-10 border-gray-300 bg-white text-base [&_svg]:hidden',
+            isHebrew ? 'flex-row-reverse text-end' : 'text-start',
             hasError ? 'border-red-800' : '',
             disabled ? 'opacity-50 cursor-not-allowed' : ''
           )}
         >
-          <SelectValue className="text-start">
+          <SelectValue className={cn(isHebrew ? 'text-end' : 'text-start')}>
             {selectOptions.find((option) => option.value === value)?.label || placeholder || ''}
           </SelectValue>
         </SelectTrigger>

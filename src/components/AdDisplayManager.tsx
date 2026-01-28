@@ -6,11 +6,9 @@ import { fetchRandomAd } from '@/lib/actions/ads-server';
 import AdFullPage from './get-started/AdFullPage';
 import { useLocation } from 'react-router-dom';
 import { getYouTubeVideoId } from '@/lib/utils/youtube';
-import { useAuth } from '@/contexts/FirebaseAuthContext';
 
 export default function AdDisplayManager() {
   const { pathname } = useLocation();
-  const { user } = useAuth();
   const { shouldShowAd, resetAdFlag } = useClickTracker();
   const [ad, setAd] = useState<any | null>(null);
   const [showAd, setShowAd] = useState(false);
@@ -26,12 +24,9 @@ export default function AdDisplayManager() {
     console.log('[AdDisplayManager] State:', { shouldShowAd, showAd, isLoading });
   }, [shouldShowAd, showAd, isLoading]);
 
-  // Fetch promo when we should show an ad
+  // Fetch promo when we should show an ad (works for both guests and authenticated users)
   useEffect(() => {
     const fetchPromo = async () => {
-      // Don't show ads for non-authenticated users
-      if (!user) return;
-
       // Don't show click-based ads on pet profile pages (they have their own mandatory ad)
       // Also don't show ads on admin pages
       if (isPetProfilePage || isAdminPage) {
@@ -39,9 +34,7 @@ export default function AdDisplayManager() {
         return;
       }
 
-      console.log('[AdDisplayManager] Checking conditions:', { shouldShowAd, showAd, isLoading, isPetProfilePage });
-
-      // Show ads for all authenticated users (removed petId requirement)
+      // Show ad when 15-click threshold is reached
       if (shouldShowAd && !showAd && !isLoading) {
         console.log('[AdDisplayManager] Fetching ad...');
         setIsLoading(true);
@@ -62,12 +55,17 @@ export default function AdDisplayManager() {
             }
           } else {
             console.log('[AdDisplayManager] No ad available or no content');
-            // No ad available, reset the flag but keep the count (user will see ad next time)
             resetAdFlag();
+            try {
+              localStorage.setItem('ad_click_count', '0');
+            } catch (_) {}
           }
         } catch (error) {
           console.error('[AdDisplayManager] Error fetching ad:', error);
           resetAdFlag();
+          try {
+            localStorage.setItem('ad_click_count', '0');
+          } catch (_) {}
         } finally {
           setIsLoading(false);
         }
@@ -75,7 +73,7 @@ export default function AdDisplayManager() {
     };
 
     fetchPromo();
-  }, [shouldShowAd, showAd, isLoading, resetAdFlag, isPetProfilePage, isAdminPage, user]);
+  }, [shouldShowAd, showAd, isLoading, resetAdFlag, isPetProfilePage, isAdminPage]);
 
   const handleAdClose = () => {
     setShowAd(false);
@@ -90,12 +88,7 @@ export default function AdDisplayManager() {
     }
   };
 
-  // Don't show ads for non-authenticated users
-  if (!user) {
-    return null;
-  }
-
-  // Show ad if we have an ad with content
+  // Show ad if we have an ad with content (for both guests and authenticated users)
   if (showAd && ad && ad.content) {
     // Detect if content is a YouTube URL
     const isYouTube = ad.content.includes('youtube.com') || ad.content.includes('youtu.be') || getYouTubeVideoId(ad.content) !== null;

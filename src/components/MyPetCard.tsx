@@ -66,17 +66,17 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
     }
   };
 
-  // Only navigate when not in edit mode.
+  // In edit mode: tap card to go to edit. Otherwise: tap card to go to pet profile.
   const handleCardClick = () => {
-    if (!isEditMode) {
-      // Pass all pet data as query parameters to avoid recalculation
+    if (isEditMode) {
+      navigate(`/${locale}/pet/${id}/edit`);
+    } else {
       const params = new URLSearchParams({
         displayName: name,
         displayBreed: breed,
         displayImage: image
       });
       const targetUrl = `/${locale}/pet/${id}?${params.toString()}`;
-      console.log('MyPetCard navigating to:', targetUrl);
       navigate(targetUrl);
     }
   };

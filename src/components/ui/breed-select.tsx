@@ -42,6 +42,7 @@ interface BreedSelectProps {
   required?: boolean;
   hasError?: boolean;
   disabled?: boolean;
+  hideDropdownIcon?: boolean;
 }
 
 export function BreedSelect({
@@ -53,7 +54,8 @@ export function BreedSelect({
   label,
   required = false,
   hasError = false,
-  disabled = false
+  disabled = false,
+  hideDropdownIcon = false
 }: BreedSelectProps) {
   const { t } = useTranslation('Pet');
   const locale = useLocale() as 'en' | 'he';
@@ -195,7 +197,8 @@ export function BreedSelect({
       {label && (
         <label
           className={cn(
-            'absolute top-2.5 left-3 w-fit text-sm text-gray-500 transition-all duration-200 ease-in-out rtl:right-3',
+            'absolute top-2.5 w-fit text-sm text-gray-500 transition-all duration-200 ease-in-out',
+            isHebrew ? 'right-3 left-auto' : 'left-3',
             value && value.length > 0
               ? 'text-primary -top-6 text-sm font-medium'
               : 'top-2.5 text-gray-500',
@@ -215,21 +218,29 @@ export function BreedSelect({
             aria-expanded={open}
             disabled={disabled}
             translate="no"
-            className={cn("h-10 border-gray-300 bg-white text-sm w-full justify-between", className, disabled && "opacity-50 cursor-not-allowed")}
+            className={cn(
+              "h-10 border-gray-300 bg-white text-sm w-full justify-between",
+              isHebrew ? "flex-row-reverse" : "",
+              className,
+              disabled && "opacity-50 cursor-not-allowed"
+            )}
             style={{ position: 'relative', zIndex: 1 }}
           >
             <span className={cn(
-              "flex-1 text-left rtl:text-right",
+              "flex-1",
+              isHebrew ? "text-right" : "text-left",
               !selectedBreed && !disabled ? "text-gray-500" : ""
             )}>
               {selectedBreed ? selectedBreed.name : (disabled ? '' : (placeholder || text.breedPlaceholder))}
             </span>
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            {!hideDropdownIcon && (
+              <ChevronsUpDown className={cn("h-4 w-4 shrink-0 opacity-50", isHebrew ? "mr-2 ml-0" : "ml-2")} />
+            )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0" align="start">
+        <PopoverContent className={cn("w-full p-0", isHebrew && "text-right")} align="start" dir={isHebrew ? 'rtl' : 'ltr'}>
           <Command shouldFilter={false}>
-            <div className="flex items-center border-b px-3">
+            <div className={cn("flex items-center border-b px-3", isHebrew && "flex-row-reverse")}>
               <CommandInput
                 placeholder={text.searchPlaceholder}
                 value={searchValue}
@@ -332,7 +343,7 @@ export function BreedSelect({
                           setShowHebrewFilter(false);
                           setHebrewFilteredBreeds([]);
                         }}
-                        className="flex items-center gap-2"
+                        className={cn("flex items-center gap-2", isHebrew && "flex-row-reverse text-right")}
                       >
                         <Check
                           className={cn(
@@ -340,15 +351,15 @@ export function BreedSelect({
                             value === breed.id ? "opacity-100" : "opacity-0"
                           )}
                         />
-                        <div className="flex-1 flex items-center gap-2">
-                          <Star className="h-3 w-3 text-yellow-500" />
+                        <div className={cn("flex-1 flex items-center gap-2", isHebrew && "flex-row-reverse text-right")}>
+                          <Star className="h-3 w-3 text-yellow-500 shrink-0" />
                           <span
                             dangerouslySetInnerHTML={{
                               __html: breed.highlightedName || breed.name
                             }}
                           />
                         </div>
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant="secondary" className="text-xs shrink-0">
                           {text.recent}
                         </Badge>
                       </CommandItem>
@@ -388,7 +399,7 @@ export function BreedSelect({
                         setShowHebrewFilter(false);
                         setHebrewFilteredBreeds([]);
                       }}
-                      className="flex items-center gap-2"
+                      className={cn("flex items-center gap-2", isHebrew && "flex-row-reverse text-right")}
                     >
                       <Check
                         className={cn(
@@ -396,9 +407,9 @@ export function BreedSelect({
                           value === breed.id ? "opacity-100" : "opacity-0"
                         )}
                       />
-                      <div className="flex-1 flex items-center gap-2">
+                      <div className={cn("flex-1 flex items-center gap-2", isHebrew && "flex-row-reverse text-right")}>
                         {breed.isRecent && !searchValue.trim() && (
-                          <Star className="h-3 w-3 text-yellow-500" />
+                          <Star className="h-3 w-3 text-yellow-500 shrink-0" />
                         )}
                         <span
                           className="flex-1"

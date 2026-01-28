@@ -15,8 +15,9 @@ export interface Ad {
     tags?: string[];
     area?: string;
     city?: string[];
-    petType?: string;
-    breed?: string;
+    petType?: string | string[];
+    petTypeOther?: string;
+    breed?: string | string[];
     ageRange?: string[];
     weight?: string[];
     views: number;
@@ -27,6 +28,17 @@ export interface Ad {
 }
 
 const ADS_COLLECTION = 'advertisements';
+
+/** Get milliseconds for sorting; handles Firestore Timestamp, Date, number, or string. */
+function getCreatedAtMs(createdAt: unknown): number {
+    if (createdAt == null) return 0;
+    if (typeof (createdAt as { toMillis?: () => number }).toMillis === 'function') return (createdAt as { toMillis: () => number }).toMillis();
+    if (typeof (createdAt as { toDate?: () => Date }).toDate === 'function') return (createdAt as { toDate: () => Date }).toDate().getTime();
+    if (createdAt instanceof Date) return createdAt.getTime();
+    if (typeof createdAt === 'number') return createdAt;
+    if (typeof createdAt === 'string') return new Date(createdAt).getTime() || 0;
+    return 0;
+}
 
 // Get ad by ID
 export async function getAdById(id: string): Promise<Ad | null> {
@@ -67,8 +79,8 @@ export async function getActiveAds(): Promise<Ad[]> {
                 const querySnapshot = await getDocs(q);
                 
                 const ads = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Ad));
-                // Sort in memory
-                ads.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+                // Sort in memory (createdAt may be Firestore Timestamp, not Date)
+                ads.sort((a, b) => getCreatedAtMs(b.createdAt) - getCreatedAtMs(a.createdAt));
                 console.log(`✅ Fetched ${ads.length} active ads from Firebase (sorted in memory)`);
                 return ads;
             }

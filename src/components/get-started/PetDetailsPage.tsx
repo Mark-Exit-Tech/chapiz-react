@@ -155,6 +155,7 @@ const PetDetailsPage: React.FC<PetDetailsPageProps> = () => {
                 required={true}
                 hasError={!!errors.breed}
                 disabled={!selectedPetType}
+                hideDropdownIcon
               />
             )
           )}

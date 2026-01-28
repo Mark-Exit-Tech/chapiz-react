@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/FirebaseAuthContext';
 
 const CLICK_COUNT_KEY = 'ad_click_count';
 const CLICK_THRESHOLD = 15;
@@ -8,7 +7,6 @@ const CLICK_DEBOUNCE_MS = 100; // Prevent rapid clicks from counting multiple ti
 
 export function useClickTracker() {
     const { pathname } = useLocation();
-    const { user } = useAuth();
     const [clickCount, setClickCount] = useState(0);
     const [shouldShowAd, setShouldShowAd] = useState(false);
     const lastClickTimeRef = useRef<number>(0);
@@ -33,11 +31,8 @@ export function useClickTracker() {
         }
     }, []);
 
-    // Track all clicks globally
+    // Track all clicks globally (for both guests and authenticated users)
     useEffect(() => {
-        // Don't track if user is not authenticated
-        if (!user) return;
-
         const handleClick = (event: MouseEvent) => {
             // Skip tracking on pet profile pages (they have their own mandatory ad)
             // Also skip tracking on admin pages
@@ -100,7 +95,7 @@ export function useClickTracker() {
         return () => {
             document.removeEventListener('click', handleClick, true);
         };
-    }, [isPetProfilePage, isAdminPage, user]);
+    }, [isPetProfilePage, isAdminPage]);
 
     const resetAdFlag = useCallback(() => {
         setShouldShowAd(false);

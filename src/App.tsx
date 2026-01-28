@@ -10,6 +10,7 @@ const AuthPage = lazy(() => import('./pages/AuthPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const SignupPage = lazy(() => import('./pages/SignupPage'));
 const FinishSignupPage = lazy(() => import('./components/auth/FinishSignupPage'));
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const MyPetsPage = lazy(() => import('./pages/MyPetsPage'));
 const CouponsPage = lazy(() => import('./pages/CouponsPage'));
@@ -64,6 +65,7 @@ function App() {
 
           {/* Redirect non-locale routes to locale routes */}
           <Route path="/auth" element={<Navigate to={`/${currentLang}/auth`} replace />} />
+          <Route path="/auth/forgot" element={<Navigate to={`/${currentLang}/auth/forgot`} replace />} />
           <Route path="/login" element={<Navigate to={`/${currentLang}/login`} replace />} />
           <Route path="/signup" element={<Navigate to={`/${currentLang}/signup`} replace />} />
           <Route path="/contact" element={<Navigate to={`/${currentLang}/contact`} replace />} />
@@ -93,6 +95,7 @@ function App() {
           <Route path="/:locale/login" element={<Suspense fallback={<PageLoader />}><LoginPage /></Suspense>} />
           <Route path="/:locale/signup" element={<Suspense fallback={<PageLoader />}><SignupPage /></Suspense>} />
           <Route path="/:locale/auth/finish-signup" element={<Suspense fallback={<PageLoader />}><FinishSignupPage /></Suspense>} />
+          <Route path="/:locale/auth/forgot" element={<Suspense fallback={<PageLoader />}><ForgotPasswordPage /></Suspense>} />
           <Route path="/:locale/contact" element={<Suspense fallback={<PageLoader />}><ContactPage /></Suspense>} />
           <Route path="/:locale/my-pets" element={<Suspense fallback={<PageLoader />}><MyPetsPage /></Suspense>} />
           <Route path="/:locale/pet/:id" element={<Suspense fallback={<PageLoader />}><PetPage /></Suspense>} />

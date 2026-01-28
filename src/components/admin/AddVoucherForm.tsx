@@ -19,7 +19,11 @@ import MediaUpload from '@/components/admin/MediaUpload';
 import { createVoucher, getBusinesses } from '@/lib/actions/admin';
 import { Business } from '@/types/promo';
 
-export default function AddVoucherForm() {
+interface AddVoucherFormProps {
+  onSuccess?: () => void;
+}
+
+export default function AddVoucherForm({ onSuccess }: AddVoucherFormProps) {
   const [isOpen, setIsOpen] = useState(false);
   
   // Get locale from URL
@@ -131,8 +135,8 @@ export default function AddVoucherForm() {
           validTo: ''
         });
         
-        // Refresh page to show new voucher
-        window.location.reload();
+        // Refresh list without full page reload
+        onSuccess?.();
       } else {
         alert(
           isHebrew 

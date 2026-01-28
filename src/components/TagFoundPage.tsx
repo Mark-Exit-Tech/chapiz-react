@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from './ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,9 @@ import { usePetId, savePetId } from '@/hooks/use-pet-id';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import BottomNavigation from '@/components/layout/BottomNavigation';
+import AdFullPage from '@/components/get-started/AdFullPage';
+import { Ad } from '@/lib/actions/admin';
+import { getYouTubeVideoId } from '@/lib/utils/youtube';
 
 interface TagFoundPageProps {
   petId: string;
@@ -31,9 +34,39 @@ export default function TagFoundPage({ petId }: TagFoundPageProps) {
   const { petId: savedPetId } = usePetId();
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showPromo, setShowPromo] = useState(false);
+  const [promo, setPromo] = useState<Ad | null>(null);
+  const [isLoadingPromo, setIsLoadingPromo] = useState(false);
+  const adShownRef = useRef(false);
 
   const locale = getLocaleFromUrl();
   const isHebrew = locale === 'he';
+
+  // Load and show ad once when page loads (same as pet profile)
+  useEffect(() => {
+    if (adShownRef.current || showPromo || isLoadingPromo || promo) return;
+    let cancelled = false;
+    setIsLoadingPromo(true);
+    (async () => {
+      try {
+        const { fetchRandomAd } = await import('@/lib/actions/ads-server');
+        const randomAd = await fetchRandomAd();
+        if (cancelled) return;
+        if (randomAd && randomAd.content) {
+          setPromo(randomAd);
+          setShowPromo(true);
+        }
+      } catch (e) {
+        if (!cancelled) console.error('[TagFoundPage] Error loading ad:', e);
+      } finally {
+        if (!cancelled) {
+          adShownRef.current = true;
+          setIsLoadingPromo(false);
+        }
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   // Sync i18n with URL locale and set document direction
   useEffect(() => {
@@ -77,6 +110,29 @@ export default function TagFoundPage({ petId }: TagFoundPageProps) {
           <BottomNavigation />
         </div>
       </div>
+    );
+  }
+
+  if (showPromo && promo && promo.content) {
+    return (
+      <AdFullPage
+        type={
+          promo.content && (promo.content.includes('youtube.com') || promo.content.includes('youtu.be') || getYouTubeVideoId(promo.content) !== null)
+            ? 'youtube'
+            : (promo.type || 'image')
+        }
+        time={5}
+        content={promo.content}
+        youtubeUrl={
+          promo.content && (promo.content.includes('youtube.com') || promo.content.includes('youtu.be') || getYouTubeVideoId(promo.content) !== null)
+            ? promo.content
+            : undefined
+        }
+        onClose={() => {
+          setShowPromo(false);
+          setPromo(null);
+        }}
+      />
     );
   }
 

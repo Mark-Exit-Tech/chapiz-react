@@ -23,6 +23,7 @@ export interface Breed {
     id: number;
     en: string;
     he: string;
+    petTypeId?: string;
 }
 
 export interface Gender {
@@ -258,42 +259,58 @@ export async function getBreedNameById(id: number, locale: 'en' | 'he' = 'en'): 
     }
 }
 
-// Helper function to get dropdown data
-export async function getBreedsForDropdown(locale: 'en' | 'he' = 'en'): Promise<{ value: string; label: string; }[]> {
-    const breeds = await getAllBreeds();
-    
-    if (breeds.length === 0) {
-        // Fallback data if collection is empty (common dog breeds)
-        console.warn('Breeds collection is empty, using fallback data');
-        return locale === 'he'
-            ? [
-                { value: '1', label: 'מעורב' },
-                { value: '2', label: 'גולדן רטריבר' },
-                { value: '3', label: 'לברדור' },
-                { value: '4', label: 'פודל' },
-                { value: '5', label: 'שיצו' },
-                { value: '6', label: 'פאג' },
-                { value: '7', label: 'ביגל' },
-                { value: '8', label: 'רועה גרמני' },
-                { value: '9', label: 'אחר' }
-              ]
-            : [
-                { value: '1', label: 'Mixed' },
-                { value: '2', label: 'Golden Retriever' },
-                { value: '3', label: 'Labrador' },
-                { value: '4', label: 'Poodle' },
-                { value: '5', label: 'Shih Tzu' },
-                { value: '6', label: 'Pug' },
-                { value: '7', label: 'Beagle' },
-                { value: '8', label: 'German Shepherd' },
-                { value: '9', label: 'Other' }
-              ];
+// Fallback breed lists per pet type (when DB is empty or breeds have no petTypeId)
+const DOG_BREEDS_FALLBACK_HE = ['מעורב', 'גולדן רטריבר', 'לברדור', 'פודל', 'שיצו', 'פאג', 'ביגל', 'רועה גרמני', 'דלמטי', 'רוטוויילר', 'האסקי סיבירי', 'בוקסר', 'דוברמן', 'צ\'יוואווה', 'יורקשייר טרייר', 'אחר'];
+const DOG_BREEDS_FALLBACK_EN = ['Mixed', 'Golden Retriever', 'Labrador', 'Poodle', 'Shih Tzu', 'Pug', 'Beagle', 'German Shepherd', 'Dalmatian', 'Rottweiler', 'Siberian Husky', 'Boxer', 'Dobermann', 'Chihuahua', 'Yorkshire Terrier', 'Other'];
+const CAT_BREEDS_FALLBACK_HE = ['מעורב', 'חתול בית', 'פרסי', 'מיין קון', 'סיאמי', 'בריטי קצר שיער', 'ראגדול', 'אביסיני', 'בנגלי', 'בורמזי', 'ספינקס', 'רוסי כחול', 'נורווגי', 'אחר'];
+const CAT_BREEDS_FALLBACK_EN = ['Mixed', 'Domestic', 'Persian', 'Maine Coon', 'Siamese', 'British Shorthair', 'Ragdoll', 'Abyssinian', 'Bengal', 'Burmese', 'Sphynx', 'Russian Blue', 'Norwegian Forest', 'Other'];
+
+function getBreedsFallback(locale: 'en' | 'he', petType: string): { value: string; label: string }[] {
+    if (petType === 'other') return [];
+    if (petType === 'dog') {
+        const labels = locale === 'he' ? DOG_BREEDS_FALLBACK_HE : DOG_BREEDS_FALLBACK_EN;
+        return labels.map((label, i) => ({ value: `dog-${i + 1}`, label }));
     }
-    
+    if (petType === 'cat') {
+        const labels = locale === 'he' ? CAT_BREEDS_FALLBACK_HE : CAT_BREEDS_FALLBACK_EN;
+        return labels.map((label, i) => ({ value: `cat-${i + 1}`, label }));
+    }
+    return [];
+}
+
+// Helper function to get dropdown data. If petType is provided, returns breeds for that type only; 'other' returns [].
+export async function getBreedsForDropdown(locale: 'en' | 'he' = 'en', petType?: string): Promise<{ value: string; label: string; }[]> {
+    if (petType === 'other') return [];
+
+    const breeds = await getAllBreeds();
+    const withType = breeds.length > 0 && breeds.some((b: Breed) => (b as any).petTypeId != null);
+
+    if (withType && petType) {
+        const filtered = breeds.filter((b: Breed) => (b as any).petTypeId === petType);
+        if (filtered.length > 0) {
+            return filtered.map(breed => ({
+                value: `${petType}-${breed.id}`,
+                label: locale === 'he' ? breed.he : breed.en
+            }));
+        }
+    }
+
+    if (breeds.length === 0 || petType) {
+        return getBreedsFallback(locale, petType || 'dog');
+    }
+
     return breeds.map(breed => ({
         value: breed.id.toString(),
         label: locale === 'he' ? breed.he : breed.en
     }));
+}
+
+/** Returns breeds for multiple pet types (e.g. ['dog','cat']), merged. Excludes 'other'. */
+export async function getBreedsForDropdownByPetTypes(locale: 'en' | 'he', petTypes: string[]): Promise<{ value: string; label: string }[]> {
+    const types = petTypes.filter(t => t && t !== 'other');
+    if (types.length === 0) return [];
+    const results = await Promise.all(types.map(t => getBreedsForDropdown(locale, t)));
+    return results.flat();
 }
 
 export async function getGendersForDropdown(locale: 'en' | 'he' = 'en'): Promise<{ value: string; label: string; }[]> {

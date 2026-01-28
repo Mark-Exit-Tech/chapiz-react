@@ -23,9 +23,10 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { MoreHorizontal, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Trash2, Video } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Ad, getAllAds, AdStatus } from '@/lib/actions/admin';
+import { getYouTubeVideoId, getYouTubeEmbedUrl, getYouTubeThumbnailUrl } from '@/lib/utils/youtube';
 import AdActions from './AdActions';
 
 export default function AdsTable() {
@@ -90,6 +91,18 @@ export default function AdsTable() {
       hour: '2-digit',
       minute: '2-digit'
     }).format(dateObj);
+  };
+
+  const isYouTubeUrl = (url: string) =>
+    url && (url.includes('youtube.com') || url.includes('youtu.be')) && getYouTubeVideoId(url) !== null;
+
+  const isVideoContent = (ad: Ad) => {
+    if (!ad.content) return false;
+    const typeIsVideo = String(ad.type || '').toLowerCase() === 'video';
+    if (typeIsVideo) return true;
+    if (isYouTubeUrl(ad.content)) return true;
+    const lower = ad.content.toLowerCase();
+    return /\.(mp4|webm|mov|ogg)(\?|$)/i.test(lower);
   };
 
   const getStatusBadge = (status: AdStatus) => {
@@ -161,13 +174,29 @@ export default function AdsTable() {
                   </TableCell>
                   <TableCell>
                     {ad.content ? (
-                      <div className="w-16 h-10 rounded-md overflow-hidden">
-                        <img
-                          src={ad.content}
-                          alt={ad.title}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
+                      isVideoContent(ad) ? (
+                        isYouTubeUrl(ad.content) ? (
+                          <div className="w-16 h-10 rounded-md overflow-hidden bg-gray-100">
+                            <img
+                              src={getYouTubeThumbnailUrl(ad.content) ?? ad.content}
+                              alt={ad.title}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-16 h-10 rounded-md bg-gray-100 flex items-center justify-center">
+                            <Video className="h-5 w-5 text-gray-500" />
+                          </div>
+                        )
+                      ) : (
+                        <div className="w-16 h-10 rounded-md overflow-hidden">
+                          <img
+                            src={ad.content}
+                            alt={ad.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )
                     ) : (
                       <div className="w-16 h-10 rounded-md bg-gray-100 flex items-center justify-center">
                         <span className="text-xs text-gray-400">{text.noImage}</span>
@@ -198,14 +227,37 @@ export default function AdsTable() {
                 <DialogTitle className="text-2xl font-bold">{previewAd.title}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
-                {/* Image */}
+                {/* Image or Video */}
                 {previewAd.content && (
                   <div className="rounded-lg overflow-hidden bg-gray-100">
-                    <img
-                      src={previewAd.content}
-                      alt={previewAd.title}
-                      className="w-full h-auto object-contain max-h-[500px] mx-auto"
-                    />
+                    {isVideoContent(previewAd) ? (
+                      isYouTubeUrl(previewAd.content) ? (
+                        <div className="aspect-video w-full max-h-[500px]">
+                          <iframe
+                            className="w-full h-full min-h-[300px]"
+                            src={getYouTubeEmbedUrl(previewAd.content) ?? ''}
+                            title={previewAd.title}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
+                        </div>
+                      ) : (
+                        <video
+                          src={previewAd.content}
+                          controls
+                          className="w-full max-h-[500px] mx-auto"
+                          playsInline
+                        >
+                          Your browser does not support the video tag.
+                        </video>
+                      )
+                    ) : (
+                      <img
+                        src={previewAd.content}
+                        alt={previewAd.title}
+                        className="w-full h-auto object-contain max-h-[500px] mx-auto"
+                      />
+                    )}
                   </div>
                 )}
 

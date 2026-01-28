@@ -8,22 +8,19 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
-import { Coins, Wallet, Calendar, ShoppingCart, History, Share2, Copy, Check, Tag, Eye, MapPin, QrCode, X } from 'lucide-react';
+import { Coins, Wallet, Calendar, ShoppingCart, History, Share2, Copy, Check, Tag, Eye, MapPin, QrCode } from 'lucide-react';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
-import { Coupon } from '@/types/coupon';
-import { getCoupons, getContactInfo, getBusinesses, getCouponById } from '@/lib/actions/admin';
+import { getContactInfo, getBusinesses } from '@/lib/actions/admin';
 import { Business } from '@/types/promo';
 import MapCard from '@/components/cards/MapCard';
-import { getUserFromFirestore } from '@/lib/firebase/database/users';
-import { addPointsToCategory, getUserPoints, deductPointsFromCategory } from '@/lib/firebase/database/points';
-import { purchaseCoupon, getActiveUserCoupons, getCouponHistory, markCouponAsUsed, UserCoupon, getUserCouponPurchaseCount } from '@/lib/firebase/database/coupons';
+import { getUserPoints, deductPointsFromCategory, addPointsToCategory } from '@/lib/firebase/database/points';
+import { getActiveVouchers, purchaseVoucher, getUserVouchers, markVoucherAsUsed, type Voucher, type UserVoucher } from '@/lib/firebase/database/vouchers';
 import { useShopRedirect } from '@/hooks/use-shop-redirect';
 import toast from 'react-hot-toast';
+import confetti from 'canvas-confetti';
 
 export default function UserVouchersPage() {
-  const { t, i18n } = useTranslation('components.UserCoupons');
+  const { i18n } = useTranslation('components.UserCoupons');
 
   // Get locale from i18n (works correctly on root path without locale prefix)
   const locale = i18n.language || 'en';
@@ -38,9 +35,9 @@ export default function UserVouchersPage() {
     myPoints: isHebrew ? 'הנקודות שלי' : 'My Points',
     pointsDescription: isHebrew ? 'השתמשו בנקודות שלכם כדי לקנות שוברים!' : 'Use your points to purchase vouchers!',
     shop: isHebrew ? 'חנות' : 'Shop',
-    myCoupons: isHebrew ? 'השוברים שלי' : 'My Vouchers',
-    availableCoupons: isHebrew ? 'שוברים זמינים' : 'Available Vouchers',
-    noCoupons: isHebrew ? 'אין שוברים זמינים כרגע' : 'No vouchers available at the moment',
+    myVouchers: isHebrew ? 'השוברים שלי' : 'My Vouchers',
+    availableVouchers: isHebrew ? 'שוברים זמינים' : 'Available Vouchers',
+    noVouchers: isHebrew ? 'אין שוברים זמינים כרגע' : 'No vouchers available at the moment',
     validUntil: isHebrew ? 'תקף עד' : 'Valid until',
     pointsRequired: isHebrew ? 'נקודות נדרשות' : 'Points required',
     price: isHebrew ? 'מחיר' : 'Price',
@@ -81,297 +78,64 @@ export default function UserVouchersPage() {
   
   const navigate = useNavigate();
   const { user, dbUser } = useAuth();
-  const [coupons, setCoupons] = useState<Coupon[]>([]);
-  const [couponHistory, setCouponHistory] = useState<UserCoupon[]>([]); // All purchased coupons (active + inactive)
+  const [vouchers, setVouchers] = useState<Voucher[]>([]); // Available vouchers (vouchers collection only)
+  const [userVouchers, setUserVouchers] = useState<UserVoucher[]>([]); // Purchased vouchers (userVouchers collection)
   const [userPoints, setUserPoints] = useState(0);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('shop');
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [shopUrl, setShopUrl] = useState<string>('');
-  const [freeCouponPrice, setFreeCouponPrice] = useState<boolean>(false);
   const [businesses, setBusinesses] = useState<Business[]>([]);
-  const [selectedCouponImage, setSelectedCouponImage] = useState<{ imageUrl: string; name: string; description?: string; coupon?: Coupon; userCoupon?: UserCoupon } | null>(null);
-  const [isDesktop, setIsDesktop] = useState(false);
-  const [activeSnapPoint, setActiveSnapPoint] = useState<number | string | null>(0.7);
+  const [justPurchasedVoucherId, setJustPurchasedVoucherId] = useState<string | null>(null); // Triggers success animation on My Vouchers card
   const { redirectToShop, getShopUrl } = useShopRedirect();
 
   useEffect(() => {
-    const checkDesktop = () => {
-      setIsDesktop(window.innerWidth >= 768);
-    };
-    checkDesktop();
-    window.addEventListener('resize', checkDesktop);
-    return () => window.removeEventListener('resize', checkDesktop);
-  }, []);
-
-  useEffect(() => {
-    if (user) {
-      fetchData();
-    }
+    fetchData();
   }, [user]);
   
 
-  const fetchData = async () => {
+  const fetchData = async (options?: { skipLoadingState?: boolean }) => {
+    const skipLoading = options?.skipLoadingState === true;
     try {
-      setLoading(true);
-      
-      console.log('=== Fetching coupons ===');
-      // Fetch available coupons
-      const couponsResult = await getCoupons();
-      console.log('Coupons result:', JSON.stringify(couponsResult, null, 2));
-      
-      if (couponsResult.success && couponsResult.coupons) {
-        console.log(`✅ Found ${couponsResult.coupons.length} total coupons`);
-        
-        // Convert ISO strings back to Date objects and normalize businessIds
-        const couponsWithDates = couponsResult.coupons.map((coupon: any) => {
-          // Parse and normalize businessIds
-          let normalizedBusinessIds: string[] | undefined = undefined;
-          if (coupon.businessIds) {
-            if (Array.isArray(coupon.businessIds)) {
-              normalizedBusinessIds = coupon.businessIds.filter((id: any) => id != null && id !== '');
-            } else if (typeof coupon.businessIds === 'string') {
-              normalizedBusinessIds = [coupon.businessIds];
-            }
-          } else if (coupon.businessId) {
-            // Legacy format: convert single businessId to array
-            normalizedBusinessIds = [coupon.businessId];
-          }
-          
-          // Debug: Log specific coupon
-          if (coupon.id === 'IvmgfeBPfGRXLIQ5ce0Q') {
-            console.log('🔍🔍🔍 CLIENT - Parsing coupon IvmgfeBPfGRXLIQ5ce0Q:', {
-              rawBusinessIds: coupon.businessIds,
-              rawBusinessId: coupon.businessId,
-              normalizedBusinessIds,
-              normalizedLength: normalizedBusinessIds?.length,
-              isArray: Array.isArray(coupon.businessIds),
-              type: typeof coupon.businessIds,
-              couponKeys: Object.keys(coupon)
-            });
-          }
-          
-          const parsedCoupon = {
-            ...coupon,
-            createdAt: new Date(coupon.createdAt),
-            updatedAt: new Date(coupon.updatedAt),
-            validFrom: new Date(coupon.validFrom),
-            validTo: new Date(coupon.validTo),
-            businessIds: normalizedBusinessIds && normalizedBusinessIds.length > 0 ? normalizedBusinessIds : undefined,
-            // Keep businessId for backward compatibility
-            businessId: coupon.businessId
-          };
-          
-          // Debug: Log specific coupon after parsing
-          if (coupon.id === 'IvmgfeBPfGRXLIQ5ce0Q') {
-            console.log('🔍 Client - After parsing coupon IvmgfeBPfGRXLIQ5ce0Q:', {
-              parsedBusinessIds: parsedCoupon.businessIds,
-              parsedBusinessIdsLength: parsedCoupon.businessIds?.length,
-              parsedBusinessIdsIsArray: Array.isArray(parsedCoupon.businessIds)
-            });
-          }
-          
-          return parsedCoupon;
-        }) as Coupon[];
-        
-        // Log all coupons for debugging
-        couponsWithDates.forEach(coupon => {
-          console.log(`Coupon: ${coupon.name}`, {
-            id: coupon.id,
-            isActive: coupon.isActive,
-            validFrom: coupon.validFrom,
-            validTo: coupon.validTo,
-            points: coupon.points,
-            price: coupon.price,
-            hasBusinessId: !!coupon.businessId,
-            hasBusinessIds: !!coupon.businessIds,
-            businessId: coupon.businessId,
-            businessIds: coupon.businessIds
-          });
-        });
-        
-        // Filter only active coupons that are currently valid
-        const now = new Date();
-        console.log(`Current date: ${now.toISOString()}`);
-        
-        const validCoupons = couponsWithDates.filter(coupon => {
-          const validFrom = coupon.validFrom;
-          const validTo = coupon.validTo;
-          const isValid = coupon.isActive && validFrom <= now && validTo >= now;
-          
-          console.log(`Checking coupon "${coupon.name}":`, {
-            isActive: coupon.isActive,
-            validFrom: validFrom.toISOString(),
-            validTo: validTo.toISOString(),
-            isValid
-          });
-          
-          return isValid;
-        });
-        
-        console.log(`✅ Found ${validCoupons.length} valid coupons after filtering`);
-        console.log('Valid coupons:', validCoupons);
+      if (!skipLoading) setLoading(true);
 
-        // Filter out coupons where user has reached purchase limit or already has an active/used voucher
-        let availableCoupons = validCoupons;
-        if (user) {
-          // First get user's coupon history to check for active/used vouchers
-          const historyResult = await getCouponHistory(user.uid);
-          const userActiveCouponIds = new Set<string>();
+      // Vouchers page: only vouchers DB (strict separation from coupons)
+      const activeVouchers = await getActiveVouchers();
+      const sorted = [...activeVouchers].sort((a, b) => {
+        const aIsFree = a.price === 0;
+        const bIsFree = b.price === 0;
+        if (aIsFree && !bIsFree) return -1;
+        if (!aIsFree && bIsFree) return 1;
+        return a.price - b.price;
+      });
+      setVouchers(sorted);
 
-          if (historyResult.success && historyResult.coupons) {
-            // Collect IDs of coupons user already has (active or used)
-            historyResult.coupons.forEach(uc => {
-              if (uc.status === 'active' || uc.status === 'used') {
-                userActiveCouponIds.add(uc.couponId);
-              }
-            });
-          }
-
-          const purchaseLimitChecks = await Promise.all(
-            validCoupons.map(async (coupon) => {
-              // Hide if user already has this voucher (active or used)
-              if (userActiveCouponIds.has(coupon.id)) {
-                console.log(`🚫 Hiding coupon "${coupon.name}" - user already has this voucher`);
-                return false;
-              }
-
-              // If no purchase limit is set, coupon is available
-              if (!coupon.purchaseLimit || coupon.purchaseLimit <= 0) {
-                return true;
-              }
-              // Check user's purchase count for this coupon
-              const purchaseCount = await getUserCouponPurchaseCount(user.uid, coupon.id);
-              const isAvailable = purchaseCount < coupon.purchaseLimit;
-              if (!isAvailable) {
-                console.log(`🚫 Hiding coupon "${coupon.name}" - purchase limit reached (${purchaseCount}/${coupon.purchaseLimit})`);
-              }
-              return isAvailable;
-            })
-          );
-          availableCoupons = validCoupons.filter((_, index) => purchaseLimitChecks[index]);
-          console.log(`✅ ${availableCoupons.length} coupons available after filtering`);
-        }
-
-        // Sort coupons: free vouchers (price === 0) first, then by price ascending
-        const sortedCoupons = [...availableCoupons].sort((a, b) => {
-          const aIsFree = a.price === 0;
-          const bIsFree = b.price === 0;
-          
-          // Free vouchers come first
-          if (aIsFree && !bIsFree) return -1;
-          if (!aIsFree && bIsFree) return 1;
-          
-          // If both are free or both are paid, sort by price ascending
-          return a.price - b.price;
-        });
-        
-        // Debug: Log final coupons before setting state
-        const targetCoupon = sortedCoupons.find(c => c.id === 'IvmgfeBPfGRXLIQ5ce0Q');
-        if (targetCoupon) {
-          console.log('🔍🔍🔍 CLIENT - Final coupon before setState IvmgfeBPfGRXLIQ5ce0Q:', {
-            id: targetCoupon.id,
-            name: targetCoupon.name,
-            businessIds: targetCoupon.businessIds,
-            businessIdsLength: targetCoupon.businessIds?.length,
-            businessIdsIsArray: Array.isArray(targetCoupon.businessIds),
-            hasBusinessId: !!targetCoupon.businessId,
-            hasBusinessIds: !!targetCoupon.businessIds,
-            allKeys: Object.keys(targetCoupon)
-          });
-        } else {
-          console.warn('⚠️⚠️⚠️ CLIENT - Target coupon IvmgfeBPfGRXLIQ5ce0Q NOT FOUND in sortedCoupons!');
-        }
-        
-        setCoupons(sortedCoupons);
-      } else {
-        console.error('❌ No coupons or failed to fetch:', couponsResult.error);
-        setCoupons([]);
-      }
-
-      // Fetch shop URL from contact info
       const contactInfo = await getContactInfo();
-      if (contactInfo?.storeUrl) {
-        setShopUrl(contactInfo.storeUrl);
-      }
+      if (contactInfo?.storeUrl) setShopUrl(contactInfo.storeUrl);
 
-      // Fetch businesses for map
       const businessesResult = await getBusinesses();
       if (businessesResult.success && businessesResult.businesses) {
-        // Store all businesses (don't filter by address here - MapCard will handle that)
-        // This ensures we can match businesses by ID even if they don't have addresses yet
-        const validBusinesses = businessesResult.businesses.filter((b: any) => 
-          b.id && b.name
-        ) as Business[];
+        const validBusinesses = businessesResult.businesses.filter((b: any) => b.id && b.name) as Business[];
         setBusinesses(validBusinesses);
-        console.log('✅ Loaded businesses for map:', validBusinesses.length);
       }
 
-      // Fetch user points from userPoints collection
       if (user) {
-        console.log('Fetching user points for UID:', user.uid);
         const pointsResult = await getUserPoints(user);
-        console.log('Points result:', pointsResult);
         if (pointsResult.success) {
           setUserPoints(pointsResult.totalPoints || pointsResult.points || 0);
         } else {
-          // Default to 0 if points not found
           setUserPoints(0);
         }
-
-        // Fetch user settings to check freeCouponPrice
-        const userResult = await getUserFromFirestore(user.uid);
-        if (userResult.success && userResult.user) {
-          setFreeCouponPrice(false);
-        }
-
-        // Fetch all purchased coupons for history (active only, exclude used)
-        const historyResult = await getCouponHistory(user.uid);
-        if (historyResult.success && historyResult.coupons) {
-          // Convert ISO strings back to Date objects
-          const allCoupons = historyResult.coupons.map(uc => ({
-            ...uc,
-            coupon: {
-              ...uc.coupon,
-              validFrom: new Date(uc.coupon.validFrom as any),
-              validTo: new Date(uc.coupon.validTo as any),
-            },
-            purchasedAt: new Date(uc.purchasedAt as any),
-            usedAt: uc.usedAt ? new Date(uc.usedAt as any) : undefined
-          }));
-
-          // Filter to show only active vouchers (not used, not expired)
-          const now = new Date();
-          const activeCoupons = allCoupons.filter(uc => {
-            // Exclude used coupons
-            if (uc.status === 'used') return false;
-            // Exclude expired coupons
-            if (uc.status === 'expired') return false;
-            // Filter out coupons that are past their validTo date
-            const validTo = new Date(uc.coupon.validTo);
-            return validTo >= now;
-          });
-
-          // Sort: free vouchers first, then by purchasedAt descending (newest first)
-          activeCoupons.sort((a, b) => {
-            const aIsFree = a.coupon.price === 0;
-            const bIsFree = b.coupon.price === 0;
-
-            // Free vouchers come first
-            if (aIsFree && !bIsFree) return -1;
-            if (!aIsFree && bIsFree) return 1;
-
-            // If both are free or both are paid, sort by purchasedAt descending (newest first)
-            return b.purchasedAt.getTime() - a.purchasedAt.getTime();
-          });
-          setCouponHistory(activeCoupons);
-        }
+        const purchasedVouchers = await getUserVouchers(user.uid);
+        setUserVouchers(purchasedVouchers);
+      } else {
+        setUserVouchers([]);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
-      toast.error(text.failedToLoad);
+      if (!skipLoading) toast.error(text.failedToLoad);
     } finally {
-      setLoading(false);
+      if (!skipLoading) setLoading(false);
     }
   };
 
@@ -422,56 +186,63 @@ export default function UserVouchersPage() {
     }
   };
 
-  const handlePurchaseCoupon = async (coupon: Coupon) => {
+  const handlePurchaseVoucher = async (voucher: Voucher) => {
     if (!user) {
       toast.error(text.pleaseSignIn);
       return;
     }
 
-    // Calculate actual points needed (0 if freeCouponPrice is enabled)
-    const pointsNeeded = freeCouponPrice ? 0 : coupon.points;
-
-    if (!freeCouponPrice && userPoints < coupon.points) {
+    const pointsNeeded = voucher.points ?? 0;
+    if (userPoints < pointsNeeded) {
       toast.error(text.insufficientPoints);
       return;
     }
 
     try {
-      // Only deduct points if freeCouponPrice is disabled
-      if (!freeCouponPrice) {
-        const deductResult = await deductPointsFromCategory(
-          user,
-          'share',
-          coupon.points
-        );
-
+      if (pointsNeeded > 0) {
+        const deductResult = await deductPointsFromCategory(user, 'share', pointsNeeded);
         if (!deductResult.success) {
           toast.error(deductResult.error || text.failedToPurchase);
           return;
         }
       }
 
-      // Purchase the coupon (with 0 points if free)
-      const purchaseResult = await purchaseCoupon(user.uid, coupon.id, pointsNeeded);
-      
+      const purchaseResult = await purchaseVoucher(user.uid, voucher.id, pointsNeeded);
+
       if (!purchaseResult.success) {
-        // Refund points if purchase failed and points were deducted
-        if (!freeCouponPrice) {
-          await addPointsToCategory(user, 'share', coupon.points);
+        if (pointsNeeded > 0) {
+          await addPointsToCategory(user, 'share', pointsNeeded);
         }
         toast.error(purchaseResult.error || text.failedToPurchase);
         return;
       }
 
-      toast.success(isHebrew ? `השובר "${coupon.name}" נרכש בהצלחה!` : `Voucher "${coupon.name}" purchased successfully!`);
-      
-      // Refresh all data
-      await fetchData();
+      setActiveTab('myVouchers');
 
-      // Switch to "My Coupons" tab to show the purchased voucher
-      setActiveTab('myCoupons');
+      const successMessage = isHebrew ? `השובר "${voucher.name}" נרכש בהצלחה!` : `Voucher "${voucher.name}" purchased successfully!`;
+      toast.success(successMessage, { duration: 4000 });
+
+      confetti({
+        particleCount: 120,
+        spread: 70,
+        origin: { y: 0.5 },
+      });
+
+      const optimisticUserVoucher: UserVoucher = {
+        id: `pending-${voucher.id}-${Date.now()}`,
+        userId: user.uid,
+        voucherId: voucher.id,
+        status: 'active',
+        purchasedAt: new Date(),
+        voucher,
+      };
+      setUserVouchers((prev) => [optimisticUserVoucher, ...prev]);
+      setJustPurchasedVoucherId(voucher.id);
+      setTimeout(() => setJustPurchasedVoucherId(null), 3500);
+
+      fetchData({ skipLoadingState: true }).catch(() => {});
     } catch (error) {
-      console.error('Error purchasing coupon:', error);
+      console.error('Error purchasing voucher:', error);
       toast.error(text.failedToPurchase);
     }
   };
@@ -488,31 +259,15 @@ export default function UserVouchersPage() {
     }
   };
 
-  const handleUseCoupon = async (userCoupon: UserCoupon) => {
-    // Mark as used and move to history
-    const result = await markCouponAsUsed(userCoupon.id);
+  const handleUseVoucher = async (userVoucher: UserVoucher) => {
+    const result = await markVoucherAsUsed(userVoucher.id);
     if (result.success) {
       toast.success(text.couponMarkedAsUsed);
-      // Refresh history
       if (user) {
-        const historyResult = await getCouponHistory(user.uid);
-        if (historyResult.success && historyResult.coupons) {
-          const allCoupons = historyResult.coupons.map(uc => ({
-            ...uc,
-            coupon: {
-              ...uc.coupon,
-              validFrom: new Date(uc.coupon.validFrom as any),
-              validTo: new Date(uc.coupon.validTo as any),
-            },
-            purchasedAt: new Date(uc.purchasedAt as any),
-            usedAt: uc.usedAt ? new Date(uc.usedAt as any) : undefined
-          }));
-          allCoupons.sort((a, b) => b.purchasedAt.getTime() - a.purchasedAt.getTime());
-          setCouponHistory(allCoupons);
-        }
+        const purchasedVouchers = await getUserVouchers(user.uid);
+        setUserVouchers(purchasedVouchers);
       }
-      // Switch to my coupons tab
-      setActiveTab('myCoupons');
+      setActiveTab('myVouchers');
     } else {
       toast.error(text.failedToMarkAsUsed);
     }
@@ -550,6 +305,14 @@ export default function UserVouchersPage() {
 
   return (
     <div className="min-h-screen bg-background" dir={isHebrew ? 'rtl' : 'ltr'}>
+      <style>{`
+        @keyframes voucher-purchase-success {
+          0% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+          50% { transform: scale(1.02); box-shadow: 0 0 0 12px rgba(34, 197, 94, 0); }
+          100% { transform: scale(1); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
+        }
+        .voucher-purchase-success-animation { animation: voucher-purchase-success 0.6s ease-out; }
+      `}</style>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 pb-24 md:pb-12 max-w-7xl">
         {/* Header */}
         <div className="mb-8 lg:mb-12">
@@ -601,11 +364,11 @@ export default function UserVouchersPage() {
           {isHebrew ? (
             <>
               <TabsTrigger 
-                value="myCoupons" 
+                value="myVouchers" 
                 className="flex items-center gap-2 text-sm lg:text-base font-medium data-[state=active]:bg-white data-[state=active]:shadow-md transition-all rounded-lg"
               >
                 <Wallet className="h-4 w-4 lg:h-5 lg:w-5" />
-                {text.myCoupons}
+                {text.myVouchers}
               </TabsTrigger>
               <TabsTrigger 
                 value="shop" 
@@ -625,11 +388,11 @@ export default function UserVouchersPage() {
                 {text.shop}
               </TabsTrigger>
               <TabsTrigger 
-                value="myCoupons" 
+                value="myVouchers" 
                 className="flex items-center gap-2 text-sm lg:text-base font-medium data-[state=active]:bg-white data-[state=active]:shadow-md transition-all rounded-lg"
               >
                 <Wallet className="h-4 w-4 lg:h-5 lg:w-5" />
-                {text.myCoupons}
+                {text.myVouchers}
               </TabsTrigger>
             </>
           )}
@@ -638,154 +401,110 @@ export default function UserVouchersPage() {
 
         {/* Shop Tab */}
         <TabsContent value="shop" className="space-y-6">
-          <h2 className="text-3xl lg:text-4xl font-bold mb-6 lg:mb-8 text-gray-900 text-end" style={isHebrew ? { textAlign: 'right' } : {}}>{text.availableCoupons}</h2>
-        {coupons.length === 0 ? (
+          <h2 className="text-3xl lg:text-4xl font-bold mb-6 lg:mb-8 text-gray-900 text-end" style={isHebrew ? { textAlign: 'right' } : {}}>{text.availableVouchers}</h2>
+        {vouchers.length === 0 ? (
           <div className="text-center py-16 lg:py-24 bg-white rounded-2xl border-2 border-dashed border-gray-200">
             <div className="inline-flex p-4 rounded-full bg-gray-100 mb-4">
               <Wallet className="h-12 w-12 lg:h-16 lg:w-16 text-gray-400" />
             </div>
-            <p className="text-lg lg:text-xl text-gray-500 font-medium">{text.noCoupons}</p>
+            <p className="text-lg lg:text-xl text-gray-500 font-medium">{text.noVouchers}</p>
           </div>
         ) : (
           <div className={`flex flex-wrap gap-6 lg:gap-8 pb-24 ${isHebrew ? 'flex-row-reverse' : ''}`}>
-            {coupons.map((coupon) => (
-              <div key={coupon.id} className="w-full md:w-[calc(50%-12px)] xl:w-[calc(33.333%-16px)] 2xl:w-[calc(25%-18px)]">
+            {vouchers.map((voucher) => (
+              <div key={voucher.id} className="w-full md:w-[calc(50%-12px)] xl:w-[calc(33.333%-16px)] 2xl:w-[calc(25%-18px)]">
               <Card
                 className="relative group hover:shadow-2xl transition-all duration-300 border-2 overflow-hidden bg-white hover:border-primary/20 flex flex-col"
                 style={isHebrew ? { transform: 'scaleX(-1)' } : {}}
               >
-                {coupon.imageUrl && (
+                {voucher.imageUrl && (
                   <div 
                     className="relative h-48 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 cursor-pointer"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setActiveSnapPoint(0.7); // Reset to initial snap point
-                      setSelectedCouponImage({ imageUrl: coupon.imageUrl, name: coupon.name, description: coupon.description, coupon });
-                    }}
+                    onClick={() => navigate(`/${locale}/vouchers/${voucher.id}`)}
                   >
                     <img 
-                      src={coupon.imageUrl} 
-                      alt={coupon.name}
+                      src={voucher.imageUrl} 
+                      alt={voucher.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        setSelectedCouponImage({ imageUrl: coupon.imageUrl, name: coupon.name, description: coupon.description, coupon });
+                        navigate(`/${locale}/vouchers/${voucher.id}`);
                       }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                    {/* Date Overlay */}
                     <div className="absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-sm px-3 py-2">
                       <div className="flex items-center gap-1.5 text-white text-sm font-medium" style={isHebrew ? { transform: 'scaleX(-1)', textAlign: 'right', flexDirection: 'row-reverse' } : {}}>
                         <Calendar className="h-4 w-4" />
-                        <span style={isHebrew ? { textAlign: 'right' } : {}}>{text.validUntil}: {formatDate(coupon.validTo)}</span>
+                        <span style={isHebrew ? { textAlign: 'right' } : {}}>{text.validUntil}: {formatDate(voucher.validTo)}</span>
                       </div>
                     </div>
                   </div>
                 )}
-                <CardHeader className={coupon.imageUrl ? "pb-3" : ""} style={isHebrew ? { transform: 'scaleX(-1)', textAlign: 'right' } : {}}>
-                  {!coupon.imageUrl && (
+                <CardHeader className={voucher.imageUrl ? "pb-3" : ""} style={isHebrew ? { transform: 'scaleX(-1)', textAlign: 'right' } : {}}>
+                  {!voucher.imageUrl && (
                     <div className="flex items-start justify-between gap-3 mb-2" style={isHebrew ? { flexDirection: 'row-reverse' } : {}}>
                       <CardTitle className="text-xl lg:text-2xl font-bold text-gray-900 leading-tight flex-1" style={isHebrew ? { textAlign: 'right' } : {}}>
-                        {coupon.name}
+                        {voucher.name}
                       </CardTitle>
                       <div className="w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5 flex-shrink-0">
                         <Wallet className="w-full h-full p-3 text-primary/40" />
                       </div>
                     </div>
                   )}
-                  {/* One-row summary info */}
                   <div className="flex items-center justify-between gap-2 text-sm" style={isHebrew ? { flexDirection: 'row-reverse' } : {}}>
                     <div className="flex items-center gap-2 flex-1 min-w-0" style={isHebrew ? { justifyContent: 'flex-end' } : {}}>
-                      <span className="font-semibold text-gray-900 truncate" style={isHebrew ? { textAlign: 'right', width: '100%' } : {}}>{coupon.name}</span>
+                      <span className="font-semibold text-gray-900 truncate" style={isHebrew ? { textAlign: 'right', width: '100%' } : {}}>{voucher.name}</span>
                     </div>
                     <div className="flex items-center gap-3 flex-shrink-0">
-                      {coupon.price !== 0 && (
-                        <Badge variant="outline" className={`flex items-center gap-1 px-2 py-0.5 text-xs ${freeCouponPrice ? 'border-green-200 text-green-700' : 'border-amber-200 text-amber-700'}`}>
+                      {(voucher.points ?? 0) > 0 && (
+                        <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs border-amber-200 text-amber-700">
                           <Coins className="h-3 w-3" />
-                          <span>{freeCouponPrice ? '0' : coupon.points}</span>
+                          <span>{voucher.points}</span>
                         </Badge>
                       )}
                     </div>
                   </div>
-                  {coupon.description && (
-                    <p className="text-sm text-gray-600 mt-2 line-clamp-2" style={isHebrew ? { textAlign: 'right' } : {}}>{coupon.description}</p>
+                  {voucher.description && (
+                    <p className="text-sm text-gray-600 mt-2 line-clamp-1" style={isHebrew ? { textAlign: 'right' } : {}}>{voucher.description}</p>
                   )}
                 </CardHeader>
                 <CardContent className="space-y-4" onClick={(e) => e.stopPropagation()} style={isHebrew ? { transform: 'scaleX(-1)', textAlign: 'right' } : {}}>
                   <div className="space-y-3">
-                    <div className={`flex items-center justify-between p-3 rounded-lg ${coupon.price === 0 ? 'bg-green-50' : 'bg-amber-50'}`} style={isHebrew ? { flexDirection: 'row-reverse' } : {}}>
+                    <div className={`flex items-center justify-between p-3 rounded-lg ${(voucher.points ?? 0) === 0 ? 'bg-green-50' : 'bg-amber-50'}`} style={isHebrew ? { flexDirection: 'row-reverse' } : {}}>
                       <span className="text-sm font-medium text-gray-600" style={isHebrew ? { textAlign: 'right' } : {}}>{text.pointsRequired}</span>
-                      {coupon.price === 0 ? (
+                      {(voucher.points ?? 0) === 0 ? (
                         <Badge className="bg-green-500 text-white hover:bg-green-600 px-3 py-1">
                           <span className="font-bold">{text.free}</span>
                         </Badge>
                       ) : (
-                      <Badge variant="outline" className={`flex items-center gap-1.5 bg-white px-3 py-1 ${freeCouponPrice ? 'border-green-200 text-green-700' : 'border-amber-200 text-amber-700'}`}>
-                        <Coins className="h-4 w-4" />
-                        <span className="font-semibold">{freeCouponPrice ? '0' : coupon.points}</span>
-                      </Badge>
+                        <Badge variant="outline" className="flex items-center gap-1.5 bg-white px-3 py-1 border-amber-200 text-amber-700">
+                          <Coins className="h-4 w-4" />
+                          <span className="font-semibold">{voucher.points}</span>
+                        </Badge>
                       )}
                     </div>
-                    {freeCouponPrice && (
-                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg" style={isHebrew ? { flexDirection: 'row-reverse' } : {}}>
-                        <span className="text-sm font-medium text-gray-600" style={isHebrew ? { textAlign: 'right' } : {}}>{text.price}</span>
-                        <Badge variant="outline" className="flex items-center gap-1.5 bg-white border-green-200 text-green-700 px-3 py-1">
-                          <span className="font-semibold">{text.free}</span>
-                        </Badge>
-                      </div>
-                    )}
                   </div>
                 </CardContent>
                 <CardFooter className="pt-4 mt-auto flex flex-col gap-2" onClick={(e) => e.stopPropagation()} style={isHebrew ? { transform: 'scaleX(-1)' } : {}}>
                   <Button 
-                    onClick={() => handlePurchaseCoupon(coupon)}
-                    disabled={!freeCouponPrice && userPoints < coupon.points}
+                    onClick={() => handlePurchaseVoucher(voucher)}
+                    disabled={userPoints < (voucher.points ?? 0)}
                     className="w-full flex items-center justify-center gap-2 h-12 text-base font-semibold shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     size="lg"
                   >
                     <ShoppingCart className="h-5 w-5" />
-                    {freeCouponPrice 
-                      ? text.getFree
-                      : (userPoints < coupon.points ? text.insufficientPoints : text.purchase)
-                    }
+                    {(voucher.points ?? 0) === 0 ? text.getFree : (userPoints < (voucher.points ?? 0) ? text.insufficientPoints : text.purchase)}
                   </Button>
                   <Button
                     variant="outline"
                     size="lg"
                     className="w-full h-12 flex items-center justify-center gap-2"
-                    onClick={async () => {
-                      // Get business IDs from coupon - fetch if needed
-                      let couponToUse = coupon;
-                      
-                      // If no businessIds found, fetch the coupon to get them
-                      const hasBusinessIds = couponToUse?.businessIds && Array.isArray(couponToUse.businessIds) && couponToUse.businessIds.length > 0;
-                      const hasBusinessId = !!couponToUse?.businessId;
-                      
-                      if (!hasBusinessIds && !hasBusinessId && couponToUse?.id) {
-                        // Fetch the coupon to get businessIds
-                        const result = await getCouponById(couponToUse.id);
-                        if (result.success && result.coupon) {
-                          couponToUse = result.coupon as Coupon;
-                        }
-                      }
-                      
-                      // Parse and normalize businessIds to ensure it's always an array
-                      let businessIds: string[] = [];
-                      if (couponToUse?.businessIds) {
-                        if (Array.isArray(couponToUse.businessIds)) {
-                          businessIds = couponToUse.businessIds.filter(id => id != null && id !== '');
-                        } else if (typeof couponToUse.businessIds === 'string') {
-                          businessIds = [couponToUse.businessIds];
-                        }
-                      } else if (couponToUse?.businessId) {
-                        businessIds = [couponToUse.businessId];
-                      }
-                      
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const businessIds = voucher.businessIds && Array.isArray(voucher.businessIds) ? voucher.businessIds.filter(id => id != null && id !== '') : [];
                       if (businessIds.length > 0) {
-                        const idsString = businessIds.join(',');
-                        navigate(`/${locale}/services?businessId=${idsString}`);
+                        navigate(`/${locale}/services?businessId=${businessIds.join(',')}`);
                       } else {
                         navigate(`/${locale}/services`);
                       }
@@ -802,10 +521,10 @@ export default function UserVouchersPage() {
           )}
         </TabsContent>
 
-        {/* My Coupons Tab */}
-        <TabsContent value="myCoupons" className="space-y-6">
-          <h2 className="text-3xl lg:text-4xl font-bold mb-6 lg:mb-8 text-gray-900 text-end" style={isHebrew ? { textAlign: 'right' } : {}}>{text.myCoupons}</h2>
-          {couponHistory.length === 0 ? (
+        {/* My Vouchers Tab */}
+        <TabsContent value="myVouchers" className="space-y-6">
+          <h2 className="text-3xl lg:text-4xl font-bold mb-6 lg:mb-8 text-gray-900 text-end" style={isHebrew ? { textAlign: 'right' } : {}}>{text.myVouchers}</h2>
+          {userVouchers.length === 0 ? (
             <div className="text-center py-16 lg:py-24 bg-white rounded-2xl border-2 border-dashed border-gray-200">
               <div className="inline-flex p-4 rounded-full bg-gray-100 mb-4">
                 <History className="h-12 w-12 lg:h-16 lg:w-16 text-gray-400" />
@@ -815,10 +534,11 @@ export default function UserVouchersPage() {
             </div>
           ) : (
             <div className={`flex flex-wrap gap-6 lg:gap-8 ${isHebrew ? 'flex-row-reverse' : ''}`}>
-              {couponHistory.map((userCoupon) => {
-                const coupon = userCoupon.coupon;
-                // Ensure status is properly set (default to 'active' if missing or invalid)
-                const status = userCoupon.status || 'active';
+              {userVouchers
+                .sort((a, b) => (b.purchasedAt?.getTime?.() ?? 0) - (a.purchasedAt?.getTime?.() ?? 0))
+                .map((userVoucherItem) => {
+                const coupon = userVoucherItem.voucher;
+                const status = userVoucherItem.status || 'active';
                 // Only mark as expired if status is explicitly 'expired', not based on date
                 // Vouchers stay active until explicitly used or expired
                 const isActive = status === 'active';
@@ -827,15 +547,19 @@ export default function UserVouchersPage() {
                 const couponCode = coupon.description;
                 const isCodeCopied = copiedCode === couponCode;
 
+                const isJustPurchased = justPurchasedVoucherId === userVoucherItem.voucherId;
                 return (
-                  <div key={userCoupon.id} className="w-full md:w-[calc(50%-12px)] xl:w-[calc(33.333%-16px)] 2xl:w-[calc(25%-18px)]">
+                  <div key={userVoucherItem.id} className="w-full md:w-[calc(50%-12px)] xl:w-[calc(33.333%-16px)] 2xl:w-[calc(25%-18px)]" style={isHebrew ? { transform: 'scaleX(-1)' } : undefined}>
                   <Card
                     className={`relative group hover:shadow-xl transition-all duration-300 border-2 overflow-hidden flex flex-col ${
-                      isActive && !isExpired 
+                      isJustPurchased ? 'voucher-purchase-success-animation border-green-400 ring-2 ring-green-400/50' : ''
+                    } ${
+                      isActive && !isExpired && !isJustPurchased
                         ? 'border-green-200 hover:border-green-300 bg-gradient-to-br from-white to-green-50/30 opacity-100' 
-                        : 'opacity-75 hover:opacity-90 border-gray-200 bg-gradient-to-br from-gray-50 to-white'
+                        : !isJustPurchased
+                        ? 'opacity-75 hover:opacity-90 border-gray-200 bg-gradient-to-br from-gray-50 to-white'
+                        : 'border-green-200 bg-gradient-to-br from-white to-green-50/30 opacity-100'
                     }`}
-                    style={isHebrew ? { transform: 'scaleX(-1)' } : {}}
                   >
                     <div className="absolute top-4 end-4 z-10" onClick={(e) => e.stopPropagation()}>
                       <Badge 
@@ -854,8 +578,7 @@ export default function UserVouchersPage() {
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          setActiveSnapPoint(0.7); // Reset to initial snap point
-                          setSelectedCouponImage({ imageUrl: coupon.imageUrl, name: coupon.name, description: coupon.description, userCoupon });
+                          navigate(`/${locale}/vouchers/${userVoucherItem.id}`);
                         }}
                       >
                         <img 
@@ -867,7 +590,7 @@ export default function UserVouchersPage() {
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            setSelectedCouponImage({ imageUrl: coupon.imageUrl, name: coupon.name, description: coupon.description, userCoupon });
+                            navigate(`/${locale}/vouchers/${userVoucherItem.id}`);
                           }}
                         />
                         <div className={`absolute inset-0 bg-gradient-to-t ${
@@ -912,7 +635,7 @@ export default function UserVouchersPage() {
                         </div>
                       </div>
                       {coupon.description && (
-                        <p className={`text-sm mt-2 line-clamp-2 ${
+                        <p className={`text-sm mt-2 line-clamp-1 ${
                           isActive && !isExpired ? 'text-gray-600' : 'text-gray-500'
                         }`} style={isHebrew ? { textAlign: 'right' } : {}}>
                           {coupon.description}
@@ -922,7 +645,7 @@ export default function UserVouchersPage() {
                     <CardContent className="space-y-4 flex-1 flex flex-col" onClick={(e) => e.stopPropagation()} style={isHebrew ? { transform: 'scaleX(-1)', textAlign: 'right' } : {}}>
                       <div className="space-y-4 flex-1">
                         {coupon.description && (
-                          <p className="text-sm text-gray-600 line-clamp-2" style={isHebrew ? { textAlign: 'right' } : {}}>{coupon.description}</p>
+                          <p className="text-sm text-gray-600 line-clamp-1" style={isHebrew ? { textAlign: 'right' } : {}}>{coupon.description}</p>
                         )}
                         <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg" style={isHebrew ? { flexDirection: 'row-reverse' } : {}}>
                           <span className={`text-sm font-medium ${
@@ -944,7 +667,7 @@ export default function UserVouchersPage() {
                       <Button
                         variant="outline"
                         size="lg"
-                        onClick={() => navigate(`/${locale}/vouchers/${userCoupon.id}`)}
+                        onClick={() => navigate(`/${locale}/vouchers/${userVoucherItem.id}`)}
                         className="w-full h-12 flex items-center justify-center gap-2"
                       >
                         <QrCode className="h-5 w-5" />
@@ -954,37 +677,10 @@ export default function UserVouchersPage() {
                         variant="outline"
                         size="lg"
                         className="w-full h-12 flex items-center justify-center gap-2"
-                        onClick={async () => {
-                          // Get business IDs from coupon - fetch if needed
-                          let couponToUse = coupon;
-                          
-                          // If no businessIds found, fetch the coupon to get them
-                          const hasBusinessIds = couponToUse?.businessIds && Array.isArray(couponToUse.businessIds) && couponToUse.businessIds.length > 0;
-                          const hasBusinessId = !!couponToUse?.businessId;
-                          
-                          if (!hasBusinessIds && !hasBusinessId && couponToUse?.id) {
-                            // Fetch the coupon to get businessIds
-                            const result = await getCouponById(couponToUse.id);
-                            if (result.success && result.coupon) {
-                              couponToUse = result.coupon as Coupon;
-                            }
-                          }
-                          
-                          // Parse and normalize businessIds to ensure it's always an array
-                          let businessIds: string[] = [];
-                          if (couponToUse?.businessIds) {
-                            if (Array.isArray(couponToUse.businessIds)) {
-                              businessIds = couponToUse.businessIds.filter(id => id != null && id !== '');
-                            } else if (typeof couponToUse.businessIds === 'string') {
-                              businessIds = [couponToUse.businessIds];
-                            }
-                          } else if (couponToUse?.businessId) {
-                            businessIds = [couponToUse.businessId];
-                          }
-                          
+                        onClick={() => {
+                          const businessIds = coupon.businessIds && Array.isArray(coupon.businessIds) ? coupon.businessIds.filter((id: string) => id != null && id !== '') : [];
                           if (businessIds.length > 0) {
-                            const idsString = businessIds.join(',');
-                            navigate(`/${locale}/services?businessId=${idsString}`);
+                            navigate(`/${locale}/services?businessId=${businessIds.join(',')}`);
                           } else {
                             navigate(`/${locale}/services`);
                           }
@@ -1003,297 +699,6 @@ export default function UserVouchersPage() {
         </TabsContent>
         </Tabs>
       </div>
-
-      {/* Responsive Modal: Dialog on Desktop, Drawer on Mobile */}
-      {isDesktop ? (
-        <Dialog open={!!selectedCouponImage} onOpenChange={(open) => !open && setSelectedCouponImage(null)}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" dir={isHebrew ? 'rtl' : 'ltr'}>
-            {selectedCouponImage && (
-              <>
-                <DialogHeader>
-                  <DialogTitle className="text-2xl font-bold">{selectedCouponImage.name}</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  {/* Image */}
-                  {selectedCouponImage.imageUrl && (
-                    <div className="rounded-lg overflow-hidden bg-gray-100">
-                      <img 
-                        src={selectedCouponImage.imageUrl} 
-                        alt={selectedCouponImage.name}
-                        className="w-full h-auto object-contain max-h-[400px] mx-auto"
-                      />
-                    </div>
-                  )}
-                  
-                  {/* Description */}
-                  {selectedCouponImage.description && (
-                    <div>
-                      <p className="text-base text-gray-700">{selectedCouponImage.description}</p>
-                    </div>
-                  )}
-                  
-                  {/* Date */}
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Calendar className="h-4 w-4" />
-                    <span className="text-sm">
-                      {text.validUntil}: {
-                        selectedCouponImage.coupon 
-                          ? formatDate(selectedCouponImage.coupon.validTo)
-                          : selectedCouponImage.userCoupon?.coupon
-                          ? formatDate(selectedCouponImage.userCoupon.coupon.validTo)
-                          : ''
-                      }
-                    </span>
-                  </div>
-                  
-                  {/* Points/Price Info */}
-                  {selectedCouponImage.coupon && (
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-600">{text.pointsRequired}</span>
-                        {selectedCouponImage.coupon.price === 0 ? (
-                          <Badge className="bg-green-500 text-white">
-                            {text.free}
-                          </Badge>
-                        ) : (
-                          <Badge variant="outline" className={`flex items-center gap-1.5 ${freeCouponPrice ? 'border-green-200 text-green-700' : 'border-amber-200 text-amber-700'}`}>
-                            <Coins className="h-4 w-4" />
-                            <span>{freeCouponPrice ? '0' : selectedCouponImage.coupon.points}</span>
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Action Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                    {selectedCouponImage.coupon && (
-                      <Button
-                        onClick={() => {
-                          if (selectedCouponImage.coupon) {
-                            handlePurchaseCoupon(selectedCouponImage.coupon);
-                            setSelectedCouponImage(null);
-                          }
-                        }}
-                        disabled={!freeCouponPrice && selectedCouponImage.coupon && userPoints < selectedCouponImage.coupon.points}
-                        className="flex-1 bg-orange-500 hover:bg-orange-600 text-white shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 h-12"
-                        size="lg"
-                      >
-                        <ShoppingCart className="h-5 w-5" />
-                        <span className="font-semibold">
-                          {freeCouponPrice 
-                            ? text.getFree 
-                            : (selectedCouponImage.coupon && userPoints < selectedCouponImage.coupon.points 
-                              ? text.insufficientPoints 
-                              : text.purchase)
-                          }
-                        </span>
-                      </Button>
-                    )}
-                    {selectedCouponImage.userCoupon && (
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          navigate(`/${locale}/vouchers/${selectedCouponImage.userCoupon!.id}`);
-                          setSelectedCouponImage(null);
-                        }}
-                        className="flex-1 border-2 flex items-center justify-center gap-2 h-12"
-                        size="lg"
-                      >
-                        <QrCode className="h-5 w-5" />
-                        <span className="font-semibold">{text.showQR}</span>
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </>
-            )}
-          </DialogContent>
-        </Dialog>
-      ) : (
-        <Drawer 
-          open={!!selectedCouponImage} 
-          onOpenChange={(open) => {
-            if (!open) {
-              setSelectedCouponImage(null);
-              setActiveSnapPoint(0.7); // Reset to initial snap point
-            }
-          }}
-          snapPoints={[0.7, 1]}
-          activeSnapPoint={activeSnapPoint}
-          setActiveSnapPoint={(snap) => {
-            if (snap !== null) {
-              setActiveSnapPoint(snap);
-            }
-          }}
-          dismissible={true}
-        >
-          <DrawerContent className="max-h-[85vh]" dir={isHebrew ? 'rtl' : 'ltr'}>
-            {selectedCouponImage && (
-              <>
-                <DrawerHeader className="pb-4">
-                  <div className="flex items-center justify-between">
-                    <DrawerTitle className="text-2xl font-bold">{selectedCouponImage.name}</DrawerTitle>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setSelectedCouponImage(null)}
-                      className="h-8 w-8"
-                    >
-                      <X className="h-5 w-5" />
-                    </Button>
-                  </div>
-                </DrawerHeader>
-                <div className="px-4 pb-6 overflow-y-auto">
-                  {/* Image */}
-                  {selectedCouponImage.imageUrl && (
-                    <div className="mb-4 rounded-lg overflow-hidden bg-gray-100">
-                      <img 
-                        src={selectedCouponImage.imageUrl} 
-                        alt={selectedCouponImage.name}
-                        className="w-full h-auto object-contain"
-                      />
-                    </div>
-                  )}
-                  
-                  {/* Description */}
-                  {selectedCouponImage.description && (
-                    <div className="mb-4">
-                      <p className="text-base text-gray-700">{selectedCouponImage.description}</p>
-                    </div>
-                  )}
-                  
-                  {/* Date */}
-                  <div className="mb-4 flex items-center gap-2 text-gray-600">
-                    <Calendar className="h-4 w-4" />
-                    <span className="text-sm">
-                      {text.validUntil}: {
-                        selectedCouponImage.coupon 
-                          ? formatDate(selectedCouponImage.coupon.validTo)
-                          : selectedCouponImage.userCoupon?.coupon
-                          ? formatDate(selectedCouponImage.userCoupon.coupon.validTo)
-                          : ''
-                      }
-                    </span>
-                  </div>
-                  
-                  {/* Points/Price Info */}
-                  {selectedCouponImage.coupon && (
-                    <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-600">{text.pointsRequired}</span>
-                        {selectedCouponImage.coupon.price === 0 ? (
-                          <Badge className="bg-green-500 text-white">
-                            {text.free}
-                          </Badge>
-                        ) : (
-                          <Badge variant="outline" className={`flex items-center gap-1.5 ${freeCouponPrice ? 'border-green-200 text-green-700' : 'border-amber-200 text-amber-700'}`}>
-                            <Coins className="h-4 w-4" />
-                            <span>{freeCouponPrice ? '0' : selectedCouponImage.coupon.points}</span>
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Action Buttons */}
-                  <div className="flex flex-col gap-3 mt-6">
-                    {selectedCouponImage.coupon && (
-                      <Button
-                        onClick={() => {
-                          if (selectedCouponImage.coupon) {
-                            handlePurchaseCoupon(selectedCouponImage.coupon);
-                            setSelectedCouponImage(null);
-                          }
-                        }}
-                        disabled={!freeCouponPrice && selectedCouponImage.coupon && userPoints < selectedCouponImage.coupon.points}
-                        className="w-full bg-orange-500 hover:bg-orange-600 text-white shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 h-12"
-                        size="lg"
-                      >
-                        <ShoppingCart className="h-5 w-5" />
-                        <span className="font-semibold">
-                          {freeCouponPrice 
-                            ? text.getFree 
-                            : (selectedCouponImage.coupon && userPoints < selectedCouponImage.coupon.points 
-                              ? text.insufficientPoints 
-                              : text.purchase)
-                          }
-                        </span>
-                      </Button>
-                    )}
-                    {selectedCouponImage.userCoupon && (
-                      <>
-                        <Button
-                          variant="outline"
-                          onClick={() => {
-                            navigate(`/${locale}/vouchers/${selectedCouponImage.userCoupon!.id}`);
-                            setSelectedCouponImage(null);
-                          }}
-                          className="w-full border-2 flex items-center justify-center gap-2 h-12"
-                          size="lg"
-                        >
-                          <QrCode className="h-5 w-5" />
-                          <span className="font-semibold">{text.showQR}</span>
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="lg"
-                          className="w-full border-2 flex items-center justify-center gap-2 h-12"
-                          onClick={async () => {
-                            const coupon = selectedCouponImage.userCoupon?.coupon;
-                            if (!coupon) return;
-
-                            // Get business IDs from coupon - fetch if needed
-                            let couponToUse = coupon;
-                            
-                            // If no businessIds found, fetch the coupon to get them
-                            const hasBusinessIds = couponToUse?.businessIds && Array.isArray(couponToUse.businessIds) && couponToUse.businessIds.length > 0;
-                            const hasBusinessId = !!couponToUse?.businessId;
-                            
-                            if (!hasBusinessIds && !hasBusinessId && couponToUse?.id) {
-                              // Fetch the coupon to get businessIds
-                              const result = await getCouponById(couponToUse.id);
-                              if (result.success && result.coupon) {
-                                couponToUse = result.coupon as Coupon;
-                              }
-                            }
-                            
-                            // Parse and normalize businessIds to ensure it's always an array
-                            let businessIds: string[] = [];
-                            if (couponToUse?.businessIds) {
-                              if (Array.isArray(couponToUse.businessIds)) {
-                                businessIds = couponToUse.businessIds.filter(id => id != null && id !== '');
-                              } else if (typeof couponToUse.businessIds === 'string') {
-                                businessIds = [couponToUse.businessIds];
-                              }
-                            } else if (couponToUse?.businessId) {
-                              businessIds = [couponToUse.businessId];
-                            }
-                            
-                            setSelectedCouponImage(null);
-                            if (businessIds.length > 0) {
-                              const idsString = businessIds.join(',');
-                              navigate(`/${locale}/services?businessId=${idsString}`);
-                            } else {
-                              navigate(`/${locale}/services`);
-                            }
-                          }}
-                        >
-                          <MapPin className="h-5 w-5" />
-                          <span className="font-semibold">{text.showMap}</span>
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                  
-                  {/* Big bottom spacer */}
-                  <div className="h-20 md:h-24" />
-                </div>
-              </>
-            )}
-          </DrawerContent>
-        </Drawer>
-      )}
     </div>
   );
 }

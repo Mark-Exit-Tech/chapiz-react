@@ -148,7 +148,7 @@ export default function AdminVouchersPage() {
             </div>
           </div>
           <div>
-            <AddVoucherForm />
+            <AddVoucherForm onSuccess={loadVouchers} />
           </div>
         </div>
 

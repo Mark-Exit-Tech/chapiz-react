@@ -64,32 +64,19 @@ export async function getAllVouchers(): Promise<Voucher[]> {
 }
 
 /**
- * Get all active vouchers
+ * Get all active vouchers (currently valid and isActive).
+ * Uses getAllVouchers + client-side filter to avoid requiring a Firestore composite index.
  */
 export async function getActiveVouchers(): Promise<Voucher[]> {
     try {
-        const q = query(
-            collection(db, VOUCHERS_COLLECTION),
-            where('isActive', '==', true),
-            orderBy('createdAt', 'desc')
-        );
-        
-        const querySnapshot = await getDocs(q);
-        const vouchers: Voucher[] = [];
-        
-        querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            vouchers.push({
-                id: doc.id,
-                ...data,
-                validFrom: data.validFrom?.toDate() || new Date(),
-                validTo: data.validTo?.toDate() || new Date(),
-                createdAt: data.createdAt?.toDate() || new Date(),
-                updatedAt: data.updatedAt?.toDate() || new Date(),
-            } as Voucher);
+        const all = await getAllVouchers();
+        const now = new Date();
+        return all.filter((v) => {
+            if (!v.isActive) return false;
+            const validFrom = v.validFrom instanceof Date ? v.validFrom : new Date(v.validFrom);
+            const validTo = v.validTo instanceof Date ? v.validTo : new Date(v.validTo);
+            return validFrom <= now && validTo >= now;
         });
-        
-        return vouchers;
     } catch (error) {
         console.error('Error fetching vouchers:', error);
         return [];
@@ -97,32 +84,32 @@ export async function getActiveVouchers(): Promise<Voucher[]> {
 }
 
 /**
- * Get user vouchers
+ * Get user vouchers (no orderBy in query to avoid composite index; sort in memory).
  */
 export async function getUserVouchers(userId: string): Promise<UserVoucher[]> {
     try {
         const q = query(
             collection(db, USER_VOUCHERS_COLLECTION),
-            where('userId', '==', userId),
-            orderBy('purchasedAt', 'desc')
+            where('userId', '==', userId)
         );
-        
         const querySnapshot = await getDocs(q);
         const userVouchers: UserVoucher[] = [];
-        
+
         for (const docSnapshot of querySnapshot.docs) {
             const data = docSnapshot.data();
-            
-            // Fetch the voucher details
-            const voucherDoc = await getDoc(doc(db, VOUCHERS_COLLECTION, data.voucherId));
+            const voucherId = data.voucherId;
+            if (!voucherId) continue;
+
+            const voucherDoc = await getDoc(doc(db, VOUCHERS_COLLECTION, voucherId));
             if (voucherDoc.exists()) {
                 const voucherData = voucherDoc.data();
+                const purchasedAt = data.purchasedAt?.toDate() || new Date();
                 userVouchers.push({
                     id: docSnapshot.id,
                     userId: data.userId,
-                    voucherId: data.voucherId,
+                    voucherId,
                     status: data.status || 'active',
-                    purchasedAt: data.purchasedAt?.toDate() || new Date(),
+                    purchasedAt,
                     usedAt: data.usedAt?.toDate(),
                     voucher: {
                         id: voucherDoc.id,
@@ -135,7 +122,8 @@ export async function getUserVouchers(userId: string): Promise<UserVoucher[]> {
                 });
             }
         }
-        
+
+        userVouchers.sort((a, b) => (b.purchasedAt?.getTime?.() ?? 0) - (a.purchasedAt?.getTime?.() ?? 0));
         return userVouchers;
     } catch (error) {
         console.error('Error fetching user vouchers:', error);
@@ -181,6 +169,43 @@ export async function markVoucherAsUsed(userVoucherId: string): Promise<{ succes
     } catch (error) {
         console.error('Error marking voucher as used:', error);
         return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    }
+}
+
+/**
+ * Get user voucher by document ID (for voucher detail page)
+ */
+export async function getUserVoucherById(userVoucherId: string): Promise<UserVoucher | null> {
+    try {
+        const userVoucherRef = doc(db, USER_VOUCHERS_COLLECTION, userVoucherId);
+        const userVoucherSnap = await getDoc(userVoucherRef);
+
+        if (!userVoucherSnap.exists()) return null;
+
+        const data = userVoucherSnap.data();
+        const voucherDoc = await getDoc(doc(db, VOUCHERS_COLLECTION, data.voucherId));
+        if (!voucherDoc.exists()) return null;
+
+        const voucherData = voucherDoc.data();
+        return {
+            id: userVoucherSnap.id,
+            userId: data.userId,
+            voucherId: data.voucherId,
+            status: data.status || 'active',
+            purchasedAt: data.purchasedAt?.toDate() || new Date(),
+            usedAt: data.usedAt?.toDate(),
+            voucher: {
+                id: voucherDoc.id,
+                ...voucherData,
+                validFrom: voucherData.validFrom?.toDate() || new Date(),
+                validTo: voucherData.validTo?.toDate() || new Date(),
+                createdAt: voucherData.createdAt?.toDate() || new Date(),
+                updatedAt: voucherData.updatedAt?.toDate() || new Date(),
+            } as Voucher,
+        };
+    } catch (error) {
+        console.error('Error fetching user voucher:', error);
+        return null;
     }
 }
 

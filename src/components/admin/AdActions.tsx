@@ -35,7 +35,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocale } from '@/hooks/use-locale';
 import { useState, useEffect } from 'react';
 import { HEBREW_SERVICE_TAGS } from '@/lib/constants/hebrew-service-tags';
-import { getPetTypesForDropdown, getBreedsForDropdown, getAreasForDropdown, getCitiesForDropdown, getAgeRangesForDropdown, getWeightRangesForDropdown } from '@/lib/firebase/database/pets';
+import { getPetTypesForDropdown, getBreedsForDropdownByPetTypes, getAreasForDropdown, getCitiesForDropdown, getAgeRangesForDropdown, getWeightRangesForDropdown } from '@/lib/firebase/database/pets';
 import { RtlMultiselect } from '@/components/ui/rtl-multiselect';
 
 interface AdActionsProps {
@@ -67,6 +67,7 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
     cityPlaceholder: isHebrew ? 'בחר עיר' : 'Select city',
     petType: isHebrew ? 'סוג חיה' : 'Pet Type',
     petTypePlaceholder: isHebrew ? 'בחר סוג חיה' : 'Select pet type',
+    otherSpecify: isHebrew ? 'אחר (פרט)' : 'Other (please specify)',
     breed: isHebrew ? 'גזע' : 'Breed',
     breedPlaceholder: isHebrew ? 'בחר גזע' : 'Select breed',
     ageRange: isHebrew ? 'טווח גיל' : 'Age Range',
@@ -116,12 +117,13 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
     return ad.type === 'video' ? 'video' : 'image';
   });
 
-  // Helper function to ensure scalar value for Select components
   const ensureString = (value: string | string[] | undefined): string => {
-    if (Array.isArray(value)) {
-      return value[0] || '';
-    }
+    if (Array.isArray(value)) return value[0] || '';
     return value || '';
+  };
+  const ensureArray = (value: string | string[] | undefined): string[] => {
+    if (Array.isArray(value)) return value.filter(Boolean);
+    return value ? [value] : [];
   };
 
   const [formData, setFormData] = useState({
@@ -139,8 +141,9 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
     tags: ad.tags || [],
     area: ensureString(ad.area),
     city: ad.city || [],
-    petType: ensureString(ad.petType),
-    breed: ensureString(ad.breed),
+    petType: ensureArray(ad.petType),
+    petTypeOther: (ad as any).petTypeOther || '',
+    breed: ensureArray(ad.breed),
     ageRange: ad.ageRange || [],
     weight: ad.weight || []
   });
@@ -151,10 +154,7 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
     setPetTypes(types);
   };
 
-  const loadBreeds = async (petType: string) => {
-    const breedList = await getBreedsForDropdown(locale);
-    setBreeds(breedList);
-  };
+  const showBreedSelector = formData.petType.filter(t => t && t !== 'other').length > 0;
 
   const loadAreas = async () => {
     const areaList = await getAreasForDropdown(locale);
@@ -188,12 +188,13 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
   }, [isEditOpen, locale]);
 
   useEffect(() => {
-    if (formData.petType) {
-      loadBreeds(formData.petType);
+    const types = formData.petType.filter(t => t && t !== 'other');
+    if (types.length > 0) {
+      getBreedsForDropdownByPetTypes(locale, formData.petType).then(setBreeds);
     } else {
       setBreeds([]);
     }
-  }, [formData.petType]);
+  }, [formData.petType, locale]);
 
   useEffect(() => {
     if (isEditOpen && ad) {
@@ -214,8 +215,9 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
         tags: ad.tags || [],
         area: ensureString(ad.area),
         city: ad.city || [],
-        petType: ensureString(ad.petType),
-        breed: ensureString(ad.breed),
+        petType: ensureArray(ad.petType),
+        petTypeOther: (ad as any).petTypeOther || '',
+        breed: ensureArray(ad.breed),
         ageRange: ad.ageRange || [],
         weight: ad.weight || []
       });
@@ -289,6 +291,7 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
         area: formData.area,
         city: formData.city,
         petType: formData.petType,
+        petTypeOther: formData.petType.includes('other') ? (formData.petTypeOther || undefined) : undefined,
         breed: formData.breed,
         ageRange: formData.ageRange,
         weight: formData.weight
@@ -377,8 +380,9 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
               tags: ad.tags || [],
               area: ad.area || '',
               city: ad.city || [],
-              petType: ad.petType || '',
-              breed: ad.breed || '',
+              petType: ensureArray(ad.petType),
+              petTypeOther: (ad as any).petTypeOther || '',
+              breed: ensureArray(ad.breed),
               ageRange: ad.ageRange || [],
               weight: ad.weight || []
             });
@@ -482,42 +486,41 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="petType">{text.petType}</Label>
-                <select
-                  id="petType"
-                  name="petType"
-                  value={formData.petType}
-                  onChange={(e) => {
-                    setFormData((prev) => ({ ...prev, petType: e.target.value, breed: '' }));
-                  }}
-                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                >
-                  <option value="">{text.petTypePlaceholder}</option>
-                  {petTypes.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
-                </select>
+                <Label>{text.petType}</Label>
+                <RtlMultiselect
+                  options={petTypes}
+                  selectedValues={formData.petType}
+                  onSelectionChange={(values) => setFormData((prev) => ({ ...prev, petType: values, breed: [], ...(values.includes('other') ? {} : { petTypeOther: '' }) }))}
+                  placeholder={text.petTypePlaceholder}
+                  searchPlaceholder={text.search}
+                  noOptionsText={text.noOptions}
+                />
+                {formData.petType.includes('other') && (
+                  <Input
+                    value={formData.petTypeOther}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, petTypeOther: e.target.value }))}
+                    placeholder={text.otherSpecify}
+                    className="mt-2"
+                  />
+                )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="breed">{text.breed}</Label>
-                <select
-                  id="breed"
-                  name="breed"
-                  value={formData.breed}
-                  onChange={handleChange}
-                  disabled={!formData.petType}
-                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <option value="">{text.breedPlaceholder}</option>
-                  {breeds.map((breed) => (
-                    <option key={breed.value} value={breed.value}>
-                      {breed.label}
-                    </option>
-                  ))}
-                </select>
+                <Label>{text.breed}</Label>
+                {showBreedSelector ? (
+                  <RtlMultiselect
+                    options={breeds}
+                    selectedValues={formData.breed}
+                    onSelectionChange={(values) => setFormData((prev) => ({ ...prev, breed: values }))}
+                    placeholder={text.breedPlaceholder}
+                    searchPlaceholder={text.search}
+                    noOptionsText={text.noOptions}
+                  />
+                ) : (
+                  <div className="flex h-9 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm text-muted-foreground">
+                    {formData.petType.length === 0 ? text.petTypePlaceholder : (isHebrew ? 'בחר סוג חיה מלבד "אחר" כדי לבחור גזע' : 'Select pet type(s) other than "Other" to choose breed')}
+                  </div>
+                )}
               </div>
             </div>
 

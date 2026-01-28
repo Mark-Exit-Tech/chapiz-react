@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
@@ -34,19 +34,21 @@ export default function RegisterPetPage() {
   // Check both URL locale and i18n language for RTL
   const isHebrew = locale === 'he' || i18n.language === 'he';
 
-  // Sync i18n language with URL locale and set document direction
-  useEffect(() => {
-    // Sync i18n language with URL
-    if (i18n.language !== locale) {
-      i18n.changeLanguage(locale);
-    }
-    // Set document direction for RTL support
+  // Set document direction and lang before paint so RTL styles apply immediately
+  useLayoutEffect(() => {
     document.documentElement.dir = locale === 'he' ? 'rtl' : 'ltr';
     document.documentElement.lang = locale;
     return () => {
       document.documentElement.dir = 'ltr';
       document.documentElement.lang = 'en';
     };
+  }, [locale]);
+
+  // Sync i18n language with URL locale
+  useEffect(() => {
+    if (i18n.language !== locale) {
+      i18n.changeLanguage(locale);
+    }
   }, [locale, i18n]);
 
   const text = {

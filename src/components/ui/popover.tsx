@@ -19,37 +19,30 @@ const PopoverContent = React.forwardRef<
   const [isRTL, setIsRTL] = React.useState(false);
 
   React.useEffect(() => {
-    // Use explicit dir prop if provided
-    if (dir) {
+    if (dir !== undefined) {
       setIsRTL(dir === 'rtl');
       return;
     }
-
-    // Check if we're in an RTL context
-    const checkRTL = () => {
-      let element = internalRef.current?.parentElement;
-      while (element) {
-        const elementDir = element.getAttribute('dir');
-        if (elementDir === 'rtl') {
-          setIsRTL(true);
-          return;
-        }
-        if (elementDir === 'ltr') {
-          setIsRTL(false);
-          return;
-        }
-        element = element.parentElement;
-      }
-      // Check document direction as fallback
-      const docDir = document.documentElement.dir || document.body.dir;
+    const docDir = document.documentElement.getAttribute('dir') || document.body.getAttribute('dir');
+    if (docDir === 'rtl' || docDir === 'ltr') {
       setIsRTL(docDir === 'rtl');
-    };
-
-    checkRTL();
+      return;
+    }
+    let element = internalRef.current?.parentElement;
+    while (element) {
+      const elementDir = element.getAttribute('dir');
+      if (elementDir === 'rtl') {
+        setIsRTL(true);
+        return;
+      }
+      if (elementDir === 'ltr') {
+        setIsRTL(false);
+        return;
+      }
+      element = element.parentElement;
+    }
+    setIsRTL(false);
   }, [dir]);
-
-  // Override align based on RTL detection if align is explicitly 'start'
-  const finalAlign = align === 'start' && isRTL ? 'end' : align;
 
   return (
     <PopoverPrimitive.Portal>
@@ -62,7 +55,7 @@ const PopoverContent = React.forwardRef<
           }
           (internalRef as any).current = node;
         }}
-        align={finalAlign}
+        align={align}
         sideOffset={sideOffset}
         dir={dir || (isRTL ? 'rtl' : 'ltr')}
         className={cn(

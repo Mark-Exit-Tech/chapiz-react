@@ -372,9 +372,9 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate(-1)}
-                className="absolute left-0 top-1/2 -translate-y-1/2"
+                className="absolute ltr:left-0 rtl:right-0 top-1/2 -translate-y-1/2"
               >
-                <ArrowLeft className="h-4 w-4" />
+                <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
               </Button>
               <CardTitle className="text-2xl font-bold text-gray-800">
                 {text.edit.title}

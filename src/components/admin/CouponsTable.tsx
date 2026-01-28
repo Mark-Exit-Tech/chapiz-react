@@ -239,7 +239,6 @@ export default function CouponsTable() {
             <TableRow>
               <TableHead className={isHebrew ? 'text-right' : ''}>{text.name}</TableHead>
               <TableHead className={isHebrew ? 'text-right' : ''}>{text.description}</TableHead>
-              <TableHead className={isHebrew ? 'text-right' : ''}>{text.business || 'Business'}</TableHead>
               <TableHead className={isHebrew ? 'text-right' : ''}>{text.price}</TableHead>
               <TableHead className={isHebrew ? 'text-right' : ''}>{text.points}</TableHead>
               <TableHead className={isHebrew ? 'text-right' : ''}>{text.image}</TableHead>
@@ -251,7 +250,7 @@ export default function CouponsTable() {
           <TableBody>
             {coupons.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-8 text-gray-500">
+                <TableCell colSpan={8} className="text-center py-8 text-gray-500">
                   {text.noCoupons}
                 </TableCell>
               </TableRow>
@@ -267,15 +266,6 @@ export default function CouponsTable() {
                   </TableCell>
                   <TableCell className={`max-w-xs truncate ${isHebrew ? 'text-right' : ''}`}>
                     {coupon.description}
-                  </TableCell>
-                  <TableCell className={isHebrew ? 'text-right' : ''}>
-                    <div className="flex flex-wrap gap-1">
-                      {getBusinessNames(coupon).map((businessName, index) => (
-                        <Badge key={index} variant="outline">
-                          {businessName}
-                    </Badge>
-                      ))}
-                    </div>
                   </TableCell>
                   <TableCell className={isHebrew ? 'text-right' : ''}>{formatPrice(coupon.price)}</TableCell>
                   <TableCell className={isHebrew ? 'text-right' : ''}>

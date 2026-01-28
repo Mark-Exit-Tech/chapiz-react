@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,8 +15,10 @@ import LocaleSwitcher from '@/components/LocaleSwitcher';
 
 const AuthPage = () => {
   const { t } = useTranslation();
+  const { locale } = useParams<{ locale?: string }>();
   const { signIn, signUp, signInWithGoogle, sendVerificationCode, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const lang = locale || 'en';
   
   // Debug logging
   console.log('AuthPage rendered:', { user, authLoading });
@@ -428,7 +430,7 @@ const AuthPage = () => {
                   <div className="text-center">
                     <button
                       type="button"
-                      onClick={() => navigate('/auth/forgot')}
+                      onClick={() => navigate(`/${lang}/auth/forgot`)}
                       className="text-sm text-gray-600 hover:text-primary underline"
                     >
                       {t('pages.AuthPage.forgotPassword')}

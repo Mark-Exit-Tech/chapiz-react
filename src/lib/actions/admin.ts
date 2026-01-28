@@ -62,8 +62,10 @@ export interface Ad {
   tags?: string[];
   area?: string;
   city?: string[];
-  petType?: string;
-  breed?: string;
+  petType?: string | string[];
+  /** Free text when pet type "other" is selected */
+  petTypeOther?: string;
+  breed?: string | string[];
   ageRange?: string[];
   weight?: string[];
   views: number;
@@ -436,6 +438,7 @@ export async function createAd(data: any) {
       area: data.area,
       city: data.city,
       petType: data.petType,
+      petTypeOther: data.petTypeOther,
       breed: data.breed,
       ageRange: data.ageRange,
       weight: data.weight,

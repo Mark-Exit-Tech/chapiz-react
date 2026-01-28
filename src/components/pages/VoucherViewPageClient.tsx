@@ -5,23 +5,22 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, ShoppingCart, Share2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useLocale } from '@/hooks/use-locale';
-import { UserCoupon, markCouponAsUsed } from '@/lib/firebase/database/coupons';
+import { markVoucherAsUsed, type UserVoucher } from '@/lib/firebase/database/vouchers';
 import Navbar from '@/components/layout/Navbar';
 import { Card, CardContent } from '@/components/ui/card';
 import toast from 'react-hot-toast';
 import QRCodeCard from '@/components/cards/QRCodeCard';
 import confetti from 'canvas-confetti';
 
-
 interface VoucherViewPageClientProps {
-  userCoupon: UserCoupon;
+  userVoucher: UserVoucher;
 }
 
-export default function VoucherViewPageClient({ userCoupon }: VoucherViewPageClientProps) {
+export default function VoucherViewPageClient({ userVoucher }: VoucherViewPageClientProps) {
   const navigate = useNavigate();
   const locale = useLocale();
   const isHebrew = locale === 'he';
-  const coupon = userCoupon.coupon;
+  const voucher = userVoucher.voucher;
   const [voucherUrl, setVoucherUrl] = useState<string>('');
   const [isMounted, setIsMounted] = useState(false);
   const [isUsingVoucher, setIsUsingVoucher] = useState(false);
@@ -44,9 +43,9 @@ export default function VoucherViewPageClient({ userCoupon }: VoucherViewPageCli
     setIsMounted(true);
     // Set voucher URL only on client side to avoid hydration mismatch
     if (typeof window !== 'undefined') {
-      setVoucherUrl(`${window.location.origin}/${locale}/vouchers/${userCoupon.id}`);
+      setVoucherUrl(`${window.location.origin}/${locale}/vouchers/${userVoucher.id}`);
     }
-  }, [locale, userCoupon.id]);
+  }, [locale, userVoucher.id]);
 
   const handleUse = async () => {
     if (isUsingVoucher) return; // Prevent double submission
@@ -54,8 +53,7 @@ export default function VoucherViewPageClient({ userCoupon }: VoucherViewPageCli
     setIsUsingVoucher(true);
 
     try {
-      // Mark the coupon as used
-      const result = await markCouponAsUsed(userCoupon.id);
+      const result = await markVoucherAsUsed(userVoucher.id);
       if (result.success) {
         // Trigger confetti animation
         confetti({
@@ -85,8 +83,8 @@ export default function VoucherViewPageClient({ userCoupon }: VoucherViewPageCli
     if (navigator.share) {
       try {
         await navigator.share({
-          title: coupon.name,
-          text: coupon.description || coupon.name,
+          title: voucher.name,
+          text: voucher.description || voucher.name,
           url: voucherUrl,
         });
         toast.success(text.sharedSuccessfully);
@@ -127,11 +125,11 @@ export default function VoucherViewPageClient({ userCoupon }: VoucherViewPageCli
         <Card className="overflow-hidden">
           <CardContent className="p-8">
             {/* Voucher Image */}
-            {coupon.imageUrl && (
+            {voucher.imageUrl && (
               <div className="relative w-full h-64 mb-6 rounded-lg overflow-hidden">
                 <img
-                  src={coupon.imageUrl}
-                  alt={coupon.name}
+                  src={voucher.imageUrl}
+                  alt={voucher.name}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -139,19 +137,19 @@ export default function VoucherViewPageClient({ userCoupon }: VoucherViewPageCli
 
             {/* Voucher Info */}
             <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold mb-4">{coupon.name}</h1>
-              {coupon.description && (
-                <p className="text-gray-600 mb-4">{coupon.description}</p>
+              <h1 className="text-3xl font-bold mb-4">{voucher.name}</h1>
+              {voucher.description && (
+                <p className="text-gray-600 mb-4">{voucher.description}</p>
               )}
-              {userCoupon.status === 'used' && (
+              {userVoucher.status === 'used' && (
                 <div className="mt-4 p-3 bg-gray-100 border border-gray-300 rounded-lg">
                   <p className="text-sm text-gray-700 font-semibold">
                     {isHebrew ? 'שובר זה כבר נוצל' : 'This voucher has already been used'}
                   </p>
-                  {userCoupon.usedAt && (
+                  {userVoucher.usedAt && (
                     <p className="text-xs text-gray-600 mt-1">
                       {isHebrew ? 'נוצל בתאריך: ' : 'Used on: '}
-                      {new Date(userCoupon.usedAt).toLocaleDateString(isHebrew ? 'he-IL' : 'en-US')}
+                      {new Date(userVoucher.usedAt).toLocaleDateString(isHebrew ? 'he-IL' : 'en-US')}
                     </p>
                   )}
                 </div>
@@ -159,7 +157,7 @@ export default function VoucherViewPageClient({ userCoupon }: VoucherViewPageCli
             </div>
 
             {/* QR Code Card - Only show if not used */}
-            {userCoupon.status !== 'used' && (
+            {userVoucher.status !== 'used' && (
               <div className="mb-8">
                 <QRCodeCard
                   url={voucherUrl}
@@ -171,7 +169,7 @@ export default function VoucherViewPageClient({ userCoupon }: VoucherViewPageCli
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
-              {userCoupon.status !== 'used' && (
+              {userVoucher.status !== 'used' && (
                 <Button
                   variant="default"
                   size="lg"
@@ -196,7 +194,7 @@ export default function VoucherViewPageClient({ userCoupon }: VoucherViewPageCli
                 variant="outline"
                 size="lg"
                 onClick={handleShare}
-                className={userCoupon.status === 'used' ? 'w-full' : 'flex-1'}
+                className={userVoucher.status === 'used' ? 'w-full' : 'flex-1'}
                 disabled={!isMounted || !voucherUrl}
               >
                 <Share2 className="w-4 h-4 me-2" />

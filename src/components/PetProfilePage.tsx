@@ -8,7 +8,7 @@ import { Ad } from '@/lib/actions/admin';
 import { motion } from 'framer-motion';
 import { useLocale } from '@/hooks/use-locale';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from './ui/button';
 import GiftPopup from './GiftPopup';
@@ -69,6 +69,7 @@ export default function PetProfilePage({
     },
   };
   const navigate = useNavigate();
+  const { id: routePetId } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const [showPopup, setShowPopup] = useState(false);
   const [activeTab, setActiveTab] = useState<TabName>('pet');
@@ -93,29 +94,26 @@ export default function PetProfilePage({
   }, [pet?.id, localStoragePetId, savePetId]);
 
   // Load and show ad when pet profile page loads (mandatory ad - only once)
+  // Use route pet id so ad loads whenever we're on /pet/:id, even before pet prop or localStorage is set
   useEffect(() => {
     const loadAd = async () => {
-      // Only show ad if pet exists and we haven't shown an ad yet on this page load
-      const hasPet = localStoragePetId || pet?.id;
+      const hasPet = Boolean(routePetId || localStoragePetId || pet?.id);
 
       if (hasPet && !adShownRef.current && !showPromo && !isLoadingPromo && !promo) {
         setIsLoadingPromo(true);
         try {
-          console.log('[PetProfilePage] Loading mandatory ad for pet profile page');
           const { fetchRandomAd } = await import('@/lib/actions/ads-server');
           const randomAd = await fetchRandomAd();
           if (randomAd && randomAd.content) {
             setPromo(randomAd);
             setShowPromo(true);
-            adShownRef.current = true; // Mark that ad has been shown
-            console.log('[PetProfilePage] Ad loaded and will be displayed');
+            adShownRef.current = true;
           } else {
-            console.log('[PetProfilePage] No ad available');
-            adShownRef.current = true; // Mark as shown even if no ad (prevent retry)
+            adShownRef.current = true; // Prevent retry when no ad available
           }
         } catch (error) {
           console.error('[PetProfilePage] Error loading ad:', error);
-          adShownRef.current = true; // Mark as shown even on error (prevent retry)
+          adShownRef.current = true;
         } finally {
           setIsLoadingPromo(false);
         }
@@ -123,7 +121,7 @@ export default function PetProfilePage({
     };
 
     loadAd();
-  }, [localStoragePetId, pet?.id]); // Removed showPromo, isLoadingPromo, promo from dependencies
+  }, [routePetId, localStoragePetId, pet?.id]);
 
   const handlePromoClose = () => {
     setShowPromo(false);

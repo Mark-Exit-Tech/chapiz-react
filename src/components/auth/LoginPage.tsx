@@ -277,7 +277,7 @@ const LoginPage = () => {
                 <div className={`${isHebrew ? 'text-right' : 'text-center'}`}>
                   <button
                     type="button"
-                    onClick={() => navigate('/auth/forgot')}
+                    onClick={() => navigate(`/${locale}/auth/forgot`)}
                     className="text-sm text-gray-600 hover:text-primary underline"
                   >
                     {t('pages.AuthPage.forgotPassword')}

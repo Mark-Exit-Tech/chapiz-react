@@ -324,6 +324,7 @@ export default function ClientRegisterPetPage({
       <form
         onSubmit={methods.handleSubmit(handleNext)}
         className="flex h-full grow flex-col p-4"
+        dir={locale === 'he' ? 'rtl' : 'ltr'}
       >
         <div className="flex w-full justify-start">
           <BackButton handleBack={handleBack} />
