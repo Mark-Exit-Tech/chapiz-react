@@ -11,6 +11,7 @@ export interface Voucher {
     validFrom: Date;
     validTo: Date;
     isActive: boolean;
+    stock?: number; // Available quantity (undefined = unlimited)
     businessId?: string;
     businessIds?: string[];
     createdAt: Date;
@@ -60,6 +61,27 @@ export async function getAllVouchers(): Promise<Voucher[]> {
     } catch (error) {
         console.error('Error fetching all vouchers:', error);
         return [];
+    }
+}
+
+/**
+ * Get purchase count per voucher (how many times each voucher was bought). For admin.
+ */
+export async function getVoucherPurchaseCounts(): Promise<Record<string, number>> {
+    try {
+        const q = query(collection(db, USER_VOUCHERS_COLLECTION));
+        const snapshot = await getDocs(q);
+        const counts: Record<string, number> = {};
+        snapshot.forEach((docSnap) => {
+            const voucherId = docSnap.data().voucherId;
+            if (voucherId) {
+                counts[voucherId] = (counts[voucherId] || 0) + 1;
+            }
+        });
+        return counts;
+    } catch (error) {
+        console.error('Error fetching voucher purchase counts:', error);
+        return {};
     }
 }
 
@@ -136,6 +158,18 @@ export async function getUserVouchers(userId: string): Promise<UserVoucher[]> {
  */
 export async function purchaseVoucher(userId: string, voucherId: string, points: number): Promise<{ success: boolean; error?: string }> {
     try {
+        const { getUserByUid } = await import('./users');
+        const user = await getUserByUid(userId);
+        if (user?.voucherPurchaseLimit != null && user.voucherPurchaseLimit >= 0) {
+            const existing = await getUserVouchers(userId);
+            if (existing.length >= user.voucherPurchaseLimit) {
+                return {
+                    success: false,
+                    error: `Purchase limit reached. You can buy up to ${user.voucherPurchaseLimit} voucher(s).`
+                };
+            }
+        }
+
         const userVoucherRef = doc(collection(db, USER_VOUCHERS_COLLECTION));
         
         await setDoc(userVoucherRef, {

@@ -13,6 +13,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Coupon } from '@/types/coupon';
 import { getCoupons, updateCoupon, deleteCoupon, getBusinesses } from '@/lib/actions/admin';
+import { getCouponPurchaseCounts } from '@/lib/firebase/database/coupons';
 import EditCouponDialog from './EditCouponDialog';
 import { Business } from '@/types/promo';
 import {
@@ -24,6 +25,7 @@ import {
 
 export default function CouponsTable() {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const [usedCountByCouponId, setUsedCountByCouponId] = useState<Record<string, number>>({});
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,12 +46,11 @@ export default function CouponsTable() {
     name: isHebrew ? 'שם' : 'Name',
     description: isHebrew ? 'תיאור' : 'Description',
     image: isHebrew ? 'תמונה' : 'Image',
-    points: isHebrew ? 'נקודות' : 'Points',
-    price: isHebrew ? 'מחיר' : 'Price',
     business: isHebrew ? 'עסק' : 'Business',
     validPeriod: isHebrew ? 'תקופת תוקף' : 'Valid Period',
     validFrom: isHebrew ? 'תקף מ' : 'Valid From',
     validTo: isHebrew ? 'תקף עד' : 'Valid To',
+    stock: isHebrew ? 'מלאי' : 'Stock',
     status: isHebrew ? 'סטטוס' : 'Status',
     edit: isHebrew ? 'ערוך' : 'Edit',
     delete: isHebrew ? 'מחק' : 'Delete',
@@ -61,7 +62,8 @@ export default function CouponsTable() {
     expired: isHebrew ? 'פג תוקף' : 'Expired',
     deleteConfirm: isHebrew ? 'האם אתה בטוח שברצונך למחוק קופון זה?' : 'Are you sure you want to delete this coupon?',
     close: isHebrew ? 'סגור' : 'Close',
-    actions: isHebrew ? 'פעולות' : 'Actions'
+    actions: isHebrew ? 'פעולות' : 'Actions',
+    totalCoupons: isHebrew ? 'סה"כ קופונים' : 'Total Coupons',
   };
 
   useEffect(() => {
@@ -91,9 +93,11 @@ export default function CouponsTable() {
   const fetchCoupons = async () => {
     try {
       setLoading(true);
-      const result = await getCoupons();
+      const [result, counts] = await Promise.all([
+        getCoupons(),
+        getCouponPurchaseCounts()
+      ]);
       if (result.success) {
-        // Convert ISO string dates back to Date objects
         const couponsWithDates = result.coupons.map(coupon => ({
           ...coupon,
           createdAt: coupon.createdAt ? new Date(coupon.createdAt as any) : new Date(),
@@ -102,6 +106,7 @@ export default function CouponsTable() {
           validTo: coupon.validTo ? new Date(coupon.validTo as any) : new Date(),
         }));
         setCoupons(couponsWithDates);
+        setUsedCountByCouponId(counts);
       } else {
         setError(result.error || 'Failed to fetch coupons');
       }
@@ -239,16 +244,20 @@ export default function CouponsTable() {
 
   return (
     <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Badge variant="outline" className="text-base px-4 py-2">
+          {text.totalCoupons}: {coupons.length}
+        </Badge>
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead className={isHebrew ? 'text-right' : ''}>{text.name}</TableHead>
               <TableHead className={isHebrew ? 'text-right' : ''}>{text.description}</TableHead>
-              <TableHead className={isHebrew ? 'text-right' : ''}>{text.price}</TableHead>
-              <TableHead className={isHebrew ? 'text-right' : ''}>{text.points}</TableHead>
               <TableHead className={isHebrew ? 'text-right' : ''}>{text.image}</TableHead>
               <TableHead className={isHebrew ? 'text-right' : ''}>{text.validPeriod}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{text.stock}</TableHead>
               <TableHead className={isHebrew ? 'text-right' : ''}>{text.status}</TableHead>
               <TableHead className={`w-[50px] ${isHebrew ? 'text-right' : 'text-center'}`}>{text.actions}</TableHead>
             </TableRow>
@@ -256,7 +265,7 @@ export default function CouponsTable() {
           <TableBody>
             {coupons.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8 text-gray-500">
+                <TableCell colSpan={7} className="text-center py-8 text-gray-500">
                   {text.noCoupons}
                 </TableCell>
               </TableRow>
@@ -272,12 +281,6 @@ export default function CouponsTable() {
                   </TableCell>
                   <TableCell className={`max-w-xs truncate ${isHebrew ? 'text-right' : ''}`}>
                     {coupon.description}
-                  </TableCell>
-                  <TableCell className={isHebrew ? 'text-right' : ''}>{formatPrice(coupon.price)}</TableCell>
-                  <TableCell className={isHebrew ? 'text-right' : ''}>
-                    <Badge variant="outline">
-                      {coupon.points} pts
-                    </Badge>
                   </TableCell>
                   <TableCell className={isHebrew ? 'text-right' : ''}>
                     {coupon.imageUrl ? (
@@ -299,6 +302,9 @@ export default function CouponsTable() {
                       <div>From: {formatDate(coupon.validFrom)}</div>
                       <div>To: {formatDate(coupon.validTo)}</div>
                     </div>
+                  </TableCell>
+                  <TableCell className={`text-sm ${isHebrew ? 'text-right' : ''}`}>
+                    {(usedCountByCouponId[coupon.id] ?? 0)}/{coupon.stock != null ? coupon.stock : '—'}
                   </TableCell>
                   <TableCell className={isHebrew ? 'text-right' : ''}>
                     {isCouponExpired(coupon) ? (
@@ -380,20 +386,16 @@ export default function CouponsTable() {
                 {/* Details */}
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="font-semibold text-gray-600">{text.price}: </span>
-                    <span>{formatPrice(previewCoupon.price)}</span>
-                  </div>
-                  <div>
-                    <span className="font-semibold text-gray-600">{text.points}: </span>
-                    <span>{previewCoupon.points} pts</span>
-                  </div>
-                  <div>
                     <span className="font-semibold text-gray-600">{text.validFrom}: </span>
                     <span>{formatDate(previewCoupon.validFrom)}</span>
                   </div>
                   <div>
                     <span className="font-semibold text-gray-600">{text.validTo}: </span>
                     <span>{formatDate(previewCoupon.validTo)}</span>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-600">{text.stock}: </span>
+                    <span>{(usedCountByCouponId[previewCoupon.id] ?? 0)}/{previewCoupon.stock != null ? previewCoupon.stock : '—'}</span>
                   </div>
                   <div>
                     <span className="font-semibold text-gray-600">{text.status}: </span>

@@ -8,6 +8,7 @@ export interface Coupon {
   validFrom: Date;
   validTo: Date;
   isActive: boolean;
+  stock?: number; // Available quantity (undefined = unlimited)
   businessId?: string; // Deprecated: use businessIds instead
   businessIds?: string[]; // Optional business assignments (multiple stores)
   purchaseLimit?: number; // Maximum times each user can purchase this voucher (undefined = unlimited)
@@ -24,6 +25,7 @@ export interface CreateCouponData {
   imageUrl: string;
   validFrom: Date;
   validTo: Date;
+  stock?: number;
   businessId?: string; // Deprecated: use businessIds instead
   businessIds?: string[]; // Optional business assignments (multiple stores)
   purchaseLimit?: number; // Maximum times each user can purchase this voucher

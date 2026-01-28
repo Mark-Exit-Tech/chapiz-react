@@ -76,6 +76,9 @@ export default function UserActions({
     optional: isHebrew ? 'אופציונלי' : 'Optional',
     pointsDescriptionPlaceholder: isHebrew ? 'למשל, תגמול על הפניה, נקודות בונוס וכו\'.' : 'e.g., Reward for referral, Bonus points, etc.',
     addingPoints: isHebrew ? 'מוסיף נקודות...' : 'Adding Points...',
+    voucherPurchaseLimit: isHebrew ? 'מגבלת רכישת שוברים' : 'Voucher purchase limit',
+    couponPurchaseLimit: isHebrew ? 'מגבלת רכישת קופונים' : 'Coupon purchase limit',
+    purchaseLimitPlaceholder: isHebrew ? 'ריק = ללא הגבלה' : 'Empty = no limit',
     roles: {
       user: isHebrew ? 'משתמש' : 'User',
       admin: isHebrew ? 'מנהל' : 'Admin',
@@ -103,6 +106,8 @@ export default function UserActions({
   const [pointsAmount, setPointsAmount] = useState('100');
   const [pointsDescription, setPointsDescription] = useState('');
   const [isAddingPoints, setIsAddingPoints] = useState(false);
+  const [voucherPurchaseLimit, setVoucherPurchaseLimit] = useState('');
+  const [couponPurchaseLimit, setCouponPurchaseLimit] = useState('');
 
   const navigate = useNavigate();
 
@@ -219,15 +224,23 @@ export default function UserActions({
         await updateUserRole(userId, newRole as 'user' | 'admin' | 'super_admin');
       }
 
-      // Update phone and address if changed
-      if (phone !== phoneNumber || currentAddress !== userAddress) {
-        const result = await updateUserByUid(userId, {
-          ...(phone !== phoneNumber ? { phone } : {}),
-          ...(currentAddress !== userAddress ? { address: currentAddress } : {})
-        });
-        if (!result.success) {
-          throw new Error(result.error || t('userActions.updateUserInfoError'));
-        }
+      const voucherLimit = voucherPurchaseLimit.trim() === '' ? null : parseInt(voucherPurchaseLimit, 10);
+      const couponLimit = couponPurchaseLimit.trim() === '' ? null : parseInt(couponPurchaseLimit, 10);
+      if (voucherLimit !== null && (isNaN(voucherLimit) || voucherLimit < 0)) {
+        throw new Error(isHebrew ? 'מגבלת שוברים חייבת להיות מספר לא שלילי' : 'Voucher purchase limit must be a non-negative number');
+      }
+      if (couponLimit !== null && (isNaN(couponLimit) || couponLimit < 0)) {
+        throw new Error(isHebrew ? 'מגבלת קופונים חייבת להיות מספר לא שלילי' : 'Coupon purchase limit must be a non-negative number');
+      }
+
+      const result = await updateUserByUid(userId, {
+        phone,
+        address: currentAddress,
+        voucherPurchaseLimit: voucherLimit,
+        couponPurchaseLimit: couponLimit
+      });
+      if (!result.success) {
+        throw new Error(result.error || t('userActions.updateUserInfoError'));
       }
 
       setIsEditOpen(false);
@@ -282,6 +295,8 @@ export default function UserActions({
       if (userResult.success && userResult.user) {
         setPhone(userResult.user.phone || '');
         setCurrentAddress(userResult.user.address || '');
+        setVoucherPurchaseLimit(userResult.user.voucherPurchaseLimit != null ? String(userResult.user.voucherPurchaseLimit) : '');
+        setCouponPurchaseLimit(userResult.user.couponPurchaseLimit != null ? String(userResult.user.couponPurchaseLimit) : '');
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -397,6 +412,32 @@ export default function UserActions({
                       }}
                     />
                     <span>{isRestricted ? text.restricted : text.active}</span>
+                  </div>
+                </div>
+
+                {/* Purchase limits (threshold for buying vouchers/coupons) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2" dir={isRTL ? 'rtl' : 'ltr'}>
+                    <Label>{text.voucherPurchaseLimit}</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={voucherPurchaseLimit}
+                      onChange={(e) => setVoucherPurchaseLimit(e.target.value)}
+                      placeholder={text.purchaseLimitPlaceholder}
+                      className={isRTL ? "text-right" : ""}
+                    />
+                  </div>
+                  <div className="space-y-2" dir={isRTL ? 'rtl' : 'ltr'}>
+                    <Label>{text.couponPurchaseLimit}</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={couponPurchaseLimit}
+                      onChange={(e) => setCouponPurchaseLimit(e.target.value)}
+                      placeholder={text.purchaseLimitPlaceholder}
+                      className={isRTL ? "text-right" : ""}
+                    />
                   </div>
                 </div>
               </>

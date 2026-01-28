@@ -50,6 +50,8 @@ export default function AddVoucherForm({ onSuccess }: AddVoucherFormProps) {
     noBusinesses: isHebrew ? 'לא נמצאו עסקים' : 'No businesses found',
     validFrom: isHebrew ? 'תקף מ' : 'Valid From',
     validTo: isHebrew ? 'תקף עד' : 'Valid To',
+    stock: isHebrew ? 'מלאי' : 'Stock',
+    stockPlaceholder: isHebrew ? 'ריק = ללא הגבלה' : 'Empty = unlimited',
     createVoucher: isHebrew ? 'צור שובר' : 'Create Voucher',
     creating: isHebrew ? 'יוצר...' : 'Creating...',
     cancel: isHebrew ? 'ביטול' : 'Cancel',
@@ -65,6 +67,7 @@ export default function AddVoucherForm({ onSuccess }: AddVoucherFormProps) {
     price: '',
     points: '',
     imageUrl: '',
+    stock: '',
     businessIds: [] as string[],
     validFrom: '',
     validTo: ''
@@ -151,6 +154,7 @@ export default function AddVoucherForm({ onSuccess }: AddVoucherFormProps) {
           price: '',
           points: '',
           imageUrl: '',
+          stock: '',
           businessIds: [],
           validFrom: '',
           validTo: ''
@@ -269,6 +273,19 @@ export default function AddVoucherForm({ onSuccess }: AddVoucherFormProps) {
               searchPlaceholder={text.search}
               noOptionsText={text.noBusinesses}
               disabled={loading}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="stock">{text.stock}</Label>
+            <Input
+              id="stock"
+              name="stock"
+              type="number"
+              min="0"
+              value={formData.stock}
+              onChange={handleChange}
+              placeholder={text.stockPlaceholder}
             />
           </div>
 

@@ -85,12 +85,16 @@ export async function getDashboardStats() {
     const { getAllContactSubmissions } = await import('@/lib/firebase/database/contact');
     
     // Fetch all data in parallel
-    const [users, comments, submissions, adsResult] = await Promise.all([
+    const { getAllVouchers } = await import('@/lib/firebase/database/vouchers');
+    const [users, comments, submissions, adsResult, couponsResult, vouchers] = await Promise.all([
       getAllUsers(),
       getAllComments(),
       getAllContactSubmissions(),
-      getAllAds(1, 1000)
+      getAllAds(1, 1000),
+      getCoupons(),
+      getAllVouchers()
     ]);
+    const coupons = couponsResult.success && couponsResult.coupons ? couponsResult.coupons : [];
 
     // Calculate stats
     const usersByRole: Record<string, number> = {};
@@ -138,8 +142,10 @@ export async function getDashboardStats() {
         total: comments.length 
       },
       rating: { 
-        average: avgRating
-      }
+        average: avgRating 
+      },
+      coupons: { total: coupons.length },
+      vouchers: { total: vouchers.length }
     };
   } catch (error) {
     console.error('Error getting dashboard stats:', error);
@@ -149,7 +155,9 @@ export async function getDashboardStats() {
       pets: { total: 0, new: 0 },
       contactSubmissions: { total: 0 },
       comments: { total: 0 },
-      rating: { average: '0.0' }
+      rating: { average: '0.0' },
+      coupons: { total: 0 },
+      vouchers: { total: 0 }
     };
   }
 }
@@ -493,8 +501,7 @@ export async function createCoupon(data: CreateCouponData) {
     const { collection, addDoc, Timestamp } = await import('firebase/firestore');
     const { db } = await import('@/lib/firebase/client');
     
-    // Create coupon document
-    const couponData = {
+    const couponData: Record<string, unknown> = {
       name: data.name,
       description: data.description,
       price: data.price,
@@ -507,8 +514,11 @@ export async function createCoupon(data: CreateCouponData) {
       isActive: true,
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
-      createdBy: 'admin' // TODO: Get actual admin user ID
+      createdBy: 'admin'
     };
+    if (data.stock !== undefined && data.stock !== '' && !isNaN(Number(data.stock))) {
+      couponData.stock = Math.max(0, Number(data.stock));
+    }
     
     const couponsRef = collection(db, 'coupons');
     const docRef = await addDoc(couponsRef, couponData);
@@ -548,8 +558,9 @@ export async function createVoucher(data: any) {
       updatedAt: Timestamp.now(),
       createdBy: 'admin'
     };
-    
-    // Only add purchaseLimit if it has a valid value
+    if (data.stock !== undefined && data.stock !== '' && !isNaN(Number(data.stock))) {
+      voucherData.stock = Math.max(0, Number(data.stock));
+    }
     if (data.purchaseLimit && !isNaN(Number(data.purchaseLimit))) {
       voucherData.purchaseLimit = Number(data.purchaseLimit);
     }
@@ -590,6 +601,7 @@ export async function getCoupons() {
         validFrom: data.validFrom?.toDate ? data.validFrom.toDate() : new Date(data.validFrom || Date.now()),
         validTo: data.validTo?.toDate ? data.validTo.toDate() : new Date(data.validTo || Date.now()),
         isActive: data.isActive !== undefined ? data.isActive : true,
+        stock: data.stock,
         businessId: data.businessId,
         businessIds: data.businessIds,
         purchaseLimit: data.purchaseLimit,
@@ -671,6 +683,11 @@ export async function updateCoupon(id: string, data: UpdateCouponData) {
     if (data.validTo) {
       updateData.validTo = Timestamp.fromDate(new Date(data.validTo));
     }
+    if (data.stock !== undefined && data.stock !== '') {
+      updateData.stock = Math.max(0, Number(data.stock));
+    } else if (data.stock === '' || (data as any).hasOwnProperty('stock')) {
+      updateData.stock = undefined;
+    }
     
     updateData.updatedAt = Timestamp.now();
     
@@ -750,6 +767,11 @@ export async function updateVoucher(id: string, data: any) {
     }
     if (data.purchaseLimit !== undefined && data.purchaseLimit !== '') {
       updateData.purchaseLimit = Number(data.purchaseLimit);
+    }
+    if (data.stock !== undefined && data.stock !== '') {
+      updateData.stock = Math.max(0, Number(data.stock));
+    } else if (data.stock === '' || data.hasOwnProperty('stock')) {
+      updateData.stock = undefined; // clear = unlimited
     }
 
     await updateDoc(voucherRef, updateData);

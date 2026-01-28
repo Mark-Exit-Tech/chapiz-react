@@ -20,8 +20,8 @@ import { useTranslation } from 'react-i18next';
 import { useLocale } from '@/hooks/use-locale';
 import { useState, useEffect } from 'react';
 import { HEBREW_SERVICE_TAGS } from '@/lib/constants/hebrew-service-tags';
-import { getPetTypesForDropdown, getBreedsForDropdownByPetTypes, getAreasForDropdown, getCitiesForDropdown, getAgeRangesForDropdown, getWeightRangesForDropdown } from '@/lib/firebase/database/pets';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { getAreasForDropdown, getCitiesForDropdown, getAgeRangesForDropdown, getWeightRangesForDropdown } from '@/lib/firebase/database/pets';
+import { PetFiltersBlock } from '@/components/admin/PetFiltersBlock';
 import { RtlMultiselect } from '@/components/ui/rtl-multiselect';
 import { getYouTubeEmbedUrl } from '@/lib/utils/youtube';
 
@@ -48,10 +48,6 @@ export default function AddAdForm() {
     youtubeUrlHelp: isHebrew ? 'הזן את קישור הסרטון מיוטיוב' : 'Enter the YouTube video URL',
     description: isHebrew ? 'תיאור' : 'Description',
     descriptionPlaceholder: isHebrew ? 'הזן תיאור למודעה' : 'Enter ad description',
-    phoneNumber: isHebrew ? 'מספר טלפון' : 'Phone Number',
-    phonePlaceholder: isHebrew ? 'הזן מספר טלפון' : 'Enter phone number',
-    location: isHebrew ? 'מיקום' : 'Location',
-    locationPlaceholder: isHebrew ? 'הזן מיקום' : 'Enter location',
     area: isHebrew ? 'אזור' : 'Area',
     areaPlaceholder: isHebrew ? 'בחר אזור' : 'Select area',
     city: isHebrew ? 'עיר' : 'City',
@@ -74,14 +70,13 @@ export default function AddAdForm() {
     clickToUpload: isHebrew ? 'לחץ להעלאת' : 'Click to upload',
     fileFormats: isHebrew ? 'פורמטים נתמכים' : 'Supported formats',
     search: isHebrew ? 'חיפוש...' : 'Search...',
-    noOptions: isHebrew ? 'לא נמצאו אפשרויות' : 'No options found'
+    noOptions: isHebrew ? 'לא נמצאו אפשרויות' : 'No options found',
+    selectPetTypeFirst: isHebrew ? 'בחר סוג חיה מלבד "אחר" כדי לבחור גזע' : 'Select pet type(s) other than "Other" to choose breed'
   };
   const [formData, setFormData] = useState({
     title: '',
     content: '',
     youtubeUrl: '',
-    phone: '',
-    location: '',
     description: '',
     tags: [] as string[],
     area: '',
@@ -94,8 +89,6 @@ export default function AddAdForm() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [petTypes, setPetTypes] = useState<Array<{ value: string; label: string }>>([]);
-  const [breeds, setBreeds] = useState<Array<{ value: string; label: string }>>([]);
   const [areas, setAreas] = useState<Array<{ value: string; label: string }>>([]);
   const [cities, setCities] = useState<Array<{ value: string; label: string }>>([]);
   const [ageRanges, setAgeRanges] = useState<Array<{ value: string; label: string }>>([]);
@@ -105,29 +98,12 @@ export default function AddAdForm() {
 
   useEffect(() => {
     if (isOpen) {
-      loadPetTypes();
       loadAreas();
       loadCities();
       loadAgeRanges();
       loadWeightRanges();
     }
   }, [isOpen, locale]);
-
-  useEffect(() => {
-    const types = formData.petType.filter(t => t && t !== 'other');
-    if (types.length > 0) {
-      getBreedsForDropdownByPetTypes(locale, formData.petType).then(setBreeds);
-    } else {
-      setBreeds([]);
-    }
-  }, [formData.petType, locale]);
-
-  const loadPetTypes = async () => {
-    const types = await getPetTypesForDropdown(locale);
-    setPetTypes(types);
-  };
-
-  const showBreedSelector = formData.petType.filter(t => t && t !== 'other').length > 0;
 
   const loadAreas = async () => {
     const areaList = await getAreasForDropdown(locale);
@@ -210,8 +186,8 @@ export default function AddAdForm() {
         startDate: null,
         endDate: null,
         createdBy: null, // Will be set server-side based on current user
-        phone: formData.phone,
-        location: formData.location,
+        phone: '',
+        location: '',
         description: formData.description,
         tags: formData.tags,
         area: formData.area,
@@ -228,8 +204,6 @@ export default function AddAdForm() {
         title: '',
         content: '',
         youtubeUrl: '',
-        phone: '',
-        location: '',
         description: '',
         tags: [],
         area: '',
@@ -379,30 +353,6 @@ export default function AddAdForm() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="phone">{text.phoneNumber}</Label>
-              <Input
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                placeholder={text.phonePlaceholder}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="location">{text.location}</Label>
-              <Input
-                id="location"
-                name="location"
-                value={formData.location}
-                onChange={handleChange}
-                placeholder={text.locationPlaceholder}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
               <Label htmlFor="area">{text.area}</Label>
               <select
                 id="area"
@@ -435,47 +385,25 @@ export default function AddAdForm() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>{text.petType}</Label>
-              <RtlMultiselect
-                options={petTypes}
-                selectedValues={formData.petType}
-                onSelectionChange={(values) => {
-                  setFormData((prev) => ({ ...prev, petType: values, breed: [], ...(values.includes('other') ? {} : { petTypeOther: '' }) }));
-                }}
-                placeholder={text.petTypePlaceholder}
-                searchPlaceholder={text.search}
-                noOptionsText={text.noOptions}
-              />
-              {formData.petType.includes('other') && (
-                <Input
-                  value={formData.petTypeOther}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, petTypeOther: e.target.value }))}
-                  placeholder={text.otherSpecify}
-                  className="mt-2"
-                />
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label>{text.breed}</Label>
-              {showBreedSelector ? (
-                <RtlMultiselect
-                  options={breeds}
-                  selectedValues={formData.breed}
-                  onSelectionChange={(values) => setFormData((prev) => ({ ...prev, breed: values }))}
-                  placeholder={text.breedPlaceholder}
-                  searchPlaceholder={text.search}
-                  noOptionsText={text.noOptions}
-                />
-              ) : (
-                <div className="flex h-9 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm text-muted-foreground">
-                  {formData.petType.length === 0 ? text.petTypePlaceholder : (isHebrew ? 'בחר סוג חיה מלבד "אחר" כדי לבחור גזע' : 'Select pet type(s) other than "Other" to choose breed')}
-                </div>
-              )}
-            </div>
-          </div>
+          <PetFiltersBlock
+            locale={locale}
+            selectedPetTypes={formData.petType}
+            onPetTypesChange={(values) => setFormData((prev) => ({ ...prev, petType: values, breed: [], ...(values.includes('other') ? {} : { petTypeOther: '' }) }))}
+            selectedBreeds={formData.breed}
+            onBreedsChange={(values) => setFormData((prev) => ({ ...prev, breed: values }))}
+            petTypeOther={formData.petTypeOther}
+            onPetTypeOtherChange={(value) => setFormData((prev) => ({ ...prev, petTypeOther: value }))}
+            text={{
+              petType: text.petType,
+              petTypePlaceholder: text.petTypePlaceholder,
+              otherSpecify: text.otherSpecify,
+              breed: text.breed,
+              breedPlaceholder: text.breedPlaceholder,
+              search: text.search,
+              noOptions: text.noOptions,
+              selectPetTypeFirst: text.selectPetTypeFirst
+            }}
+          />
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">

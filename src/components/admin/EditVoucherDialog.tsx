@@ -32,6 +32,7 @@ export default function EditVoucherDialog({ voucher, isOpen, onClose, onSuccess 
     price: '',
     points: '',
     imageUrl: '',
+    stock: '',
     businessIds: [] as string[],
     validFrom: '',
     validTo: ''
@@ -65,6 +66,8 @@ export default function EditVoucherDialog({ voucher, isOpen, onClose, onSuccess 
     noBusinesses: isHebrew ? 'לא נמצאו עסקים' : 'No businesses found',
     validFrom: isHebrew ? 'תקף מ' : 'Valid From',
     validTo: isHebrew ? 'תקף עד' : 'Valid To',
+    stock: isHebrew ? 'מלאי' : 'Stock',
+    stockPlaceholder: isHebrew ? 'ריק = ללא הגבלה' : 'Empty = unlimited',
     cancel: isHebrew ? 'ביטול' : 'Cancel',
     update: isHebrew ? 'עדכן' : 'Update',
     updating: isHebrew ? 'מעדכן...' : 'Updating...',
@@ -80,6 +83,7 @@ export default function EditVoucherDialog({ voucher, isOpen, onClose, onSuccess 
         price: voucher.price?.toString() || '',
         points: voucher.points?.toString() || '',
         imageUrl: voucher.imageUrl || '',
+        stock: voucher.stock != null ? String(voucher.stock) : '',
         businessIds: (voucher as any).businessIds || [],
         validFrom: voucher.validFrom ? new Date(voucher.validFrom).toISOString().slice(0, 16) : '',
         validTo: voucher.validTo ? new Date(voucher.validTo).toISOString().slice(0, 16) : ''
@@ -257,6 +261,19 @@ export default function EditVoucherDialog({ voucher, isOpen, onClose, onSuccess 
               searchPlaceholder={text.search}
               noOptionsText={text.noBusinesses}
               disabled={loading}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="stock">{text.stock}</Label>
+            <Input
+              id="stock"
+              name="stock"
+              type="number"
+              min="0"
+              value={formData.stock}
+              onChange={handleChange}
+              placeholder={text.stockPlaceholder}
             />
           </div>
 

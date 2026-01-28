@@ -33,6 +33,10 @@ export default function AdminDashboard() {
       users: isHebrew ? 'משתמשים' : 'Users',
       totalPets: isHebrew ? 'סך חיות המחמד' : 'Total Pets',
       pets: isHebrew ? 'חיות מחמד' : 'Pets',
+      totalCoupons: isHebrew ? 'סה"כ קופונים' : 'Total Coupons',
+      coupons: isHebrew ? 'קופונים' : 'Coupons',
+      totalVouchers: isHebrew ? 'סה"כ שוברים' : 'Total Vouchers',
+      vouchers: isHebrew ? 'שוברים' : 'Vouchers',
     },
     userActivity: isHebrew ? 'פעילות משתמשים' : 'User Activity',
     adActivity: isHebrew ? 'פעילות מודעות' : 'Ad Activity',
@@ -60,7 +64,9 @@ export default function AdminDashboard() {
     pets: { total: 0, new: 0 },
     contactSubmissions: { total: 0 },
     comments: { total: 0 },
-    rating: { average: '0.0' }
+    rating: { average: '0.0' },
+    coupons: { total: 0 },
+    vouchers: { total: 0 }
   });
 
   const [activity, setActivity] = useState({
@@ -85,7 +91,9 @@ export default function AdminDashboard() {
           pets: { total: 0, new: 0 },
           contactSubmissions: { total: 0 },
           comments: { total: 0 },
-          rating: { average: '0.0' }
+          rating: { average: '0.0' },
+          coupons: { total: 0 },
+          vouchers: { total: 0 }
         });
 
         setActivity(activityData || {
@@ -296,6 +304,54 @@ export default function AdminDashboard() {
               {stats.pets.total}
             </div>
             <div className='mt-1 text-xs md:text-sm text-gray-500'>{text.stats.pets}</div>
+          </div>
+        </div>
+
+        {/* Total Coupons */}
+        <div className="rounded-lg bg-white p-4 md:p-6 shadow-md">
+          <div className="mb-3 md:mb-4 flex items-center justify-between">
+            <h3 className="text-sm md:text-lg font-semibold">{text.stats.totalCoupons}</h3>
+            <div className="rounded-lg bg-amber-100 p-1.5 md:p-2 text-amber-800">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 md:h-5 md:w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+              </svg>
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl md:text-4xl font-bold text-amber-600">
+              {stats.coupons?.total ?? 0}
+            </div>
+            <div className="mt-1 text-xs md:text-sm text-gray-500">{text.stats.coupons}</div>
+          </div>
+        </div>
+
+        {/* Total Vouchers */}
+        <div className="rounded-lg bg-white p-4 md:p-6 shadow-md">
+          <div className="mb-3 md:mb-4 flex items-center justify-between">
+            <h3 className="text-sm md:text-lg font-semibold">{text.stats.totalVouchers}</h3>
+            <div className="rounded-lg bg-teal-100 p-1.5 md:p-2 text-teal-800">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 md:h-5 md:w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+              </svg>
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl md:text-4xl font-bold text-teal-600">
+              {stats.vouchers?.total ?? 0}
+            </div>
+            <div className="mt-1 text-xs md:text-sm text-gray-500">{text.stats.vouchers}</div>
           </div>
         </div>
       </div>

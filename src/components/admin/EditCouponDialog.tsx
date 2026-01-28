@@ -32,8 +32,8 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
     name: '',
     description: '',
     price: '',
-    points: '',
     imageUrl: '',
+    stock: '',
     validFrom: '',
     validTo: '',
     businessIds: [] as string[],
@@ -59,8 +59,6 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
     descriptionPlaceholder: isHebrew ? 'הזן תיאור' : 'Enter description',
     price: isHebrew ? 'מחיר (0 לחינם)' : 'Price (0 for free)',
     pricePlaceholder: isHebrew ? 'הזן מחיר' : 'Enter price',
-    points: isHebrew ? 'נקודות' : 'Points',
-    pointsPlaceholder: isHebrew ? 'הזן נקודות' : 'Enter points',
     image: isHebrew ? 'תמונה' : 'Image',
     business: isHebrew ? 'עסק' : 'Business',
     businessPlaceholder: isHebrew ? 'בחר עסקים' : 'Select businesses',
@@ -68,6 +66,8 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
     noBusinesses: isHebrew ? 'לא נמצאו עסקים' : 'No businesses found',
     validFrom: isHebrew ? 'תקף מ' : 'Valid From',
     validTo: isHebrew ? 'תקף עד' : 'Valid To',
+    stock: isHebrew ? 'מלאי' : 'Stock',
+    stockPlaceholder: isHebrew ? 'ריק = ללא הגבלה' : 'Empty = unlimited',
     purchaseLimit: isHebrew ? 'מגבלת רכישה' : 'Purchase Limit',
     purchaseLimitPlaceholder: isHebrew ? 'הזן מגבלה (אופציונלי)' : 'Enter limit (optional)',
     purchaseLimitHelp: isHebrew ? 'מספר פעמים שמשתמש יכול לרכוש קופון זה' : 'Number of times a user can purchase this coupon',
@@ -98,9 +98,8 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
         setFormData({
           name: coupon.name || '',
           description: coupon.description || '',
-          price: coupon.price?.toString() || '',
-          points: coupon.points?.toString() || '',
           imageUrl: coupon.imageUrl || '',
+          stock: coupon.stock != null ? String(coupon.stock) : '',
           validFrom: coupon.validFrom ? new Date(coupon.validFrom).toISOString().slice(0, 16) : '',
           validTo: coupon.validTo ? new Date(coupon.validTo).toISOString().slice(0, 16) : '',
           businessIds: businessIds,
@@ -155,23 +154,6 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
     setError(null);
 
     try {
-      // Allow empty price for free vouchers (defaults to 0)
-      const price = formData.price === '' ? 0 : parseFloat(formData.price);
-
-      // Default points to 0 if empty and price is 0
-      let points = parseInt(formData.points);
-      if (isNaN(points) && price === 0) {
-        points = 0;
-      }
-
-      if (isNaN(price) || price < 0) {
-        throw new Error('Please enter a valid price (0 for free vouchers)');
-      }
-
-      if (isNaN(points) || points < 0) {
-        throw new Error('Please enter valid points');
-      }
-
       console.log('🔍 EditCouponDialog - Submitting with businessIds:', {
         couponId: coupon.id,
         businessIds: formData.businessIds,
@@ -194,12 +176,14 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
         throw new Error(text.errorValidToBeforeFrom);
       }
 
+      const stock = formData.stock.trim() === '' ? undefined : Math.max(0, parseInt(formData.stock, 10));
       const result = await updateCoupon(coupon.id, {
         name: formData.name,
         description: formData.description,
         price: price,
         points: points,
         imageUrl: formData.imageUrl,
+        stock: isNaN(stock as number) ? undefined : stock,
         validFrom: new Date(formData.validFrom),
         validTo: new Date(formData.validTo),
         businessIds: formData.businessIds.length > 0 ? formData.businessIds : undefined,
@@ -288,19 +272,18 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
               />
             </div>
 
-            {(formData.price !== '' && parseFloat(formData.price) > 0) && (
-              <div className="space-y-2">
-                <Label htmlFor="points">{text.points}</Label>
-                <Input
-                  id="points"
-                  name="points"
-                  type="number"
-                  value={formData.points}
-                  onChange={handleChange}
-                  placeholder={text.pointsPlaceholder}
-                />
-              </div>
-            )}
+            <div className="space-y-2">
+              <Label htmlFor="points">{text.points}</Label>
+              <Input
+                id="points"
+                name="points"
+                type="number"
+                min="0"
+                value={formData.points}
+                onChange={handleChange}
+                placeholder={text.pointsPlaceholder}
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -352,6 +335,19 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
                 required
               />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="stock">{text.stock}</Label>
+            <Input
+              id="stock"
+              name="stock"
+              type="number"
+              min="0"
+              value={formData.stock}
+              onChange={handleChange}
+              placeholder={text.stockPlaceholder}
+            />
           </div>
 
           <div className="space-y-2">

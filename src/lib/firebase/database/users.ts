@@ -14,6 +14,10 @@ export interface User {
   createdAt?: Date; // ACTUAL Firestore field (camelCase)
   updatedAt?: Date; // ACTUAL Firestore field (camelCase)
   
+  // Purchase limits (max vouchers/coupons this user can buy in total; undefined = no limit)
+  voucherPurchaseLimit?: number;
+  couponPurchaseLimit?: number;
+
   // Legacy fields for backward compatibility (snake_case - OLD)
   full_name?: string;
   display_name?: string;
@@ -173,6 +177,8 @@ export async function updateUserByUid(uid: string, updates: {
   placeId?: string;
   profileImage?: string;
   language?: string;
+  voucherPurchaseLimit?: number | null;
+  couponPurchaseLimit?: number | null;
 }): Promise<{ success: boolean; error?: string }> {
   try {
     const updateData: Partial<User> = {};
@@ -188,6 +194,8 @@ export async function updateUserByUid(uid: string, updates: {
       updateData.photoURL = updates.profileImage;
     }
     if (updates.language !== undefined) updateData.language = updates.language;
+    if (updates.voucherPurchaseLimit !== undefined) updateData.voucherPurchaseLimit = updates.voucherPurchaseLimit ?? undefined;
+    if (updates.couponPurchaseLimit !== undefined) updateData.couponPurchaseLimit = updates.couponPurchaseLimit ?? undefined;
     
     await updateUser(uid, updateData);
     return { success: true };

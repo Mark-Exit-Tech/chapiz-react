@@ -80,6 +80,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
   const [locationPermission, setLocationPermission] = useState<'granted' | 'denied' | 'prompt'>('prompt');
   const [hasRequestedLocation, setHasRequestedLocation] = useState(false);
   const [markers, setMarkers] = useState<any[]>([]);
+  const markersRef = useRef<any[]>([]); // ref so we always clear the actual markers on the map (avoids stale count when filters change)
   const [markerInfoWindows, setMarkerInfoWindows] = useState<Map<string, any>>(new Map());
   const [currentInfoWindow, setCurrentInfoWindow] = useState<any>(null);
   const [selectedService, setSelectedService] = useState<ServiceWithCoordinates | null>(null);
@@ -588,8 +589,10 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
     const mapToUse = targetMap || map;
     if (!mapToUse || !window.google) return;
 
-    // Clear existing markers
-    markers.forEach(marker => marker.setMap(null));
+    // Clear existing markers (use ref so we clear the actual markers on map, not stale state)
+    const currentMarkers = markersRef.current || markers;
+    currentMarkers.forEach(marker => marker.setMap(null));
+    markersRef.current = [];
     const newMarkers: any[] = [];
     const newInfoWindows = new Map<string, any>();
 
@@ -654,6 +657,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
     });
 
     setMarkers(newMarkers);
+    markersRef.current = newMarkers;
     setMarkerInfoWindows(newInfoWindows);
 
     // Focus map on Israel with markers
@@ -706,15 +710,8 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
     }
   };
 
-  // Load Google Maps script (skip if favorites filter is active)
+  // Load Google Maps script (always load so favorites can display on map too)
   useEffect(() => {
-    // Don't load Google Maps if favorites is active - no need for map
-    if (filterType === 'favorites') {
-      setIsLoading(false);
-      setServicesWithCoords(services as ServiceWithCoordinates[]);
-      return;
-    }
-
     const apiKey = googleMapsApiKey;
     let script: HTMLScriptElement | null = null;
     let checkInterval: NodeJS.Timeout | null = null;
@@ -826,8 +823,8 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
 
       setMap(mapInstance);
 
-      // Extract coordinates and show markers immediately (even without user location)
-      if (filterType !== 'favorites' && services.length > 0) {
+      // Extract coordinates and show markers immediately (even without user location; same for favorites)
+      if (services.length > 0) {
         // Extract coordinates from services
         const servicesWithData: ServiceWithCoordinates[] = services.map(service => {
           const coords = getServiceCoordinates(service);
@@ -891,7 +888,8 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
       setServicesWithCoords(services as ServiceWithCoordinates[]);
       // Clear map markers
       if (map) {
-        markers.forEach(marker => marker.setMap(null));
+        (markersRef.current || []).forEach((m: any) => m.setMap(null));
+        markersRef.current = [];
         setMarkers([]);
         setMarkerInfoWindows(new Map());
       }
@@ -905,14 +903,34 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
     }
   }, [filterType]); // Only depend on filterType for immediate response when switching
 
-  // Update services when prop changes (skip map loading if favorites filter is active)
+  // Update services when prop changes (for favorites: extract coords and show markers on map)
   useEffect(() => {
-    // If favorites is active, just update services immediately - NO GEOCODING AT ALL
+    // Favorites: extract coordinates from services and show markers on map (no geocoding)
     if (filterType === 'favorites') {
-      // Always set loading to false immediately for favorites
       setIsLoading(false);
-      // Update services immediately (even if empty - that's fine)
-      setServicesWithCoords(services as ServiceWithCoordinates[]);
+      const servicesWithData: ServiceWithCoordinates[] = services.map(service => {
+        const coords = getServiceCoordinates(service);
+        if (coords) {
+          let distance: number | undefined;
+          if (userLocation) {
+            distance = calculateDistance(userLocation.lat, userLocation.lng, coords.lat, coords.lng);
+          }
+          return { ...service, coordinates: coords, distance };
+        }
+        return { ...service };
+      });
+      setServicesWithCoords(servicesWithData);
+      if (map && window.google) {
+        const withCoords = servicesWithData.filter(s => s.coordinates);
+        if (withCoords.length > 0) {
+          updateMapMarkers(withCoords);
+        } else {
+          (markersRef.current || []).forEach((m: any) => m.setMap(null));
+          markersRef.current = [];
+          setMarkers([]);
+          setMarkerInfoWindows(new Map());
+        }
+      }
       return;
     }
 
@@ -954,12 +972,10 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
 
     setServicesWithCoords(servicesWithData);
     
-    // Update map markers with services that have coordinates (even without user location)
+    // Always update map markers to match filtered list (including clearing when 0 results)
     if (map && window.google) {
-      const servicesWithCoords = servicesWithData.filter(s => s.coordinates);
-      if (servicesWithCoords.length > 0) {
-        updateMapMarkers(servicesWithCoords);
-      }
+      const withCoords = servicesWithData.filter(s => s.coordinates);
+      updateMapMarkers(withCoords);
     }
     
     setIsLoading(false);
@@ -999,9 +1015,6 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
 
   // Reinitialize map when layout/container changes (e.g., mobile vs desktop refresh)
   useEffect(() => {
-    // Skip map initialization if favorites is active
-    if (filterType === 'favorites') return;
-    
     if (typeof window === 'undefined') return;
     if (!window.google) return;
     if (!mapRef.current) return;

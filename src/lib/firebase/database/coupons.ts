@@ -46,11 +46,59 @@ export async function getUserCouponPurchaseCount(userId: string, couponId: strin
 }
 
 /**
+ * Get purchase count per coupon (how many times each coupon was bought). For admin.
+ */
+export async function getCouponPurchaseCounts(): Promise<Record<string, number>> {
+    try {
+        const userCouponsRef = collection(db, USER_COUPONS_COLLECTION);
+        const snapshot = await getDocs(userCouponsRef);
+        const counts: Record<string, number> = {};
+        snapshot.forEach((docSnap) => {
+            const couponId = docSnap.data().couponId;
+            if (couponId) {
+                counts[couponId] = (counts[couponId] || 0) + 1;
+            }
+        });
+        return counts;
+    } catch (error) {
+        console.error('❌ Error fetching coupon purchase counts:', error);
+        return {};
+    }
+}
+
+/**
+ * Get total number of coupons purchased by a user (all coupons combined)
+ */
+export async function getTotalUserCouponCount(userId: string): Promise<number> {
+    try {
+        const userCouponsRef = collection(db, USER_COUPONS_COLLECTION);
+        const q = query(userCouponsRef, where('userId', '==', userId));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.size;
+    } catch (error) {
+        console.error('❌ Error getting total coupon count:', error);
+        return 0;
+    }
+}
+
+/**
  * Purchase coupon
  */
 export async function purchaseCoupon(userId: string, couponId: string, points: number): Promise<{ success: boolean; error?: string }> {
     try {
         console.log('💰 Purchasing coupon:', { userId, couponId, points });
+
+        const { getUserByUid } = await import('./users');
+        const user = await getUserByUid(userId);
+        if (user?.couponPurchaseLimit != null && user.couponPurchaseLimit >= 0) {
+            const totalPurchased = await getTotalUserCouponCount(userId);
+            if (totalPurchased >= user.couponPurchaseLimit) {
+                return {
+                    success: false,
+                    error: `Purchase limit reached. You can buy up to ${user.couponPurchaseLimit} coupon(s).`
+                };
+            }
+        }
 
         // Get the coupon details
         const couponRef = doc(db, COUPONS_COLLECTION, couponId);
@@ -63,7 +111,7 @@ export async function purchaseCoupon(userId: string, couponId: string, points: n
 
         const couponData = couponSnap.data();
 
-        // Check purchase limit restriction
+        // Check per-coupon purchase limit restriction
         const purchaseLimit = couponData.purchaseLimit;
         if (purchaseLimit && purchaseLimit > 0) {
             const currentPurchaseCount = await getUserCouponPurchaseCount(userId, couponId);

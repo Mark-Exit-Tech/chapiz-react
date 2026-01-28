@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getAllVouchers, type Voucher } from '@/lib/firebase/database/vouchers';
+import { getAllVouchers, getVoucherPurchaseCounts, type Voucher } from '@/lib/firebase/database/vouchers';
 import { Ticket } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -17,6 +17,7 @@ import { deleteVoucher } from '@/lib/actions/admin';
 
 export default function AdminVouchersPage() {
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
+  const [usedCountByVoucherId, setUsedCountByVoucherId] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [editingVoucher, setEditingVoucher] = useState<Voucher | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -41,6 +42,7 @@ export default function AdminVouchersPage() {
     points: isHebrew ? 'נקודות' : 'Points',
     validFrom: isHebrew ? 'תקף מ' : 'Valid From',
     validTo: isHebrew ? 'תקף עד' : 'Valid To',
+    stock: isHebrew ? 'מלאי' : 'Stock',
     status: isHebrew ? 'סטטוס' : 'Status',
     active: isHebrew ? 'פעיל' : 'Active',
     inactive: isHebrew ? 'לא פעיל' : 'Inactive',
@@ -58,8 +60,12 @@ export default function AdminVouchersPage() {
   const loadVouchers = async () => {
     setLoading(true);
     try {
-      const data = await getAllVouchers();
+      const [data, counts] = await Promise.all([
+        getAllVouchers(),
+        getVoucherPurchaseCounts()
+      ]);
       setVouchers(data);
+      setUsedCountByVoucherId(counts);
     } catch (error) {
       console.error('Error loading vouchers:', error);
     } finally {
@@ -183,6 +189,9 @@ export default function AdminVouchersPage() {
                       {text.validTo}
                     </th>
                     <th className={`px-6 py-3 ${isHebrew ? 'text-right' : 'text-left'} text-xs font-medium text-gray-500 uppercase tracking-wider`}>
+                      {text.stock}
+                    </th>
+                    <th className={`px-6 py-3 ${isHebrew ? 'text-right' : 'text-left'} text-xs font-medium text-gray-500 uppercase tracking-wider`}>
                       {text.status}
                     </th>
                     <th className={`px-6 py-3 ${isHebrew ? 'text-right' : 'text-center'} text-xs font-medium text-gray-500 uppercase tracking-wider w-[50px]`}>
@@ -233,6 +242,9 @@ export default function AdminVouchersPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {formatDate(voucher.validTo)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {(usedCountByVoucherId[voucher.id] ?? 0)}/{voucher.stock != null ? voucher.stock : '—'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {isVoucherExpired(voucher) ? (
@@ -332,6 +344,10 @@ export default function AdminVouchersPage() {
                   <div>
                     <span className="font-semibold text-gray-600">{text.validTo}: </span>
                     <span>{formatDate(previewVoucher.validTo)}</span>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-600">{text.stock}: </span>
+                    <span>{(usedCountByVoucherId[previewVoucher.id] ?? 0)}/{previewVoucher.stock != null ? previewVoucher.stock : '—'}</span>
                   </div>
                   <div>
                     <span className="font-semibold text-gray-600">{text.status}: </span>
