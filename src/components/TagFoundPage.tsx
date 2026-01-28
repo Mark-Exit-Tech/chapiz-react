@@ -26,7 +26,7 @@ function getLocaleFromUrl(): string {
 }
 
 export default function TagFoundPage({ petId }: TagFoundPageProps) {
-  const { t, i18n } = useTranslation('pages.TagFound');
+  const { t, i18n } = useTranslation();
   const { user, dbUser, loading: authLoading } = useAuth();
   const { petId: savedPetId } = usePetId();
   const navigate = useNavigate();
@@ -70,7 +70,7 @@ export default function TagFoundPage({ petId }: TagFoundPageProps) {
         <Navbar />
         <div className="container mx-auto px-4 py-8 flex-1 flex flex-col items-center justify-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto" />
-          <p className="mt-4 text-gray-600">{t('loading')}</p>
+          <p className="mt-4 text-gray-600">{t('pages.TagFound.loading')}</p>
         </div>
         <Footer />
         <div className="md:hidden">
@@ -85,29 +85,29 @@ export default function TagFoundPage({ petId }: TagFoundPageProps) {
       <Navbar />
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-10">
         <div className="text-center max-w-md">
-          <h1 className="text-primary text-3xl font-bold">{t('title')}</h1>
-          <p className="text-base text-gray-500 mt-2">{t('subtitle')}</p>
+          <h1 className="text-primary text-3xl font-bold">{t('pages.TagFound.title')}</h1>
+          <p className="text-base text-gray-500 mt-2">{t('pages.TagFound.subtitle')}</p>
 
           {user ? (
             <div className="mt-6 space-y-3">
-              <p className="text-green-700 font-medium">{t('welcomeBack', { name: dbUser?.full_name || user.email })}</p>
+              <p className="text-green-700 font-medium">{t('pages.TagFound.welcomeBack', { name: dbUser?.full_name || user.email })}</p>
               <Button
                 onClick={handleRegisterPet}
                 disabled={isProcessing}
                 className="bg-primary mt-4 rounded-full font-normal hover:bg-[#ff6243]/90"
               >
-                {isProcessing ? t('processing') : t('registerPet')}
+                {isProcessing ? t('pages.TagFound.processing') : t('pages.TagFound.registerPet')}
               </Button>
             </div>
           ) : (
             <div className="mt-6 space-y-3">
-              <p className="text-orange-700 font-medium">{t('needAccount')}</p>
+              <p className="text-orange-700 font-medium">{t('pages.TagFound.needAccount')}</p>
               <Button
                 onClick={handleRegisterPet}
                 disabled={isProcessing}
                 className="bg-primary mt-4 rounded-full font-normal hover:bg-[#ff6243]/90"
               >
-                {isProcessing ? t('processing') : t('createAccountAndRegister')}
+                {isProcessing ? t('pages.TagFound.processing') : t('pages.TagFound.createAccountAndRegister')}
               </Button>
             </div>
           )}
