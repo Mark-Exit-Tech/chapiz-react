@@ -3,6 +3,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { getPetById } from '@/lib/firebase/database/pets';
 import { getUserFromFirestore, getUserByEmail } from '@/lib/firebase/database/users';
 import PetProfilePage from '@/components/PetProfilePage';
+import TagFoundPage from '@/components/TagFoundPage';
 
 export default function PetPage() {
   const { id } = useParams<{ id: string }>();
@@ -112,6 +113,12 @@ export default function PetPage() {
     );
   }
 
+  // If pet doesn't exist, show TagFoundPage (for NFC tag scanning/registration)
+  if (!pet && id) {
+    return <TagFoundPage petId={id} />;
+  }
+
+  // If pet still doesn't exist after loading (and no id), show error
   if (!pet) {
     return (
       <div className="container mx-auto px-4 py-8">

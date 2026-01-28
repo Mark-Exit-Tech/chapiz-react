@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Generates a CSV file with 1000 add-pet links for writing into NFC tags.
- * Each link is: {baseUrl}/{locale}/pet/{tagId}/get-started/register
+ * Generates a CSV file with 1000 tag links for writing into NFC tags.
+ * Columns: Tag found link (scan → "tag found" page), Pet link (view pet profile).
  * Open the output CSV in Excel (or any spreadsheet app).
  */
 
@@ -18,16 +18,16 @@ const OUT_DIR = path.join(__dirname, '..');
 const OUT_FILE = path.join(OUT_DIR, 'add-pet-links-1000.csv');
 
 const rows = [];
-rows.push('#,Tag ID,Add-pet link');
+rows.push('#,Tag ID,Pet link');
 
 for (let i = 1; i <= COUNT; i++) {
   const tagId = `tag-${String(i).padStart(4, '0')}`;
-  const link = `${BASE_URL}/${LOCALE}/pet/${tagId}/get-started/register`;
-  rows.push(`${i},${tagId},"${link}"`);
+  const petLink = `${BASE_URL}/${LOCALE}/pet/${tagId}`;
+  rows.push(`${i},${tagId},"${petLink}"`);
 }
 
 const csv = rows.join('\n');
 fs.writeFileSync(OUT_FILE, csv, 'utf8');
-console.log(`Written ${COUNT} add-pet links to ${OUT_FILE}`);
+console.log(`Written ${COUNT} rows to ${OUT_FILE}`);
 console.log(`Base URL: ${BASE_URL}, Locale: ${LOCALE}`);
-console.log('Open in Excel and use the "Add-pet link" column for each NFC tag.');
+console.log('Pet link: Shows TagFoundPage if pet not registered, PetProfilePage if registered.');
