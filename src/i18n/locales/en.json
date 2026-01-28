@@ -901,7 +901,7 @@
     "TagFound": {
       "title": "Tag Found!",
       "subtitle": "This pet tag has been detected. Register your pet to get started.",
-      "welcomeBack": "Welcome back, {name}!",
+      "welcomeBack": "Welcome back!",
       "needAccount": "You need an account to register this pet.",
       "registerPet": "Register Pet",
       "createAccountAndRegister": "Create Account & Register Pet",

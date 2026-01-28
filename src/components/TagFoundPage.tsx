@@ -90,7 +90,7 @@ export default function TagFoundPage({ petId }: TagFoundPageProps) {
 
           {user ? (
             <div className="mt-6 space-y-3">
-              <p className="text-green-700 font-medium">{t('pages.TagFound.welcomeBack', { name: dbUser?.full_name || user.email })}</p>
+              <p className="text-green-700 font-medium">{t('pages.TagFound.welcomeBack')}</p>
               <Button
                 onClick={handleRegisterPet}
                 disabled={isProcessing}

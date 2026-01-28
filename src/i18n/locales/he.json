@@ -917,7 +917,7 @@
     "TagFound": {
       "title": "תג נמצא!",
       "subtitle": "תג חיית המחמד הזה זוהה. הרשם את חיית המחמד שלך כדי להתחיל.",
-      "welcomeBack": "ברוך שובך, {name}!",
+      "welcomeBack": "ברוך שובך!",
       "needAccount": "אתה צריך חשבון כדי לרשום את חיית המחמד הזו.",
       "registerPet": "רשום חיית מחמד",
       "createAccountAndRegister": "צור חשבון ורשום חיית מחמד",
