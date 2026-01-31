@@ -1139,8 +1139,8 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
       {/* Mobile Layout: Map + Drawer for Services List */}
       {isMobile ? (
         <div className="relative h-full w-full" style={{ overflow: 'hidden' }}>
-          {/* Mobile Header */}
-          <div className="absolute top-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-b border-gray-200 p-4 shadow-sm z-30">
+          {/* Mobile Header - z-index above drawer overlay so search/filters stay tappable */}
+          <div className="absolute top-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-b border-gray-200 p-4 shadow-sm z-[10051]">
             {headerContent}
           </div>
 
@@ -1196,7 +1196,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
               // Prevent closing - keep drawer always open
             }}
           >
-            <DrawerContent className="h-[100vh]">
+            <DrawerContent className="h-[100vh]" noOverlay>
               <DrawerHeader className="sr-only">
                 <DrawerTitle>Services List</DrawerTitle>
               </DrawerHeader>
@@ -1613,7 +1613,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
                           toast.error('Business ID not available');
                         }
                       }}
-                      title={t('coupons') || 'Vouchers'}
+                      title={t('pages.ServicesPage.coupons') || 'Coupons'}
                     >
                       <Ticket size={20} />
                     </Button>
@@ -1924,7 +1924,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
                             toast.error('Business ID not available');
                           }
                         }}
-                        title={t('coupons') || 'Vouchers'}
+                        title={t('pages.ServicesPage.coupons') || 'Coupons'}
                       >
                         <Ticket size={24} />
                       </Button>

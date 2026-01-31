@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { Tag, MapPin, QrCode } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Tag, MapPin, QrCode, X } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -51,7 +51,13 @@ export default function PromosPageClient({
     available: isHebrew ? 'זמין' : 'Available',
     used: isHebrew ? 'משומש' : 'Used',
     usedOn: isHebrew ? 'נוצל בתאריך' : 'Used on',
+    removeFilter: isHebrew ? 'הסר סינון' : 'Remove Filter',
+    couponsForBusiness: (name: string) => (isHebrew ? `קופונים עבור ${name}` : `Coupons for ${name}`),
+    couponsForSelectedBusiness: isHebrew ? 'קופונים לעסק הנבחר' : 'Coupons for selected business',
   };
+
+  const [searchParams] = useSearchParams();
+  const businessIdFromUrl = searchParams.get('businessId');
 
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [usedCoupons, setUsedCoupons] = useState<UserCoupon[]>([]);
@@ -89,9 +95,9 @@ export default function PromosPageClient({
 
         // Load businesses
         const businessesResult = await getBusinesses();
-        if (businessesResult && Array.isArray(businessesResult)) {
-          setBusinesses(businessesResult);
-          console.log('✅ Loaded businesses:', businessesResult.length);
+        if (businessesResult?.success && Array.isArray(businessesResult.businesses)) {
+          setBusinesses(businessesResult.businesses);
+          console.log('✅ Loaded businesses:', businessesResult.businesses.length);
         }
 
         // Load used coupons if user is logged in
@@ -109,7 +115,7 @@ export default function PromosPageClient({
         }
 
         // Filter out used coupons from available coupons
-        const availableCoupons = activeCoupons.filter(c => !usedCouponIds.includes(c.id));
+        let availableCoupons = activeCoupons.filter(c => !usedCouponIds.includes(c.id));
         setCoupons(availableCoupons);
         console.log('✅ Available coupons (excluding used):', availableCoupons.length);
       } catch (error) {
@@ -123,9 +129,35 @@ export default function PromosPageClient({
     loadData();
   }, [user]);
 
+  // Filter coupons by businessId when coming from service detail link
+  const filteredCoupons = useMemo(() => {
+    if (!businessIdFromUrl) return coupons;
+    return coupons.filter((c: Coupon) => {
+      const ids = c.businessIds || (c.businessId ? [c.businessId] : []);
+      return ids.includes(businessIdFromUrl);
+    });
+  }, [coupons, businessIdFromUrl]);
+
+  const filteredUsedCoupons = useMemo(() => {
+    if (!businessIdFromUrl) return usedCoupons;
+    return usedCoupons.filter((uc: UserCoupon) => {
+      const ids = uc.coupon?.businessIds || (uc.coupon?.businessId ? [uc.coupon.businessId] : []);
+      return ids.includes(businessIdFromUrl);
+    });
+  }, [usedCoupons, businessIdFromUrl]);
+
+  const filteredBusiness = useMemo(() =>
+    businessIdFromUrl ? businesses.find((b: Business) => b.id === businessIdFromUrl) : null,
+  [businesses, businessIdFromUrl]);
+
+  const handleRemoveFilter = () => {
+    navigate(`/${locale}/coupons`, { replace: true });
+  };
+
   const handleViewCoupon = (coupon: Coupon) => {
-    const url = business
-      ? `/${locale}/coupons/${coupon.id}?businessId=${business.id}`
+    const businessId = businessIdFromUrl || business?.id;
+    const url = businessId
+      ? `/${locale}/coupons/${coupon.id}?businessId=${businessId}`
       : `/${locale}/coupons/${coupon.id}`;
     navigate(url);
   };
@@ -306,6 +338,26 @@ export default function PromosPageClient({
         <p className="text-gray-600">{text.description}</p>
       </div>
 
+      {/* Filter by business: info + Remove filter button */}
+      {businessIdFromUrl && (
+        <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-lg bg-gray-100 border border-gray-200">
+          <p className="text-sm font-medium text-gray-700">
+            {filteredBusiness?.name
+              ? text.couponsForBusiness(filteredBusiness.name)
+              : text.couponsForSelectedBusiness}
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRemoveFilter}
+            className="flex items-center gap-2 border-orange-500 text-orange-500 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-600 shrink-0"
+          >
+            <X className="h-4 w-4" />
+            {text.removeFilter}
+          </Button>
+        </div>
+      )}
+
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-6">
           <TabsTrigger value="used">{text.used}</TabsTrigger>
@@ -313,14 +365,14 @@ export default function PromosPageClient({
         </TabsList>
 
         <TabsContent value="used">
-          {usedCoupons.length === 0 ? (
+          {filteredUsedCoupons.length === 0 ? (
             <div className="text-center py-12">
               <Tag className="w-16 h-16 mx-auto text-gray-300 mb-4" />
               <p className="text-gray-600">{text.noUsedCoupons}</p>
             </div>
           ) : (
             <div className={`flex flex-wrap gap-6 ${isHebrew ? 'flex-row-reverse' : ''}`}>
-              {usedCoupons.map(userCoupon => (
+              {filteredUsedCoupons.map(userCoupon => (
                 <div key={userCoupon.id} className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]">
                   {renderUsedCouponCard(userCoupon)}
                 </div>
@@ -330,14 +382,14 @@ export default function PromosPageClient({
         </TabsContent>
 
         <TabsContent value="available">
-          {coupons.length === 0 ? (
+          {filteredCoupons.length === 0 ? (
             <div className="text-center py-12">
               <Tag className="w-16 h-16 mx-auto text-gray-300 mb-4" />
               <p className="text-gray-600">{text.noCoupons}</p>
             </div>
           ) : (
             <div className={`flex flex-wrap gap-6 ${isHebrew ? 'flex-row-reverse' : ''}`}>
-              {coupons.map(coupon => (
+              {filteredCoupons.map(coupon => (
                 <div key={coupon.id} className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]">
                   {renderCouponCard(coupon)}
                 </div>

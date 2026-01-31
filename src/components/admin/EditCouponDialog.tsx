@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { RtlMultiselect } from '@/components/ui/rtl-multiselect';
 import { updateCoupon, getBusinesses } from '@/lib/actions/admin';
+import { roundDatetimeLocalTo15Min } from '@/lib/utils/date';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useMemo } from 'react';
 import { Coupon } from '@/types/coupon';
@@ -124,9 +125,11 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
+    const isDatetime = name === 'validFrom' || name === 'validTo';
+    const finalValue = isDatetime && value ? roundDatetimeLocalTo15Min(value) : value;
     setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: finalValue
     }));
   };
 
@@ -287,6 +290,7 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
                 id="validFrom"
                 name="validFrom"
                 type="datetime-local"
+                step={900}
                 value={formData.validFrom}
                 onChange={handleChange}
                 required
@@ -299,6 +303,7 @@ export default function EditCouponDialog({ coupon, isOpen, onClose, onSuccess }:
                 id="validTo"
                 name="validTo"
                 type="datetime-local"
+                step={900}
                 value={formData.validTo}
                 onChange={handleChange}
                 required

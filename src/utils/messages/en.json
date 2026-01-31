@@ -992,7 +992,8 @@
       },
       "addToFavorites": "Add to Favorites",
       "removeFromFavorites": "Remove from Favorites",
-      "coupons": "Vouchers",
+      "coupons": "Coupons",
+      "vouchers": "Vouchers",
       "navigation": "Navigation",
       "call": "Call"
     },

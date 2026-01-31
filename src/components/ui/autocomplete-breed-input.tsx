@@ -243,9 +243,12 @@ export function AutocompleteBreedInput({
         </label>
       )}
 
-      <div className="relative">
+      <div className="relative" dir={locale === 'he' ? 'rtl' : 'ltr'}>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className={cn(
+            "absolute top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400",
+            locale === 'he' ? "right-3 left-auto" : "left-3 right-auto"
+          )} />
           <input
             ref={inputRef}
             type="text"
@@ -256,6 +259,7 @@ export function AutocompleteBreedInput({
             onBlur={handleBlur}
             placeholder={placeholder || t('searchPlaceholder')}
             disabled={disabled}
+            dir={locale === 'he' ? 'rtl' : 'ltr'}
             className={cn(
               "w-full h-10 pl-10 pr-10 border border-gray-300 rounded-md bg-white text-sm",
               "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
@@ -269,7 +273,10 @@ export function AutocompleteBreedInput({
               variant="ghost"
               size="sm"
               onClick={clearInput}
-              className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 text-gray-400 hover:text-gray-600"
+              className={cn(
+                "absolute top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 text-gray-400 hover:text-gray-600",
+                locale === 'he' ? "left-1 right-auto" : "right-1 left-auto"
+              )}
             >
               <X className="h-4 w-4" />
             </Button>
@@ -300,12 +307,9 @@ export function AutocompleteBreedInput({
                     {isRecent && (
                       <Star className="h-3 w-3 text-yellow-500 shrink-0" />
                     )}
-                    <span
-                      className="flex-1"
-                      dangerouslySetInnerHTML={{
-                        __html: match.highlightedName || match.item.name
-                      }}
-                    />
+                    <span className="flex-1">
+                      {match.item.name}
+                    </span>
                   </div>
                   <div className="flex items-center gap-1">
                     {isRecent && (

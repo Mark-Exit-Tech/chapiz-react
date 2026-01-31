@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ShoppingCart, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useLocale } from '@/hooks/use-locale';
 import { purchaseVoucher, type Voucher } from '@/lib/firebase/database/vouchers';
@@ -38,6 +38,15 @@ export default function VoucherShopViewClient({ voucher }: VoucherShopViewClient
     pleaseSignIn: isHebrew ? 'אנא התחבר כדי לרכוש שוברים' : 'Please sign in to purchase vouchers',
     purchaseSuccess: isHebrew ? 'השובר נרכש בהצלחה!' : 'Voucher purchased successfully!',
     failedToPurchase: isHebrew ? 'נכשל ברכישת השובר' : 'Failed to purchase voucher',
+    showOnMap: isHebrew ? 'הצג במפה' : 'Show on Map',
+  };
+
+  const businessIds = (voucher.businessIds || (voucher.businessId ? [voucher.businessId] : [])).filter(Boolean);
+  const handleShowOnMap = () => {
+    const url = businessIds.length > 0
+      ? `/${locale}/services?businessId=${businessIds.join(',')}`
+      : `/${locale}/services`;
+    navigate(url);
   };
 
   useEffect(() => {
@@ -166,6 +175,19 @@ export default function VoucherShopViewClient({ voucher }: VoucherShopViewClient
             ) : (
               <p className="text-center text-gray-600 mb-4">{text.pleaseSignIn}</p>
             )}
+
+            {/* Show on Map - after buy button */}
+            <div className="mt-4">
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full flex items-center justify-center gap-2"
+                onClick={handleShowOnMap}
+              >
+                <MapPin className="w-5 h-5" />
+                {text.showOnMap}
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

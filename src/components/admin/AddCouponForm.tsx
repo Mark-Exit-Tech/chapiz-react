@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
 import { createCoupon, getBusinesses } from '@/lib/actions/admin';
+import { getDefaultValidFromDateOnly, getDefaultValidToDateOnly, parseDateOnlyLocal, parseDateOnlyEndOfDay } from '@/lib/utils/date';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useMemo } from 'react';
@@ -81,6 +82,15 @@ export default function AddCouponForm() {
   useEffect(() => {
     if (isOpen) {
       fetchBusinesses();
+      // Auto-select today and 2 weeks from today for Valid From / Valid To (date only, no time)
+      const timer = setTimeout(() => {
+        setFormData((prev) => ({
+          ...prev,
+          validFrom: getDefaultValidFromDateOnly(),
+          validTo: getDefaultValidToDateOnly(),
+        }));
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
@@ -136,13 +146,17 @@ export default function AddCouponForm() {
         throw new Error('Purchase limit must be a positive number or left empty for unlimited');
       }
 
-      const now = new Date();
-      const validFrom = formData.validFrom ? new Date(formData.validFrom) : null;
-      const validTo = formData.validTo ? new Date(formData.validTo) : null;
-      if (validFrom && validFrom.getTime() < now.getTime()) {
+      // Parse date-only as local time. Allow validFrom = today or yesterday (1 day back).
+      const validFrom = formData.validFrom ? parseDateOnlyLocal(formData.validFrom) : null;
+      const validTo = formData.validTo ? parseDateOnlyLocal(formData.validTo) : null;
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const oneDayBack = new Date(todayStart);
+      oneDayBack.setDate(oneDayBack.getDate() - 1);
+      if (validFrom && validFrom.getTime() < oneDayBack.getTime()) {
         throw new Error(text.errorValidFromPast);
       }
-      if (validTo && validTo.getTime() < now.getTime()) {
+      if (validTo && validTo.getTime() < todayStart.getTime()) {
         throw new Error(text.errorValidToPast);
       }
       if (validFrom && validTo && validTo.getTime() < validFrom.getTime()) {
@@ -156,8 +170,8 @@ export default function AddCouponForm() {
         price: 0,
         points: 0,
         imageUrl: formData.imageUrl,
-        validFrom: new Date(formData.validFrom),
-        validTo: new Date(formData.validTo),
+        validFrom: parseDateOnlyLocal(formData.validFrom),
+        validTo: parseDateOnlyEndOfDay(formData.validTo),
         stock: isNaN(stock as number) ? undefined : stock,
         businessIds: formData.businessIds.length > 0 ? formData.businessIds : undefined,
         purchaseLimit: purchaseLimit
@@ -280,7 +294,7 @@ export default function AddCouponForm() {
               <Input
                 id="validFrom"
                 name="validFrom"
-                type="datetime-local"
+                type="date"
                 value={formData.validFrom}
                 onChange={handleChange}
                 required
@@ -291,7 +305,7 @@ export default function AddCouponForm() {
               <Input
                 id="validTo"
                 name="validTo"
-                type="datetime-local"
+                type="date"
                 value={formData.validTo}
                 onChange={handleChange}
                 required

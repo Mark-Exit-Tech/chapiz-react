@@ -1,5 +1,4 @@
 import Navbar from '@/components/layout/Navbar';
-import BottomNavigation from '@/components/layout/BottomNavigation';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -112,11 +111,9 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex grow flex-col pb-16 md:pb-0">
-      {/* Navbar */}
+    <div className="flex grow flex-col">
       <Navbar />
 
-      {/* Always show the public landing page */}
       <PublicLandingPage t={t} navigate={navigate} />
 
       {/* Cookie Consent - Lazy loaded, not blocking initial render */}
@@ -126,11 +123,6 @@ export default function HomePage() {
           onReject={handleCookieReject}
         />
       </Suspense>
-
-      {/* Bottom Navigation - only visible on mobile */}
-      <div className="md:hidden">
-        <BottomNavigation />
-      </div>
     </div>
   );
 }

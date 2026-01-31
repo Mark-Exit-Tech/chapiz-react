@@ -158,11 +158,11 @@ export default function AdminSettingsPage() {
 
   return (
     <AdminLayout>
-      <div className="container mx-auto p-4 md:p-8">
+      <div className="container mx-auto p-4 md:p-8" dir={isHebrew ? 'rtl' : 'ltr'}>
       <div className="space-y-6">
         {/* Header */}
-        <div className="text-left rtl:text-right">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2">
+        <div className={isHebrew ? 'text-right' : 'text-left'}>
+          <h1 className={`text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end' : ''}`}>
             <Settings className="w-8 h-8" />
             {text.title}
           </h1>
@@ -174,26 +174,27 @@ export default function AdminSettingsPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Contact Information */}
           <div className="bg-white shadow-md rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <h2 className={`text-xl font-semibold mb-4 flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end' : ''}`}>
               <Mail className="w-5 h-5" />
               {text.contactInfo}
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="siteName">{text.siteName}</Label>
+                <Label htmlFor="siteName" className={isHebrew ? 'block text-right' : ''}>{text.siteName}</Label>
                 <Input
                   id="siteName"
                   type="text"
                   placeholder={text.siteNamePlaceholder}
                   value={formData.siteName}
                   onChange={handleChange}
+                  className={isHebrew ? 'text-right' : ''}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email" className="flex items-center ltr:gap-2 rtl:gap-2 rtl:flex-row-reverse">
-                  <Mail className="w-4 h-4" />
+                <Label htmlFor="email" className={`flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end text-right' : ''}`}>
+                  <Mail className="w-4 h-4 shrink-0" />
                   {text.email}
                 </Label>
                 <Input
@@ -202,31 +203,32 @@ export default function AdminSettingsPage() {
                   placeholder={text.emailPlaceholder}
                   value={formData.email}
                   onChange={handleChange}
+                  className={isHebrew ? 'text-right' : ''}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone" className="flex items-center ltr:gap-2 rtl:gap-2 rtl:flex-row-reverse">
-                  <Phone className="w-4 h-4" />
+                <Label htmlFor="phone" className={`flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end text-right' : ''}`}>
+                  <Phone className="w-4 h-4 shrink-0" />
                   {text.phone}
                 </Label>
                 <div className="relative" dir={isHebrew ? 'rtl' : 'ltr'}>
                   <Phone className="absolute top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 ltr:left-3 rtl:right-3" />
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder={text.phonePlaceholder}
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className="ltr:pl-10 rtl:pr-10"
-                    dir={isHebrew ? 'rtl' : 'ltr'}
-                  />
-                </div>
+<Input
+                  id="phone"
+                  type="tel"
+                  placeholder={text.phonePlaceholder}
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className={`ltr:pl-10 rtl:pr-10 ${isHebrew ? 'text-right' : ''}`}
+                  dir={isHebrew ? 'rtl' : 'ltr'}
+                />
               </div>
+            </div>
 
               <div className="space-y-2">
-                <Label htmlFor="address" className="flex items-center ltr:gap-2 rtl:gap-2 rtl:flex-row-reverse">
-                  <MapPin className="w-4 h-4" />
+                <Label htmlFor="address" className={`flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end text-right' : ''}`}>
+                  <MapPin className="w-4 h-4 shrink-0" />
                   {text.address}
                 </Label>
                 <Input
@@ -235,12 +237,13 @@ export default function AdminSettingsPage() {
                   placeholder={text.addressPlaceholder}
                   value={formData.address}
                   onChange={handleChange}
+                  className={isHebrew ? 'text-right' : ''}
                 />
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="workHours" className="flex items-center ltr:gap-2 rtl:gap-2 rtl:flex-row-reverse">
-                  <Clock className="w-4 h-4" />
+                <Label htmlFor="workHours" className={`flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end text-right' : ''}`}>
+                  <Clock className="w-4 h-4 shrink-0" />
                   {text.workHours}
                 </Label>
                 <Textarea
@@ -249,6 +252,8 @@ export default function AdminSettingsPage() {
                   rows={2}
                   value={formData.workHours}
                   onChange={handleChange}
+                  className={isHebrew ? 'text-right' : ''}
+                  dir={isHebrew ? 'rtl' : 'ltr'}
                 />
               </div>
             </div>
@@ -256,15 +261,15 @@ export default function AdminSettingsPage() {
 
           {/* Branding */}
           <div className="bg-white shadow-md rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <h2 className={`text-xl font-semibold mb-4 flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end' : ''}`}>
               <ImageIcon className="w-5 h-5" />
               {text.branding}
             </h2>
             
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="logo">{text.logo}</Label>
-                <div className="flex items-center gap-4">
+                <Label htmlFor="logo" className={isHebrew ? 'block text-right' : ''}>{text.logo}</Label>
+                <div className={`flex items-center gap-4 ${isHebrew ? 'flex-row-reverse' : ''}`}>
                   <div className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden">
                     {formData.logoUrl ? (
                       <img src={formData.logoUrl} alt="Logo" className="w-full h-full object-contain" />
@@ -272,7 +277,7 @@ export default function AdminSettingsPage() {
                       <ImageIcon className="w-8 h-8 text-gray-400" />
                     )}
                   </div>
-                  <div className="flex-1">
+                  <div className={`flex-1 ${isHebrew ? 'text-right' : ''}`}>
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -285,7 +290,7 @@ export default function AdminSettingsPage() {
                       variant="outline"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={uploading}
-                      className="gap-2"
+                      className={isHebrew ? 'gap-2 flex-row-reverse' : 'gap-2'}
                     >
                       <Upload className="w-4 h-4" />
                       {uploading ? text.uploading : text.uploadLogo}
@@ -299,15 +304,15 @@ export default function AdminSettingsPage() {
 
           {/* Social Media Links */}
           <div className="bg-white shadow-md rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <h2 className={`text-xl font-semibold mb-4 flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end' : ''}`}>
               <Globe className="w-5 h-5" />
               {text.socialLinks}
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="facebook" className="flex items-center ltr:gap-2 rtl:gap-2 rtl:flex-row-reverse">
-                  <Facebook className="w-4 h-4" />
+                <Label htmlFor="facebook" className={`flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end text-right' : ''}`}>
+                  <Facebook className="w-4 h-4 shrink-0" />
                   {text.facebook}
                 </Label>
                 <Input
@@ -316,12 +321,13 @@ export default function AdminSettingsPage() {
                   placeholder={text.facebookPlaceholder}
                   value={formData.facebook}
                   onChange={handleChange}
+                  className={isHebrew ? 'text-right' : ''}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="instagram" className="flex items-center ltr:gap-2 rtl:gap-2 rtl:flex-row-reverse">
-                  <Instagram className="w-4 h-4" />
+                <Label htmlFor="instagram" className={`flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end text-right' : ''}`}>
+                  <Instagram className="w-4 h-4 shrink-0" />
                   {text.instagram}
                 </Label>
                 <Input
@@ -330,12 +336,13 @@ export default function AdminSettingsPage() {
                   placeholder={text.instagramPlaceholder}
                   value={formData.instagram}
                   onChange={handleChange}
+                  className={isHebrew ? 'text-right' : ''}
                 />
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="whatsapp" className="flex items-center ltr:gap-2 rtl:gap-2 rtl:flex-row-reverse">
-                  <MessageCircle className="w-4 h-4" />
+                <Label htmlFor="whatsapp" className={`flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end text-right' : ''}`}>
+                  <MessageCircle className="w-4 h-4 shrink-0" />
                   {text.whatsapp}
                 </Label>
                 <div className="relative" dir={isHebrew ? 'rtl' : 'ltr'}>
@@ -346,25 +353,25 @@ export default function AdminSettingsPage() {
                     placeholder={text.whatsappPlaceholder}
                     value={formData.whatsapp}
                     onChange={handleChange}
-                    className="ltr:pl-10 rtl:pr-10"
+                    className={`ltr:pl-10 rtl:pr-10 ${isHebrew ? 'text-right' : ''}`}
                     dir={isHebrew ? 'rtl' : 'ltr'}
                   />
                 </div>
-                <p className="text-sm text-gray-500">{text.whatsappHelp}</p>
+                <p className={`text-sm text-gray-500 ${isHebrew ? 'text-right' : ''}`}>{text.whatsappHelp}</p>
               </div>
             </div>
           </div>
 
           {/* Store Link */}
           <div className="bg-white shadow-md rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <h2 className={`text-xl font-semibold mb-4 flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end' : ''}`}>
               <ShoppingBag className="w-5 h-5" />
               {text.storeLink}
             </h2>
 
             <div className="space-y-2">
-              <Label htmlFor="storeUrl" className="flex items-center ltr:gap-2 rtl:gap-2 rtl:flex-row-reverse">
-                <ShoppingBag className="w-4 h-4" />
+              <Label htmlFor="storeUrl" className={`flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end text-right' : ''}`}>
+                <ShoppingBag className="w-4 h-4 shrink-0" />
                 {text.storeUrl}
               </Label>
               <Input
@@ -373,13 +380,14 @@ export default function AdminSettingsPage() {
                 placeholder={text.storeUrlPlaceholder}
                 value={formData.storeUrl || ''}
                 onChange={handleChange}
+                className={isHebrew ? 'text-right' : ''}
               />
-              <p className="text-sm text-gray-500">{text.storeUrlHelp}</p>
+              <p className={`text-sm text-gray-500 ${isHebrew ? 'text-right' : ''}`}>{text.storeUrlHelp}</p>
             </div>
           </div>
 
           {/* Save Button */}
-          <div className="flex justify-end">
+          <div className={`flex ${isHebrew ? 'justify-start' : 'justify-end'}`}>
             <Button type="submit" disabled={saving} className="px-6">
               {saving ? text.saving : text.save}
             </Button>

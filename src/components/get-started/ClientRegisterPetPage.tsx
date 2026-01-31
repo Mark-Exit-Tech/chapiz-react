@@ -326,19 +326,22 @@ export default function ClientRegisterPetPage({
         className="flex h-full grow flex-col p-4"
         dir={locale === 'he' ? 'rtl' : 'ltr'}
       >
-        <div className="flex w-full justify-start">
-          <BackButton handleBack={handleBack} />
-        </div>
-        <div className="grow">{StepComponent}</div>
-        <div className="flex w-full flex-row items-center justify-between">
-          <GetStartedProgressDots
-            numberOfDots={schemaSteps.length}
-            currentDot={currentStep}
-          />
-          <GetStartedFloatingActionButton
-            isLastStep={currentStep === schemaSteps.length - 1}
-            loading={loading}
-          />
+        {/* Limit width: 1204px */}
+        <div className="mx-auto w-full max-w-[1204px] flex flex-col grow">
+          <div className="flex w-full justify-start">
+            <BackButton handleBack={handleBack} />
+          </div>
+          <div className="grow">{StepComponent}</div>
+          <div className="flex w-full flex-row items-center justify-between">
+            <GetStartedProgressDots
+              numberOfDots={schemaSteps.length}
+              currentDot={currentStep}
+            />
+            <GetStartedFloatingActionButton
+              isLastStep={currentStep === schemaSteps.length - 1}
+              loading={loading}
+            />
+          </div>
         </div>
       </form>
     </FormProvider>

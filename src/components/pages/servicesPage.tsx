@@ -246,7 +246,7 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
                 </div>
 
                 {/* Search Bar - Full width on mobile, grows on desktop */}
-                <div className="relative h-9 grow rounded-lg bg-white border border-gray-200">
+                <div className="relative h-9 grow rounded-lg bg-white border border-gray-200 shrink-0 min-w-0">
                   <Search
                     className="absolute top-1/2 -translate-y-1/2 transform text-gray-400 ltr:left-3 rtl:right-3 pointer-events-none"
                     size={16}
@@ -257,6 +257,10 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
                     onChange={(e) => setSearch(e.target.value)}
                     className="w-full h-full rounded-lg p-2 ltr:pl-10 rtl:pr-10 border-none focus-visible:ring-0"
                     dir={isHebrew ? 'rtl' : 'ltr'}
+                    translate="no"
+                    autoComplete="off"
+                    inputMode="search"
+                    aria-label={text.searchPlaceholder}
                   />
                 </div>
               </div>

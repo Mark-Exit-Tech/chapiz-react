@@ -466,7 +466,7 @@ export async function createAd(data: any) {
   }
 }
 
-/** Validate voucher/coupon dates: no past dates, validTo >= validFrom */
+/** Validate voucher/coupon dates. Allow validFrom up to 1 day in the past; validTo must be today or future. */
 function validateVoucherCouponDates(validFrom: Date | string, validTo: Date | string, isCreate: boolean): string | null {
   const from = new Date(validFrom);
   const to = new Date(validTo);
@@ -474,8 +474,9 @@ function validateVoucherCouponDates(validFrom: Date | string, validTo: Date | st
     return 'Valid From and Valid To must be valid dates';
   }
   const now = new Date();
+  const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
   if (isCreate) {
-    if (from.getTime() < now.getTime()) {
+    if (from.getTime() < oneDayAgo.getTime()) {
       return 'Valid From date cannot be in the past';
     }
     if (to.getTime() < now.getTime()) {

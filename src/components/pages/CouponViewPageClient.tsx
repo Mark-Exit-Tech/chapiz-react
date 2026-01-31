@@ -400,16 +400,19 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
                 </div>
             </div>
 
-            {/* Confirmation Dialog */}
+            {/* Confirmation Dialog - RTL support for Hebrew */}
             <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
+              <DialogContent
+                className="sm:max-w-md"
+                dir={isHebrew ? 'rtl' : 'ltr'}
+              >
+                <DialogHeader className={isHebrew ? 'text-right' : 'text-left'}>
                   <DialogTitle>{text.confirmUse}</DialogTitle>
-                  <DialogDescription>
+                  <DialogDescription className={isHebrew ? 'text-right' : 'text-left'}>
                     {text.confirmUseMessage}
                   </DialogDescription>
                 </DialogHeader>
-                <DialogFooter>
+                <DialogFooter className={`flex gap-2 sm:justify-end ${isHebrew ? 'flex-row-reverse' : ''}`}>
                   <Button
                     variant="outline"
                     onClick={() => setShowConfirmDialog(false)}
@@ -424,12 +427,12 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
                   >
                     {isUsingCoupon ? (
                       <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin me-2" />
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin ltr:me-2 rtl:ms-2" />
                         {text.using}
                       </>
                     ) : (
                       <>
-                        <CheckCircle2 className="w-4 h-4 me-2" />
+                        <CheckCircle2 className="w-4 h-4 ltr:me-2 rtl:ms-2" />
                         {text.confirm}
                       </>
                     )}

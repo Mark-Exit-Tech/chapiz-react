@@ -90,6 +90,11 @@ export default function CouponsTable() {
     return validTo.getTime() < Date.now();
   };
 
+  const firstThreeWords = (str: string | null | undefined): string => {
+    if (!str || typeof str !== 'string') return '';
+    return str.trim().split(/\s+/).slice(0, 3).join(' ');
+  };
+
   const fetchCoupons = async () => {
     try {
       setLoading(true);
@@ -279,8 +284,11 @@ export default function CouponsTable() {
                   <TableCell className={`font-medium ${isHebrew ? 'text-right' : ''}`}>
                     {coupon.name}
                   </TableCell>
-                  <TableCell className={`max-w-xs truncate ${isHebrew ? 'text-right' : ''}`}>
-                    {coupon.description}
+                  <TableCell
+                    className={`max-w-xs truncate ${isHebrew ? 'text-right' : ''}`}
+                    title={coupon.description ?? undefined}
+                  >
+                    {firstThreeWords(coupon.description)}
                   </TableCell>
                   <TableCell className={isHebrew ? 'text-right' : ''}>
                     {coupon.imageUrl ? (

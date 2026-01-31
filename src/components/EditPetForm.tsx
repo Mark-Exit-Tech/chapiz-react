@@ -599,6 +599,25 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
 
                 {/* Action Buttons */}
                 <div className="flex justify-between pt-6">
+                  {/* Save Button */}
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting || uploadProgress.status === 'uploading'}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2" />
+                        {text.form.updating}
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4 mr-2" />
+                        {text.form.save}
+                      </>
+                    )}
+                  </Button>
+
                   {/* Delete Button */}
                   <Button
                     type="button"
@@ -609,25 +628,6 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
                     {text.delete}
-                  </Button>
-
-                  {/* Save Button */}
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting || uploadProgress.status === 'uploading'}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        {text.form.updating}
-                      </>
-                    ) : (
-                      <>
-                        <Save className="w-4 h-4 mr-2" />
-                        {text.form.save}
-                      </>
-                    )}
                   </Button>
                 </div>
               </form>

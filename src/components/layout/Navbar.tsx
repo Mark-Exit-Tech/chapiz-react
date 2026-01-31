@@ -152,7 +152,32 @@ const Navbar = () => {
                         </div>
                       </div>
                       <DropdownMenuSeparator />
-                      {/* Settings and Actions */}
+                      {/* My Pets, Coupons, Vouchers, Services - show on mobile too */}
+                      <DropdownMenuItem asChild>
+                        <Link to="/pages/my-pets" className="flex items-center">
+                          <PawPrint className="mr-2 h-4 w-4" />
+                          <span>{t('components.Navbar.myPets')}</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/coupons" className="flex items-center">
+                          <Ticket className="mr-2 h-4 w-4" />
+                          <span>{t('components.Navbar.allPromos')}</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/vouchers" className="flex items-center">
+                          <Gift className="mr-2 h-4 w-4" />
+                          <span>{t('components.Navbar.coupons')}</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/services" className="flex items-center">
+                          <MapPin className="mr-2 h-4 w-4" />
+                          <span>{t('components.Navbar.services')}</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
                         <Link to="/user/settings" className="flex items-center">
                           <CircleUserRound className="mr-2 h-4 w-4" />
@@ -329,6 +354,31 @@ const Navbar = () => {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56" align={locale === 'he' ? 'start' : 'end'}>
+                      <DropdownMenuItem asChild>
+                        <Link to="/pages/my-pets" className="flex items-center">
+                          <PawPrint className="mr-2 h-4 w-4" />
+                          <span>{t('components.Navbar.myPets')}</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/coupons" className="flex items-center">
+                          <Ticket className="mr-2 h-4 w-4" />
+                          <span>{t('components.Navbar.allPromos')}</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/vouchers" className="flex items-center">
+                          <Gift className="mr-2 h-4 w-4" />
+                          <span>{t('components.Navbar.coupons')}</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/services" className="flex items-center">
+                          <MapPin className="mr-2 h-4 w-4" />
+                          <span>{t('components.Navbar.services')}</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
                         <Link to="/contact" className="flex items-center">
                           <Mail className="mr-2 h-4 w-4" />

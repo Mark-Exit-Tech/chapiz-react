@@ -195,18 +195,8 @@ function calculateFuzzyScore(query: string, target: string): { score: number; ma
 /**
  * Highlight matched characters in a string
  */
-function highlightMatches(text: string, matchedIndices: number[]): string {
-  if (matchedIndices.length === 0) return text;
-  
-  let result = '';
-  for (let i = 0; i < text.length; i++) {
-    if (matchedIndices.includes(i)) {
-      result += `<mark class="bg-yellow-200 text-yellow-900 px-0.5 rounded">${text[i]}</mark>`;
-    } else {
-      result += text[i];
-    }
-  }
-  return result;
+function highlightMatches(text: string, _matchedIndices: number[]): string {
+  return text;
 }
 
 /**
@@ -325,10 +315,7 @@ export function getSuggestions(
           item,
           score: 30 - item.name.length, // Simple scoring based on length
           matchedIndices: [],
-          highlightedName: item.name.replace(
-            new RegExp(`(${queryLower})`, 'gi'),
-            '<mark class="bg-yellow-200 text-yellow-900 px-0.5 rounded">$1</mark>'
-          )
+          highlightedName: item.name
         });
       }
     }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, ShoppingCart, Share2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ShoppingCart, Share2, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useLocale } from '@/hooks/use-locale';
 import { markVoucherAsUsed, type UserVoucher } from '@/lib/firebase/database/vouchers';
@@ -37,6 +37,15 @@ export default function VoucherViewPageClient({ userVoucher }: VoucherViewPageCl
     share: isHebrew ? 'שתף' : 'Share',
     couponMarkedAsUsed: isHebrew ? 'השובר סומן כמשומש' : 'Voucher marked as used',
     failedToMarkAsUsed: isHebrew ? 'נכשל בסימון השובר כמשומש' : 'Failed to mark voucher as used',
+    showOnMap: isHebrew ? 'הצג במפה' : 'Show on Map',
+  };
+
+  const businessIds = (voucher.businessIds || (voucher.businessId ? [voucher.businessId] : [])).filter(Boolean);
+  const handleShowOnMap = () => {
+    const url = businessIds.length > 0
+      ? `/${locale}/services?businessId=${businessIds.join(',')}`
+      : `/${locale}/services`;
+    navigate(url);
   };
 
   useEffect(() => {
@@ -194,11 +203,24 @@ export default function VoucherViewPageClient({ userVoucher }: VoucherViewPageCl
                 variant="outline"
                 size="lg"
                 onClick={handleShare}
-                className={userVoucher.status === 'used' ? 'w-full' : 'flex-1'}
+                className="w-full sm:flex-1"
                 disabled={!isMounted || !voucherUrl}
               >
                 <Share2 className="w-4 h-4 me-2" />
                 {text.share}
+              </Button>
+            </div>
+
+            {/* Show on Map - after Use / Share buttons */}
+            <div className="mt-4">
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full flex items-center justify-center gap-2"
+                onClick={handleShowOnMap}
+              >
+                <MapPin className="w-5 h-5" />
+                {text.showOnMap}
               </Button>
             </div>
           </CardContent>

@@ -17,6 +17,7 @@ import { Plus } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 import MediaUpload from '@/components/admin/MediaUpload';
 import { createVoucher, getBusinesses } from '@/lib/actions/admin';
+import { getDefaultValidFromDateOnly, getDefaultValidToDateOnly, parseDateOnlyLocal, parseDateOnlyEndOfDay } from '@/lib/utils/date';
 import { Business } from '@/types/promo';
 
 interface AddVoucherFormProps {
@@ -79,6 +80,15 @@ export default function AddVoucherForm({ onSuccess }: AddVoucherFormProps) {
   useEffect(() => {
     if (isOpen) {
       fetchBusinesses();
+      // Auto-select today and 2 weeks from today for Valid From / Valid To (date only, no time)
+      const timer = setTimeout(() => {
+        setFormData((prev) => ({
+          ...prev,
+          validFrom: getDefaultValidFromDateOnly(),
+          validTo: getDefaultValidToDateOnly(),
+        }));
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
@@ -123,15 +133,19 @@ export default function AddVoucherForm({ onSuccess }: AddVoucherFormProps) {
     setIsSubmitting(true);
 
     try {
-      const now = new Date();
-      const validFrom = formData.validFrom ? new Date(formData.validFrom) : null;
-      const validTo = formData.validTo ? new Date(formData.validTo) : null;
-      if (validFrom && validFrom.getTime() < now.getTime()) {
+      // Parse date-only as local time. Allow validFrom = today or yesterday (1 day back).
+      const validFrom = formData.validFrom ? parseDateOnlyLocal(formData.validFrom) : null;
+      const validTo = formData.validTo ? parseDateOnlyLocal(formData.validTo) : null;
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const oneDayBack = new Date(todayStart);
+      oneDayBack.setDate(oneDayBack.getDate() - 1);
+      if (validFrom && validFrom.getTime() < oneDayBack.getTime()) {
         alert(text.errorValidFromPast);
         setIsSubmitting(false);
         return;
       }
-      if (validTo && validTo.getTime() < now.getTime()) {
+      if (validTo && validTo.getTime() < todayStart.getTime()) {
         alert(text.errorValidToPast);
         setIsSubmitting(false);
         return;
@@ -141,7 +155,11 @@ export default function AddVoucherForm({ onSuccess }: AddVoucherFormProps) {
         setIsSubmitting(false);
         return;
       }
-      const result = await createVoucher(formData);
+      const result = await createVoucher({
+        ...formData,
+        validFrom: parseDateOnlyLocal(formData.validFrom).toISOString(),
+        validTo: parseDateOnlyEndOfDay(formData.validTo).toISOString(),
+      });
       
       if (result.success) {
         alert(isHebrew ? '✅ שובר נוצר בהצלחה!' : '✅ Voucher created successfully!');
@@ -295,7 +313,7 @@ export default function AddVoucherForm({ onSuccess }: AddVoucherFormProps) {
               <Input
                 id="validFrom"
                 name="validFrom"
-                type="datetime-local"
+                type="date"
                 value={formData.validFrom}
                 onChange={handleChange}
                 required
@@ -306,7 +324,7 @@ export default function AddVoucherForm({ onSuccess }: AddVoucherFormProps) {
               <Input
                 id="validTo"
                 name="validTo"
-                type="datetime-local"
+                type="date"
                 value={formData.validTo}
                 onChange={handleChange}
                 required

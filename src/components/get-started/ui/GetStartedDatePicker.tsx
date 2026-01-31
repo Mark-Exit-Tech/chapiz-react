@@ -92,12 +92,15 @@ const GetStartedDatePicker = ({
           <Button
             variant="outline"
             {...props}
+            dir={isRTL ? 'rtl' : 'ltr'}
             className={cn(
-              "h-10 w-full justify-start border-gray-300 bg-white px-3 text-base font-normal hover:bg-white",
-              isRTL && "justify-end"
+              "h-10 w-full border-gray-300 bg-white px-3 text-base font-normal hover:bg-white",
+              isRTL ? "justify-end text-right" : "justify-start text-left"
             )}
           >
-            <span className={cn(isRTL && "text-right")}>{value ? format(parsedDate!, 'dd/MM/yyyy') : ''}</span>
+            <span className={cn("block w-full", isRTL ? "text-right" : "text-left")}>
+              {value ? format(parsedDate!, 'dd/MM/yyyy') : ''}
+            </span>
           </Button>
         </PopoverTrigger>
         <PopoverContent className="flex w-auto p-0" align="start" dir={isRTL ? 'rtl' : 'ltr'}>
