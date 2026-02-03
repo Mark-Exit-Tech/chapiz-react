@@ -181,8 +181,8 @@ export async function updateUserByUid(uid: string, updates: {
   couponPurchaseLimit?: number | null;
 }): Promise<{ success: boolean; error?: string }> {
   try {
-    const updateData: Partial<User> = {};
-    
+    const updateData: Record<string, unknown> = {};
+
     if (updates.displayName !== undefined) {
       updateData.display_name = updates.displayName;
       updateData.full_name = updates.displayName;
@@ -201,8 +201,8 @@ export async function updateUserByUid(uid: string, updates: {
     if (updates.couponPurchaseLimit !== undefined) {
       updateData.couponPurchaseLimit = updates.couponPurchaseLimit == null ? deleteField() : updates.couponPurchaseLimit;
     }
-    
-    await updateUser(uid, updateData);
+
+    await updateUser(uid, updateData as Partial<User>);
     return { success: true };
   } catch (error) {
     return { 

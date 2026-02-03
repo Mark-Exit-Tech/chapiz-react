@@ -140,7 +140,7 @@ const Navbar = () => {
                         <Menu className="h-5 w-5" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56" align={locale === 'he' ? 'start' : 'end'} dir={locale === 'he' ? 'rtl' : 'ltr'}>
+                    <DropdownMenuContent className="w-56" align={locale === 'he' ? 'start' : 'end'}>
                       <div className="flex items-center gap-2 p-2">
                         <div className="flex flex-col space-y-1 leading-none min-w-0">
                           {user?.displayName && (
@@ -227,7 +227,7 @@ const Navbar = () => {
                         <Menu className="h-5 w-5" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56" align={locale === 'he' ? 'start' : 'end'} dir={locale === 'he' ? 'rtl' : 'ltr'}>
+                    <DropdownMenuContent className="w-56" align={locale === 'he' ? 'start' : 'end'}>
                       <div className="flex items-center justify-start gap-2 p-2">
                         <div className="flex flex-col space-y-1 leading-none">
                           {user?.displayName && (
@@ -353,7 +353,7 @@ const Navbar = () => {
                         <Menu className="h-5 w-5" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56" align={locale === 'he' ? 'start' : 'end'} dir={locale === 'he' ? 'rtl' : 'ltr'}>
+                    <DropdownMenuContent className="w-56" align={locale === 'he' ? 'start' : 'end'}>
                       <DropdownMenuItem asChild>
                         <Link to="/pages/my-pets" className="flex items-center">
                           <PawPrint className="mr-2 h-4 w-4" />
