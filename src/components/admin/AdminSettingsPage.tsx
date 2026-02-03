@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { uploadProfileImage } from '@/lib/firebase/storage';
+import { validateImageFile, DEFAULT_MAX_SIZE_BYTES } from '@/lib/validation/image';
 import { getSiteSettings, saveSiteSettings, SiteSettings } from '@/lib/firebase/database/settings';
 import AdminLayout from './AdminLayout';
 
@@ -79,7 +80,9 @@ export default function AdminSettingsPage() {
     saving: isHebrew ? 'שומר...' : 'Saving...',
     saved: isHebrew ? 'נשמר בהצלחה' : 'Saved successfully',
     uploading: isHebrew ? 'מעלה...' : 'Uploading...',
-    uploadError: isHebrew ? 'שגיאה בהעלאת תמונה' : 'Error uploading image'
+    uploadError: isHebrew ? 'שגיאה בהעלאת תמונה' : 'Error uploading image',
+    imageInvalidType: isHebrew ? 'פורמט לא נתמך. העלה JPG, PNG, GIF או WebP' : 'Invalid format. Use JPG, PNG, GIF or WebP',
+    imageTooLarge: isHebrew ? 'התמונה גדולה מדי. מקסימום 10MB' : 'Image too large. Maximum 10MB',
   };
 
   // Load settings on mount
@@ -109,6 +112,19 @@ export default function AdminSettingsPage() {
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    const validation = validateImageFile(file, {
+      maxSizeBytes: DEFAULT_MAX_SIZE_BYTES,
+      errors: {
+        noFile: text.uploadError,
+        type: text.imageInvalidType,
+        size: text.imageTooLarge,
+      },
+    });
+    if (!validation.valid) {
+      alert(validation.error);
+      return;
+    }
 
     try {
       setUploading(true);
@@ -162,8 +178,8 @@ export default function AdminSettingsPage() {
       <div className="space-y-6">
         {/* Header */}
         <div className={isHebrew ? 'text-right' : 'text-left'}>
-          <h1 className={`text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end' : ''}`}>
-            <Settings className="w-8 h-8" />
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2">
+            <Settings className="w-8 h-8 shrink-0" />
             {text.title}
           </h1>
           <p className="text-gray-600 mt-2 text-sm md:text-base">
@@ -174,8 +190,8 @@ export default function AdminSettingsPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Contact Information */}
           <div className="bg-white shadow-md rounded-lg p-6">
-            <h2 className={`text-xl font-semibold mb-4 flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end' : ''}`}>
-              <Mail className="w-5 h-5" />
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <Mail className="w-5 h-5 shrink-0" />
               {text.contactInfo}
             </h2>
             
@@ -193,7 +209,7 @@ export default function AdminSettingsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email" className={`flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end text-right' : ''}`}>
+                <Label htmlFor="email" className={`flex items-center gap-2 ${isHebrew ? 'text-right' : ''}`}>
                   <Mail className="w-4 h-4 shrink-0" />
                   {text.email}
                 </Label>
@@ -208,26 +224,26 @@ export default function AdminSettingsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone" className={`flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end text-right' : ''}`}>
+                <Label htmlFor="phone" className={`flex items-center gap-2 ${isHebrew ? 'text-right' : ''}`}>
                   <Phone className="w-4 h-4 shrink-0" />
                   {text.phone}
                 </Label>
                 <div className="relative" dir={isHebrew ? 'rtl' : 'ltr'}>
-                  <Phone className="absolute top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 ltr:left-3 rtl:right-3" />
-<Input
+                  <Phone className="absolute top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 start-3" />
+                  <Input
                   id="phone"
                   type="tel"
                   placeholder={text.phonePlaceholder}
                   value={formData.phone}
                   onChange={handleChange}
-                  className={`ltr:pl-10 rtl:pr-10 ${isHebrew ? 'text-right' : ''}`}
+                  className={`ps-10 ${isHebrew ? 'text-right' : ''}`}
                   dir={isHebrew ? 'rtl' : 'ltr'}
                 />
               </div>
             </div>
 
               <div className="space-y-2">
-                <Label htmlFor="address" className={`flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end text-right' : ''}`}>
+                <Label htmlFor="address" className={`flex items-center gap-2 ${isHebrew ? 'text-right' : ''}`}>
                   <MapPin className="w-4 h-4 shrink-0" />
                   {text.address}
                 </Label>
@@ -242,7 +258,7 @@ export default function AdminSettingsPage() {
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="workHours" className={`flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end text-right' : ''}`}>
+                <Label htmlFor="workHours" className={`flex items-center gap-2 ${isHebrew ? 'text-right' : ''}`}>
                   <Clock className="w-4 h-4 shrink-0" />
                   {text.workHours}
                 </Label>
@@ -261,8 +277,8 @@ export default function AdminSettingsPage() {
 
           {/* Branding */}
           <div className="bg-white shadow-md rounded-lg p-6">
-            <h2 className={`text-xl font-semibold mb-4 flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end' : ''}`}>
-              <ImageIcon className="w-5 h-5" />
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <ImageIcon className="w-5 h-5 shrink-0" />
               {text.branding}
             </h2>
             
@@ -281,7 +297,7 @@ export default function AdminSettingsPage() {
                     <input
                       ref={fileInputRef}
                       type="file"
-                      accept="image/*"
+                      accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                       onChange={handleLogoUpload}
                       className="hidden"
                     />
@@ -304,14 +320,14 @@ export default function AdminSettingsPage() {
 
           {/* Social Media Links */}
           <div className="bg-white shadow-md rounded-lg p-6">
-            <h2 className={`text-xl font-semibold mb-4 flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end' : ''}`}>
-              <Globe className="w-5 h-5" />
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <Globe className="w-5 h-5 shrink-0" />
               {text.socialLinks}
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="facebook" className={`flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end text-right' : ''}`}>
+                <Label htmlFor="facebook" className={`flex items-center gap-2 ${isHebrew ? 'text-right' : ''}`}>
                   <Facebook className="w-4 h-4 shrink-0" />
                   {text.facebook}
                 </Label>
@@ -326,7 +342,7 @@ export default function AdminSettingsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="instagram" className={`flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end text-right' : ''}`}>
+                <Label htmlFor="instagram" className={`flex items-center gap-2 ${isHebrew ? 'text-right' : ''}`}>
                   <Instagram className="w-4 h-4 shrink-0" />
                   {text.instagram}
                 </Label>
@@ -341,19 +357,19 @@ export default function AdminSettingsPage() {
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="whatsapp" className={`flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end text-right' : ''}`}>
+                <Label htmlFor="whatsapp" className={`flex items-center gap-2 ${isHebrew ? 'text-right' : ''}`}>
                   <MessageCircle className="w-4 h-4 shrink-0" />
                   {text.whatsapp}
                 </Label>
                 <div className="relative" dir={isHebrew ? 'rtl' : 'ltr'}>
-                  <MessageCircle className="absolute top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 ltr:left-3 rtl:right-3" />
+                  <MessageCircle className="absolute top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 start-3" />
                   <Input
                     id="whatsapp"
                     type="tel"
                     placeholder={text.whatsappPlaceholder}
                     value={formData.whatsapp}
                     onChange={handleChange}
-                    className={`ltr:pl-10 rtl:pr-10 ${isHebrew ? 'text-right' : ''}`}
+                    className={`ps-10 ${isHebrew ? 'text-right' : ''}`}
                     dir={isHebrew ? 'rtl' : 'ltr'}
                   />
                 </div>
@@ -364,13 +380,13 @@ export default function AdminSettingsPage() {
 
           {/* Store Link */}
           <div className="bg-white shadow-md rounded-lg p-6">
-            <h2 className={`text-xl font-semibold mb-4 flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end' : ''}`}>
-              <ShoppingBag className="w-5 h-5" />
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <ShoppingBag className="w-5 h-5 shrink-0" />
               {text.storeLink}
             </h2>
 
             <div className="space-y-2">
-              <Label htmlFor="storeUrl" className={`flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end text-right' : ''}`}>
+              <Label htmlFor="storeUrl" className={`flex items-center gap-2 ${isHebrew ? 'text-right' : ''}`}>
                 <ShoppingBag className="w-4 h-4 shrink-0" />
                 {text.storeUrl}
               </Label>

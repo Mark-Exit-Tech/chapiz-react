@@ -1,6 +1,6 @@
 'use client';
 
-import { Search, X } from 'lucide-react';
+import { X, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLocale } from '@/hooks/use-locale';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -214,6 +214,9 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
           services={servicesToDisplay}
           initialHighlightedServiceId={businessId}
           filterType={filterType}
+          drawerSearchValue={search}
+          onDrawerSearchChange={setSearch}
+          drawerSearchPlaceholder={text.searchPlaceholder}
           headerContent={
             <div className="space-y-4">
               {/* Title and Filter Chips on Same Row */}
@@ -225,10 +228,9 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
                 />
               </div>
 
-              {/* Search Bar and Filter Row */}
-              <div className="flex flex-col sm:flex-row gap-3" dir={isHebrew ? 'rtl' : 'ltr'}>
-                {/* Tags Filter - Full width on mobile, fixed width on desktop */}
-                <div className="w-full sm:w-[200px] shrink-0">
+              {/* Filter Row - Tags + Search (search only on desktop; mobile uses bottom sheet search) */}
+              <div className="w-full flex flex-col md:flex-row gap-3" dir={isHebrew ? 'rtl' : 'ltr'}>
+                <div className="w-full md:min-w-0 md:flex-1">
                   <TagsFilter
                     tags={availableTags}
                     selectedTags={selectedTags}
@@ -244,11 +246,10 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
                     dir={isHebrew ? 'rtl' : 'ltr'}
                   />
                 </div>
-
-                {/* Search Bar - Full width on mobile, grows on desktop */}
-                <div className="relative h-9 grow rounded-lg bg-white border border-gray-200 shrink-0 min-w-0">
+                {/* Desktop-only search box */}
+                <div className="hidden md:flex relative h-9 flex-1 min-w-0 rounded-lg border border-gray-200 bg-white">
                   <Search
-                    className="absolute top-1/2 -translate-y-1/2 transform text-gray-400 ltr:left-3 rtl:right-3 pointer-events-none"
+                    className="absolute top-1/2 -translate-y-1/2 text-gray-400 ltr:left-3 rtl:right-3 pointer-events-none"
                     size={16}
                   />
                   <Input
@@ -257,7 +258,6 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ ads, businessId }) => {
                     onChange={(e) => setSearch(e.target.value)}
                     className="w-full h-full rounded-lg p-2 ltr:pl-10 rtl:pr-10 border-none focus-visible:ring-0"
                     dir={isHebrew ? 'rtl' : 'ltr'}
-                    translate="no"
                     autoComplete="off"
                     inputMode="search"
                     aria-label={text.searchPlaceholder}

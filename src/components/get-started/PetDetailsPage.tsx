@@ -92,7 +92,7 @@ const PetDetailsPage: React.FC<PetDetailsPageProps> = () => {
               folder="pets"
               value={field.value} // Controlled value
               onFileChange={field.onChange} // Controlled onChange
-              required={false}
+              required={true}
               error={errors.imageUrl?.message as string}
             />
           )}
@@ -188,6 +188,7 @@ const PetDetailsPage: React.FC<PetDetailsPageProps> = () => {
               label={t('form.BirthDate')}
               id="date"
               maxDate={new Date()} // Restrict to today and earlier
+              calendarPrefix={t('form.calendarEmoji')}
               {...field}
               onChange={(date) => {
                 field.onChange(date);

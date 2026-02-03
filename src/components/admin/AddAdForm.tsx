@@ -71,8 +71,10 @@ export default function AddAdForm() {
     fileFormats: isHebrew ? 'פורמטים נתמכים' : 'Supported formats',
     search: isHebrew ? 'חיפוש...' : 'Search...',
     noOptions: isHebrew ? 'לא נמצאו אפשרויות' : 'No options found',
-    selectPetTypeFirst: isHebrew ? 'בחר סוג חיה מלבד "אחר" כדי לבחור גזע' : 'Select pet type(s) other than "Other" to choose breed'
+    selectPetTypeFirst: isHebrew ? 'בחר סוג חיה מלבד "אחר" כדי לבחור גזע' : 'Select pet type(s) other than "Other" to choose breed',
+    requiredField: isHebrew ? 'שדה חובה' : 'Required field'
   };
+  const [fieldErrors, setFieldErrors] = useState<Record<string, boolean>>({});
   const [formData, setFormData] = useState({
     title: '',
     content: '',
@@ -131,6 +133,7 @@ export default function AddAdForm() {
     >
   ) => {
     const { name, value } = e.target;
+    setFieldErrors((prev) => ({ ...prev, [name]: false }));
     setFormData((prev) => ({
       ...prev,
       [name]: value
@@ -157,8 +160,18 @@ export default function AddAdForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setError(null);
+    const required: Record<string, boolean> = {
+      title: !formData.title.trim(),
+      youtubeUrl: mediaType === 'youtube' ? !formData.youtubeUrl.trim() : false,
+      content: mediaType !== 'youtube' ? !formData.content.trim() : false
+    };
+    if (Object.values(required).some(Boolean)) {
+      setFieldErrors(required);
+      return;
+    }
+    setFieldErrors({});
+    setIsSubmitting(true);
 
     try {
       // Determine ad type and content based on media type
@@ -255,8 +268,9 @@ export default function AddAdForm() {
               name="title"
               value={formData.title}
               onChange={handleChange}
-              required
+              className={fieldErrors.title ? 'border-red-500 ring-2 ring-red-200' : ''}
             />
+            {fieldErrors.title && <p className="text-sm text-red-600">{text.requiredField}</p>}
           </div>
 
 
@@ -307,8 +321,9 @@ export default function AddAdForm() {
                 onChange={handleChange}
                 placeholder="https://www.youtube.com/watch?v=..."
                 type="url"
-                required
+                className={fieldErrors.youtubeUrl ? 'border-red-500 ring-2 ring-red-200' : ''}
               />
+              {fieldErrors.youtubeUrl && <p className="text-sm text-red-600">{text.requiredField}</p>}
               <p className="text-sm text-gray-500">
                 {text.youtubeUrlHelp || 'Enter a YouTube video URL'}
               </p>
@@ -329,13 +344,17 @@ export default function AddAdForm() {
           ) : (
             <div className="space-y-2">
               <Label htmlFor="content">{text.content}</Label>
-              <MediaUpload
-                type={mediaType}
-                value={formData.content}
-                onChange={(filePath) => {
-                  setFormData((prev) => ({ ...prev, content: filePath }));
-                }}
-              />
+              <div className={fieldErrors.content ? 'rounded-md ring-2 ring-red-200 ring-offset-0' : ''}>
+                <MediaUpload
+                  type={mediaType}
+                  value={formData.content}
+                  onChange={(filePath) => {
+                    setFieldErrors((prev) => ({ ...prev, content: false }));
+                    setFormData((prev) => ({ ...prev, content: filePath }));
+                  }}
+                />
+              </div>
+              {fieldErrors.content && <p className="text-sm text-red-600">{text.requiredField}</p>}
             </div>
           )}
 

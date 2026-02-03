@@ -26,6 +26,8 @@ interface GetStartedDatePickerProps {
   required?: boolean;
   maxDate?: Date; // Maximum selectable date
   onChange: (date: Date | null) => void;
+  /** Calendar emoji or prefix from translation (e.g. "📅 ") */
+  calendarPrefix?: string;
 }
 
 const GetStartedDatePicker = ({
@@ -35,6 +37,7 @@ const GetStartedDatePicker = ({
   required = false,
   maxDate,
   onChange,
+  calendarPrefix = '📅 ',
   ...props
 }: GetStartedDatePickerProps) => {
   const locale = useLocale() as string;
@@ -94,12 +97,12 @@ const GetStartedDatePicker = ({
             {...props}
             dir={isRTL ? 'rtl' : 'ltr'}
             className={cn(
-              "h-10 w-full border-gray-300 bg-white px-3 text-base font-normal hover:bg-white",
-              isRTL ? "justify-end text-right" : "justify-start text-left"
+              "h-10 w-full border-gray-300 bg-white px-3 text-base font-normal hover:bg-white justify-start",
+              isRTL ? "text-right" : "text-left"
             )}
           >
-            <span className={cn("block w-full", isRTL ? "text-right" : "text-left")}>
-              {value ? format(parsedDate!, 'dd/MM/yyyy') : ''}
+            <span className={cn("block min-w-0 py-1.5 pe-5 text-inherit", isRTL ? "text-right" : "text-left")}>
+              {calendarPrefix}{value ? format(parsedDate!, 'dd/MM/yyyy') : ''}
             </span>
           </Button>
         </PopoverTrigger>

@@ -72,8 +72,11 @@ export default function EditVoucherDialog({ voucher, isOpen, onClose, onSuccess 
     update: isHebrew ? 'עדכן' : 'Update',
     updating: isHebrew ? 'מעדכן...' : 'Updating...',
     errorValidToPast: isHebrew ? 'תאריך "תקף עד" לא יכול להיות בעבר' : 'Valid To date cannot be in the past',
-    errorValidToBeforeFrom: isHebrew ? '"תקף עד" חייב להיות ביום או אחרי "תקף מ"' : 'Valid To must be on or after Valid From'
+    errorValidToBeforeFrom: isHebrew ? '"תקף עד" חייב להיות ביום או אחרי "תקף מ"' : 'Valid To must be on or after Valid From',
+    requiredField: isHebrew ? 'שדה חובה' : 'Required field'
   };
+
+  const [fieldErrors, setFieldErrors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (isOpen && voucher) {
@@ -128,6 +131,7 @@ export default function EditVoucherDialog({ voucher, isOpen, onClose, onSuccess 
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
+    setFieldErrors((prev) => ({ ...prev, [name]: false }));
     setFormData((prev) => ({
       ...prev,
       [name]: value
@@ -136,8 +140,20 @@ export default function EditVoucherDialog({ voucher, isOpen, onClose, onSuccess 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setError(null);
+    const required: Record<string, boolean> = {
+      name: !formData.name.trim(),
+      description: !formData.description.trim(),
+      imageUrl: !formData.imageUrl.trim(),
+      validFrom: !formData.validFrom.trim(),
+      validTo: !formData.validTo.trim()
+    };
+    if (Object.values(required).some(Boolean)) {
+      setFieldErrors(required);
+      return;
+    }
+    setFieldErrors({});
+    setIsSubmitting(true);
 
     try {
       const now = new Date();
@@ -191,8 +207,9 @@ export default function EditVoucherDialog({ voucher, isOpen, onClose, onSuccess 
               value={formData.name}
               onChange={handleChange}
               placeholder={text.namePlaceholder}
-              required
+              className={fieldErrors.name ? 'border-red-500 ring-2 ring-red-200' : ''}
             />
+            {fieldErrors.name && <p className="text-sm text-red-600">{text.requiredField}</p>}
           </div>
 
           <div className="space-y-2">
@@ -204,8 +221,9 @@ export default function EditVoucherDialog({ voucher, isOpen, onClose, onSuccess 
               onChange={handleChange}
               placeholder={text.descriptionPlaceholder}
               rows={3}
-              required
+              className={fieldErrors.description ? 'border-red-500 ring-2 ring-red-200' : ''}
             />
+            {fieldErrors.description && <p className="text-sm text-red-600">{text.requiredField}</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -241,14 +259,18 @@ export default function EditVoucherDialog({ voucher, isOpen, onClose, onSuccess 
 
           <div className="space-y-2">
             <Label htmlFor="imageUrl">{text.image}</Label>
-            <MediaUpload
-              type="image"
-              value={formData.imageUrl}
-              onChange={(filePath) => {
-                setFormData((prev) => ({ ...prev, imageUrl: filePath }));
-              }}
-              className="w-1/5"
-            />
+            <div className={fieldErrors.imageUrl ? 'rounded-md ring-2 ring-red-200 ring-offset-0' : ''}>
+              <MediaUpload
+                type="image"
+                value={formData.imageUrl}
+                onChange={(filePath) => {
+                  setFieldErrors((prev) => ({ ...prev, imageUrl: false }));
+                  setFormData((prev) => ({ ...prev, imageUrl: filePath }));
+                }}
+                className="w-1/5"
+              />
+            </div>
+            {fieldErrors.imageUrl && <p className="text-sm text-red-600">{text.requiredField}</p>}
           </div>
 
           <div className="space-y-2">
@@ -286,8 +308,9 @@ export default function EditVoucherDialog({ voucher, isOpen, onClose, onSuccess 
                 type="datetime-local"
                 value={formData.validFrom}
                 onChange={handleChange}
-                required
+                className={fieldErrors.validFrom ? 'border-red-500 ring-2 ring-red-200' : ''}
               />
+              {fieldErrors.validFrom && <p className="text-sm text-red-600">{text.requiredField}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="validTo">{text.validTo}</Label>
@@ -297,8 +320,9 @@ export default function EditVoucherDialog({ voucher, isOpen, onClose, onSuccess 
                 type="datetime-local"
                 value={formData.validTo}
                 onChange={handleChange}
-                required
+                className={fieldErrors.validTo ? 'border-red-500 ring-2 ring-red-200' : ''}
               />
+              {fieldErrors.validTo && <p className="text-sm text-red-600">{text.requiredField}</p>}
             </div>
           </div>
 

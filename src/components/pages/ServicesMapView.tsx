@@ -2,8 +2,9 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MapPin, Phone, Star, Send, Heart, Ticket, X } from 'lucide-react';
+import { MapPin, Phone, Star, Send, Heart, Ticket, X, Search } from 'lucide-react';
 import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 import {
   Drawer,
   DrawerContent,
@@ -41,6 +42,10 @@ interface ServicesMapViewProps {
   mapFloatingControls?: React.ReactNode;
   initialHighlightedServiceId?: string;
   filterType?: 'all' | 'favorites';
+  /** Optional search box inside the mobile list drawer (value + onChange + placeholder) */
+  drawerSearchValue?: string;
+  onDrawerSearchChange?: (value: string) => void;
+  drawerSearchPlaceholder?: string;
 }
 
 declare global {
@@ -55,7 +60,7 @@ interface ServiceWithCoordinates extends Service {
   distance?: number;
 }
 
-const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerContent, mapFloatingControls, initialHighlightedServiceId, filterType = 'all' }) => {
+const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerContent, mapFloatingControls, initialHighlightedServiceId, filterType = 'all', drawerSearchValue = '', onDrawerSearchChange, drawerSearchPlaceholder }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const locale = useLocale();
@@ -378,8 +383,8 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
         setDrawerOpen(false);
         setSelectedService(null);
       } else {
-        // On mobile, snap to minimum 20% for the list drawer
-        setActiveSnapPoint(0.2);
+        // On mobile, snap to minimum 50% for the service details drawer
+        setActiveSnapPoint(0.5);
         setDrawerOpen(true);
       }
     } else {
@@ -1139,8 +1144,8 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
       {/* Mobile Layout: Map + Drawer for Services List */}
       {isMobile ? (
         <div className="relative h-full w-full" style={{ overflow: 'hidden' }}>
-          {/* Mobile Header - z-index above drawer overlay so search/filters stay tappable */}
-          <div className="absolute top-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-b border-gray-200 p-4 shadow-sm z-[10051]">
+          {/* Mobile Header - above overlay (z-30), below drawer (z-50) and dropdowns (z-100) */}
+          <div className="absolute top-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-b border-gray-200 p-4 shadow-sm z-40">
             {headerContent}
           </div>
 
@@ -1196,34 +1201,58 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
               // Prevent closing - keep drawer always open
             }}
           >
-            <DrawerContent className="h-[100vh]" noOverlay>
+            <DrawerContent className="h-[100vh] mt-0 rounded-t-2xl" noOverlay>
               <DrawerHeader className="sr-only">
                 <DrawerTitle>Services List</DrawerTitle>
               </DrawerHeader>
-              {/* Search Bar Placeholder or Title */}
-              <div
-                className="px-4 py-2 border-b cursor-pointer"
-                onClick={() => {
-                  // Toggle between 40% and 100% when header is tapped
-                  if (listSnapPoint === 0.4) {
-                    setListSnapPoint(1);
-                  } else {
-                    setListSnapPoint(0.4);
-                  }
-                }}
-              >
-                <p className="text-sm font-semibold text-gray-500 text-center">{services.length} {t('pages.ServicesPage.map.servicesFound')}</p>
+              {/* Header: handle + count + search — consistent padding */}
+              <div className="shrink-0 px-4 pt-2 pb-4 bg-white">
+                <div
+                  className="cursor-pointer py-3"
+                  onClick={() => {
+                    if (listSnapPoint === 0.4) {
+                      setListSnapPoint(1);
+                    } else {
+                      setListSnapPoint(0.4);
+                    }
+                  }}
+                >
+                  <p className="text-sm font-medium text-gray-600 text-center">
+                    {services.length} {t('pages.ServicesPage.map.servicesFound')}
+                  </p>
+                </div>
+                {onDrawerSearchChange != null && (
+                  <div className="pt-1">
+                    <div className="relative h-10 rounded-xl bg-gray-100">
+                      <Search
+                        className="absolute top-1/2 -translate-y-1/2 text-gray-400 ltr:left-3 rtl:right-3 pointer-events-none"
+                        size={18}
+                      />
+                      <Input
+                        placeholder={drawerSearchPlaceholder ?? t('pages.ServicesPage.searchPlaceholder') ?? 'Search services...'}
+                        value={drawerSearchValue}
+                        onChange={(e) => onDrawerSearchChange(e.target.value)}
+                        className="h-full w-full rounded-xl bg-transparent border-0 p-0 ltr:pl-10 ltr:pr-4 rtl:pr-10 rtl:pl-4 focus-visible:ring-0 focus-visible:ring-offset-0 text-sm placeholder:text-gray-400"
+                        dir={locale === 'he' ? 'rtl' : 'ltr'}
+                        autoComplete="off"
+                        inputMode="search"
+                        aria-label={drawerSearchPlaceholder ?? t('pages.ServicesPage.searchPlaceholder') ?? 'Search services'}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className="flex-1 overflow-y-auto bg-gray-50 p-4 service-cards-scroll">
+              <div className="flex-1 overflow-y-auto bg-gray-50/80 px-4 pb-6 pt-1 service-cards-scroll">
                 {!isLoading ? (
                   servicesWithCoords.length > 0 ? (
-                    <div className="space-y-4 pb-20">
+                    <div className="space-y-3 pb-20">
                       {servicesWithCoords.map((service, index) => (
                         <div
                           key={service.id || index}
                           className={cn(
-                            "bg-white rounded-lg border p-3 cursor-pointer transition-all hover:shadow-md",
-                            highlightedServiceIds.includes(service.id || '') ? "border-blue-500 ring-1 ring-blue-500" : "border-gray-200"
+                            "bg-white rounded-xl border border-gray-100 p-3 cursor-pointer transition-all hover:shadow-sm hover:border-gray-200",
+                            highlightedServiceIds.includes(service.id || '') ? "border-primary ring-1 ring-primary/20" : ""
                           )}
                           onClick={(e) => {
                             e.preventDefault();
@@ -1631,12 +1660,12 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
                   setSelectedService(null);
                 }
               }}
-              snapPoints={[0.2, 1]}
+              snapPoints={[0.5, 1]}
               activeSnapPoint={activeSnapPoint}
               setActiveSnapPoint={(snap) => {
                 // Allow dragging down to close, but prevent expanding beyond 100%
-                if (snap === null || (typeof snap === 'number' && snap < 0.2)) {
-                  setActiveSnapPoint(0.2);
+                if (snap === null || (typeof snap === 'number' && snap < 0.5)) {
+                  setActiveSnapPoint(0.5);
                 } else if (typeof snap === 'number' && snap > 1) {
                   setActiveSnapPoint(1);
                 } else {

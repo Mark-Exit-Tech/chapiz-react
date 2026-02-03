@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { FileUp, Image as ImageIcon, Video, X, Edit } from 'lucide-react';
 import { uploadAdMedia, deleteAdMedia } from '@/lib/firebase/storage';
+import { validateImageFile, AD_MEDIA_MAX_SIZE_BYTES } from '@/lib/validation/image';
 import { useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -43,32 +44,41 @@ export default function MediaUpload({
     uploading: isHebrew ? 'מעלה' : 'Uploading',
     clickToUploadImage: isHebrew ? 'לחץ להעלאת תמונה' : 'Click to upload image',
     clickToUploadVideo: isHebrew ? 'לחץ להעלאת וידאו' : 'Click to upload video',
-    imageFormats: isHebrew ? 'PNG, JPG, GIF עד 20MB' : 'PNG, JPG, GIF up to 20MB',
-    videoFormats: isHebrew ? 'MP4, MOV, AVI עד 100MB' : 'MP4, MOV, AVI up to 100MB'
+    imageFormats: isHebrew ? 'PNG, JPG, GIF, WebP עד 20MB' : 'PNG, JPG, GIF, WebP up to 20MB',
+    videoFormats: isHebrew ? 'MP4, MOV, AVI עד 100MB' : 'MP4, MOV, AVI up to 100MB',
+    errorType: isHebrew ? 'פורמט לא נתמך. רק JPG, PNG, GIF, WebP' : 'Invalid format. Only JPG, PNG, GIF, WebP',
+    errorSize: isHebrew ? 'הקובץ גדול מדי. מקסימום 20MB' : 'File too large. Maximum 20MB',
+    errorVideoType: isHebrew ? 'יש להעלות קובץ וידאו' : 'Please upload a video file',
+    errorVideoSize: isHebrew ? 'קובץ גדול מדי. מקסימום 100MB' : 'File too large. Maximum 100MB',
   };
 
   const validateFile = (file: File): boolean => {
-    // 20MB limit for images, 100MB for videos
-    const maxSize = type === 'image' ? 20 * 1024 * 1024 : 100 * 1024 * 1024;
+    if (type === 'image') {
+      const result = validateImageFile(file, {
+        maxSizeBytes: AD_MEDIA_MAX_SIZE_BYTES,
+        errors: {
+          noFile: text.errorType,
+          type: text.errorType,
+          size: text.errorSize,
+        },
+      });
+      if (!result.valid) {
+        toast.error(result.error);
+        return false;
+      }
+      return true;
+    }
 
+    // Video validation
+    const maxSize = 100 * 1024 * 1024;
     if (file.size > maxSize) {
-      toast.error(
-        `File size too large. Maximum size is ${maxSize / (1024 * 1024)}MB`
-      );
+      toast.error(text.errorVideoSize);
       return false;
     }
-
-    // Validate file type
-    if (type === 'image' && !file.type.startsWith('image/')) {
-      toast.error('Please upload an image file');
+    if (!file.type.startsWith('video/')) {
+      toast.error(text.errorVideoType);
       return false;
     }
-
-    if (type === 'video' && !file.type.startsWith('video/')) {
-      toast.error('Please upload a video file');
-      return false;
-    }
-
     return true;
   };
 
@@ -182,7 +192,7 @@ export default function MediaUpload({
       <input
         ref={fileInputRef}
         type="file"
-        accept={type === 'image' ? 'image/*' : 'video/*'}
+        accept={type === 'image' ? 'image/jpeg,image/jpg,image/png,image/gif,image/webp' : 'video/*'}
         onChange={handleFileChange}
         className="hidden"
       />

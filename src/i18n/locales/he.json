@@ -17,8 +17,8 @@
           "description": "תן שם מיוחד לחיית המחמד שלך"
         },
         "photo": {
-          "title": "הוספת תמונה (אופציונלי)",
-          "description": "העלה תמונה חמודה של חיית המחמד שלך (אופציונלי)"
+          "title": "הוספת תמונה",
+          "description": "העלה תמונה של חיית המחמד שלך (חובה)"
         },
         "complete": {
           "title": "הושלם!",
@@ -74,8 +74,8 @@
       },
       "photo": {
         "title": "הוסף תמונה של {name}",
-        "description": "העלה תמונה חמודה של חיית המחמד שלך (אופציונלי)",
-        "uploadPrompt": "לחץ להעלאת תמונה (אופציונלי)",
+        "description": "העלה תמונה של חיית המחמד שלך (חובה)",
+        "uploadPrompt": "לחץ להעלאת תמונה (חובה)",
         "uploading": "מעלה...",
         "uploadComplete": "התמונה הועלתה בהצלחה!",
         "uploadFailed": "העלאת התמונה נכשלה"
@@ -1008,7 +1008,7 @@
       },
       "addToFavorites": "הוסף למועדפים",
       "removeFromFavorites": "הסר ממועדפים",
-      "coupons": "קופונים",
+      "coupons": "הקופונים של העסק",
       "vouchers": "שוברים",
       "navigation": "ניווט",
       "call": "התקשר",
@@ -1231,7 +1231,8 @@
         "Type": "סוג",
         "Breed": "גזע",
         "Gender": "מין",
-        "BirthDate": "תאריך לידה",
+        "BirthDate": "📅 תאריך לידה ",
+        "calendarEmoji": "",
         "weight": "משקל (קילוגרם)",
         "Notes": "הערות/ רגישויות/ סוג מזון",
         "selectTypeFirst": "אנא בחר סוג חיית מחמד תחילה"

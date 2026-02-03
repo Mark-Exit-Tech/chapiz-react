@@ -181,6 +181,14 @@ export default function ClientRegisterPetPage({
       return;
     }
 
+    const imageUrl = (allFormData as any).imageUrl?.trim() || '';
+    if (!imageUrl) {
+      const msg = locale === 'he' ? 'נא להעלות תמונה' : 'Please upload a photo';
+      setError(msg);
+      toast.error(msg);
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -226,7 +234,7 @@ export default function ClientRegisterPetPage({
         birthDate: formDataAny.birthDate ? formDataAny.birthDate.toISOString() : '',
         weight: formDataAny.weight || '',
         notes: formDataAny.notes || '',
-        imageUrl: formDataAny.imageUrl || '',
+        imageUrl: formDataAny.imageUrl?.trim() || '',
         // Owner details
         ownerFullName: formDataAny.ownerFullName || '',
         ownerPhoneNumber: formDataAny.ownerPhoneNumber || '',

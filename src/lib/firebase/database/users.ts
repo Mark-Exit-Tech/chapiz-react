@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc, collection, query, where, getDocs, updateDoc, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, query, where, getDocs, updateDoc, deleteDoc, deleteField } from 'firebase/firestore';
 import { db } from '../client';
 
 export interface User {
@@ -194,8 +194,13 @@ export async function updateUserByUid(uid: string, updates: {
       updateData.photoURL = updates.profileImage;
     }
     if (updates.language !== undefined) updateData.language = updates.language;
-    if (updates.voucherPurchaseLimit !== undefined) updateData.voucherPurchaseLimit = updates.voucherPurchaseLimit ?? undefined;
-    if (updates.couponPurchaseLimit !== undefined) updateData.couponPurchaseLimit = updates.couponPurchaseLimit ?? undefined;
+    // Use deleteField() to remove limits; Firestore does not accept undefined
+    if (updates.voucherPurchaseLimit !== undefined) {
+      updateData.voucherPurchaseLimit = updates.voucherPurchaseLimit == null ? deleteField() : updates.voucherPurchaseLimit;
+    }
+    if (updates.couponPurchaseLimit !== undefined) {
+      updateData.couponPurchaseLimit = updates.couponPurchaseLimit == null ? deleteField() : updates.couponPurchaseLimit;
+    }
     
     await updateUser(uid, updateData);
     return { success: true };

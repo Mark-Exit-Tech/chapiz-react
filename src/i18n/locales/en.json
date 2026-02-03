@@ -17,8 +17,8 @@
           "description": "Give your pet a special name"
         },
         "photo": {
-          "title": "Add Photo (Optional)",
-          "description": "Upload a cute photo of your pet (optional)"
+          "title": "Add Photo",
+          "description": "Upload a photo of your pet (required)"
         },
         "complete": {
           "title": "Complete!",
@@ -74,8 +74,8 @@
       },
       "photo": {
         "title": "Add photo of {name}",
-        "description": "Upload a cute photo of your pet (optional)",
-        "uploadPrompt": "Click to upload photo (optional)",
+        "description": "Upload a photo of your pet (required)",
+        "uploadPrompt": "Click to upload photo (required)",
         "uploading": "Uploading...",
         "uploadComplete": "Photo uploaded successfully!",
         "uploadFailed": "Photo upload failed"
@@ -1001,7 +1001,7 @@
       },
       "addToFavorites": "Add to Favorites",
       "removeFromFavorites": "Remove from Favorites",
-      "coupons": "Coupons",
+      "coupons": "Business Coupons",
       "vouchers": "Vouchers",
       "navigation": "Navigation",
       "call": "Call",
@@ -1304,7 +1304,8 @@
         "Type": "Type",
         "Breed": "Breed",
         "Gender": "Gender",
-        "BirthDate": "Birth Date",
+        "BirthDate": "📅 Birth Date",
+        "calendarEmoji": "",
         "weight": "Weight (kg)",
         "Notes": "Notes",
         "selectTypeFirst": "Please select a pet type first"

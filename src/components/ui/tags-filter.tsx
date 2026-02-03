@@ -94,14 +94,14 @@ export function TagsFilter({
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-[300px] p-0"
+          className="w-[300px] p-0 z-[100]"
           align={isRTL ? "end" : "start"}
           side="bottom"
           sideOffset={4}
           avoidCollisions={true}
           collisionPadding={16}
           dir={isRTL ? 'rtl' : 'ltr'}
-          style={{ direction: isRTL ? 'rtl' : 'ltr' }}
+          style={{ direction: isRTL ? 'rtl' : 'ltr', zIndex: 100 }}
         >
           <Command dir={isRTL ? 'rtl' : 'ltr'}>
             <CommandInput placeholder={searchTagsPlaceholder} className="ltr:text-left rtl:text-right" />

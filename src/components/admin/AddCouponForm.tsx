@@ -59,9 +59,11 @@ export default function AddCouponForm() {
     fileFormats: isHebrew ? 'PNG, JPG, GIF עד 10MB' : 'PNG, JPG, GIF up to 10MB',
     errorValidFromPast: isHebrew ? 'תאריך "תקף מ" לא יכול להיות בעבר' : 'Valid From date cannot be in the past',
     errorValidToPast: isHebrew ? 'תאריך "תקף עד" לא יכול להיות בעבר' : 'Valid To date cannot be in the past',
-    errorValidToBeforeFrom: isHebrew ? '"תקף עד" חייב להיות ביום או אחרי "תקף מ"' : 'Valid To must be on or after Valid From'
+    errorValidToBeforeFrom: isHebrew ? '"תקף עד" חייב להיות ביום או אחרי "תקף מ"' : 'Valid To must be on or after Valid From',
+    requiredField: isHebrew ? 'שדה חובה' : 'Required field'
   };
-  
+
+  const [fieldErrors, setFieldErrors] = useState<Record<string, boolean>>({});
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -112,6 +114,7 @@ export default function AddCouponForm() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
+    setFieldErrors((prev) => ({ ...prev, [name]: false }));
     setFormData((prev) => ({
       ...prev,
       [name]: value
@@ -135,8 +138,21 @@ export default function AddCouponForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setError(null);
+    const required: Record<string, boolean> = {
+      name: !formData.name.trim(),
+      description: !formData.description.trim(),
+      imageUrl: !formData.imageUrl.trim(),
+      validFrom: !formData.validFrom.trim(),
+      validTo: !formData.validTo.trim()
+    };
+    const hasRequiredErrors = Object.values(required).some(Boolean);
+    if (hasRequiredErrors) {
+      setFieldErrors(required);
+      return;
+    }
+    setFieldErrors({});
+    setIsSubmitting(true);
 
     try {
       console.log('Submitting coupon data:', formData);
@@ -233,8 +249,9 @@ export default function AddCouponForm() {
               value={formData.name}
               onChange={handleChange}
               placeholder={text.namePlaceholder}
-              required
+              className={fieldErrors.name ? 'border-red-500 ring-2 ring-red-200' : ''}
             />
+            {fieldErrors.name && <p className="text-sm text-red-600">{text.requiredField}</p>}
           </div>
 
           <div className="space-y-2">
@@ -246,20 +263,25 @@ export default function AddCouponForm() {
               onChange={handleChange}
               placeholder={text.descriptionPlaceholder}
               rows={3}
-              required
+              className={fieldErrors.description ? 'border-red-500 ring-2 ring-red-200' : ''}
             />
+            {fieldErrors.description && <p className="text-sm text-red-600">{text.requiredField}</p>}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="imageUrl">{text.image}</Label>
-            <MediaUpload
-              type="image"
-              value={formData.imageUrl}
-              onChange={(filePath) => {
-                setFormData((prev) => ({ ...prev, imageUrl: filePath }));
-              }}
-              className="w-1/5"
-            />
+            <div className={fieldErrors.imageUrl ? 'rounded-md ring-2 ring-red-200 ring-offset-0' : ''}>
+              <MediaUpload
+                type="image"
+                value={formData.imageUrl}
+                onChange={(filePath) => {
+                  setFieldErrors((prev) => ({ ...prev, imageUrl: false }));
+                  setFormData((prev) => ({ ...prev, imageUrl: filePath }));
+                }}
+                className="w-1/5"
+              />
+            </div>
+            {fieldErrors.imageUrl && <p className="text-sm text-red-600">{text.requiredField}</p>}
           </div>
 
           <div className="space-y-2">
@@ -297,8 +319,9 @@ export default function AddCouponForm() {
                 type="date"
                 value={formData.validFrom}
                 onChange={handleChange}
-                required
+                className={fieldErrors.validFrom ? 'border-red-500 ring-2 ring-red-200' : ''}
               />
+              {fieldErrors.validFrom && <p className="text-sm text-red-600">{text.requiredField}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="validTo">{text.validTo}</Label>
@@ -308,8 +331,9 @@ export default function AddCouponForm() {
                 type="date"
                 value={formData.validTo}
                 onChange={handleChange}
-                required
+                className={fieldErrors.validTo ? 'border-red-500 ring-2 ring-red-200' : ''}
               />
+              {fieldErrors.validTo && <p className="text-sm text-red-600">{text.requiredField}</p>}
             </div>
           </div>
 

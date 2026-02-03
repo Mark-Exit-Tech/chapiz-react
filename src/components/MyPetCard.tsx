@@ -37,14 +37,17 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
   const cardHeight = 120; // in pixels, increased for better mobile display
   const optionsPanelWidth = 60; // width of the options panel, reduced for small screens
 
-  // State to track how many images have loaded.
-  const [imagesLoaded, setImagesLoaded] = React.useState(0);
-  const totalImages = 2;
-  const allImagesLoaded = imagesLoaded === totalImages;
+  // State to track image loading
+  const [imageError, setImageError] = React.useState(false);
 
   const handleImageLoad = () => {
     console.log('Image loaded successfully for pet:', name);
-    setImagesLoaded((prev) => prev + 1);
+    setImageError(false);
+  };
+
+  const handleImageError = () => {
+    console.error('Failed to load pet image:', image);
+    setImageError(true);
   };
 
   // Validate if image URL is valid
@@ -153,19 +156,16 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
         style={{ width: `${imageWidth}px` }}
       >
         <div className="h-full w-full bg-transparent">
-          {isValidImageUrl(image) ? (
+          {isValidImageUrl(image) && !imageError ? (
             <img
+              key={`${id}-${image}`}
               alt={name}
               src={image}
               width={imageWidth}
               height={cardHeight}
-              loading="lazy"
               className="h-full w-full object-cover ltr:rounded-e-2xl rtl:rounded-s-2xl bg-transparent"
               onLoad={handleImageLoad}
-              onError={(e) => {
-                console.error('Failed to load pet image:', image);
-                e.currentTarget.style.display = 'none';
-              }}
+              onError={handleImageError}
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-white ltr:rounded-e-2xl rtl:rounded-s-2xl">

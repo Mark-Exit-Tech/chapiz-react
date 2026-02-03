@@ -10,7 +10,6 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Upload, Loader2, CheckCircle, XCircle, Save, ArrowLeft, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
 import { getBreedsForDropdown, getGendersForDropdown, getPetTypesForDropdown } from '@/lib/firebase/database/pets';
 import { motion } from 'framer-motion';
 // Image removed;
@@ -57,7 +56,6 @@ interface UploadProgress {
 
 export default function EditPetForm({ pet }: EditPetFormProps) {
   const { user, dbUser } = useAuth();
-  const navigate = useNavigate();
 
   // Get locale from URL - check if first path segment is a valid locale
   const getLocaleFromUrl = () => {
@@ -94,7 +92,7 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
       uploadPrompt: isHebrew ? 'לחץ להעלאה' : 'Click to upload',
       imageRequirements: isHebrew ? 'PNG, JPG עד 10MB' : 'PNG, JPG up to 10MB',
       updating: isHebrew ? 'מעדכן...' : 'Updating...',
-      birthDate: isHebrew ? 'תאריך לידה' : 'Birth Date',
+      birthDate: isHebrew ? '📅 תאריך לידה' : '📅 Birth Date',
       gender: isHebrew ? 'מין' : 'Gender',
       selectGender: isHebrew ? 'בחר מין' : 'Select gender',
       weight: isHebrew ? 'משקל (ק"ג)' : 'Weight (kg)',
@@ -300,7 +298,7 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
 
       if (success) {
         toast.success(text.edit.deleteSuccess);
-        navigate(`/${locale}/my-pets`);
+        window.location.href = `/${locale}/my-pets`;
       } else {
         toast.error(text.edit.deleteError);
       }
@@ -371,7 +369,7 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate(-1)}
+                onClick={() => (window.location.href = `/${locale}/my-pets`)}
                 className="absolute ltr:left-0 rtl:right-0 top-1/2 -translate-y-1/2"
               >
                 <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
@@ -537,6 +535,7 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                       id="birthDate"
                       value={formData.birthDate}
                       maxDate={new Date()}
+                      calendarPrefix=""
                       onChange={(date) => {
                         if (date) {
                           handleInputChange('birthDate', date.toISOString());

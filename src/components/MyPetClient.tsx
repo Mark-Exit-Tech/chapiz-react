@@ -10,7 +10,7 @@ import InviteFriendsCard from './InviteFriendsCard';
 import { Button } from './ui/button';
 import { Separator } from './ui/separator';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useLocale } from '@/hooks/use-locale';
 import { getBreedNameById, getPetsByUserEmail } from '@/lib/firebase/database/pets';
 
@@ -42,15 +42,21 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
 
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [search, setSearch] = useState('');
   const [isEditMode, setIsEditMode] = useState(false);
   const [pets, setPets] = useState(initialPets);
   const [petsLoading, setPetsLoading] = useState(false);
+  const [listRefreshKey, setListRefreshKey] = useState(0);
 
-  // Fetch pets when user is authenticated
+  // Fetch pets when user is authenticated or when returning to this page
   useEffect(() => {
+    // Increment refresh key immediately to force cards to re-mount
+    setListRefreshKey((k) => k + 1);
+
     const fetchPets = async () => {
       if (user?.email && !loading) {
+        setPets([]);
         setPetsLoading(true);
         try {
           // Use Firebase to fetch pets
@@ -133,7 +139,7 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
                     id: result.pet.id,
                     name: result.pet.name || text.unknownPet,
                     breed: breedDisplay,
-                    image: result.pet.imageUrl || '/default-pet.png'
+                    image: result.pet.imageUrl || (result.pet as any).image_url || '/default-pet.png'
                   };
                 } else {
                   // Fallback to basic data if consolidated method fails
@@ -185,7 +191,7 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
     };
 
     fetchPets();
-  }, [user?.uid, user?.email, loading]);
+  }, [user?.uid, user?.email, loading, location.key]);
 
   const filteredPets = pets.filter((pet) =>
     pet.name.toLowerCase().includes(search.toLowerCase())
@@ -264,7 +270,7 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
           >
             {filteredPets.map((pet, index) => (
               <motion.div
-                key={pet.id}
+                key={`${pet.id}-${listRefreshKey}`}
                 variants={{
                   hidden: { opacity: 0, y: 20, scale: 0.95 },
                   visible: {

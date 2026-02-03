@@ -80,8 +80,8 @@ export default function AdminCommentsPage() {
       <div className="container mx-auto p-4 md:p-8" dir={isHebrew ? 'rtl' : 'ltr'}>
         <div className="space-y-6">
         <div className={isHebrew ? 'text-right' : 'text-left'}>
-          <h1 className={`text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2 ${isHebrew ? 'flex-row-reverse justify-end' : ''}`}>
-            <MessageSquare className="w-8 h-8" />
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2">
+            <MessageSquare className="w-8 h-8 shrink-0" />
             {text.title}
           </h1>
           <p className="text-gray-600 mt-2 text-sm md:text-base">

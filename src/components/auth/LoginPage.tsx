@@ -151,9 +151,9 @@ const LoginPage = () => {
               <OptimizedImage
                 src="/assets/Chapiz-logo"
                 alt="Chapiz"
-                width={128}
-                height={64}
-                className="h-16 w-auto object-contain"
+                width={130}
+                height={50}
+                className="w-[130px] h-[50px] object-fill object-center"
               />
             </div>
             <p className="text-xl text-gray-600 max-w-md">
