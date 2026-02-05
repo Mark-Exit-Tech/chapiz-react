@@ -147,13 +147,13 @@ const LoginPage = () => {
             />
           </div>
           <div className="text-center space-y-4">
-            <div className="flex justify-center">
+            <div className="flex justify-center -mt-[10px]">
               <OptimizedImage
                 src="/assets/Chapiz-logo"
                 alt="Chapiz"
                 width={130}
-                height={50}
-                className="w-[130px] h-[50px] object-fill object-center"
+                height={55}
+                className="w-[170px] h-[59px]"
               />
             </div>
             <p className="text-xl text-gray-600 max-w-md">

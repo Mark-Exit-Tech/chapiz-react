@@ -63,8 +63,6 @@ export default function PromosPageClient({
   const [usedCoupons, setUsedCoupons] = useState<UserCoupon[]>([]);
   const [businesses, setBusinesses] = useState<Business[]>(initialBusinesses);
   const [loading, setLoading] = useState(true);
-  const [showMapDialog, setShowMapDialog] = useState(false);
-  const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null);
   const [activeTab, setActiveTab] = useState('available');
 
   // Load all coupons and businesses from Firebase
@@ -163,8 +161,11 @@ export default function PromosPageClient({
   };
 
   const handleShowMap = (coupon: Coupon) => {
-    setSelectedCoupon(coupon);
-    setShowMapDialog(true);
+    const businessIds = coupon.businessIds || (coupon.businessId ? [coupon.businessId] : []);
+    if (businessIds.length > 0) {
+      // Navigate to services map with highlighted businesses
+      navigate(`/${locale}/services?highlight=${businessIds.join(',')}`);
+    }
   };
 
   const getCouponBusinesses = (coupon: Coupon): Business[] => {
@@ -398,30 +399,6 @@ export default function PromosPageClient({
           )}
         </TabsContent>
       </Tabs>
-
-      {/* Map Dialog */}
-      <Dialog open={showMapDialog} onOpenChange={setShowMapDialog}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {selectedCoupon
-                ? `${text.mapFor} ${selectedCoupon.name}`
-                : text.showMap
-              }
-            </DialogTitle>
-          </DialogHeader>
-          {selectedCoupon && getCouponBusinesses(selectedCoupon).length > 0 ? (
-            <MapCard
-              businesses={getCouponBusinesses(selectedCoupon)}
-              title={`${text.mapFor} ${selectedCoupon.name}`}
-            />
-          ) : (
-            <div className="p-4 text-center text-gray-500">
-              {text.noBusinessesFound}
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

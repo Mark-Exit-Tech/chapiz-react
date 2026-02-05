@@ -175,14 +175,14 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
           display: none !important;
         }
         [data-vaul-drawer] {
-          height: 100vh !important;
-          max-height: 100vh !important;
-          min-height: 100vh !important;
+          height: calc(100vh - 90px) !important;
+          max-height: calc(100vh - 90px) !important;
+          min-height: calc(100vh - 90px) !important;
           bottom: 0 !important;
-          top: 0 !important;
+          top: 90px !important;
         }
         [data-vaul-drawer-wrapper] {
-          height: 100vh !important;
+          height: calc(100vh - 90px) !important;
         }
       }
     `;

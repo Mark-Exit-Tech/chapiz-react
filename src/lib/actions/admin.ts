@@ -511,7 +511,6 @@ export async function createCoupon(data: CreateCouponData) {
       validFrom: Timestamp.fromDate(new Date(data.validFrom)),
       validTo: Timestamp.fromDate(new Date(data.validTo)),
       businessIds: data.businessIds || [],
-      purchaseLimit: data.purchaseLimit,
       isActive: true,
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
@@ -520,6 +519,9 @@ export async function createCoupon(data: CreateCouponData) {
     const stockVal = (data as { stock?: number | string }).stock;
     if (stockVal !== undefined && stockVal !== null && String(stockVal).trim() !== '' && !isNaN(Number(stockVal))) {
       couponData.stock = Math.max(0, Number(stockVal));
+    }
+    if (data.purchaseLimit !== undefined && data.purchaseLimit !== null && !isNaN(Number(data.purchaseLimit))) {
+      couponData.purchaseLimit = Number(data.purchaseLimit);
     }
     
     const couponsRef = collection(db, 'coupons');
@@ -555,6 +557,7 @@ export async function createVoucher(data: any) {
       imageUrl: data.imageUrl || '',
       validFrom: Timestamp.fromDate(new Date(data.validFrom)),
       validTo: Timestamp.fromDate(new Date(data.validTo)),
+      businessIds: data.businessIds || [],
       isActive: true,
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
@@ -672,12 +675,21 @@ export async function updateCoupon(id: string, data: UpdateCouponData) {
         return { success: false, error: 'Valid To date cannot be in the past' };
       }
     }
-    const { doc, updateDoc, Timestamp } = await import('firebase/firestore');
+    const { doc, updateDoc, Timestamp, deleteField } = await import('firebase/firestore');
     const { db } = await import('@/lib/firebase/client');
-    
+
     const couponRef = doc(db, 'coupons', id);
-    const updateData: any = { ...data };
-    
+    const updateData: any = {};
+
+    // Only include defined fields
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.description !== undefined) updateData.description = data.description;
+    if (data.price !== undefined) updateData.price = data.price;
+    if (data.points !== undefined) updateData.points = data.points;
+    if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl;
+    if (data.businessIds !== undefined) updateData.businessIds = data.businessIds;
+    if ((data as any).isActive !== undefined) updateData.isActive = (data as any).isActive;
+
     // Convert date strings to Timestamps if present
     if (data.validFrom) {
       updateData.validFrom = Timestamp.fromDate(new Date(data.validFrom));
@@ -685,15 +697,25 @@ export async function updateCoupon(id: string, data: UpdateCouponData) {
     if (data.validTo) {
       updateData.validTo = Timestamp.fromDate(new Date(data.validTo));
     }
+
+    // Handle stock - use deleteField() to remove if empty
     const stockVal = (data as { stock?: number | string }).stock;
-    if (stockVal !== undefined && stockVal !== null && String(stockVal).trim() !== '') {
+    if (stockVal !== undefined && stockVal !== null && String(stockVal).trim() !== '' && !isNaN(Number(stockVal))) {
       updateData.stock = Math.max(0, Number(stockVal));
     } else if ((data as any).hasOwnProperty('stock')) {
-      updateData.stock = undefined;
+      updateData.stock = deleteField();
     }
-    
+
+    // Handle purchaseLimit - use deleteField() to remove if empty
+    const purchaseLimitVal = (data as any).purchaseLimit;
+    if (purchaseLimitVal !== undefined && purchaseLimitVal !== null && String(purchaseLimitVal).trim() !== '' && !isNaN(Number(purchaseLimitVal))) {
+      updateData.purchaseLimit = Number(purchaseLimitVal);
+    } else if ((data as any).hasOwnProperty('purchaseLimit')) {
+      updateData.purchaseLimit = deleteField();
+    }
+
     updateData.updatedAt = Timestamp.now();
-    
+
     await updateDoc(couponRef, updateData);
     return { success: true, error: undefined };
   } catch (error) {

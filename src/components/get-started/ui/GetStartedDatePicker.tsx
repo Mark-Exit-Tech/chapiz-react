@@ -46,29 +46,34 @@ const GetStartedDatePicker = ({
     value && !isNaN(Date.parse(value)) ? new Date(value) : new Date();
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [displayMonth, setDisplayMonth] = useState<Date>(parsedDate);
 
   const handleDateChange = (date: Date | undefined) => {
     if (date) {
-      const newDate = new Date(parsedDate);
-      newDate.setDate(date.getDate());
-      onChange(newDate);
+      onChange(date);
       setIsPopoverOpen(false);
     }
   };
 
   const handleMonthChange = (month: string) => {
-    if (parsedDate) {
-      const newDate = new Date(parsedDate);
-      newDate.setMonth(parseInt(month, 10));
-      onChange(newDate);
+    const newDate = new Date(displayMonth);
+    newDate.setMonth(parseInt(month, 10));
+    setDisplayMonth(newDate);
+    if (value) {
+      const updatedValue = new Date(parsedDate);
+      updatedValue.setMonth(parseInt(month, 10));
+      onChange(updatedValue);
     }
   };
 
   const handleYearChange = (year: string) => {
-    if (parsedDate) {
-      const newDate = new Date(parsedDate);
-      newDate.setFullYear(parseInt(year, 10));
-      onChange(newDate);
+    const newDate = new Date(displayMonth);
+    newDate.setFullYear(parseInt(year, 10));
+    setDisplayMonth(newDate);
+    if (value) {
+      const updatedValue = new Date(parsedDate);
+      updatedValue.setFullYear(parseInt(year, 10));
+      onChange(updatedValue);
     }
   };
 
@@ -78,7 +83,7 @@ const GetStartedDatePicker = ({
       <label
         htmlFor={id}
         className={cn(
-          'absolute top-2.5 w-fit text-sm text-black transition-all duration-200 ease-in-out',
+          'absolute top-2.5 w-fit text-sm text-black transition-all duration-200 ease-in-out pointer-events-none',
           isRTL ? 'right-3 left-auto' : 'left-3',
           value
             ? 'text-black -top-6 text-sm font-medium'
@@ -94,7 +99,6 @@ const GetStartedDatePicker = ({
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            {...props}
             dir={isRTL ? 'rtl' : 'ltr'}
             className={cn(
               "h-10 w-full border-gray-300 bg-white px-3 text-base font-normal hover:bg-white justify-start",
@@ -106,90 +110,73 @@ const GetStartedDatePicker = ({
             </span>
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="flex w-auto p-0" align="start" dir={isRTL ? 'rtl' : 'ltr'}>
+        <PopoverContent className="flex w-auto flex-col p-0 z-50" align="start" sideOffset={4}>
+          {/* Custom Month/Year Dropdowns */}
+          <div className="flex items-center justify-between gap-2 px-3 py-2 border-b">
+            {/* Month Dropdown */}
+            <div className="w-1/2">
+              <Select
+                value={displayMonth.getMonth().toString()}
+                onValueChange={handleMonthChange}
+              >
+                <SelectTrigger className="h-8">
+                  <SelectValue>
+                    {format(new Date(0, displayMonth.getMonth()), 'MMMM')}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: 12 }).map((_, index) => (
+                    <SelectItem key={index} value={index.toString()}>
+                      {format(new Date(0, index), 'MMMM')}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Year Dropdown */}
+            <div className="w-1/2">
+              <Select
+                value={displayMonth.getFullYear().toString()}
+                onValueChange={handleYearChange}
+              >
+                <SelectTrigger className="h-8">
+                  <SelectValue>
+                    {displayMonth.getFullYear().toString()}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from(
+                    { length: new Date().getFullYear() - 2000 + 1 },
+                    (_, i) => (2000 + i).toString()
+                  ).map((year) => (
+                    <SelectItem key={year} value={year}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Calendar Grid */}
           <Calendar
             mode="single"
-            captionLayout="dropdown"
             selected={parsedDate || undefined}
             onSelect={handleDateChange}
+            month={displayMonth}
+            onMonthChange={setDisplayMonth}
             disabled={(date) => {
               if (maxDate) {
                 return date > maxDate;
               }
               return false;
             }}
-            month={
-              parsedDate
-                ? new Date(parsedDate.getFullYear(), parsedDate.getMonth())
-                : undefined
-            }
-            components={{
-              MonthCaption: ({ calendarMonth }) => (
-                <div className="flex items-center justify-between gap-2 px-2 py-1">
-                  {/* Month Dropdown */}
-                  <div className="w-1/2">
-                    <Select
-                      value={
-                        parsedDate
-                          ? parsedDate.getMonth().toString()
-                          : calendarMonth.date.getMonth().toString()
-                      }
-                      onValueChange={handleMonthChange}
-                    >
-                      <SelectTrigger>
-                        <SelectValue>
-                          {format(
-                            new Date(
-                              0,
-                              parsedDate
-                                ? parsedDate.getMonth()
-                                : calendarMonth.date.getMonth()
-                            ),
-                            'M'
-                          )}
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Array.from({ length: 12 }).map((_, index) => (
-                          <SelectItem key={index} value={index.toString()}>
-                            {format(new Date(0, index), 'M')}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Year Dropdown */}
-                  <div className="w-1/2">
-                    <Select
-                      value={
-                        parsedDate
-                          ? parsedDate.getFullYear().toString()
-                          : calendarMonth.date.getFullYear().toString()
-                      }
-                      onValueChange={handleYearChange}
-                    >
-                      <SelectTrigger>
-                        <SelectValue>
-                          {parsedDate
-                            ? parsedDate.getFullYear().toString()
-                            : calendarMonth.date.getFullYear().toString()}
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Array.from(
-                          { length: new Date().getFullYear() - 2000 + 1 },
-                          (_, i) => (2000 + i).toString()
-                        ).map((year) => (
-                          <SelectItem key={year} value={year}>
-                            {year}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              )
+            disableNavigation
+            classNames={{
+              month_caption: 'hidden',
+              nav: 'hidden',
+              day_button: 'h-9 w-9 p-0 font-normal cursor-pointer hover:bg-accent rounded-md flex items-center justify-center'
             }}
           />
         </PopoverContent>

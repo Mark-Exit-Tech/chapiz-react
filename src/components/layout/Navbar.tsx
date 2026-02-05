@@ -140,7 +140,7 @@ const Navbar = () => {
                         <Menu className="h-5 w-5" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56" align={locale === 'he' ? 'start' : 'end'}>
+                    <DropdownMenuContent className="w-56" align={locale === 'he' ? 'start' : 'end'} dir={locale === 'he' ? 'rtl' : 'ltr'} sideOffset={8} collisionPadding={16}>
                       <div className="flex items-center gap-2 p-2">
                         <div className="flex flex-col space-y-1 leading-none min-w-0">
                           {user?.displayName && (
@@ -202,7 +202,7 @@ const Navbar = () => {
                         </>
                       )}
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleLogout} className="text-primary">
+                      <DropdownMenuItem onClick={handleLogout} className="text-primary flex items-center gap-2">
                         <LogOut className="h-4 w-4 shrink-0" />
                         <span>{t('components.Navbar.signOut')}</span>
                       </DropdownMenuItem>
@@ -227,7 +227,7 @@ const Navbar = () => {
                         <Menu className="h-5 w-5" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56" align={locale === 'he' ? 'start' : 'end'}>
+                    <DropdownMenuContent className="w-56" align={locale === 'he' ? 'start' : 'end'} dir={locale === 'he' ? 'rtl' : 'ltr'} sideOffset={8} collisionPadding={16}>
                       <div className="flex items-center justify-start gap-2 p-2">
                         <div className="flex flex-col space-y-1 leading-none">
                           {user?.displayName && (
@@ -239,44 +239,42 @@ const Navbar = () => {
                         </div>
                       </div>
                       <DropdownMenuSeparator />
-                      {/* Desktop Navigation Items */}
-                      <div className="hidden md:block">
-                        <DropdownMenuItem asChild>
-                          <Link to="/pages/my-pets" className="flex items-center">
-                            <PawPrint className="mr-2 h-4 w-4" />
-                            <span>{t('components.Navbar.myPets')}</span>
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link to="/coupons" className="flex items-center">
-                            <Ticket className="mr-2 h-4 w-4" />
-                            <span>{t('components.Navbar.allPromos')}</span>
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link to="/vouchers" className="flex items-center">
-                            <Gift className="mr-2 h-4 w-4" />
-                            <span>{t('components.Navbar.coupons')}</span>
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link to="/services" className="flex items-center">
-                            <MapPin className="mr-2 h-4 w-4" />
-                            <span>{t('components.Navbar.services')}</span>
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                      </div>
+                      {/* My Pets, Coupons, Vouchers, Services */}
+                      <DropdownMenuItem asChild>
+                        <Link to="/pages/my-pets" className="flex items-center gap-2">
+                          <PawPrint className="h-4 w-4 shrink-0" />
+                          <span>{t('components.Navbar.myPets')}</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/coupons" className="flex items-center gap-2">
+                          <Ticket className="h-4 w-4 shrink-0" />
+                          <span>{t('components.Navbar.allPromos')}</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/vouchers" className="flex items-center gap-2">
+                          <Gift className="h-4 w-4 shrink-0" />
+                          <span>{t('components.Navbar.coupons')}</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/services" className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4 shrink-0" />
+                          <span>{t('components.Navbar.services')}</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
                       {/* Settings and Actions */}
                       <DropdownMenuItem asChild>
-                        <Link to="/user/settings" className="flex items-center">
-                          <CircleUserRound className="mr-2 h-4 w-4" />
+                        <Link to="/user/settings" className="flex items-center gap-2">
+                          <CircleUserRound className="h-4 w-4 shrink-0" />
                           <span>{t('components.Navbar.profile')}</span>
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link to="/contact" className="flex items-center">
-                          <Mail className="mr-2 h-4 w-4" />
+                        <Link to="/contact" className="flex items-center gap-2">
+                          <Mail className="h-4 w-4 shrink-0" />
                           <span>{t('components.Navbar.contact')}</span>
                         </Link>
                       </DropdownMenuItem>
@@ -284,16 +282,16 @@ const Navbar = () => {
                         <>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem asChild>
-                            <Link to={`/${locale}/admin`} className="flex items-center">
-                              <Shield className="mr-2 h-4 w-4" />
+                            <Link to={`/${locale}/admin`} className="flex items-center gap-2">
+                              <Shield className="h-4 w-4 shrink-0" />
                               <span>{t('components.Navbar.adminPanel')}</span>
                             </Link>
                           </DropdownMenuItem>
                         </>
                       )}
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleLogout} className="text-primary">
-                        <LogOut className="mr-2 h-4 w-4" />
+                      <DropdownMenuItem onClick={handleLogout} className="text-primary flex items-center gap-2">
+                        <LogOut className="h-4 w-4 shrink-0" />
                         <span>{t('components.Navbar.signOut')}</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -353,41 +351,41 @@ const Navbar = () => {
                         <Menu className="h-5 w-5" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56" align={locale === 'he' ? 'start' : 'end'}>
+                    <DropdownMenuContent className="w-56" align={locale === 'he' ? 'start' : 'end'} dir={locale === 'he' ? 'rtl' : 'ltr'} sideOffset={8} collisionPadding={16}>
                       <DropdownMenuItem asChild>
-                        <Link to="/pages/my-pets" className="flex items-center">
-                          <PawPrint className="mr-2 h-4 w-4" />
+                        <Link to="/pages/my-pets" className="flex items-center gap-2">
+                          <PawPrint className="h-4 w-4 shrink-0" />
                           <span>{t('components.Navbar.myPets')}</span>
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link to="/coupons" className="flex items-center">
-                          <Ticket className="mr-2 h-4 w-4" />
+                        <Link to="/coupons" className="flex items-center gap-2">
+                          <Ticket className="h-4 w-4 shrink-0" />
                           <span>{t('components.Navbar.allPromos')}</span>
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link to="/vouchers" className="flex items-center">
-                          <Gift className="mr-2 h-4 w-4" />
+                        <Link to="/vouchers" className="flex items-center gap-2">
+                          <Gift className="h-4 w-4 shrink-0" />
                           <span>{t('components.Navbar.coupons')}</span>
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link to="/services" className="flex items-center">
-                          <MapPin className="mr-2 h-4 w-4" />
+                        <Link to="/services" className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4 shrink-0" />
                           <span>{t('components.Navbar.services')}</span>
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
-                        <Link to="/contact" className="flex items-center">
-                          <Mail className="mr-2 h-4 w-4" />
+                        <Link to="/contact" className="flex items-center gap-2">
+                          <Mail className="h-4 w-4 shrink-0" />
                           <span>{t('components.Navbar.contact')}</span>
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link to="/login" className="flex items-center">
-                          <LogIn className="mr-2 h-4 w-4" />
+                        <Link to="/login" className="flex items-center gap-2">
+                          <LogIn className="h-4 w-4 shrink-0" />
                           <span>{t('components.Navbar.signIn')}</span>
                         </Link>
                       </DropdownMenuItem>

@@ -17,8 +17,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { deleteUser, updateUserRole, restrictUser, unrestrictUser, addPointsToUser } from '@/lib/actions/admin';
 import { updateUserByUid } from '@/lib/firebase/database/users';
-import { Phone, Coins } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Phone } from 'lucide-react';
 import { useState } from 'react';
 import { useLocale } from '@/hooks/use-locale';
 import { cn } from '@/lib/utils';
@@ -76,9 +75,6 @@ export default function UserActions({
     optional: isHebrew ? 'אופציונלי' : 'Optional',
     pointsDescriptionPlaceholder: isHebrew ? 'למשל, תגמול על הפניה, נקודות בונוס וכו\'.' : 'e.g., Reward for referral, Bonus points, etc.',
     addingPoints: isHebrew ? 'מוסיף נקודות...' : 'Adding Points...',
-    voucherPurchaseLimit: isHebrew ? 'מגבלת רכישת שוברים' : 'Voucher purchase limit',
-    couponPurchaseLimit: isHebrew ? 'מגבלת רכישת קופונים' : 'Coupon purchase limit',
-    purchaseLimitPlaceholder: isHebrew ? 'ריק = ללא הגבלה' : 'Empty = no limit',
     roles: {
       user: isHebrew ? 'משתמש' : 'User',
       admin: isHebrew ? 'מנהל' : 'Admin',
@@ -86,19 +82,11 @@ export default function UserActions({
     }
   };
 
-  // Helper function to get translated role name
-  const getRoleName = (role: string): string => {
-    if (role === 'user') return text.roles.user;
-    if (role === 'admin') return text.roles.admin;
-    if (role === 'super_admin') return text.roles.superAdmin;
-    return text.selectRole;
-  };
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [newRole, setNewRole] = useState(currentRole);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [restrictionReason, setRestrictionReason] = useState('');
   const [phone, setPhone] = useState(phoneNumber || '');
   const [currentAddress, setCurrentAddress] = useState(userAddress || '');
   const [isLoading, setIsLoading] = useState(false);
@@ -106,31 +94,6 @@ export default function UserActions({
   const [pointsAmount, setPointsAmount] = useState('100');
   const [pointsDescription, setPointsDescription] = useState('');
   const [isAddingPoints, setIsAddingPoints] = useState(false);
-  const [voucherPurchaseLimit, setVoucherPurchaseLimit] = useState('');
-  const [couponPurchaseLimit, setCouponPurchaseLimit] = useState('');
-
-  const navigate = useNavigate();
-
-  const handleRoleChange = async () => {
-    if (newRole === currentRole) {
-      setIsEditOpen(false);
-      return;
-    }
-
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      await updateUserRole(userId, newRole as 'user' | 'admin' | 'super_admin');
-      setIsEditOpen(false);
-      window.location.reload();
-    } catch (err) {
-      setError(t('userActions.updateRoleError'));
-      console.error(err);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const handleDeleteClick = () => {
     setIsDeleting(true);
@@ -151,45 +114,6 @@ export default function UserActions({
       }
     } catch (err) {
       setError(t('userActions.deleteUserError'));
-      console.error(err);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleRestrictUser = async () => {
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      const result = await restrictUser(userId, restrictionReason);
-      if (result.success) {
-        setRestrictionReason('');
-        window.location.reload();
-      } else {
-        setError(result.error || t('userActions.restrictUserError'));
-      }
-    } catch (err) {
-      setError(t('userActions.restrictUserError'));
-      console.error(err);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleUnrestrictUser = async () => {
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      const result = await unrestrictUser(userId);
-      if (result.success) {
-        window.location.reload();
-      } else {
-        setError(result.error || t('userActions.unrestrictUserError'));
-      }
-    } catch (err) {
-      setError(t('userActions.unrestrictUserError'));
       console.error(err);
     } finally {
       setIsSubmitting(false);
@@ -224,20 +148,9 @@ export default function UserActions({
         await updateUserRole(userId, newRole as 'user' | 'admin' | 'super_admin');
       }
 
-      const voucherLimit = voucherPurchaseLimit.trim() === '' ? null : parseInt(voucherPurchaseLimit, 10);
-      const couponLimit = couponPurchaseLimit.trim() === '' ? null : parseInt(couponPurchaseLimit, 10);
-      if (voucherLimit !== null && (isNaN(voucherLimit) || voucherLimit < 0)) {
-        throw new Error(isHebrew ? 'מגבלת שוברים חייבת להיות מספר לא שלילי' : 'Voucher purchase limit must be a non-negative number');
-      }
-      if (couponLimit !== null && (isNaN(couponLimit) || couponLimit < 0)) {
-        throw new Error(isHebrew ? 'מגבלת קופונים חייבת להיות מספר לא שלילי' : 'Coupon purchase limit must be a non-negative number');
-      }
-
       const result = await updateUserByUid(userId, {
         phone,
-        address: currentAddress,
-        voucherPurchaseLimit: voucherLimit,
-        couponPurchaseLimit: couponLimit
+        address: currentAddress
       });
       if (!result.success) {
         throw new Error(result.error || t('userActions.updateUserInfoError'));
@@ -295,8 +208,6 @@ export default function UserActions({
       if (userResult.success && userResult.user) {
         setPhone(userResult.user.phone || '');
         setCurrentAddress(userResult.user.address || '');
-        setVoucherPurchaseLimit(userResult.user.voucherPurchaseLimit != null ? String(userResult.user.voucherPurchaseLimit) : '');
-        setCouponPurchaseLimit(userResult.user.couponPurchaseLimit != null ? String(userResult.user.couponPurchaseLimit) : '');
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -412,32 +323,6 @@ export default function UserActions({
                       }}
                     />
                     <span>{isRestricted ? text.restricted : text.active}</span>
-                  </div>
-                </div>
-
-                {/* Purchase limits (threshold for buying vouchers/coupons) */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2" dir={isRTL ? 'rtl' : 'ltr'}>
-                    <Label>{text.voucherPurchaseLimit}</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      value={voucherPurchaseLimit}
-                      onChange={(e) => setVoucherPurchaseLimit(e.target.value)}
-                      placeholder={text.purchaseLimitPlaceholder}
-                      className={isRTL ? "text-right" : ""}
-                    />
-                  </div>
-                  <div className="space-y-2" dir={isRTL ? 'rtl' : 'ltr'}>
-                    <Label>{text.couponPurchaseLimit}</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      value={couponPurchaseLimit}
-                      onChange={(e) => setCouponPurchaseLimit(e.target.value)}
-                      placeholder={text.purchaseLimitPlaceholder}
-                      className={isRTL ? "text-right" : ""}
-                    />
                   </div>
                 </div>
               </>

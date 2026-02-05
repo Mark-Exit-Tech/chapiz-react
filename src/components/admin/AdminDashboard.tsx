@@ -3,12 +3,10 @@
 import { useEffect, useState } from 'react';
 import { getDashboardStats, getRecentActivity } from '@/lib/actions/admin';
 import { format } from 'date-fns';
-import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export default function AdminDashboard() {
-  const { t } = useTranslation('Admin');
 
   // Get locale from URL or default to 'en'
   const locale = typeof window !== 'undefined'
@@ -421,8 +419,8 @@ export default function AdminDashboard() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {activity.ads.map((ad) => (
-                    <TableRow key={ad.id}>
+                  {activity.ads.map((ad, index) => (
+                    <TableRow key={ad.id || `ad-${index}`}>
                       <TableCell className="px-2 md:px-4 text-xs md:text-sm">{ad.title}</TableCell>
                       <TableCell className="px-2 md:px-4">
                         <span

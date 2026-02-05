@@ -534,41 +534,28 @@ export default function AdActions({ ad, onDelete, onUpdate }: AdActionsProps) {
             <div className="space-y-2">
               <Label htmlFor="tags">{text.tags}</Label>
 
-              {/* Predefined Hebrew Service Tags */}
+              {/* Predefined Hebrew Service Tags - click to toggle */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-gray-600">{text.serviceTags}</Label>
                 <div className="flex flex-wrap gap-2">
-                  {HEBREW_SERVICE_TAGS.map((tag, index) => (
-                    <button
-                      key={index}
-                      type="button"
-                      onClick={() => addPredefinedTag(tag)}
-                      disabled={formData.tags.includes(tag)}
-                      className={`px-3 py-1 rounded-full text-sm border transition-colors ${formData.tags.includes(tag)
-                        ? 'bg-primary text-primary-foreground border-primary'
-                        : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
-                        }`}
-                    >
-                      {tag}
-                    </button>
-                  ))}
+                  {HEBREW_SERVICE_TAGS.map((tag, index) => {
+                    const isSelected = formData.tags.includes(tag);
+                    return (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => isSelected ? removeTag(tag) : addPredefinedTag(tag)}
+                        className={`px-3 py-1 rounded-full text-sm border transition-colors ${isSelected
+                          ? 'bg-primary text-primary-foreground border-primary'
+                          : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+                          }`}
+                      >
+                        {tag}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
-
-              {/* Selected Tags */}
-              {formData.tags.length > 0 && (
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-600">{tCommon('selectedTags')}</Label>
-                  <div className="flex flex-wrap gap-2">
-                    {formData.tags.map((tag, index) => (
-                      <span key={index} className="bg-primary text-primary-foreground px-2 py-1 rounded text-sm flex items-center gap-1">
-                        {tag}
-                        <button type="button" onClick={() => removeTag(tag)} className="ml-1 hover:text-red-300">×</button>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
 
             <div className="space-y-2">

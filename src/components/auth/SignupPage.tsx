@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useLocale } from '@/hooks/use-locale';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,6 +16,8 @@ import LocaleSwitcher from '@/components/LocaleSwitcher';
 
 const SignupPage = () => {
   const { t } = useTranslation();
+  const locale = useLocale();
+  const isHebrew = locale === 'he';
   const { signIn, signUp, signInWithGoogle, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   
@@ -202,10 +205,10 @@ const SignupPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-center">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4" dir={isHebrew ? 'rtl' : 'ltr'}>
+      <div className={`w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-center ${isHebrew ? 'lg:grid-flow-col-dense' : ''}`}>
         {/* Left Side - Image and Branding */}
-        <div className="hidden lg:flex flex-col items-center justify-center space-y-8">
+        <div className={`hidden lg:flex flex-col items-center justify-center space-y-8 ${isHebrew ? 'lg:order-2' : ''}`}>
           <div className="relative w-80 h-80">
             <OptimizedImage
               src="/pets/bear"
@@ -216,13 +219,13 @@ const SignupPage = () => {
             />
           </div>
           <div className="text-center space-y-4">
-            <div className="flex justify-center">
+            <div className="flex justify-center -mt-[10px]">
               <OptimizedImage
                 src="/assets/Chapiz-logo"
                 alt="Chapiz"
                 width={130}
-                height={50}
-                className="w-[130px] h-[50px] object-fill object-center"
+                height={55}
+                className="w-[170px] h-[59px]"
               />
             </div>
             <p className="text-xl text-gray-600 max-w-md">
@@ -232,13 +235,13 @@ const SignupPage = () => {
         </div>
 
         {/* Right Side - Signup Form */}
-        <div className="w-full max-w-md mx-auto">
+        <div className={`w-full max-w-md mx-auto ${isHebrew ? 'lg:order-1' : ''}`}>
           <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
             {/* Language Switcher */}
-            <div className="flex justify-end p-4">
+            <div className={`flex p-4 ${isHebrew ? 'justify-start' : 'justify-end'}`}>
               <LocaleSwitcher />
             </div>
-            <CardHeader className="space-y-2 text-center pb-8">
+            <CardHeader className={`space-y-2 pb-8 ${isHebrew ? 'text-right' : 'text-center'}`}>
               <CardTitle className="text-2xl font-bold text-gray-900">
                 {t('pages.AuthPage.createAccount')}
               </CardTitle>
@@ -253,9 +256,9 @@ const SignupPage = () => {
                 onClick={handleGoogleAuth}
                 disabled={formLoading}
                 variant="outline"
-                className="w-full h-12 text-gray-700 border-gray-300 hover:bg-gray-50"
+                className={`w-full h-12 text-gray-700 border-gray-300 hover:bg-gray-50 flex items-center ${isHebrew ? 'flex-row-reverse' : ''}`}
               >
-                <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
+                <svg className={`w-5 h-5 ${isHebrew ? 'ml-3' : 'mr-3'}`} viewBox="0 0 24 24">
                   <path
                     fill="#4285F4"
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -288,9 +291,9 @@ const SignupPage = () => {
               {/* Email Form */}
               <form onSubmit={handleEmailAuth} className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">{t('pages.AuthPage.fullName')}</label>
+                  <label className={`text-sm font-medium text-gray-700 ${isHebrew ? 'text-right' : ''}`}>{t('pages.AuthPage.fullName')}</label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <User className={`absolute top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 ${isHebrew ? 'right-3' : 'left-3'}`} />
                     <Input
                       name="fullName"
                       type="text"
@@ -298,15 +301,16 @@ const SignupPage = () => {
                       value={formData.fullName}
                       onChange={handleInputChange}
                       required
-                      className="pl-10 h-12"
+                      className={`h-12 ${isHebrew ? 'pr-10 text-right' : 'pl-10'}`}
+                      dir={isHebrew ? 'rtl' : 'ltr'}
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">{t('pages.AuthPage.address')}</label>
+                  <label className={`text-sm font-medium text-gray-700 ${isHebrew ? 'text-right' : ''}`}>{t('pages.AuthPage.address')}</label>
                   <div className="relative">
-                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <MapPin className={`absolute top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 ${isHebrew ? 'right-3' : 'left-3'}`} />
                     <Input
                       name="address"
                       type="text"
@@ -314,15 +318,16 @@ const SignupPage = () => {
                       value={formData.address}
                       onChange={handleInputChange}
                       required
-                      className="pl-10 h-12"
+                      className={`h-12 ${isHebrew ? 'pr-10 text-right' : 'pl-10'}`}
+                      dir={isHebrew ? 'rtl' : 'ltr'}
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">{t('pages.AuthPage.phone')}</label>
+                  <label className={`text-sm font-medium text-gray-700 ${isHebrew ? 'text-right' : ''}`}>{t('pages.AuthPage.phone')}</label>
                   <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Phone className={`absolute top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 ${isHebrew ? 'right-3' : 'left-3'}`} />
                     <Input
                       name="phone"
                       type="tel"
@@ -330,15 +335,16 @@ const SignupPage = () => {
                       value={formData.phone}
                       onChange={handleInputChange}
                       required
-                      className="pl-10 h-12"
+                      className={`h-12 ${isHebrew ? 'pr-10 text-right' : 'pl-10'}`}
+                      dir={isHebrew ? 'rtl' : 'ltr'}
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">{t('pages.AuthPage.email')}</label>
+                  <label className={`text-sm font-medium text-gray-700 ${isHebrew ? 'text-right' : ''}`}>{t('pages.AuthPage.email')}</label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Mail className={`absolute top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 ${isHebrew ? 'right-3' : 'left-3'}`} />
                     <Input
                       name="email"
                       type="email"
@@ -346,15 +352,16 @@ const SignupPage = () => {
                       value={formData.email}
                       onChange={handleInputChange}
                       required
-                      className="pl-10 h-12"
+                      className={`h-12 ${isHebrew ? 'pr-10 text-right' : 'pl-10'}`}
+                      dir={isHebrew ? 'rtl' : 'ltr'}
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">{t('pages.AuthPage.password')}</label>
+                  <label className={`text-sm font-medium text-gray-700 ${isHebrew ? 'text-right' : ''}`}>{t('pages.AuthPage.password')}</label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Lock className={`absolute top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 ${isHebrew ? 'right-3' : 'left-3'}`} />
                     <Input
                       name="password"
                       type={showPassword ? 'text' : 'password'}
@@ -362,12 +369,13 @@ const SignupPage = () => {
                       value={formData.password}
                       onChange={handleInputChange}
                       required
-                      className="pl-10 pr-10 h-12"
+                      className={`h-12 ${isHebrew ? 'pr-10 pl-10 text-right' : 'pl-10 pr-10'}`}
+                      dir={isHebrew ? 'rtl' : 'ltr'}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className={`absolute top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 ${isHebrew ? 'left-3' : 'right-3'}`}
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -377,10 +385,10 @@ const SignupPage = () => {
                 <Button
                   type="submit"
                   disabled={formLoading}
-                  className="w-full h-12 bg-primary hover:bg-primary/90 text-white"
+                  className={`w-full h-12 bg-primary hover:bg-primary/90 text-white ${formLoading ? 'flex items-center' : ''} ${isHebrew ? 'flex-row-reverse' : ''}`}
                 >
                   {formLoading ? (
-                    <div className="flex items-center space-x-2">
+                    <div className={`flex items-center ${isHebrew ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                       <span>{t('pages.AuthPage.loading')}</span>
                     </div>
@@ -391,7 +399,7 @@ const SignupPage = () => {
               </form>
 
               {/* Link to Login */}
-              <div className="text-center">
+              <div className={`${isHebrew ? 'text-right' : 'text-center'}`}>
                 <p className="text-sm text-gray-600">
                   {t('pages.AuthPage.haveAccount')}{' '}
                   <Link

@@ -120,13 +120,21 @@ export async function createAd(adData: Omit<Ad, 'id' | 'createdAt'>): Promise<Ad
     try {
         const adsRef = collection(db, ADS_COLLECTION);
         const newAdRef = doc(adsRef);
-        
+
+        // Filter out undefined values (Firestore doesn't accept undefined)
+        const cleanedData: Record<string, any> = {};
+        for (const [key, value] of Object.entries(adData)) {
+            if (value !== undefined) {
+                cleanedData[key] = value;
+            }
+        }
+
         const ad: Ad = {
             id: newAdRef.id,
-            ...adData,
+            ...cleanedData,
             createdAt: new Date()
-        };
-        
+        } as Ad;
+
         await setDoc(newAdRef, ad);
         return ad;
     } catch (error) {
