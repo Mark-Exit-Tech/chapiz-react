@@ -134,7 +134,7 @@ const Navbar = () => {
                   </Button>
 
                   {/* Burger menu - Mobile */}
-                  <DropdownMenu>
+                  <DropdownMenu dir={locale === 'he' ? 'rtl' : 'ltr'}>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="h-8 w-8 p-0 bg-white/90 backdrop-blur-sm shadow-md rounded-full flex items-center justify-center">
                         <Menu className="h-5 w-5" />
@@ -221,7 +221,7 @@ const Navbar = () => {
                     <ShoppingBag className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     <span className="text-center">{t('components.Navbar.chapizStore')}</span>
                   </Button>
-                  <DropdownMenu>
+                  <DropdownMenu dir={locale === 'he' ? 'rtl' : 'ltr'}>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="h-8 w-8 p-0 bg-white/90 backdrop-blur-sm shadow-md rounded-full flex items-center justify-center">
                         <Menu className="h-5 w-5" />
@@ -345,7 +345,7 @@ const Navbar = () => {
                   </Button>
 
                   {/* Burger menu - Mobile */}
-                  <DropdownMenu>
+                  <DropdownMenu dir={locale === 'he' ? 'rtl' : 'ltr'}>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="h-8 w-8 p-0 bg-white/90 backdrop-blur-sm shadow-md rounded-full flex items-center justify-center">
                         <Menu className="h-5 w-5" />
