@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Gift, Ticket, PawPrint, MapPin, Mail, LogIn } from 'lucide-react';
 import { Link as RouterLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +11,22 @@ export default function BottomNavigation() {
   const pathname = usePathname();
   const { t, i18n } = useTranslation('components');
   const { user, dbUser } = useAuth();
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
+
+  // Hide bottom nav when virtual keyboard is open
+  useEffect(() => {
+    if (!('visualViewport' in window)) return;
+
+    const onResize = () => {
+      const vv = window.visualViewport;
+      if (!vv) return;
+      // If visual viewport is significantly smaller than window height, keyboard is open
+      setKeyboardOpen(window.innerHeight - vv.height > 150);
+    };
+
+    window.visualViewport!.addEventListener('resize', onResize);
+    return () => window.visualViewport!.removeEventListener('resize', onResize);
+  }, []);
 
   // Get locale from i18n (works correctly on root path without locale prefix)
   const locale = i18n.language || 'en';
@@ -72,6 +89,11 @@ export default function BottomNavigation() {
 
   // Don't show bottom navigation for non-logged-in users
   if (!user) {
+    return null;
+  }
+
+  // Hide when keyboard is open
+  if (keyboardOpen) {
     return null;
   }
 

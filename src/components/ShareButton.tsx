@@ -22,21 +22,16 @@ const ShareMenu = () => {
     };
 
     try {
-      if (navigator.canShare(shareData)) {
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
         await navigator.share(shareData);
       } else {
-        navigator.clipboard
-          .writeText(shareData.text + ' ' + shareData.url)
-          .then(() => {
-            toast.success(t('linkCopied'));
-          })
-          .catch(() => {
-            toast.error('something went wrong');
-          });
+        await navigator.clipboard.writeText(shareData.text + ' ' + shareData.url);
+        toast.success(t('linkCopied'));
       }
       setMenuOpen(false);
     } catch (err) {
-      console.error('Failed to copy link:', err);
+      // User cancelled share dialog or clipboard failed
+      console.error('Share failed:', err);
     }
   };
 

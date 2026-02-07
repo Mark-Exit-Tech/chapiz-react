@@ -164,7 +164,7 @@ export default function PromosPageClient({
     const businessIds = coupon.businessIds || (coupon.businessId ? [coupon.businessId] : []);
     if (businessIds.length > 0) {
       // Navigate to services map with highlighted businesses
-      navigate(`/${locale}/services?highlight=${businessIds.join(',')}`);
+      navigate(`/${locale}/services?businessId=${businessIds.join(',')}`);
     }
   };
 

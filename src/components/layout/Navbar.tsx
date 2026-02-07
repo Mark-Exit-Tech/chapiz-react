@@ -103,7 +103,7 @@ const Navbar = () => {
               />
             ) : (
               <img
-                src="/assets/Chapiz-logo.webp"
+                src="/assets/Chapiz-logo.png"
                 alt="Chapiz"
                 className="h-10 sm:h-12 w-auto object-contain"
                 style={{ maxHeight: '48px' }}
@@ -151,32 +151,6 @@ const Navbar = () => {
                           </p>
                         </div>
                       </div>
-                      <DropdownMenuSeparator />
-                      {/* My Pets, Coupons, Vouchers, Services - show on mobile too */}
-                      <DropdownMenuItem asChild>
-                        <Link to="/pages/my-pets" className="flex items-center gap-2">
-                          <PawPrint className="h-4 w-4 shrink-0" />
-                          <span>{t('components.Navbar.myPets')}</span>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to="/coupons" className="flex items-center gap-2">
-                          <Ticket className="h-4 w-4 shrink-0" />
-                          <span>{t('components.Navbar.allPromos')}</span>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to="/vouchers" className="flex items-center gap-2">
-                          <Gift className="h-4 w-4 shrink-0" />
-                          <span>{t('components.Navbar.coupons')}</span>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to="/services" className="flex items-center gap-2">
-                          <MapPin className="h-4 w-4 shrink-0" />
-                          <span>{t('components.Navbar.services')}</span>
-                        </Link>
-                      </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
                         <Link to="/user/settings" className="flex items-center gap-2">

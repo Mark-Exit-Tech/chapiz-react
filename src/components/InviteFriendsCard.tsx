@@ -48,7 +48,11 @@ const InviteFriendsCard: React.FC<InviteFriendsCardProps> = ({ onClose, onShareS
       if (onShareSuccess) {
         onShareSuccess();
       }
-    } catch (err) {
+    } catch (err: any) {
+      // User cancelled share dialog - not a real error
+      if (err?.name === 'AbortError') {
+        return;
+      }
       console.error('Failed to share:', err);
       // Even if share fails, still award points if user attempted to share
       if (onShareSuccess) {

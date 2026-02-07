@@ -24,6 +24,9 @@ export default defineConfig({
     hmr: {
       overlay: true,
     },
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
+    },
   },
   // Environment variable prefix
   envPrefix: ['VITE_', 'NEXT_PUBLIC_'],

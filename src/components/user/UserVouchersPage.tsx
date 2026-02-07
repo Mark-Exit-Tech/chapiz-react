@@ -150,20 +150,12 @@ export default function UserVouchersPage() {
       return;
     }
 
-    // Generate shop URL with userid, coupon, and callback
-    // Using a default coupon code 'sale990' as shown in the example
-    // You may want to make this configurable or use a different default
-    const generatedShopUrl = getShopUrl();
-    
-    if (!generatedShopUrl) {
-      toast.error(isHebrew ? 'נכשל ביצירת קישור החנות' : 'Failed to generate shop URL');
-      return;
-    }
+    const shareUrl = shopUrl || (typeof window !== 'undefined' ? window.location.href : '');
 
     const shareData = {
       title: text.shareShopTitle,
       text: text.shareShopText,
-      url: generatedShopUrl
+      url: shareUrl
     };
 
     try {
@@ -172,7 +164,7 @@ export default function UserVouchersPage() {
         toast.success(text.sharedSuccessfully);
       } else {
         // Fallback: copy to clipboard
-        await navigator.clipboard.writeText(generatedShopUrl);
+        await navigator.clipboard.writeText(shareUrl);
         toast.success(text.linkCopied);
       }
       // Note: Points will be awarded when someone actually uses the callback URL,

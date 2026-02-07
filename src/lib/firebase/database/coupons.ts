@@ -361,15 +361,23 @@ export async function getUserCouponByIds(userId: string, couponId: string): Prom
             return { purchased: false };
         }
 
-        // Get the first userCoupon (there should only be one per user per coupon in most cases)
-        const userCouponDoc = querySnapshot.docs[0];
-        const data = userCouponDoc.data();
+        // Prioritize finding an active (unused) coupon
+        const activeCoupon = querySnapshot.docs.find(doc => {
+            const data = doc.data();
+            return data.status !== 'used' && !data.usedAt;
+        });
 
-        return {
-            purchased: true,
-            userCouponId: userCouponDoc.id,
-            isUsed: data.status === 'used' || !!data.usedAt
-        };
+        if (activeCoupon) {
+            return {
+                purchased: true,
+                userCouponId: activeCoupon.id,
+                isUsed: false
+            };
+        }
+
+        // All copies are used — return purchased: false so the frontend
+        // can attempt a new purchase (purchaseCoupon will enforce the limit)
+        return { purchased: false };
     } catch (error) {
         console.error('❌ Error checking user coupon:', error);
         return { purchased: false };
