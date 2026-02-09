@@ -27,7 +27,7 @@ const LoginPage = () => {
     password: ''
   });
   const [loadingTimeout, setLoadingTimeout] = useState(false);
-  
+
   // Timeout fallback if loading takes too long
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -36,10 +36,10 @@ const LoginPage = () => {
         setLoadingTimeout(true);
       }
     }, 5000); // 5 second timeout
-    
+
     return () => clearTimeout(timer);
   }, [authLoading]);
-  
+
   // Redirect if user is already authenticated
   useEffect(() => {
     if (!authLoading && user) {
@@ -83,16 +83,16 @@ const LoginPage = () => {
         status: error.status,
         error: error
       });
-      
+
       // Provide more specific error messages
       let errorMessage = error.message || t('pages.AuthPage.authError');
-      
+
       if (error.message?.includes('Invalid login credentials')) {
         errorMessage = 'Invalid email or password. Please check your credentials.';
       } else if (error.message?.includes('Email not confirmed')) {
         errorMessage = 'Please check your email and confirm your account before signing in.';
       }
-      
+
       toast.error(errorMessage);
     } finally {
       setFormLoading(false);
@@ -124,7 +124,7 @@ const LoginPage = () => {
       </div>
     );
   }
-  
+
   // Debug logging
   useEffect(() => {
     console.log('🔍 LoginPage render state:', { authLoading, loadingTimeout, user });
@@ -151,7 +151,7 @@ const LoginPage = () => {
               <img
                 src="/assets/Chapiz-logo.png"
                 alt="Chapiz"
-                className="w-[170px] h-[59px]"
+                className="w-[170px] h-[102px]"
               />
             </div>
             <p className="text-xl text-gray-600 max-w-md">

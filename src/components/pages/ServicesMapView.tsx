@@ -555,7 +555,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
       setIsLoading(false);
       return;
     }
-    
+
     setIsLoading(true);
 
     // Use existing coordinates from database (saved by admin)
@@ -793,7 +793,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
         console.warn('⚠️ Map container ref not available');
         return;
       }
-      
+
       if (!window.google || !window.google.maps) {
         console.warn('⚠️ Google Maps API not loaded');
         return;
@@ -859,13 +859,13 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
         }
 
         setServicesWithCoords(servicesWithData);
-        
+
         // Show markers immediately (even without user location)
         const servicesWithCoords = servicesWithData.filter(s => s.coordinates);
         if (servicesWithCoords.length > 0) {
           updateMapMarkers(servicesWithCoords, mapInstance);
         }
-        
+
         setIsLoading(false);
       }
     } catch (error) {
@@ -941,7 +941,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
 
     // Normal flow: extract coordinates and show markers (distance only if user location available)
     setIsLoading(true);
-    
+
     // Extract coordinates from services (already saved by admin)
     const servicesWithData: ServiceWithCoordinates[] = services.map(service => {
       const coords = getServiceCoordinates(service);
@@ -976,13 +976,13 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
     }
 
     setServicesWithCoords(servicesWithData);
-    
+
     // Always update map markers to match filtered list (including clearing when 0 results)
     if (map && window.google) {
       const withCoords = servicesWithData.filter(s => s.coordinates);
       updateMapMarkers(withCoords);
     }
-    
+
     setIsLoading(false);
   }, [services, filterType, userLocation, map]);
 
@@ -1232,7 +1232,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
                         placeholder={drawerSearchPlaceholder ?? t('pages.ServicesPage.searchPlaceholder') ?? 'Search services...'}
                         value={drawerSearchValue}
                         onChange={(e) => onDrawerSearchChange(e.target.value)}
-                        className="h-full w-full rounded-xl bg-transparent border-0 p-0 ltr:pl-10 ltr:pr-4 rtl:pr-10 rtl:pl-4 focus-visible:ring-0 focus-visible:ring-offset-0 text-sm placeholder:text-gray-400"
+                        className="h-full w-full rounded-xl bg-transparent border-0 p-0 ltr:pl-10 ltr:pr-4 rtl:pr-10 rtl:pl-4 focus-visible:ring-0 focus-visible:ring-offset-0 text-base placeholder:text-gray-400"
                         dir={locale === 'he' ? 'rtl' : 'ltr'}
                         autoComplete="off"
                         inputMode="search"

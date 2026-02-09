@@ -20,14 +20,14 @@ const SignupPage = () => {
   const isHebrew = locale === 'he';
   const { signIn, signUp, signInWithGoogle, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  
+
   // Redirect if user is already authenticated
   useEffect(() => {
     if (!authLoading && user) {
       navigate('/pages/my-pets');
     }
   }, [user, authLoading, navigate]);
-  
+
   const [showPassword, setShowPassword] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
@@ -69,19 +69,19 @@ const SignupPage = () => {
     }
 
     try {
-      console.log('🔍 Starting signup process:', { 
-        email: formData.email, 
+      console.log('🔍 Starting signup process:', {
+        email: formData.email,
         hasPassword: !!formData.password,
-        hasFullName: !!formData.fullName 
+        hasFullName: !!formData.fullName
       });
-      
+
       // Sign up
       await signUp(formData.email, formData.password, formData.fullName, formData.phone, formData.address);
       console.log('✅ Signup successful');
-      
+
       // Wait for Firebase to process
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       // Try to sign in
       console.log('🔄 Attempting to establish session...');
       try {
@@ -108,10 +108,10 @@ const SignupPage = () => {
         status: error.status,
         error: error
       });
-      
+
       // Provide more specific error messages
       let errorMessage = error.message || t('pages.AuthPage.authError');
-      
+
       if (error.message?.includes('Invalid login credentials')) {
         errorMessage = 'Invalid email or password. Please check your credentials.';
       } else if (error.message?.includes('Email not confirmed')) {
@@ -121,7 +121,7 @@ const SignupPage = () => {
       } else if (error.message?.includes('Password')) {
         errorMessage = error.message;
       }
-      
+
       toast.error(errorMessage);
     } finally {
       setFormLoading(false);
@@ -223,7 +223,7 @@ const SignupPage = () => {
               <img
                 src="/assets/Chapiz-logo.png"
                 alt="Chapiz"
-                className="w-[170px] h-[59px]"
+                className="w-[170px] h-[102px]"
               />
             </div>
             <p className="text-xl text-gray-600 max-w-md">
