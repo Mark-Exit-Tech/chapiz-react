@@ -13,6 +13,7 @@ import { getUserCouponByIds, markCouponAsUsed } from '@/lib/firebase/database/co
 import { motion } from 'framer-motion';
 import { getYouTubeEmbedUrl } from '@/lib/utils/youtube';
 import QRCodeCard from '@/components/cards/QRCodeCard';
+import { generateShareUrl } from '@/lib/utils/shop-url';
 import confetti from 'canvas-confetti';
 import {
   Dialog,
@@ -182,26 +183,29 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
   };
 
   const handleShare = async () => {
-    if (!isMounted || !couponUrl) return;
+    if (!isMounted) return;
+
+    // Generate share URL with userid and callback for points
+    const shareUrl = user
+      ? generateShareUrl(user.uid, coupon.id, window.location.origin)
+      : couponUrl;
 
     if (navigator.share) {
       try {
         await navigator.share({
           title: coupon.name,
           text: coupon.description || coupon.name,
-          url: couponUrl,
+          url: shareUrl,
         });
         toast.success(text.shared);
       } catch (error: any) {
         if (error.name !== 'AbortError') {
-          // Fallback to clipboard
-          navigator.clipboard.writeText(couponUrl);
+          navigator.clipboard.writeText(shareUrl);
           toast.success(text.linkCopied);
         }
       }
     } else {
-      // Fallback to clipboard
-      navigator.clipboard.writeText(couponUrl);
+      navigator.clipboard.writeText(shareUrl);
       toast.success(text.linkCopied);
     }
   };

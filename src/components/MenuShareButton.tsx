@@ -5,16 +5,29 @@ import { SiWhatsapp } from '@icons-pack/react-simple-icons';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Facebook, Link2, Share, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import { FacebookShareButton, WhatsappShareButton } from 'react-share';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
+import { generateShareUrl } from '@/lib/utils/shop-url';
 
-const MenuShareMenu = () => {
+interface MenuShareMenuProps {
+  coupon?: string;
+}
+
+const MenuShareMenu = ({ coupon = 'default' }: MenuShareMenuProps) => {
   const { t } = useTranslation('components.ShareButton');
+  const { user } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Get the current page URL and title safely
-  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+  // Build share URL with userid and callback if user is logged in
+  const shareUrl = useMemo(() => {
+    if (user) {
+      return generateShareUrl(user.uid, coupon, window.location.origin);
+    }
+    return typeof window !== 'undefined' ? window.location.href : '';
+  }, [user, coupon]);
+
   const shareData = {
     title: t('title'),
     text: `${t('text')} ${shareUrl}`,

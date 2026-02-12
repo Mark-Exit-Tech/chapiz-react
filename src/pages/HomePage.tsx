@@ -1,8 +1,8 @@
 import Navbar from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import Footer from '@/components/layout/Footer';
 import OptimizedImage from '@/components/OptimizedImage';
@@ -101,6 +101,23 @@ const petCharacters = [
 export default function HomePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const callbackCalled = useRef(false);
+
+  // Handle callback URL params: when someone visits a shared link,
+  // call the callback URL to award 20 points to the sharing user
+  useEffect(() => {
+    const callbackUrl = searchParams.get('callback');
+    const userid = searchParams.get('userid');
+
+    if (callbackUrl && userid && !callbackCalled.current) {
+      callbackCalled.current = true;
+      // Call the callback URL to award points
+      fetch(callbackUrl, { mode: 'cors' }).catch((err) => {
+        console.error('Callback failed:', err);
+      });
+    }
+  }, [searchParams]);
 
   const handleCookieAccept = () => {
     console.log('Cookies accepted');

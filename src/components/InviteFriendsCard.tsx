@@ -6,6 +6,8 @@ import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { cn } from '../lib/utils';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
+import { generateShareUrl } from '@/lib/utils/shop-url';
 
 interface InviteFriendsCardProps {
   onClose?: () => void;
@@ -14,18 +16,21 @@ interface InviteFriendsCardProps {
 
 const InviteFriendsCard: React.FC<InviteFriendsCardProps> = ({ onClose, onShareSuccess }) => {
   const { t } = useTranslation('components.InviteFriendsCard');
+  const { user } = useAuth();
   const [shared, setShared] = useState(false);
   const iconSectionWidth = 100; // width reserved for the icon
-  
+
   // Get locale from URL
-  const locale = typeof window !== 'undefined' 
-    ? window.location.pathname.split('/')[1] 
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1]
     : 'en';
   const isHebrew = locale === 'he';
 
   const handleShare = async () => {
-    // Use the correct website URL
-    const shareUrl = 'https://facepet-kappa.vercel.app';
+    // Generate share URL with userid and callback for 20 points
+    const shareUrl = user
+      ? generateShareUrl(user.uid, 'invite', 'https://chapiz.co.il')
+      : 'https://chapiz.co.il';
     const shareText = isHebrew ? 'בדוק את אפליקציית Chapiz לחיות!' : 'Check out Chapiz app for pets!';
     const shareTitle = isHebrew ? 'הצטרף ל-Chapiz' : 'Join Chapiz';
     const shareData = {

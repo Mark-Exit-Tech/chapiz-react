@@ -6,15 +6,24 @@ import { Share, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
+import { generateShareUrl } from '@/lib/utils/shop-url';
 
-const ShareMenu = () => {
+interface ShareMenuProps {
+  coupon?: string;
+}
+
+const ShareMenu = ({ coupon = 'default' }: ShareMenuProps) => {
   const { t } = useTranslation('components.ShareButton');
+  const { user } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
 
   // For the "copy link" option.
   const handleCopyLink = async () => {
-    // Get the current page URL and title safely
-    const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+    // Build share URL with userid and callback if user is logged in
+    const shareUrl = user
+      ? generateShareUrl(user.uid, coupon, window.location.origin)
+      : (typeof window !== 'undefined' ? window.location.href : '');
     const shareData = {
       title: t('title'),
       text: `${t('text')} ${shareUrl}`,

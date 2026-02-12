@@ -1,5 +1,10 @@
 import * as functions from 'firebase-functions';
+import * as admin from 'firebase-admin';
 import { Resend } from 'resend';
+
+// Initialize Firebase Admin
+admin.initializeApp();
+const firestore = admin.firestore();
 
 // Get Resend API key from environment variables or fallback to hardcoded (for development)
 const resendApiKey = process.env.RESEND_API_KEY || 're_4B3FSDoU_GjgVXh2vLWks6VzuQvfnvaBf';
@@ -86,5 +91,58 @@ export const sendInviteEmail = functions.https.onCall(async (data, context) => {
     // Otherwise, wrap it in an HttpsError
     const errorMessage = error?.message || 'Failed to send email. Please check Resend configuration and verify the sender email is verified.';
     throw new functions.https.HttpsError('internal', errorMessage);
+  }
+});
+
+/**
+ * Shop Callback - Awards 20 points to the user when their shared link is visited
+ * Called via HTTP GET/POST with ?userid=<userId>
+ */
+export const shopCallback = functions.https.onRequest(async (req, res) => {
+  // Enable CORS
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    res.status(204).send('');
+    return;
+  }
+
+  const userid = req.query.userid as string || req.body?.userid;
+
+  if (!userid || typeof userid !== 'string') {
+    res.status(400).json({ success: false, error: 'userid is required' });
+    return;
+  }
+
+  try {
+    const POINTS_TO_AWARD = 20;
+    const userPointsRef = firestore.collection('userPoints').doc(userid);
+    const transactionsRef = firestore.collection('pointsTransactions');
+
+    // Award 20 points using increment (creates doc if doesn't exist)
+    await userPointsRef.set({
+      userId: userid,
+      points: admin.firestore.FieldValue.increment(POINTS_TO_AWARD),
+      updatedAt: new Date()
+    }, { merge: true });
+
+    // Create transaction record
+    const transactionDoc = transactionsRef.doc();
+    await transactionDoc.set({
+      id: transactionDoc.id,
+      userId: userid,
+      points: POINTS_TO_AWARD,
+      category: 'share_visit',
+      description: 'Points awarded for shared link visit',
+      createdAt: new Date()
+    });
+
+    console.log(`Awarded ${POINTS_TO_AWARD} points to user ${userid}`);
+    res.status(200).json({ success: true, points: POINTS_TO_AWARD, userid });
+  } catch (error: any) {
+    console.error('Error awarding points:', error);
+    res.status(500).json({ success: false, error: error.message || 'Failed to award points' });
   }
 });

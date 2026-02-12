@@ -1,20 +1,30 @@
-// Stub hook for shop redirect
+import { useAuth } from '@/contexts/FirebaseAuthContext';
+import { generateShopUrl, generateShareUrl, getCallbackUrl } from '@/lib/utils/shop-url';
+
 export function useShopRedirect() {
+  const { user } = useAuth();
+
+  const redirectToShop = (shopUrl: string, coupon: string) => {
+    if (!user) return;
+    const url = generateShopUrl(shopUrl, user.uid, coupon);
+    window.location.href = url;
+  };
+
+  const getShopUrl = (shopUrl: string, coupon: string) => {
+    if (!user) return '';
+    return generateShopUrl(shopUrl, user.uid, coupon);
+  };
+
+  const getShareUrl = (coupon: string) => {
+    if (!user) return '';
+    return generateShareUrl(user.uid, coupon);
+  };
+
   return {
-    redirectToShop: (url?: string, code?: string, ...args: any[]) => {
-      console.log('Shop redirect not implemented', url, code);
-    },
-    getShopUrl: () => {
-      return '';
-    },
-    getShopUrlWithUniqueCallback: (url: string, code?: string) => {
-      console.log('getShopUrlWithUniqueCallback not implemented', url, code);
-      return {
-        shopUrl: url,
-        callbackToken: 'dummy-token',
-        callbackUrl: 'https://example.com/callback'
-      };
-    },
-    isAuthenticated: true // Set to true for development/example purposes
+    redirectToShop,
+    getShopUrl,
+    getShareUrl,
+    getCallbackUrl: user ? () => getCallbackUrl(user.uid) : () => '',
+    isAuthenticated: !!user,
   };
 }
