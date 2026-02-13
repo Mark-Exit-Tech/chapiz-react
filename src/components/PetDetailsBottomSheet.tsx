@@ -73,7 +73,6 @@ export default function PetDetailsBottomSheet({
       try {
         await navigator.share({
           title: `${pet.name} - Pet Profile`,
-          text: `Check out ${pet.name}'s pet profile!`,
           url: petShareUrl,
         });
       } catch (error) {

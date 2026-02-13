@@ -6,24 +6,13 @@ import { Share, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '@/contexts/FirebaseAuthContext';
-import { generateShareUrl } from '@/lib/utils/shop-url';
 
-interface ShareMenuProps {
-  coupon?: string;
-}
-
-const ShareMenu = ({ coupon = 'default' }: ShareMenuProps) => {
+const ShareMenu = () => {
   const { t } = useTranslation('components.ShareButton');
-  const { user } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // For the "copy link" option.
   const handleCopyLink = async () => {
-    // Build share URL with userid and callback if user is logged in
-    const shareUrl = user
-      ? generateShareUrl(user.uid, coupon, window.location.origin)
-      : (typeof window !== 'undefined' ? window.location.href : '');
+    const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
     try {
       if (navigator.share) {
         await navigator.share({ title: t('title'), url: shareUrl });
@@ -33,14 +22,12 @@ const ShareMenu = ({ coupon = 'default' }: ShareMenuProps) => {
       }
       setMenuOpen(false);
     } catch (err) {
-      // User cancelled share dialog or clipboard failed
       console.error('Share failed:', err);
     }
   };
 
   return (
     <div className="relative">
-      {/* Main share button */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

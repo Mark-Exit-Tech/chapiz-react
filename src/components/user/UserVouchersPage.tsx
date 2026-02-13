@@ -16,6 +16,7 @@ import MapCard from '@/components/cards/MapCard';
 import { getUserPoints, deductPointsFromCategory, addPointsToCategory } from '@/lib/firebase/database/points';
 import { getActiveVouchers, purchaseVoucher, getUserVouchers, markVoucherAsUsed, type Voucher, type UserVoucher } from '@/lib/firebase/database/vouchers';
 import { useShopRedirect } from '@/hooks/use-shop-redirect';
+import { generateShareUrl } from '@/lib/utils/shop-url';
 import toast from 'react-hot-toast';
 import confetti from 'canvas-confetti';
 
@@ -150,17 +151,14 @@ export default function UserVouchersPage() {
       return;
     }
 
-    const shareUrl = shopUrl || (typeof window !== 'undefined' ? window.location.href : '');
-
-    const shareData = {
-      title: text.shareShopTitle,
-      text: text.shareShopText,
-      url: shareUrl
-    };
+    // Generate share URL with userid and callback for 20 points
+    const shareUrl = user
+      ? generateShareUrl(user.uid, 'shop', shopUrl || window.location.origin)
+      : (shopUrl || (typeof window !== 'undefined' ? window.location.href : ''));
 
     try {
-      if (navigator.share && navigator.canShare(shareData)) {
-        await navigator.share(shareData);
+      if (navigator.share) {
+        await navigator.share({ title: text.shareShopTitle, url: shareUrl });
         toast.success(text.sharedSuccessfully);
       } else {
         // Fallback: copy to clipboard

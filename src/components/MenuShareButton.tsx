@@ -5,30 +5,16 @@ import { SiWhatsapp } from '@icons-pack/react-simple-icons';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Facebook, Link2, Share, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { FacebookShareButton, WhatsappShareButton } from 'react-share';
-import { useAuth } from '@/contexts/FirebaseAuthContext';
-import { generateShareUrl } from '@/lib/utils/shop-url';
 
-interface MenuShareMenuProps {
-  coupon?: string;
-}
-
-const MenuShareMenu = ({ coupon = 'default' }: MenuShareMenuProps) => {
+const MenuShareMenu = () => {
   const { t } = useTranslation('components.ShareButton');
-  const { user } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Build share URL with userid and callback if user is logged in
-  const shareUrl = useMemo(() => {
-    if (user) {
-      return generateShareUrl(user.uid, coupon, window.location.origin);
-    }
-    return typeof window !== 'undefined' ? window.location.href : '';
-  }, [user, coupon]);
+  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
 
-  // For the "copy link" option.
   const handleCopyLink = async () => {
     try {
       if (navigator.share) {
@@ -39,25 +25,23 @@ const MenuShareMenu = ({ coupon = 'default' }: MenuShareMenuProps) => {
       }
       setMenuOpen(false);
     } catch (err) {
-      // User cancelled share dialog or clipboard failed
       console.error('Share failed:', err);
     }
   };
 
-  // Animation variants for staggered animation
   const containerVariants = {
     hidden: { opacity: 1 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.05, // Delay between each button's animation
+        staggerChildren: 0.05,
         staggerDirection: -1
       }
     },
     exit: {
       opacity: 1,
       transition: {
-        staggerChildren: 0 // Delay between each button's animation
+        staggerChildren: 0
       }
     }
   };
@@ -80,7 +64,6 @@ const MenuShareMenu = ({ coupon = 'default' }: MenuShareMenuProps) => {
     }
   });
 
-  // Define share buttons for cleaner rendering
   const shareButtons = [
     {
       id: 'facebook',
@@ -129,7 +112,6 @@ const MenuShareMenu = ({ coupon = 'default' }: MenuShareMenuProps) => {
 
   return (
     <div className="relative">
-      {/* Dark overlay similar to a drawer */}
       {menuOpen && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -141,7 +123,6 @@ const MenuShareMenu = ({ coupon = 'default' }: MenuShareMenuProps) => {
         />
       )}
 
-      {/* Share menu options */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
@@ -164,7 +145,6 @@ const MenuShareMenu = ({ coupon = 'default' }: MenuShareMenuProps) => {
         )}
       </AnimatePresence>
 
-      {/* Main share button */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

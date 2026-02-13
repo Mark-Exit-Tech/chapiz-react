@@ -93,7 +93,6 @@ export default function VoucherViewPageClient({ userVoucher }: VoucherViewPageCl
       try {
         await navigator.share({
           title: voucher.name,
-          text: voucher.description || voucher.name,
           url: voucherUrl,
         });
         toast.success(text.sharedSuccessfully);
