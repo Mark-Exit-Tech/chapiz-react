@@ -29,6 +29,7 @@ const RegisterPetPage = lazy(() => import('./pages/RegisterPetPage'));
 const PetDonePage = lazy(() => import('./pages/PetDonePage'));
 const AddPetRedirect = lazy(() => import('./pages/AddPetRedirect'));
 const TagFoundRoutePage = lazy(() => import('./pages/TagFoundRoutePage'));
+const ShopCallbackPage = lazy(() => import('./pages/ShopCallbackPage'));
 
 // Admin sub-pages
 const AdminUsersPage = lazy(() => import('./components/admin/AdminUsersPage'));
@@ -60,6 +61,9 @@ function App() {
       <AuthProvider>
         <AdDisplayManager />
         <Routes>
+          {/* Callback route for awarding points from shared links */}
+          <Route path="/api/shop/callback" element={<Suspense fallback={<PageLoader />}><ShopCallbackPage /></Suspense>} />
+
           {/* Root path renders HomePage directly - no redirect to avoid double reload */}
           <Route path="/" element={<HomePage />} />
 
