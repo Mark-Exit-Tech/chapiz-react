@@ -43,9 +43,8 @@ const InviteFriendsCard: React.FC<InviteFriendsCardProps> = ({ onClose, onShareS
       if (navigator.canShare && navigator.canShare(shareData)) {
         await navigator.share(shareData);
       } else {
-        // Fallback: copy the full share text with URL to clipboard
-        const fullShareText = `${shareText} ${shareUrl}`;
-        await navigator.clipboard.writeText(fullShareText);
+        // Fallback: copy the URL to clipboard
+        await navigator.clipboard.writeText(shareUrl);
         toast.success(isHebrew ? 'הלינק הועתק ללוח!' : 'Link copied to clipboard!');
       }
       setShared(true);

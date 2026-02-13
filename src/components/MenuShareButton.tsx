@@ -30,7 +30,7 @@ const MenuShareMenu = ({ coupon = 'default' }: MenuShareMenuProps) => {
 
   const shareData = {
     title: t('title'),
-    text: `${t('text')} ${shareUrl}`,
+    text: t('text'),
     url: shareUrl
   };
   // For the "copy link" option.
@@ -39,7 +39,7 @@ const MenuShareMenu = ({ coupon = 'default' }: MenuShareMenuProps) => {
       if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
         await navigator.share(shareData);
       } else {
-        await navigator.clipboard.writeText(shareData.text + ' ' + shareData.url);
+        await navigator.clipboard.writeText(shareUrl);
         toast.success(t('linkCopied'));
       }
       setMenuOpen(false);
