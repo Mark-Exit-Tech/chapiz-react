@@ -52,7 +52,7 @@ export default function ShopCallbackPage() {
   if (!userid) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <p className="text-gray-500">Missing userid parameter</p>
+        <p className="text-gray-500">חסר פרמטר משתמש</p>
       </div>
     );
   }
@@ -62,7 +62,7 @@ export default function ShopCallbackPage() {
       {status === 'loading' && (
         <div className="text-center">
           <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="mt-4 text-gray-600">Crediting points...</p>
+          <p className="mt-4 text-gray-600">מזכים נקודות...</p>
         </div>
       )}
 
@@ -87,7 +87,7 @@ export default function ShopCallbackPage() {
             transition={{ delay: 0.2 }}
             className="text-4xl font-bold text-gray-900"
           >
-            +{POINTS_TO_AWARD} Points!
+            +{POINTS_TO_AWARD} נקודות!
           </motion.h1>
 
           <motion.p
@@ -96,15 +96,15 @@ export default function ShopCallbackPage() {
             transition={{ delay: 0.4 }}
             className="mt-3 text-lg text-gray-600"
           >
-            Points credited successfully
+            הנקודות זוכו בהצלחה
           </motion.p>
         </motion.div>
       )}
 
       {status === 'error' && (
         <div className="text-center">
-          <p className="text-lg text-red-500">Failed to credit points</p>
-          <p className="mt-2 text-sm text-gray-500">Please try again later</p>
+          <p className="text-lg text-red-500">שגיאה בזיכוי נקודות</p>
+          <p className="mt-2 text-sm text-gray-500">אנא נסו שוב מאוחר יותר</p>
         </div>
       )}
     </div>
