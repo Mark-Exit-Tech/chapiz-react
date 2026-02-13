@@ -58,7 +58,7 @@ export default function ShopCallbackPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-orange-50 to-white">
+    <div dir="rtl" className="flex min-h-screen items-center justify-center bg-gradient-to-b from-orange-50 to-white">
       {status === 'loading' && (
         <div className="text-center">
           <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
