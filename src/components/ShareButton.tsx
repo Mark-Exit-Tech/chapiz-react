@@ -24,15 +24,9 @@ const ShareMenu = ({ coupon = 'default' }: ShareMenuProps) => {
     const shareUrl = user
       ? generateShareUrl(user.uid, coupon, window.location.origin)
       : (typeof window !== 'undefined' ? window.location.href : '');
-    const shareData = {
-      title: t('title'),
-      text: t('text'),
-      url: shareUrl
-    };
-
     try {
-      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
-        await navigator.share(shareData);
+      if (navigator.share) {
+        await navigator.share({ title: t('title'), url: shareUrl });
       } else {
         await navigator.clipboard.writeText(shareUrl);
         toast.success(t('linkCopied'));

@@ -33,15 +33,9 @@ const InviteFriendsCard: React.FC<InviteFriendsCardProps> = ({ onClose, onShareS
       : 'https://chapiz.co.il';
     const shareText = isHebrew ? 'בדוק את אפליקציית Chapiz לחיות!' : 'Check out Chapiz app for pets!';
     const shareTitle = isHebrew ? 'הצטרף ל-Chapiz' : 'Join Chapiz';
-    const shareData = {
-      title: shareTitle,
-      text: shareText,
-      url: shareUrl
-    };
-
     try {
-      if (navigator.canShare && navigator.canShare(shareData)) {
-        await navigator.share(shareData);
+      if (navigator.share) {
+        await navigator.share({ title: shareTitle, url: shareUrl });
       } else {
         // Fallback: copy the URL to clipboard
         await navigator.clipboard.writeText(shareUrl);

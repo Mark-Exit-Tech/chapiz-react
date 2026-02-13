@@ -194,7 +194,6 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
       try {
         await navigator.share({
           title: coupon.name,
-          text: coupon.description || coupon.name,
           url: shareUrl,
         });
         toast.success(text.shared);

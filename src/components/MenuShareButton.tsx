@@ -28,16 +28,11 @@ const MenuShareMenu = ({ coupon = 'default' }: MenuShareMenuProps) => {
     return typeof window !== 'undefined' ? window.location.href : '';
   }, [user, coupon]);
 
-  const shareData = {
-    title: t('title'),
-    text: t('text'),
-    url: shareUrl
-  };
   // For the "copy link" option.
   const handleCopyLink = async () => {
     try {
-      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
-        await navigator.share(shareData);
+      if (navigator.share) {
+        await navigator.share({ title: t('title'), url: shareUrl });
       } else {
         await navigator.clipboard.writeText(shareUrl);
         toast.success(t('linkCopied'));
