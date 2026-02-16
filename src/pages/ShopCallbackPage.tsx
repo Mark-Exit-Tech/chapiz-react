@@ -30,7 +30,6 @@ export default function ShopCallbackPage() {
 
         if (success) {
           setStatus('success');
-          // Trigger confetti
           confetti({ particleCount: 150, spread: 80, origin: { y: 0.5 } });
           setTimeout(() => {
             confetti({ particleCount: 80, spread: 60, origin: { y: 0.4, x: 0.3 } });

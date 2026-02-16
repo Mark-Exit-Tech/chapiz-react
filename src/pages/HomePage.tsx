@@ -6,6 +6,7 @@ import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import Footer from '@/components/layout/Footer';
 import OptimizedImage from '@/components/OptimizedImage';
+import { addPointsToCategory } from '@/lib/firebase/database/points';
 
 // Lazy load CountUp - used only in whileInView section (below the fold)
 const CountUp = lazy(() => import('react-countup').then(m => ({ default: m.default })));
@@ -104,17 +105,14 @@ export default function HomePage() {
   const [searchParams] = useSearchParams();
   const callbackCalled = useRef(false);
 
-  // Handle callback URL params: when someone visits a shared link,
-  // call the callback URL to award 20 points to the sharing user
+  // Handle shared link: when someone visits with userid param, award 20 points
   useEffect(() => {
-    const callbackUrl = searchParams.get('callback');
     const userid = searchParams.get('userid');
 
-    if (callbackUrl && userid && !callbackCalled.current) {
+    if (userid && !callbackCalled.current) {
       callbackCalled.current = true;
-      // Call the callback URL to award points
-      fetch(callbackUrl, { mode: 'cors' }).catch((err) => {
-        console.error('Callback failed:', err);
+      addPointsToCategory({ uid: userid }, 'share_visit', 20).catch((err) => {
+        console.error('Failed to award points:', err);
       });
     }
   }, [searchParams]);
