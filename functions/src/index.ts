@@ -1,5 +1,9 @@
 import * as functions from 'firebase-functions';
+import * as admin from 'firebase-admin';
 import { Resend } from 'resend';
+
+admin.initializeApp();
+const firestore = admin.firestore();
 
 // Get Resend API key from environment variables or fallback to hardcoded (for development)
 const resendApiKey = process.env.RESEND_API_KEY || 're_4B3FSDoU_GjgVXh2vLWks6VzuQvfnvaBf';
@@ -86,5 +90,48 @@ export const sendInviteEmail = functions.https.onCall(async (data, context) => {
     // Otherwise, wrap it in an HttpsError
     const errorMessage = error?.message || 'Failed to send email. Please check Resend configuration and verify the sender email is verified.';
     throw new functions.https.HttpsError('internal', errorMessage);
+  }
+});
+
+/**
+ * Server-side shop callback — awards points when called via HTTP GET.
+ * Works from WooCommerce server-to-server callbacks (no browser needed).
+ * URL: https://tag.chapiz.co.il/api/shop/callback?userid=XXX
+ */
+export const shopCallback = functions.https.onRequest(async (req, res) => {
+  const userid = req.query.userid as string;
+
+  if (!userid) {
+    res.status(400).json({ success: false, error: 'Missing userid parameter' });
+    return;
+  }
+
+  const POINTS_TO_AWARD = 20;
+  const CATEGORY = 'share_visit';
+
+  try {
+    // Update total points
+    const pointsRef = firestore.collection('userPoints').doc(userid);
+    await pointsRef.set({
+      userId: userid,
+      points: admin.firestore.FieldValue.increment(POINTS_TO_AWARD),
+      updatedAt: new Date()
+    }, { merge: true });
+
+    // Create transaction record
+    const transactionRef = firestore.collection('pointsTransactions').doc();
+    await transactionRef.set({
+      id: transactionRef.id,
+      userId: userid,
+      points: POINTS_TO_AWARD,
+      category: CATEGORY,
+      createdAt: new Date()
+    });
+
+    console.log(`Awarded ${POINTS_TO_AWARD} points to user ${userid} (server-side callback)`);
+    res.status(200).json({ success: true, points: POINTS_TO_AWARD, userId: userid });
+  } catch (error: any) {
+    console.error('Error awarding points:', error);
+    res.status(500).json({ success: false, error: error.message || 'Internal error' });
   }
 });
