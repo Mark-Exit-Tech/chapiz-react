@@ -1,5 +1,5 @@
 // Callback URL on tag.chapiz.co.il - awards 20 points with animation
-const CALLBACK_BASE_URL = 'https://tag.chapiz.co.il/api/shop/callback';
+const CALLBACK_BASE_URL = 'https://us-central1-facepet-48b13.cloudfunctions.net/shopCallback';
 
 /**
  * Get the callback URL for a given user
