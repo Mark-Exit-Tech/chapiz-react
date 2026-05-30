@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { SERVICE_TAGS_TRANSLATIONS } from '@/lib/constants/hebrew-service-tags';
+import { onImageError } from '@/lib/utils/image-fallback';
 
 // Real comments will be loaded from the database
 const realComments: Array<{
@@ -268,6 +269,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
               src={service.image}
               alt={service.name}
               className="max-w-full max-h-full object-contain"
+              onError={onImageError}
             />
           </div>
         </div>
@@ -323,6 +325,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
                 src={service.image}
                 alt={service.name}
                 className="max-w-full max-h-48 object-contain"
+                onError={onImageError}
               />
             </div>
             

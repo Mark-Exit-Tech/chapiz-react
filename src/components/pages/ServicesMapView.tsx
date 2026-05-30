@@ -24,6 +24,7 @@ import { addToFavorites, removeFromFavorites, isAdFavorited } from '@/lib/fireba
 import { useNavigate } from 'react-router-dom';
 import { useLocale } from '@/hooks/use-locale';
 import { SERVICE_TAGS_TRANSLATIONS } from '@/lib/constants/hebrew-service-tags';
+import { onImageError } from '@/lib/utils/image-fallback';
 
 interface Service {
   id?: string;
@@ -1100,6 +1101,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
                     src={service.image}
                     alt={service.name}
                     className="max-w-full max-h-full object-contain"
+                    onError={onImageError}
                   />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -1266,6 +1268,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
                                 src={service.image}
                                 alt={service.name}
                                 className="max-w-full max-h-full object-contain"
+                                onError={onImageError}
                               />
                             </div>
                             <div className="flex-1 min-w-0">
@@ -1418,6 +1421,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
                       src={selectedService.image}
                       alt={selectedService.name}
                       className="max-w-full max-h-[400px] object-contain"
+                      onError={onImageError}
                       style={{
                         display: 'block'
                       }}
@@ -1729,6 +1733,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
                         src={selectedService.image}
                         alt={selectedService.name}
                         className="max-w-full max-h-[400px] object-contain"
+                        onError={onImageError}
                         style={{
                           display: 'block'
                         }}
