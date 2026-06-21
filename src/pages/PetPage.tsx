@@ -4,6 +4,8 @@ import { getPetById } from '@/lib/firebase/database/pets';
 import { getUserFromFirestore, getUserByEmail } from '@/lib/firebase/database/users';
 import PetProfilePage from '@/components/PetProfilePage';
 import TagFoundPage from '@/components/TagFoundPage';
+import RegisteredTagShopPage from '@/components/RegisteredTagShopPage';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
 
 export default function PetPage() {
   const { id } = useParams<{ id: string }>();
@@ -11,6 +13,7 @@ export default function PetPage() {
   const [pet, setPet] = useState<any>(null);
   const [owner, setOwner] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const { user, dbUser, loading: authLoading } = useAuth();
 
   // Get locale from URL - check if first path segment is a valid locale
   const getLocaleFromUrl = () => {
@@ -100,7 +103,7 @@ export default function PetPage() {
     loadData();
   }, [id]);
 
-  if (loading) {
+  if (loading || (pet && !pet.isLost && authLoading)) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-center h-64">
@@ -133,6 +136,15 @@ export default function PetPage() {
         </div>
       </div>
     );
+  }
+
+  const isOwner =
+    Boolean(user?.uid && pet.ownerId && user.uid === pet.ownerId) ||
+    Boolean(user?.email && pet.userEmail && user.email === pet.userEmail);
+  const isAdmin = dbUser?.role === 'admin' || dbUser?.role === 'super_admin';
+
+  if (!pet.isLost && !isOwner && !isAdmin) {
+    return <RegisteredTagShopPage />;
   }
 
   return (

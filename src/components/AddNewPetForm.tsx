@@ -155,7 +155,8 @@ export default function AddNewPetForm() {
         description: '',
         userEmail: user.email,
         ownerId: user.uid,
-        genderId: 1 // Default gender
+        genderId: 1, // Default gender
+        isLost: false
       };
 
       const result = await createPetInFirestore(petData);

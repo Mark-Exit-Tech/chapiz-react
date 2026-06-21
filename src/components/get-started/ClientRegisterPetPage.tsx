@@ -259,7 +259,8 @@ export default function ClientRegisterPetPage({
         isVetAddressPrivate: formDataAny.isVetAddressPrivate || false,
         // User info
         userEmail: user.email || '',
-        ownerId: user.uid
+        ownerId: user.uid,
+        isLost: false
       };
 
       const result = await createPetInFirestore(petData);

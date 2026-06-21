@@ -8,6 +8,7 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
+import { Switch } from './ui/switch';
 import { Upload, Loader2, CheckCircle, XCircle, Save, ArrowLeft, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getBreedsForDropdown, getGendersForDropdown, getPetTypesForDropdown } from '@/lib/firebase/database/pets';
@@ -30,6 +31,7 @@ interface Pet {
   weight?: string;
   notes?: string;
   birthDate?: string;
+  isLost?: boolean;
 }
 
 interface EditPetFormProps {
@@ -46,6 +48,7 @@ interface PetFormData {
   gender: string;
   weight: string;
   notes: string;
+  isLost: boolean;
 }
 
 interface UploadProgress {
@@ -99,6 +102,10 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
       weightPlaceholder: isHebrew ? 'הזן משקל' : 'Enter weight',
       notes: isHebrew ? 'הערות' : 'Notes',
       notesPlaceholder: isHebrew ? 'הזן הערות' : 'Enter notes',
+      lostStatus: isHebrew ? 'חיית המחמד אבדה' : 'Pet is lost',
+      lostStatusDescription: isHebrew
+        ? 'כאשר מופעל, סריקת התג תציג את פרופיל חיית המחמד כדי שמוצא יוכל ליצור קשר.'
+        : 'When enabled, scanning the tag shows the pet profile so a finder can contact you.',
       save: isHebrew ? 'שמור' : 'Save',
     },
     delete: isHebrew ? 'מחק' : 'Delete',
@@ -142,6 +149,7 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
     gender: pet.gender || '',
     weight: pet.weight || '',
     notes: pet.notes || '',
+    isLost: pet.isLost || false,
   });
   const [uploadProgress, setUploadProgress] = useState<UploadProgress>({
     progress: 0,
@@ -328,6 +336,7 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
         gender: formData.gender,
         weight: formData.weight,
         notes: formData.notes,
+        isLost: formData.isLost,
       };
 
       console.log('Updating pet with data:', petData);
@@ -590,6 +599,26 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                       onChange={(e) => handleInputChange('notes', e.target.value)}
                       placeholder={text.form.notesPlaceholder}
                       className="w-full"
+                    />
+                  </div>
+                </div>
+
+                <div className="rounded-lg border border-orange-200 bg-orange-50 p-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="space-y-1">
+                      <Label htmlFor="isLost" className="text-sm font-semibold text-gray-900">
+                        {text.form.lostStatus}
+                      </Label>
+                      <p className="text-sm text-gray-600">
+                        {text.form.lostStatusDescription}
+                      </p>
+                    </div>
+                    <Switch
+                      id="isLost"
+                      checked={formData.isLost}
+                      onCheckedChange={(checked) => {
+                        setFormData(prev => ({ ...prev, isLost: checked }));
+                      }}
                     />
                   </div>
                 </div>

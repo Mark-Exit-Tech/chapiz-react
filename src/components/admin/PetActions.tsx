@@ -18,15 +18,20 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { deletePet } from '@/lib/actions/admin';
+import { updatePetInFirestore } from '@/lib/firebase/database/pets';
 import { MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
 
 export default function PetActions({
   petId,
-  petName
+  petName,
+  isLost = false,
+  onLostChange
 }: {
   petId: string;
   petName: string;
+  isLost?: boolean;
+  onLostChange?: (petId: string, isLost: boolean) => void;
 }) {
   const { t } = useTranslation('Admin.petActions');
 
@@ -39,6 +44,7 @@ export default function PetActions({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUpdatingLost, setIsUpdatingLost] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleDelete = async () => {
@@ -62,6 +68,28 @@ export default function PetActions({
     }
   };
 
+  const handleToggleLost = async () => {
+    setIsUpdatingLost(true);
+    setError(null);
+
+    try {
+      const nextIsLost = !isLost;
+      const result = await updatePetInFirestore(petId, { isLost: nextIsLost });
+
+      if (!result.success) {
+        setError(result.error || 'Failed to update lost status');
+        return;
+      }
+
+      onLostChange?.(petId, nextIsLost);
+    } catch (err) {
+      setError('Failed to update lost status');
+      console.error(err);
+    } finally {
+      setIsUpdatingLost(false);
+    }
+  };
+
   return (
     <>
       {/* Actions select with native menu */}
@@ -70,6 +98,7 @@ export default function PetActions({
         onChange={(e) => {
           const value = e.target.value;
           if (value === 'view') window.open(`/pet/${petId}`, '_blank');
+          if (value === 'lost') handleToggleLost();
           if (value === 'delete') setIsDeleting(true);
           e.target.value = '';
         }}
@@ -78,6 +107,9 @@ export default function PetActions({
       >
         <option value="" disabled>⋮</option>
         <option value="view">{t('view')}</option>
+        <option value="lost" disabled={isUpdatingLost}>
+          {isLost ? (isHebrew ? 'סמן כנמצא' : 'Mark found') : (isHebrew ? 'סמן כאבוד' : 'Mark lost')}
+        </option>
         <option value="delete">{t('delete')}</option>
       </select>
 

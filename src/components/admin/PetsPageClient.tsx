@@ -7,6 +7,7 @@ import PetActions from '@/components/admin/PetActions';
 import EditableTableCell from '@/components/admin/EditableTableCell';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { PawPrint } from 'lucide-react';
 import {
   Table,
@@ -31,6 +32,7 @@ interface Pet {
   imageUrl: string;
   ownerName: string;
   ownerId: string;
+  isLost?: boolean;
   createdAt: Date;
 }
 
@@ -130,11 +132,21 @@ export default function PetsPageClient({ pets, searchParams, hideOwnerColumn = f
   };
 
   // Handle pet field updates
-  const handlePetUpdate = (petId: string, field: 'type' | 'breed' | 'gender', newValue: string) => {
+  const handlePetUpdate = (petId: string, field: 'type' | 'breed' | 'gender' | 'weight', newValue: string) => {
     setPetsData(prevPets => 
       prevPets.map(pet => 
         pet.id === petId 
           ? { ...pet, [field]: newValue }
+          : pet
+      )
+    );
+  };
+
+  const handleLostStatusChange = (petId: string, isLost: boolean) => {
+    setPetsData(prevPets =>
+      prevPets.map(pet =>
+        pet.id === petId
+          ? { ...pet, isLost }
           : pet
       )
     );
@@ -281,6 +293,7 @@ export default function PetsPageClient({ pets, searchParams, hideOwnerColumn = f
                 </a>
               </TableHead>
               <TableHead className={isHebrew ? 'text-right' : ''}>{t('petsManagement.table.image')}</TableHead>
+              <TableHead className={isHebrew ? 'text-right' : ''}>{isHebrew ? 'סטטוס תג' : 'Tag status'}</TableHead>
               {!hideOwnerColumn && <TableHead className={isHebrew ? 'text-right' : ''}>{t('petsManagement.table.ownerName')}</TableHead>}
               <TableHead className={isHebrew ? 'text-right' : ''}>
                 <a href={getSortUrl('createdAt')} className="flex items-center">
@@ -302,7 +315,7 @@ export default function PetsPageClient({ pets, searchParams, hideOwnerColumn = f
           <TableBody>
             {paginatedPets.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={hideOwnerColumn ? 8 : 9} className="h-24 text-center">
+                <TableCell colSpan={hideOwnerColumn ? 9 : 10} className="h-24 text-center">
                   {t('petsManagement.table.noPets')}
                 </TableCell>
               </TableRow>
@@ -355,10 +368,25 @@ export default function PetsPageClient({ pets, searchParams, hideOwnerColumn = f
                       </div>
                     )}
                   </TableCell>
+                  <TableCell className={isHebrew ? 'text-right' : ''}>
+                    <Badge
+                      variant={pet.isLost ? 'destructive' : 'secondary'}
+                      className={pet.isLost ? '' : 'bg-green-100 text-green-800'}
+                    >
+                      {pet.isLost
+                        ? (isHebrew ? 'אבוד - פרופיל פתוח' : 'Lost - profile visible')
+                        : (isHebrew ? 'רשום - חנות' : 'Registered - shop')}
+                    </Badge>
+                  </TableCell>
                   {!hideOwnerColumn && <TableCell className={`font-medium ${isHebrew ? 'text-right' : ''}`}>{pet.ownerName}</TableCell>}
                   <TableCell className={isHebrew ? 'text-right' : ''}>{formatDate(pet.createdAt)}</TableCell>
                   <TableCell className={isHebrew ? 'text-right' : 'text-center'}>
-                    <PetActions petId={pet.id} petName={pet.name} />
+                    <PetActions
+                      petId={pet.id}
+                      petName={pet.name}
+                      isLost={pet.isLost}
+                      onLostChange={handleLostStatusChange}
+                    />
                   </TableCell>
                 </TableRow>
               ))

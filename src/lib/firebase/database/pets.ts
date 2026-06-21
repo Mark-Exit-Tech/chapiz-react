@@ -15,6 +15,7 @@ export interface Pet {
     userEmail: string;
     ownerId?: string;
     vetId?: string;
+    isLost?: boolean;
     createdAt: Date;
     updatedAt: Date;
 }
