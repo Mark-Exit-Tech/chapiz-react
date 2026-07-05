@@ -8,7 +8,7 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Switch } from './ui/switch';
+import { Checkbox } from './ui/checkbox';
 import { Upload, Loader2, CheckCircle, XCircle, Save, ArrowLeft, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getBreedsForDropdown, getGendersForDropdown, getPetTypesForDropdown } from '@/lib/firebase/database/pets';
@@ -613,12 +613,13 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                         {text.form.lostStatusDescription}
                       </p>
                     </div>
-                    <Switch
+                    <Checkbox
                       id="isLost"
                       checked={formData.isLost}
                       onCheckedChange={(checked) => {
-                        setFormData(prev => ({ ...prev, isLost: checked }));
+                        setFormData(prev => ({ ...prev, isLost: checked === true }));
                       }}
+                      className="h-5 w-5 border-orange-300 data-[state=checked]:border-orange-500 data-[state=checked]:bg-orange-500"
                     />
                   </div>
                 </div>

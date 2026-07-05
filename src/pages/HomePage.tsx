@@ -220,7 +220,7 @@ const PublicLandingPage = ({ t, navigate }: { t: any; navigate: any }) => {
       <div className="relative w-full">
         <ProductHighlights />
       </div>
-      <Footer />
+      <Footer showLanguageSwitcher={false} />
     </>
   );
 };

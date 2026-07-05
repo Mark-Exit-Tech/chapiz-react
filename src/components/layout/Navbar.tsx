@@ -72,6 +72,12 @@ const Navbar = () => {
     }
   };
 
+  const openStore = () => {
+    if (storeUrl) {
+      window.location.href = storeUrl;
+    }
+  };
+
   // Show minimal navbar during hydration (don't block on auth loading)
   if (!isMounted) {
     return (
@@ -126,7 +132,7 @@ const Navbar = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => storeUrl && window.open(storeUrl, '_blank')}
+                    onClick={openStore}
                     className="border-primary text-primary hover:bg-primary/10 hover:text-primary hover:border-primary flex items-center justify-center whitespace-nowrap text-xs px-2 gap-1.5 transition-colors"
                   >
                     <ShoppingBag className="h-3.5 w-3.5" />
@@ -189,7 +195,7 @@ const Navbar = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => storeUrl && window.open(storeUrl, '_blank')}
+                    onClick={openStore}
                     className="border-primary text-primary hover:bg-primary/10 hover:text-primary hover:border-primary flex items-center justify-center whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 gap-1.5 sm:gap-2 transition-colors"
                   >
                     <ShoppingBag className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -288,7 +294,7 @@ const Navbar = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => storeUrl && window.open(storeUrl, '_blank')}
+                    onClick={openStore}
                     className="border-primary text-primary hover:bg-primary/10 hover:text-primary hover:border-primary flex items-center justify-center whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 gap-1.5 sm:gap-2 transition-colors"
                   >
                     <ShoppingBag className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -311,7 +317,7 @@ const Navbar = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => storeUrl && window.open(storeUrl, '_blank')}
+                    onClick={openStore}
                     className="border-primary text-primary hover:bg-primary/10 hover:text-primary hover:border-primary flex items-center justify-center whitespace-nowrap text-xs px-2 gap-1.5 transition-colors"
                   >
                     <ShoppingBag className="h-3.5 w-3.5" />

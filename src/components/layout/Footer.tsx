@@ -3,7 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import LocaleSwitcher from '../LocaleSwitcher';
 
-const Footer = () => {
+interface FooterProps {
+  showLanguageSwitcher?: boolean;
+}
+
+const Footer = ({ showLanguageSwitcher = true }: FooterProps) => {
   const { t } = useTranslation();
   const version = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.0.0';
 
@@ -27,10 +31,11 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Language Switcher Row */}
-          <div className="flex items-center justify-center">
-            <LocaleSwitcher />
-          </div>
+          {showLanguageSwitcher && (
+            <div className="flex items-center justify-center">
+              <LocaleSwitcher />
+            </div>
+          )}
 
           {/* Love Message Row */}
           <div className="flex items-center justify-center gap-2 text-sm">
