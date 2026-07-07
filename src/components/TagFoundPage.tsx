@@ -105,7 +105,7 @@ export default function TagFoundPage({ petId }: TagFoundPageProps) {
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto" />
           <p className="mt-4 text-gray-600">{t('pages.TagFound.loading')}</p>
         </div>
-        <Footer />
+        <Footer showLanguageSwitcher={false} />
         <div className="md:hidden">
           <BottomNavigation />
         </div>
@@ -169,7 +169,7 @@ export default function TagFoundPage({ petId }: TagFoundPageProps) {
           )}
         </div>
       </main>
-      <Footer />
+      <Footer showLanguageSwitcher={false} />
       <div className="md:hidden">
         <BottomNavigation />
       </div>

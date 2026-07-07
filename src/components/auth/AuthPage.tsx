@@ -11,7 +11,6 @@ import { Separator } from '@/components/ui/separator';
 import { Mail, Lock, User, Eye, EyeOff, MapPin, Phone } from 'lucide-react';
 import toast from 'react-hot-toast';
 import OptimizedImage from '@/components/OptimizedImage';
-import LocaleSwitcher from '@/components/LocaleSwitcher';
 
 const AuthPage = () => {
   const { t } = useTranslation();
@@ -264,10 +263,6 @@ const AuthPage = () => {
         {/* Right Side - Authentication Form */}
         <div className="w-full max-w-md mx-auto">
           <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-            {/* Language Switcher */}
-            <div className="flex justify-end p-4">
-              <LocaleSwitcher />
-            </div>
             <CardHeader className="space-y-2 text-center pb-8">
               <CardTitle className="text-2xl font-bold text-gray-900">
                 {isSignUp ? t('pages.AuthPage.createAccount') : t('pages.AuthPage.welcomeBack')}

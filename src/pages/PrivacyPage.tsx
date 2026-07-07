@@ -261,7 +261,7 @@ export default function PrivacyPage() {
                     </div>
 
                     {/* Footer */}
-                    <Footer />
+                    <Footer showLanguageSwitcher={false} />
                 </div>
             </div>
         </>

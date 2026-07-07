@@ -409,7 +409,7 @@ export default function ContactPage() {
                 </div>
 
                 {/* Footer - inside scroll area */}
-                <Footer />
+                <Footer showLanguageSwitcher={false} />
             </main>
 
             {/* Bottom Navigation - fixed, top layer (mobile only) */}

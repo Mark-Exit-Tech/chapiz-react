@@ -75,7 +75,7 @@ export default function RegisteredTagShopPage() {
           </Button>
         </div>
       </main>
-      <Footer />
+      <Footer showLanguageSwitcher={false} />
       <div className="md:hidden">
         <BottomNavigation />
       </div>

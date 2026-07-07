@@ -12,7 +12,6 @@ import { Separator } from '@/components/ui/separator';
 import { Mail, Lock, User, Eye, EyeOff, MapPin, Phone } from 'lucide-react';
 import toast from 'react-hot-toast';
 import OptimizedImage from '@/components/OptimizedImage';
-import LocaleSwitcher from '@/components/LocaleSwitcher';
 
 const SignupPage = () => {
   const { t } = useTranslation();
@@ -235,10 +234,6 @@ const SignupPage = () => {
         {/* Right Side - Signup Form */}
         <div className={`w-full max-w-md mx-auto ${isHebrew ? 'lg:order-1' : ''}`}>
           <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-            {/* Language Switcher */}
-            <div className={`flex p-4 ${isHebrew ? 'justify-start' : 'justify-end'}`}>
-              <LocaleSwitcher />
-            </div>
             <CardHeader className={`space-y-2 pb-8 ${isHebrew ? 'text-right' : 'text-center'}`}>
               <CardTitle className="text-2xl font-bold text-gray-900">
                 {t('pages.AuthPage.createAccount')}

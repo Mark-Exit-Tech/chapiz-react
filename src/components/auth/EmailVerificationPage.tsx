@@ -10,7 +10,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Mail, ArrowLeft, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 // Image removed;
-import LocaleSwitcher from '@/components/LocaleSwitcher';
 
 interface EmailVerificationPageProps {
   email: string;
@@ -108,10 +107,6 @@ const EmailVerificationPage = ({ email, password, fullName, address, phone, onBa
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-          {/* Language Switcher */}
-          <div className="flex justify-end p-4">
-            <LocaleSwitcher />
-          </div>
           <CardHeader className="space-y-2 text-center pb-8">
             <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
               <Mail className="w-8 h-8 text-primary" />

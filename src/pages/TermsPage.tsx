@@ -214,7 +214,7 @@ export default function TermsPage() {
                     </div>
 
                     {/* Footer */}
-                    <Footer />
+                    <Footer showLanguageSwitcher={false} />
                 </div>
             </div>
         </>

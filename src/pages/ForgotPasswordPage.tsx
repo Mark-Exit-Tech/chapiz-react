@@ -76,7 +76,7 @@ export default function ForgotPasswordPage() {
             </Card>
           </div>
         </div>
-        <Footer />
+        <Footer showLanguageSwitcher={false} />
         <div className="md:hidden">
           <BottomNavigation />
         </div>
@@ -143,7 +143,7 @@ export default function ForgotPasswordPage() {
           </Card>
         </div>
       </div>
-      <Footer />
+      <Footer showLanguageSwitcher={false} />
       <div className="md:hidden">
         <BottomNavigation />
       </div>
