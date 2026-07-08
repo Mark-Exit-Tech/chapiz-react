@@ -102,10 +102,10 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
       weightPlaceholder: isHebrew ? 'הזן משקל' : 'Enter weight',
       notes: isHebrew ? 'הערות' : 'Notes',
       notesPlaceholder: isHebrew ? 'הזן הערות' : 'Enter notes',
-      lostStatus: isHebrew ? 'חיית המחמד אבדה' : 'Pet is lost',
+      lostStatus: isHebrew ? 'הסתרת פרטי חיית המחמד' : 'Hide pet profile',
       lostStatusDescription: isHebrew
-        ? 'כאשר מופעל, סריקת התג תציג את פרופיל חיית המחמד כדי שמוצא יוכל ליצור קשר.'
-        : 'When enabled, scanning the tag shows the pet profile so a finder can contact you.',
+        ? 'סמנו כדי למנוע הצגת פרטי חיית המחמד בעת סריקת התג.'
+        : 'Check this to prevent the pet profile from being shown when the tag is scanned.',
       save: isHebrew ? 'שמור' : 'Save',
     },
     delete: isHebrew ? 'מחק' : 'Delete',
@@ -615,9 +615,9 @@ export default function EditPetForm({ pet }: EditPetFormProps) {
                     </div>
                     <Checkbox
                       id="isLost"
-                      checked={formData.isLost}
+                      checked={!formData.isLost}
                       onCheckedChange={(checked) => {
-                        setFormData(prev => ({ ...prev, isLost: checked === true }));
+                        setFormData(prev => ({ ...prev, isLost: checked !== true }));
                       }}
                       className="h-5 w-5 border-orange-300 data-[state=checked]:border-orange-500 data-[state=checked]:bg-orange-500"
                     />

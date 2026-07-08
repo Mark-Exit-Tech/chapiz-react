@@ -20,7 +20,7 @@ import {
   PopoverTrigger,
 } from './popover';
 import { Badge } from './badge';
-import { getLocalizedBreedsForType, type PetType } from '@/lib/data/breeds';
+import { getLocalizedBreedsForType, keepOtherBreedFirst, type PetType } from '@/lib/data/breeds';
 import { HebrewAlphabetFilter, HebrewLetterRangeSelector } from './hebrew-alphabet-filter';
 import { sortHebrewStrings, compareHebrew } from '@/lib/utils/hebrew-sort';
 import {
@@ -96,7 +96,7 @@ export function BreedSelect({
       const breedList = getLocalizedBreedsForType(petType, locale);
       // Sort Hebrew breeds alphabetically when in Hebrew locale
       if (locale === 'he') {
-        return breedList.sort((a, b) => compareHebrew(a.name, b.name));
+        return keepOtherBreedFirst(breedList.sort((a, b) => compareHebrew(a.name, b.name)));
       }
       return breedList;
     } catch (error) {

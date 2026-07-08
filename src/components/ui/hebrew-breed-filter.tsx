@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 
 import { useTranslation } from 'react-i18next';
 import { useLocale } from '@/hooks/use-locale';
-import { getLocalizedBreedsForType, type PetType } from '@/lib/data/breeds';
+import { getLocalizedBreedsForType, keepOtherBreedFirst, type PetType } from '@/lib/data/breeds';
 import { HebrewAlphabetFilter, HebrewLetterRangeSelector } from './hebrew-alphabet-filter';
 import { compareHebrew } from '@/lib/utils/hebrew-sort';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
@@ -34,7 +34,7 @@ export function HebrewBreedFilter({
       const breedList = getLocalizedBreedsForType(petType, locale);
       // Sort Hebrew breeds alphabetically when in Hebrew locale
       if (locale === 'he') {
-        return breedList.sort((a, b) => compareHebrew(a.name, b.name));
+        return keepOtherBreedFirst(breedList.sort((a, b) => compareHebrew(a.name, b.name)));
       }
       return breedList;
     } catch (error) {
@@ -142,7 +142,7 @@ export function InlineHebrewBreedFilter({
     try {
       const breedList = getLocalizedBreedsForType(petType, locale);
       if (locale === 'he') {
-        return breedList.sort((a, b) => compareHebrew(a.name, b.name));
+        return keepOtherBreedFirst(breedList.sort((a, b) => compareHebrew(a.name, b.name)));
       }
       return breedList;
     } catch (error) {

@@ -115,6 +115,12 @@ export const breedsByType = {
 
 export type PetType = keyof typeof breedsByType;
 export type Breed = { id: string; name: string; nameHe?: string };
+export type LocalizedBreed = { id: string; name: string };
+
+const otherBreedByType: Partial<Record<PetType, Breed>> = {
+  cat: { id: 'cat-210', name: 'Other', nameHe: 'אחר' },
+  dog: { id: 'dog-other', name: 'Other', nameHe: 'אחר' }
+};
 
 export function getBreedsForType(petType: PetType): Breed[] {
   return breedsByType[petType] || breedsByType.other;
@@ -128,11 +134,25 @@ export function getLocalizedBreedName(breed: Breed, locale: 'en' | 'he' = 'en'):
   return breed.name;
 }
 
+function isOtherBreed(breed: LocalizedBreed): boolean {
+  return breed.name === 'Other' || breed.name === 'אחר';
+}
+
+export function keepOtherBreedFirst<T extends LocalizedBreed>(breeds: T[]): T[] {
+  const otherBreeds = breeds.filter(isOtherBreed);
+  const remainingBreeds = breeds.filter(breed => !isOtherBreed(breed));
+  return [...otherBreeds, ...remainingBreeds];
+}
+
 // Get breeds for type with localized names
-export function getLocalizedBreedsForType(petType: PetType, locale: 'en' | 'he' = 'en'): Array<{ id: string; name: string }> {
+export function getLocalizedBreedsForType(petType: PetType, locale: 'en' | 'he' = 'en'): LocalizedBreed[] {
   const breeds = getBreedsForType(petType);
-  return breeds.map(breed => ({
+  const breedsWithOther = otherBreedByType[petType]
+    ? [otherBreedByType[petType], ...breeds.filter(breed => !isOtherBreed({ id: breed.id, name: getLocalizedBreedName(breed, locale) }))]
+    : breeds;
+
+  return keepOtherBreedFirst(breedsWithOther.map(breed => ({
     id: breed.id,
     name: getLocalizedBreedName(breed, locale)
-  }));
+  })));
 }
