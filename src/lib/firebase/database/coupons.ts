@@ -375,9 +375,20 @@ export async function getUserCouponByIds(userId: string, couponId: string): Prom
             };
         }
 
-        // All copies are used — return purchased: false so the frontend
-        // can attempt a new purchase (purchaseCoupon will enforce the limit)
-        return { purchased: false };
+        const usedCoupon = querySnapshot.docs.find(doc => {
+            const data = doc.data();
+            return data.status === 'used' || !!data.usedAt;
+        });
+
+        if (usedCoupon) {
+            return {
+                purchased: true,
+                userCouponId: usedCoupon.id,
+                isUsed: true
+            };
+        }
+
+        return { purchased: true, userCouponId: querySnapshot.docs[0].id, isUsed: false };
     } catch (error) {
         console.error('❌ Error checking user coupon:', error);
         return { purchased: false };

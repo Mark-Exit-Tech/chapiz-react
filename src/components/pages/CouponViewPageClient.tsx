@@ -126,6 +126,10 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
           if (statusResult.userCouponId) {
             setUserCouponId(statusResult.userCouponId);
           }
+          if (statusResult.isUsed) {
+            toast.error(isHebrew ? 'הקופון כבר נוצל' : 'This coupon has already been used');
+            return;
+          }
         } else {
           toast.error(result.error || (isHebrew ? 'נכשל בקבלת הקופון' : 'Failed to get coupon'));
           return;
@@ -150,7 +154,17 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
         return;
       }
 
-      const result = await markCouponAsUsed(userCouponId);
+      const statusResult = await getUserCouponByIds(user.uid, coupon.id);
+      if (statusResult.isUsed) {
+        setIsUsed(true);
+        toast.error(isHebrew ? 'הקופון כבר נוצל' : 'This coupon has already been used');
+        return;
+      }
+
+      const couponIdToUse = statusResult.userCouponId || userCouponId;
+      setUserCouponId(couponIdToUse);
+
+      const result = await markCouponAsUsed(couponIdToUse);
 
       if (result.success) {
         setIsUsed(true);
@@ -449,4 +463,3 @@ export default function CouponViewPageClient({ coupon, business, businesses = []
     </div>
   );
 }
-
