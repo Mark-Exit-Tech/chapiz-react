@@ -98,7 +98,7 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
     <motion.div
       onClick={handleCardClick}
       className={cn(
-        `bg-white relative h-[120px] w-full cursor-pointer rounded-2xl shadow-md overflow-hidden`
+        `group bg-white relative h-[120px] w-full cursor-pointer rounded-2xl shadow-md overflow-hidden`
       )}
       whileHover={{ scale: 1.02, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)' }}
       whileTap={{ scale: 0.98 }}
@@ -144,14 +144,14 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
         </div>
 
         {/* Call-to-Action Arrow Overlay */}
-        <div className="absolute top-0 bottom-0 z-20 flex items-center justify-center p-4 ltr:right-0 rtl:left-0">
-          <ArrowRight className="h-4 w-4 stroke-gray-600 rtl:rotate-180" />
+        <div className="absolute top-1/2 z-20 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-gray-50 shadow-sm transition-colors group-hover:bg-gray-100 ltr:right-3 rtl:left-3">
+          <ArrowRight className="h-4 w-4 stroke-gray-700 rtl:rotate-180" />
         </div>
       </motion.div>
 
       {/* Static Image Container */}
       <div
-        className="absolute top-0 bottom-0 ltr:right-0 rtl:left-0 z-5 bg-transparent"
+        className="absolute top-0 bottom-0 z-[5] bg-transparent ltr:right-0 rtl:left-0"
         style={{ width: `${imageWidth}px` }}
       >
         <div className="h-full w-full bg-transparent">
