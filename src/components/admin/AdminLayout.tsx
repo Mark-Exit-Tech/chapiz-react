@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { Button } from '@/components/ui/button';
-import { AppWindow, LayoutDashboard, Users, Loader2, ShieldX, MessageSquare, Settings, Mail, Ticket, Megaphone, Building2 } from 'lucide-react';
+import { AppWindow, LayoutDashboard, Users, Loader2, ShieldX, MessageSquare, Settings, Mail, Ticket, Megaphone, Building2, PawPrint } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -166,6 +166,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <Link to={`/${locale}/admin/users`} className="flex gap-3 rounded p-2 transition hover:bg-white hover:shadow-xs">
                 <Users className="h-6 w-6" />
                 {t('Admin.navigation.manageUsers')}
+              </Link>
+            </li>
+            <li>
+              <Link to={`/${locale}/admin/pets`} className="flex gap-3 rounded p-2 transition hover:bg-white hover:shadow-xs">
+                <PawPrint className="h-6 w-6" />
+                {isHebrew ? 'ניהול חיות מחמד' : 'Manage pets'}
               </Link>
             </li>
           </ul>

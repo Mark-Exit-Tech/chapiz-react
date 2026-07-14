@@ -97,7 +97,8 @@ export default function PetActions({
         className="h-8 w-8 p-0 border-0 bg-transparent cursor-pointer appearance-none text-center"
         onChange={(e) => {
           const value = e.target.value;
-          if (value === 'view') window.open(`/pet/${petId}`, '_blank');
+          if (value === 'view') window.open(`/${locale}/pet/${petId}`, '_blank');
+          if (value === 'edit') window.location.assign(`/${locale}/pet/${petId}/edit`);
           if (value === 'lost') handleToggleLost();
           if (value === 'delete') setIsDeleting(true);
           e.target.value = '';
@@ -107,6 +108,7 @@ export default function PetActions({
       >
         <option value="" disabled>⋮</option>
         <option value="view">{t('view')}</option>
+        <option value="edit">{isHebrew ? 'ערוך' : 'Edit'}</option>
         <option value="lost" disabled={isUpdatingLost}>
           {isLost ? (isHebrew ? 'סמן כנמצא' : 'Mark found') : (isHebrew ? 'סמן כאבוד' : 'Mark lost')}
         </option>

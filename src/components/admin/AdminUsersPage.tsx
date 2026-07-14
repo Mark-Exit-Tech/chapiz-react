@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { getAllUsers, updateUser, deleteUser, type User } from '@/lib/firebase/database/users';
-import { getPetsByUserEmail, type Pet } from '@/lib/firebase/database/pets';
-import { Trash2, Edit2, Users, Shield, ShieldAlert, Eye, PawPrint } from 'lucide-react';
+import { deletePetFromFirestore, getPetsByUserEmail, type Pet } from '@/lib/firebase/database/pets';
+import { Users, Shield, ShieldAlert, Eye, PawPrint, ExternalLink, Pencil, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -23,6 +24,8 @@ import AddUserForm from '@/components/admin/AddUserForm';
 import AdminLayout from '@/components/admin/AdminLayout';
 import UserActions from '@/components/admin/UserActions';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
+import AdminAddPetDialog from '@/components/admin/AdminAddPetDialog';
+import { Link } from 'react-router-dom';
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -71,6 +74,11 @@ export default function AdminUsersPage() {
     petName: isHebrew ? 'שם' : 'Name',
     petType: isHebrew ? 'סוג' : 'Type',
     breed: isHebrew ? 'גזע' : 'Breed'
+    ,openPet: isHebrew ? 'פתח פרופיל' : 'Open profile'
+    ,editPet: isHebrew ? 'ערוך' : 'Edit'
+    ,deletePet: isHebrew ? 'מחק' : 'Delete'
+    ,deletePetConfirm: isHebrew ? 'למחוק את חיית המחמד הזו?' : 'Delete this pet?'
+    ,deletePetFailed: isHebrew ? 'מחיקת חיית המחמד נכשלה' : 'Failed to delete pet'
   };
 
   useEffect(() => {
@@ -116,6 +124,17 @@ export default function AdminUsersPage() {
     } finally {
       setLoadingPets(false);
     }
+  };
+
+  const handleDeletePet = async (pet: Pet) => {
+    if (!confirm(`${text.deletePetConfirm} ${pet.name}`)) return;
+
+    const result = await deletePetFromFirestore(pet.id);
+    if (!result.success) {
+      alert(result.error || text.deletePetFailed);
+      return;
+    }
+    setUserPets((current) => current.filter((item) => item.id !== pet.id));
   };
 
   const getRoleBadge = (role: string, isRestricted?: boolean) => {
@@ -357,10 +376,10 @@ export default function AdminUsersPage() {
 
               {/* User's Pets */}
               <div>
-                <h4 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                  <PawPrint className="w-5 h-5" />
-                  {text.userPets}
-                </h4>
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <h4 className="text-lg font-semibold flex items-center gap-2"><PawPrint className="w-5 h-5" />{text.userPets}</h4>
+                  <AdminAddPetDialog owner={{ uid: selectedUser.uid, email: selectedUser.email }} onCreated={(pet) => setUserPets((current) => [pet, ...current])} />
+                </div>
                 
                 {loadingPets ? (
                   <div className="text-center py-8">
@@ -393,6 +412,11 @@ export default function AdminUsersPage() {
                             <p className="text-sm text-gray-600">{pet.breedName || pet.breed || '-'}</p>
                             {pet.description && <p className="text-xs text-gray-500">{pet.description}</p>}
                           </div>
+                        </div>
+                        <div className="mt-3 flex gap-2">
+                          <Button asChild size="sm" variant="outline"><Link to={`/${locale}/pet/${pet.id}`} target="_blank"><ExternalLink className="me-1 h-4 w-4" />{text.openPet}</Link></Button>
+                          <Button asChild size="sm"><Link to={`/${locale}/pet/${pet.id}/edit`}><Pencil className="me-1 h-4 w-4" />{text.editPet}</Link></Button>
+                          <Button size="sm" variant="destructive" onClick={() => handleDeletePet(pet)}><Trash2 className="me-1 h-4 w-4" />{text.deletePet}</Button>
                         </div>
                       </div>
                     ))}
