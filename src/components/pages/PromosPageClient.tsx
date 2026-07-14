@@ -203,7 +203,9 @@ export default function PromosPageClient({
               {coupon.description && (
                 <p className="text-sm text-gray-600 mb-2 line-clamp-1 sm:line-clamp-2">{coupon.description}</p>
               )}
+            </div>
 
+            <div className="mt-auto shrink-0">
               {coupon.points > 0 && (
                 <p className="text-sm font-semibold text-primary mb-2">
                   {coupon.points} {text.points}
@@ -215,10 +217,9 @@ export default function PromosPageClient({
                   {text.validUntil}: {new Date(coupon.validTo).toLocaleDateString(isHebrew ? 'he-IL' : 'en-US')}
                 </p>
               )}
-
             </div>
 
-            <div className="flex gap-2 mt-auto shrink-0 pt-2">
+            <div className="flex gap-2 shrink-0 pt-2">
               <Button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -290,16 +291,17 @@ export default function PromosPageClient({
               {coupon.description && (
                 <p className="text-sm text-gray-600 mb-2 line-clamp-1 sm:line-clamp-2">{coupon.description}</p>
               )}
+            </div>
 
+            <div className="mt-auto shrink-0">
               {userCoupon.usedAt && (
                 <p className="text-xs text-gray-500 mb-2">
                   {text.usedOn}: {new Date(userCoupon.usedAt).toLocaleDateString(isHebrew ? 'he-IL' : 'en-US')}
                 </p>
               )}
-
             </div>
 
-            <div className="flex gap-2 mt-auto shrink-0 pt-2">
+            <div className="flex gap-2 shrink-0 pt-2">
               <Button
                 onClick={(e) => {
                   e.stopPropagation();
