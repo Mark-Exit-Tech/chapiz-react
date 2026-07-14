@@ -23,7 +23,7 @@ export default function AdminAddPetDialog({ owner, onCreated }: AdminAddPetDialo
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [imageError, setImageError] = useState('');
-  const emptyForm = { name: '', type: 'dog', breedName: '', gender: '', birthDate: '', weight: '', notes: '', imageUrl: '', isLost: false };
+  const emptyForm = { name: '', type: 'dog', breedName: '', gender: '', birthDate: '', weight: '', notes: '', imageUrl: '', isLost: true };
   const [form, setForm] = useState(emptyForm);
 
   const text = {

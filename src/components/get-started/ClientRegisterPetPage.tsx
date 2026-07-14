@@ -252,7 +252,8 @@ export default function ClientRegisterPetPage({
         // User info
         userEmail: user.email || '',
         ownerId: user.uid,
-        isLost: false
+        // New pet profiles are visible by default; hiding must be explicitly enabled later.
+        isLost: true
       };
 
       const result = await createPetInFirestore(petData);
