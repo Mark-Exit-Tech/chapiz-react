@@ -23,11 +23,6 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
   image,
   isEditMode
 }) => {
-  console.log('MyPetCard received image URL:', image);
-  console.log('Image URL type:', typeof image);
-  console.log('Image URL length:', image?.length);
-  console.log('Image URL starts with http:', image?.startsWith('http'));
-  console.log('Image URL starts with https:', image?.startsWith('https'));
   const navigate = useNavigate();
   const locale = (useLocale() as string) || 'en';
   const isRTL = locale === 'he';
@@ -39,6 +34,10 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
 
   // State to track image loading
   const [imageError, setImageError] = React.useState(false);
+
+  React.useEffect(() => {
+    setImageError(false);
+  }, [image]);
 
   const handleImageLoad = () => {
     console.log('Image loaded successfully for pet:', name);
@@ -168,10 +167,13 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
               onError={handleImageError}
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-white ltr:rounded-e-2xl rtl:rounded-s-2xl">
-              <div className="text-center">
-                <PawPrint className="h-8 w-8 text-gray-400 mx-auto" />
-              </div>
+            <div className="flex h-full w-full items-center justify-center bg-[#fff5f5] p-2 ltr:rounded-e-2xl rtl:rounded-s-2xl">
+              <img
+                src="/assets/upload_figures.webp"
+                alt=""
+                aria-hidden="true"
+                className="h-full w-full object-contain"
+              />
             </div>
           )}
         </div>

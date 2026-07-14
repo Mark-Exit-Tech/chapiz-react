@@ -178,14 +178,14 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
           display: none !important;
         }
         [data-vaul-drawer] {
-          height: calc(100vh - 90px) !important;
-          max-height: calc(100vh - 90px) !important;
-          min-height: calc(100vh - 90px) !important;
+          height: 100dvh !important;
+          max-height: 100dvh !important;
+          min-height: 100dvh !important;
           bottom: 0 !important;
-          top: 90px !important;
+          top: auto !important;
         }
         [data-vaul-drawer-wrapper] {
-          height: calc(100vh - 90px) !important;
+          height: 100dvh !important;
         }
       }
     `;
@@ -1205,12 +1205,28 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
               // Prevent closing - keep drawer always open
             }}
           >
-            <DrawerContent className="h-[100vh] mt-0 rounded-t-2xl" noOverlay>
+            <DrawerContent className={cn("h-[100dvh] mt-0", listSnapPoint === 1 ? "drawer-fullscreen rounded-none" : "rounded-t-2xl")} noOverlay>
               <DrawerHeader className="sr-only">
                 <DrawerTitle>Services List</DrawerTitle>
               </DrawerHeader>
               {/* Header: handle + count + search — consistent padding */}
-              <div className="shrink-0 px-4 pt-2 pb-4 bg-white">
+              <div className="relative shrink-0 px-4 pt-2 pb-4 bg-white">
+                {listSnapPoint === 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-2 right-3 z-10 h-9 w-9 rounded-full"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setListSnapPoint(MOBILE_LIST_COLLAPSED_SNAP_POINT);
+                    }}
+                    aria-label={locale === 'he' ? 'סגור רשימה' : 'Close list'}
+                    title={locale === 'he' ? 'סגור רשימה' : 'Close list'}
+                  >
+                    <X className="h-5 w-5" />
+                  </Button>
+                )}
                 <div
                   className="cursor-pointer py-3"
                   onClick={() => {
