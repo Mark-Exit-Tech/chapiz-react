@@ -61,6 +61,8 @@ interface ServiceWithCoordinates extends Service {
   distance?: number;
 }
 
+const MOBILE_LIST_COLLAPSED_SNAP_POINT = 0.52;
+
 const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerContent, mapFloatingControls, initialHighlightedServiceId, filterType = 'all', drawerSearchValue = '', onDrawerSearchChange, drawerSearchPlaceholder }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -95,7 +97,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
   const [highlightedServiceIds, setHighlightedServiceIds] = useState<string[]>(initialHighlightedIds);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [activeSnapPoint, setActiveSnapPoint] = useState<number | string | null>(1);
-  const [listSnapPoint, setListSnapPoint] = useState<number | string | null>(0.4);
+  const [listSnapPoint, setListSnapPoint] = useState<number | string | null>(MOBILE_LIST_COLLAPSED_SNAP_POINT);
   const [showCommentForm, setShowCommentForm] = useState(false);
   const [userRating, setUserRating] = useState(0);
   const [commentText, setCommentText] = useState('');
@@ -1184,12 +1186,12 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
             <div ref={mapRef} className="w-full h-full" />
           </div>
 
-          {/* Services List Drawer (Always persistent - starts at 40%, can expand to 100% on tap) */}
+          {/* Services List Drawer (Always persistent - starts just above halfway, can expand to 100% on tap) */}
           <Drawer
             open={true}
             modal={false}
-            snapPoints={[0.4, 1]}
-            activeSnapPoint={listSnapPoint || 0.4}
+            snapPoints={[MOBILE_LIST_COLLAPSED_SNAP_POINT, 1]}
+            activeSnapPoint={listSnapPoint || MOBILE_LIST_COLLAPSED_SNAP_POINT}
             setActiveSnapPoint={(snap) => {
               // Update snap point when user interacts with drawer
               if (snap !== null) {
@@ -1212,10 +1214,10 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
                 <div
                   className="cursor-pointer py-3"
                   onClick={() => {
-                    if (listSnapPoint === 0.4) {
+                    if (listSnapPoint === MOBILE_LIST_COLLAPSED_SNAP_POINT) {
                       setListSnapPoint(1);
                     } else {
-                      setListSnapPoint(0.4);
+                      setListSnapPoint(MOBILE_LIST_COLLAPSED_SNAP_POINT);
                     }
                   }}
                 >

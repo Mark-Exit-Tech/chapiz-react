@@ -4,7 +4,7 @@ export const getPetRegisterSchemas = (
   t: (key: string) => string
 ) => ({
   petDetails: z.object({
-    imageUrl: z.string().min(1, t('errors.petDetails.imageRequired')),
+    imageUrl: z.string().optional().default(''),
     petName: z.string().nonempty(t('errors.petDetails.nameRequired')),
     type: z.string().min(1, t('errors.petDetails.typeRequired')),
     breed: z.string().min(1, t('errors.petDetails.breedRequired')),

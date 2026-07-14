@@ -1193,7 +1193,7 @@
     "PetDetailsPage": {
       "title": "פרטי חיית המחמד",
       "form": {
-        "UploadImageTitle": "העלה תמונה",
+        "UploadImageTitle": "העלה תמונה (אופציונלי)",
         "PetName": "שם חיית המחמד",
         "Type": "סוג",
         "Breed": "גזע",

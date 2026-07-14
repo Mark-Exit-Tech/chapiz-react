@@ -1299,7 +1299,7 @@
     "PetDetailsPage": {
       "title": "Pet Details",
       "form": {
-        "UploadImageTitle": "Upload Pet Image",
+        "UploadImageTitle": "Upload Pet Image (optional)",
         "PetName": "Pet Name",
         "Type": "Type",
         "Breed": "Breed",
