@@ -1266,7 +1266,7 @@
     "PetDetailsPage": {
       "title": "Pet Details",
       "form": {
-        "UploadImageTitle": "Upload Pet Image (optional)",
+        "UploadImageTitle": "Upload Pet Image",
         "PetName": "Pet Name",
         "Type": "Type",
         "Breed": "Breed",
