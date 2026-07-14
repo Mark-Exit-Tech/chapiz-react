@@ -216,11 +216,6 @@ export default function PromosPageClient({
                 </p>
               )}
 
-              {couponBusinesses.length > 0 && (
-                <p className="text-xs text-gray-500 mb-3 line-clamp-1">
-                  {text.acceptedAt}: {couponBusinesses.map((b: Business) => b.name).join(', ')}
-                </p>
-              )}
             </div>
 
             <div className="flex gap-2 mt-auto shrink-0 pt-2">
@@ -267,9 +262,6 @@ export default function PromosPageClient({
 
   const renderUsedCouponCard = (userCoupon: UserCoupon) => {
     const coupon = userCoupon.coupon;
-    const couponBusinesses = businesses.filter(b =>
-      (coupon.businessIds || []).includes(b.id) || coupon.businessId === b.id
-    );
 
     return (
       <Card
@@ -305,11 +297,6 @@ export default function PromosPageClient({
                 </p>
               )}
 
-              {couponBusinesses.length > 0 && (
-                <p className="text-xs text-gray-500 mb-3 line-clamp-1">
-                  {text.acceptedAt}: {couponBusinesses.map((b: Business) => b.name).join(', ')}
-                </p>
-              )}
             </div>
 
             <div className="flex gap-2 mt-auto shrink-0 pt-2">
