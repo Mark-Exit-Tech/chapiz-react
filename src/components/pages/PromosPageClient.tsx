@@ -196,12 +196,12 @@ export default function PromosPageClient({
           )}
 
           {/* Content on the right */}
-          <CardContent className="flex-1 p-4 flex flex-col justify-between min-w-0">
-            <div>
+          <CardContent className="flex-1 min-w-0 p-4 flex flex-col">
+            <div className="min-h-0 overflow-hidden">
               <h3 className="font-semibold text-lg line-clamp-2 mb-2">{coupon.name}</h3>
 
               {coupon.description && (
-                <p className="text-sm text-gray-600 mb-2 line-clamp-2">{coupon.description}</p>
+                <p className="text-sm text-gray-600 mb-2 line-clamp-1 sm:line-clamp-2">{coupon.description}</p>
               )}
 
               {coupon.points > 0 && (
@@ -223,7 +223,7 @@ export default function PromosPageClient({
               )}
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 mt-auto shrink-0 pt-2">
               <Button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -291,12 +291,12 @@ export default function PromosPageClient({
           )}
 
           {/* Content on the right */}
-          <CardContent className="flex-1 p-4 flex flex-col justify-between min-w-0">
-            <div>
+          <CardContent className="flex-1 min-w-0 p-4 flex flex-col">
+            <div className="min-h-0 overflow-hidden">
               <h3 className="font-semibold text-lg line-clamp-2 mb-2">{coupon.name}</h3>
 
               {coupon.description && (
-                <p className="text-sm text-gray-600 mb-2 line-clamp-2">{coupon.description}</p>
+                <p className="text-sm text-gray-600 mb-2 line-clamp-1 sm:line-clamp-2">{coupon.description}</p>
               )}
 
               {userCoupon.usedAt && (
@@ -312,7 +312,7 @@ export default function PromosPageClient({
               )}
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 mt-auto shrink-0 pt-2">
               <Button
                 onClick={(e) => {
                   e.stopPropagation();
