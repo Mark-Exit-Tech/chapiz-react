@@ -414,9 +414,19 @@ export default function AdminUsersPage() {
                           </div>
                         </div>
                         <div className="mt-3 flex gap-2">
-                          <Button asChild size="sm" variant="outline"><Link to={`/${locale}/pet/${pet.id}`} target="_blank"><ExternalLink className="me-1 h-4 w-4" />{text.openPet}</Link></Button>
-                          <Button asChild size="sm"><Link to={`/${locale}/pet/${pet.id}/edit`}><Pencil className="me-1 h-4 w-4" />{text.editPet}</Link></Button>
-                          <Button size="sm" variant="destructive" onClick={() => handleDeletePet(pet)}><Trash2 className="me-1 h-4 w-4" />{text.deletePet}</Button>
+                          <Button asChild size="icon" variant="outline">
+                            <Link to={`/${locale}/pet/${pet.id}`} target="_blank" title={text.openPet} aria-label={text.openPet}>
+                              <ExternalLink className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                          <Button asChild size="icon">
+                            <Link to={`/${locale}/pet/${pet.id}/edit`} title={text.editPet} aria-label={text.editPet}>
+                              <Pencil className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                          <Button size="icon" variant="destructive" title={text.deletePet} aria-label={text.deletePet} onClick={() => handleDeletePet(pet)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
                       </div>
                     ))}
