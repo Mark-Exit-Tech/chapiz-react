@@ -181,13 +181,13 @@ const ImageUpload = ({
               }}
               disabled={uploading}
             >
-              <span className="w-full text-base font-medium ltr:pl-3 ltr:text-left rtl:pr-3 rtl:text-right">
+              <span className="w-1/2 text-base font-medium ltr:mr-auto ltr:pl-3 ltr:text-left rtl:ml-auto rtl:pr-3 rtl:text-right">
                 {uploading ? text.uploading : label}
               </span>
               <img
                 src={assets.upload_figures}
                 alt="figure"
-                className="absolute -top-11 ltr:right-6 rtl:left-6 w-40 h-32"
+                className="pointer-events-none absolute -top-9 h-28 w-32 object-contain ltr:right-2 ltr:left-auto rtl:right-auto rtl:left-2 sm:-top-11 sm:h-32 sm:w-40 sm:ltr:right-6 sm:rtl:left-6"
               />
             </Button>
           )}
@@ -204,7 +204,6 @@ const ImageUpload = ({
         <p className="mt-2 text-sm text-red-600">{error}</p>
       )}
 
-      {/* Required indicator removed - image is now optional */}
     </div>
   );
 };

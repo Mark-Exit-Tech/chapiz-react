@@ -22,6 +22,7 @@ export default function AdminAddPetDialog({ owner, onCreated }: AdminAddPetDialo
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+  const [imageError, setImageError] = useState('');
   const emptyForm = { name: '', type: 'dog', breedName: '', gender: '', birthDate: '', weight: '', notes: '', imageUrl: '', isLost: false };
   const [form, setForm] = useState(emptyForm);
 
@@ -59,18 +60,20 @@ export default function AdminAddPetDialog({ owner, onCreated }: AdminAddPetDialo
     });
 
     if (!validation.valid || !file) {
-      setError(validation.error || 'Invalid image');
+      setImageError(validation.error || 'Invalid image');
       event.target.value = '';
       return;
     }
 
     setUploading(true);
     setError('');
+    setImageError('');
     const result = await uploadPetImage(file, owner.uid);
     if (!result.success || !result.downloadURL) {
-      setError(result.error || (isHebrew ? 'העלאת התמונה נכשלה' : 'Image upload failed'));
+      setImageError(result.error || (isHebrew ? 'העלאת התמונה נכשלה' : 'Image upload failed'));
     } else {
       setForm((current) => ({ ...current, imageUrl: result.downloadURL || '' }));
+      setImageError('');
     }
     setUploading(false);
   };
@@ -79,7 +82,7 @@ export default function AdminAddPetDialog({ owner, onCreated }: AdminAddPetDialo
     event.preventDefault();
     if (!form.name.trim()) return;
     if (!form.imageUrl) {
-      setError(isHebrew ? 'יש להעלות תמונה של חיית המחמד' : 'Please upload a pet image');
+      setImageError(isHebrew ? 'יש להעלות תמונה של חיית המחמד' : 'Please upload a pet image');
       return;
     }
 
@@ -149,11 +152,12 @@ export default function AdminAddPetDialog({ owner, onCreated }: AdminAddPetDialo
           <div className="space-y-2">
             <Label htmlFor="admin-pet-image">{text.image}</Label>
             {form.imageUrl ? <img src={form.imageUrl} alt="" className="h-28 w-28 rounded-lg border object-cover" /> : null}
-            <Label htmlFor="admin-pet-image" className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md border bg-white px-4 hover:bg-gray-50">
+            <Label htmlFor="admin-pet-image" className={`flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md border bg-white px-4 hover:bg-gray-50 ${imageError ? 'border-red-500 ring-1 ring-red-500' : ''}`}>
               {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
               {uploading ? text.uploading : text.chooseImage}
             </Label>
-            <Input id="admin-pet-image" className="sr-only" type="file" accept="image/jpeg,image/png,image/gif,image/webp" onChange={handleImageChange} disabled={uploading} />
+            <Input id="admin-pet-image" className="sr-only" type="file" accept="image/jpeg,image/png,image/gif,image/webp" aria-invalid={Boolean(imageError)} aria-describedby={imageError ? 'admin-pet-image-error' : undefined} onChange={handleImageChange} disabled={uploading} />
+            {imageError ? <p id="admin-pet-image-error" role="alert" className="text-sm font-medium text-red-600">{imageError}</p> : null}
           </div>
           <div className="flex items-start gap-3 rounded-md border p-3">
             <Checkbox id="admin-pet-lost" checked={form.isLost} onCheckedChange={(checked) => setForm({ ...form, isLost: checked === true })} />

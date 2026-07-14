@@ -34,7 +34,7 @@ export default function AdDisplayManager() {
         return;
       }
 
-      // Show ad when 15-click threshold is reached
+      // Show ad when the 30-click threshold is reached
       if (shouldShowAd && !showAd && !isLoading) {
         console.log('[AdDisplayManager] Fetching ad...');
         setIsLoading(true);
@@ -107,4 +107,3 @@ export default function AdDisplayManager() {
 
   return null;
 }
-
