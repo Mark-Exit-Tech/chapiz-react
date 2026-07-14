@@ -61,7 +61,7 @@ interface ServiceWithCoordinates extends Service {
   distance?: number;
 }
 
-const MOBILE_LIST_COLLAPSED_SNAP_POINT = 0.52;
+const MOBILE_LIST_COLLAPSED_SNAP_POINT = 0.4;
 
 const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerContent, mapFloatingControls, initialHighlightedServiceId, filterType = 'all', drawerSearchValue = '', onDrawerSearchChange, drawerSearchPlaceholder }) => {
   const { t } = useTranslation();
@@ -1186,7 +1186,7 @@ const ServicesMapView: React.FC<ServicesMapViewProps> = ({ services, headerConte
             <div ref={mapRef} className="w-full h-full" />
           </div>
 
-          {/* Services List Drawer (Always persistent - starts just above halfway, can expand to 100% on tap) */}
+          {/* Services List Drawer (Always persistent - starts at 40%, expands to 100% on tap) */}
           <Drawer
             open={true}
             modal={false}
