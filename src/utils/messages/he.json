@@ -1355,7 +1355,15 @@
       "address": "כתובת",
       "addressPlaceholder": "הזינו את הכתובת שלכם",
       "phone": "מספר טלפון",
-      "phonePlaceholder": "הזינו את מספר הטלפון שלכם"
+      "phonePlaceholder": "הזינו את מספר הטלפון שלכם",
+      "checkEmail": "בדקו את האימייל שלכם",
+      "confirmationSent": "שלחנו קישור לאימות לכתובת:",
+      "nextSteps": "השלבים הבאים:",
+      "step1": "פתחו את תיבת הדואר הנכנס",
+      "step2": "לחצו על קישור האימות",
+      "step3": "חזרו לכאן והתחברו",
+      "goToSignIn": "מעבר להתחברות",
+      "backToSignUp": "חזרה להרשמה"
     },
     "EmailVerification": {
       "title": "אמתו את האימייל שלכם",

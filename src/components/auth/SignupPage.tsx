@@ -148,7 +148,10 @@ const SignupPage = () => {
   // Show loading while checking auth
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div
+        className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4"
+        dir={isHebrew ? 'rtl' : 'ltr'}
+      >
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-2 border-primary mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
@@ -167,10 +170,10 @@ const SignupPage = () => {
               <Mail className="w-8 h-8 text-primary" />
             </div>
             <CardTitle className="text-2xl font-bold text-gray-900">
-              Check Your Email
+              {t('pages.AuthPage.checkEmail')}
             </CardTitle>
             <p className="text-gray-600">
-              We've sent a confirmation link to:
+              {t('pages.AuthPage.confirmationSent')}
             </p>
             <p className="text-primary font-semibold">{signupEmail}</p>
           </CardHeader>
@@ -178,12 +181,12 @@ const SignupPage = () => {
           <CardContent className="space-y-4">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
               <p className="text-sm text-gray-700">
-                <strong>Next steps:</strong>
+                <strong>{t('pages.AuthPage.nextSteps')}</strong>
               </p>
               <ol className="text-sm text-gray-600 space-y-1 list-decimal list-inside">
-                <li>Open your email inbox</li>
-                <li>Click the confirmation link</li>
-                <li>Return here and sign in</li>
+                <li>{t('pages.AuthPage.step1')}</li>
+                <li>{t('pages.AuthPage.step2')}</li>
+                <li>{t('pages.AuthPage.step3')}</li>
               </ol>
             </div>
 
@@ -191,7 +194,7 @@ const SignupPage = () => {
               onClick={() => navigate('/login')}
               className="w-full bg-primary hover:bg-primary/90"
             >
-              Go to Sign In
+              {t('pages.AuthPage.goToSignIn')}
             </Button>
 
             <Button
@@ -199,7 +202,7 @@ const SignupPage = () => {
               onClick={() => setShowEmailConfirmation(false)}
               className="w-full"
             >
-              Back to Sign Up
+              {t('pages.AuthPage.backToSignUp')}
             </Button>
           </CardContent>
         </Card>

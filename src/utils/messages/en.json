@@ -1337,7 +1337,15 @@
       "address": "Address",
       "addressPlaceholder": "Enter your address",
       "phone": "Phone Number",
-      "phonePlaceholder": "Enter your phone number"
+      "phonePlaceholder": "Enter your phone number",
+      "checkEmail": "Check Your Email",
+      "confirmationSent": "We've sent a confirmation link to:",
+      "nextSteps": "Next steps:",
+      "step1": "Open your email inbox",
+      "step2": "Click the confirmation link",
+      "step3": "Return here and sign in",
+      "goToSignIn": "Go to Sign In",
+      "backToSignUp": "Back to Sign Up"
     },
     "EmailVerification": {
       "title": "Verify Your Email",
