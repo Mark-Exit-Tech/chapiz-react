@@ -870,6 +870,7 @@
     }
   },
   "common": {
+    "loading": "Loading...",
     "cancel": "Cancel",
     "save": "Save",
     "saving": "Saving...",
