@@ -34,13 +34,11 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
 
   // State to track image loading
   const [imageError, setImageError] = React.useState(false);
-  const [imageLoaded, setImageLoaded] = React.useState(false);
   const [imageRetryCount, setImageRetryCount] = React.useState(0);
   const retryTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   React.useEffect(() => {
     setImageError(false);
-    setImageLoaded(false);
     setImageRetryCount(0);
 
     return () => {
@@ -51,12 +49,10 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
   const handleImageLoad = () => {
     console.log('Image loaded successfully for pet:', name);
     setImageError(false);
-    setImageLoaded(true);
   };
 
   const handleImageError = () => {
     console.error('Failed to load pet image:', image);
-    setImageLoaded(false);
 
     if (imageRetryCount < 2) {
       retryTimerRef.current = setTimeout(() => {
@@ -178,16 +174,14 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
         style={{ width: `${imageWidth}px` }}
       >
         <div className="relative h-full w-full overflow-hidden bg-[#fff5f5] ltr:rounded-e-2xl rtl:rounded-s-2xl">
-          {!imageLoaded && (
-            <div className="absolute inset-0 flex items-center justify-center p-2">
-              <img
-                src="/assets/upload_figures.webp"
-                alt=""
-                aria-hidden="true"
-                className="h-full w-full object-contain"
-              />
-            </div>
-          )}
+          <div className="absolute inset-0 flex items-center justify-center p-2">
+            <img
+              src="/assets/upload_figures.webp"
+              alt=""
+              aria-hidden="true"
+              className="h-full w-full object-contain"
+            />
+          </div>
           {isValidImageUrl(image) && !imageError ? (
             <img
               key={`${id}-${imageSrc}`}
@@ -195,10 +189,7 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
               src={imageSrc}
               width={imageWidth}
               height={cardHeight}
-              className={cn(
-                'absolute inset-0 h-full w-full object-cover transition-opacity duration-200 ltr:rounded-e-2xl rtl:rounded-s-2xl',
-                imageLoaded ? 'opacity-100' : 'opacity-0'
-              )}
+              className="absolute inset-0 h-full w-full object-cover ltr:rounded-e-2xl rtl:rounded-s-2xl"
               onLoad={handleImageLoad}
               onError={handleImageError}
             />

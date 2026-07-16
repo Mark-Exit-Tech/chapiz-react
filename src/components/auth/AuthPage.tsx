@@ -16,20 +16,12 @@ import LocationAutocompleteComboSelect from '@/components/get-started/ui/Locatio
 const AuthPage = () => {
   const { t } = useTranslation();
   const { locale } = useParams<{ locale?: string }>();
-  const { signIn, signUp, signInWithGoogle, sendVerificationCode, user, loading: authLoading } = useAuth();
+  const { signIn, signUp, signInWithGoogle, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const lang = locale || 'en';
   
   // Debug logging
   console.log('AuthPage rendered:', { user, authLoading });
-  
-  // Redirect if user is already authenticated
-  useEffect(() => {
-    if (!authLoading && user) {
-      console.log('User already authenticated, redirecting to dashboard');
-      navigate('/pages/my-pets');
-    }
-  }, [user, authLoading, navigate]);
   
   const [isSignUp, setIsSignUp] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
@@ -49,6 +41,13 @@ const AuthPage = () => {
   const passwordLengthMessage = lang === 'he'
     ? 'הסיסמה חייבת להכיל לפחות 6 תווים'
     : 'Password must be at least 6 characters';
+
+  useEffect(() => {
+    if (!authLoading && user && !formLoading && !showEmailConfirmation) {
+      console.log('User already authenticated, redirecting to dashboard');
+      navigate('/pages/my-pets');
+    }
+  }, [user, authLoading, formLoading, showEmailConfirmation, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -114,32 +113,12 @@ const AuthPage = () => {
           addressCoordinates,
           addressPlaceId
         );
-        console.log('✅ Signup successful, attempting sign in...');
-        
-        toast.success(t('pages.AuthPage.accountCreatedSuccess'));
-        
-        // Wait a bit for the session to be established
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        try {
-          await signIn(formData.email, formData.password);
-          console.log('✅ Sign in successful');
-          toast.success(t('pages.AuthPage.signInSuccess'));
-          await new Promise(resolve => setTimeout(resolve, 500));
-          navigate('/pages/my-pets');
-        } catch (signInError: any) {
-          // If sign-in fails, likely email confirmation is required
-          if (signInError.message?.includes('Email not confirmed') || signInError.message?.includes('not confirmed')) {
-            console.log('📧 Email confirmation required');
-            setSignupEmail(formData.email);
-            setShowEmailConfirmation(true);
-            toast.success('Account created! Please check your email to confirm.');
-          } else {
-            console.error('⚠️ Sign in after signup failed:', signInError);
-            toast.success('Account created! Please sign in.');
-            navigate('/pages/my-pets');
-          }
-        }
+        console.log('✅ Signup successful, verification email sent');
+        setSignupEmail(formData.email);
+        setShowEmailConfirmation(true);
+        toast.success(lang === 'he'
+          ? 'נשלח קישור לאימות האימייל'
+          : 'A verification link has been sent to your email');
       } else {
         console.log('🔍 Starting sign in process:', { email: formData.email });
         await signIn(formData.email, formData.password);

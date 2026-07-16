@@ -9,6 +9,7 @@ export interface User {
   address?: string;
   coordinates?: { lat: number; lng: number };
   placeId?: string;
+  requiresEmailVerification?: boolean;
   role: 'user' | 'admin' | 'super_admin';
   language?: string;
   acceptCookies?: boolean; // ACTUAL Firestore field (camelCase)

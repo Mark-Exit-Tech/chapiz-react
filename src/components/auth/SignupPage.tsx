@@ -18,15 +18,8 @@ const SignupPage = () => {
   const { t } = useTranslation();
   const locale = useLocale();
   const isHebrew = locale === 'he';
-  const { signIn, signUp, signInWithGoogle, user, loading: authLoading } = useAuth();
+  const { signUp, signInWithGoogle, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-
-  // Redirect if user is already authenticated
-  useEffect(() => {
-    if (!authLoading && user) {
-      navigate('/pages/my-pets');
-    }
-  }, [user, authLoading, navigate]);
 
   const [showPassword, setShowPassword] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
@@ -45,6 +38,14 @@ const SignupPage = () => {
   const passwordLengthMessage = isHebrew
     ? 'הסיסמה חייבת להכיל לפחות 6 תווים'
     : 'Password must be at least 6 characters';
+
+  // Do not redirect during signup: Firebase signs in briefly while it sends
+  // the verification email, then signs the new account back out.
+  useEffect(() => {
+    if (!authLoading && user && !formLoading && !showEmailConfirmation) {
+      navigate('/pages/my-pets');
+    }
+  }, [user, authLoading, formLoading, showEmailConfirmation, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -98,28 +99,11 @@ const SignupPage = () => {
       );
       console.log('✅ Signup successful');
 
-      // Wait for Firebase to process
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Try to sign in
-      console.log('🔄 Attempting to establish session...');
-      try {
-        await signIn(formData.email, formData.password);
-        console.log('✅ Session established - redirecting');
-        toast.success(t('pages.AuthPage.signInSuccess'));
-        await new Promise(resolve => setTimeout(resolve, 500));
-        navigate('/pages/my-pets');
-      } catch (signInError: any) {
-        // If sign-in fails, likely email confirmation is required
-        if (signInError.message?.includes('Email not confirmed') || signInError.message?.includes('not confirmed')) {
-          console.log('📧 Email confirmation required');
-          setSignupEmail(formData.email);
-          setShowEmailConfirmation(true);
-          toast.success('Account created! Please check your email to confirm.');
-        } else {
-          throw signInError;
-        }
-      }
+      setSignupEmail(formData.email);
+      setShowEmailConfirmation(true);
+      toast.success(isHebrew
+        ? 'נשלח קישור לאימות האימייל'
+        : 'A verification link has been sent to your email');
     } catch (error: any) {
       console.error('❌ Auth error details:', {
         message: error.message,

@@ -5,11 +5,23 @@ import {
   GoogleAuthProvider,
   signOut as firebaseSignOut,
   sendPasswordResetEmail,
+  sendEmailVerification,
   User as FirebaseUser,
 } from 'firebase/auth';
 import { auth } from './client';
 
 const googleProvider = new GoogleAuthProvider();
+
+export const sendVerificationEmail = async (user: FirebaseUser) => {
+  const continueUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/login`
+    : undefined;
+
+  await sendEmailVerification(
+    user,
+    continueUrl ? { url: continueUrl } : undefined
+  );
+};
 
 // Sign up with email and password
 export const signUpWithEmail = async (email: string, password: string) => {

@@ -9,6 +9,7 @@ import {
   signInWithGoogle,
   signOut as firebaseSignOut,
   resetPassword as firebaseResetPassword,
+  sendVerificationEmail,
 } from '@/lib/firebase/auth';
 import { getUserByUid, getUserByEmail, upsertUser, User as DBUser } from '@/lib/firebase/database/users';
 import { generateOTPCode } from '@/lib/otp-generator';
@@ -125,7 +126,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const signIn = async (email: string, password: string) => {
     try {
       console.log('🔍 Starting Firebase sign in:', { email });
-      await signInWithEmail(email, password);
+      const firebaseUser = await signInWithEmail(email, password);
+      const userData = await getUserByUid(firebaseUser.uid);
+
+      if (userData?.requiresEmailVerification && !firebaseUser.emailVerified) {
+        await sendVerificationEmail(firebaseUser);
+        await firebaseSignOut();
+        throw new Error('Please verify your email. A new verification link has been sent.');
+      }
       console.log('✅ Sign in successful');
     } catch (error: any) {
       console.error('❌ Sign in error:', error);
@@ -162,10 +170,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         address: address || '',
         ...(coordinates ? { coordinates } : {}),
         ...(placeId ? { placeId } : {}),
+        requiresEmailVerification: true,
         role: userRole,
         language: 'en',
         accept_cookies: cookiePreference,
       });
+
+      await sendVerificationEmail(firebaseUser);
+      await firebaseSignOut();
 
       console.log('✅ Signup successful');
     } catch (error: any) {
