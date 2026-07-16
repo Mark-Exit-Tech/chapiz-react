@@ -150,11 +150,21 @@ function removeUndefinedValues(obj: any): any {
 }
 
 // Create pet
-export async function createPetInFirestore(petData: any): Promise<{ success: boolean; petId?: string; error?: string }> {
+export async function createPetInFirestore(
+    petData: any,
+    documentId?: string
+): Promise<{ success: boolean; petId?: string; error?: string }> {
     try {
         const petsRef = collection(db, PETS_COLLECTION);
-        const newPetRef = doc(petsRef);
+        const newPetRef = documentId ? doc(petsRef, documentId) : doc(petsRef);
         const now = new Date();
+
+        if (documentId) {
+            const existingPet = await getDoc(newPetRef);
+            if (existingPet.exists()) {
+                return { success: false, error: 'This tag is already registered' };
+            }
+        }
 
         // Remove undefined values as Firebase doesn't accept them
         const cleanedPetData = removeUndefinedValues(petData);

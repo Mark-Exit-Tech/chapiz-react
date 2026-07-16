@@ -256,7 +256,9 @@ export default function ClientRegisterPetPage({
         isLost: true
       };
 
-      const result = await createPetInFirestore(petData);
+      // The pet document ID must match the physical tag ID from the URL so
+      // scanning the same tag later resolves to this pet profile.
+      const result = await createPetInFirestore(petData, petId);
 
       if (result.success) {
         clearPetId();

@@ -37,7 +37,9 @@ const MyPetClient: React.FC<MyPetClientProps> = ({ pets: initialPets }) => {
     unknownPet: isHebrew ? 'חיית מחמד לא ידועה' : 'Unknown Pet',
     loadingPets: isHebrew ? 'טוען חיות מחמד...' : 'Loading pets...',
     noPetsYet: isHebrew ? 'עדיין אין חיות מחמד' : 'No pets yet',
-    scanToAddPet: isHebrew ? 'סרוק את תג ה-NFC כדי להוסיף חיית מחמד' : 'Scan the NFC tag to add a pet',
+    scanToAddPet: isHebrew
+      ? 'להוספת חיית מחמד חדשה, קרבו את הטלפון לתג.'
+      : 'To add a new pet, bring your phone close to the tag.',
   };
 
   const { user, loading } = useAuth();
