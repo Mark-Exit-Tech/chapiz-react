@@ -120,7 +120,9 @@ const ImageUpload = ({
 
   return (
     <div className="w-full">
-      <Card className="h-15 w-full overflow-visible rounded-lg border-none bg-transparent shadow-none">
+      <Card
+        className={`${value ? 'h-auto' : 'h-15'} w-full overflow-visible rounded-lg border-none bg-transparent shadow-none`}
+      >
         <CardContent className="p-0">
           {/* Hidden file input */}
           <input
@@ -133,7 +135,7 @@ const ImageUpload = ({
           />
 
           {value ? (
-            <div className="relative h-15 w-full rounded-lg">
+            <div className="relative aspect-video w-full overflow-hidden rounded-lg">
               {/* Image */}
               <img
                 alt="Uploaded pet image"
@@ -142,7 +144,7 @@ const ImageUpload = ({
               />
 
               {/* Action buttons */}
-              <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black bg-opacity-50 rounded-lg opacity-0 hover:opacity-100 transition-opacity">
+              <div className="absolute inset-0 flex items-center justify-center gap-2 rounded-lg bg-black/35 opacity-100 transition-opacity sm:opacity-0 sm:hover:opacity-100">
                 <Button
                   variant="ghost"
                   size="sm"

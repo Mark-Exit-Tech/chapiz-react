@@ -34,20 +34,43 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
 
   // State to track image loading
   const [imageError, setImageError] = React.useState(false);
+  const [imageLoaded, setImageLoaded] = React.useState(false);
+  const [imageRetryCount, setImageRetryCount] = React.useState(0);
+  const retryTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   React.useEffect(() => {
     setImageError(false);
+    setImageLoaded(false);
+    setImageRetryCount(0);
+
+    return () => {
+      if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
+    };
   }, [image]);
 
   const handleImageLoad = () => {
     console.log('Image loaded successfully for pet:', name);
     setImageError(false);
+    setImageLoaded(true);
   };
 
   const handleImageError = () => {
     console.error('Failed to load pet image:', image);
+    setImageLoaded(false);
+
+    if (imageRetryCount < 2) {
+      retryTimerRef.current = setTimeout(() => {
+        setImageRetryCount((count) => count + 1);
+      }, 750 * (imageRetryCount + 1));
+      return;
+    }
+
     setImageError(true);
   };
+
+  const imageSrc = imageRetryCount > 0
+    ? `${image}${image.includes('?') ? '&' : '?'}retry=${imageRetryCount}`
+    : image;
 
   // Validate if image URL is valid
   const isValidImageUrl = (url: string): boolean => {
@@ -154,20 +177,9 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
         className="absolute top-0 bottom-0 z-[5] bg-transparent ltr:right-0 rtl:left-0"
         style={{ width: `${imageWidth}px` }}
       >
-        <div className="h-full w-full bg-transparent">
-          {isValidImageUrl(image) && !imageError ? (
-            <img
-              key={`${id}-${image}`}
-              alt={name}
-              src={image}
-              width={imageWidth}
-              height={cardHeight}
-              className="h-full w-full object-cover ltr:rounded-e-2xl rtl:rounded-s-2xl bg-transparent"
-              onLoad={handleImageLoad}
-              onError={handleImageError}
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-[#fff5f5] p-2 ltr:rounded-e-2xl rtl:rounded-s-2xl">
+        <div className="relative h-full w-full overflow-hidden bg-[#fff5f5] ltr:rounded-e-2xl rtl:rounded-s-2xl">
+          {!imageLoaded && (
+            <div className="absolute inset-0 flex items-center justify-center p-2">
               <img
                 src="/assets/upload_figures.webp"
                 alt=""
@@ -176,6 +188,21 @@ const MyPetCard: React.FC<MyPetCardProps> = ({
               />
             </div>
           )}
+          {isValidImageUrl(image) && !imageError ? (
+            <img
+              key={`${id}-${imageSrc}`}
+              alt={name}
+              src={imageSrc}
+              width={imageWidth}
+              height={cardHeight}
+              className={cn(
+                'absolute inset-0 h-full w-full object-cover transition-opacity duration-200 ltr:rounded-e-2xl rtl:rounded-s-2xl',
+                imageLoaded ? 'opacity-100' : 'opacity-0'
+              )}
+              onLoad={handleImageLoad}
+              onError={handleImageError}
+            />
+          ) : null}
         </div>
       </div>
     </motion.div>
