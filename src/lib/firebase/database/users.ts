@@ -7,6 +7,8 @@ export interface User {
   displayName?: string; // ACTUAL Firestore field (camelCase)
   phone?: string;
   address?: string;
+  coordinates?: { lat: number; lng: number };
+  placeId?: string;
   role: 'user' | 'admin' | 'super_admin';
   language?: string;
   acceptCookies?: boolean; // ACTUAL Firestore field (camelCase)

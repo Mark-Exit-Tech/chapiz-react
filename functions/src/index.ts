@@ -9,6 +9,36 @@ const firestore = admin.firestore();
 const resendApiKey = process.env.RESEND_API_KEY || 're_4B3FSDoU_GjgVXh2vLWks6VzuQvfnvaBf';
 const resend = new Resend(resendApiKey);
 
+export const deleteUserAccount = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'Authentication is required');
+  }
+
+  const callerDoc = await firestore.collection('users').doc(context.auth.uid).get();
+  const callerRole = callerDoc.data()?.role;
+  if (callerRole !== 'admin' && callerRole !== 'super_admin') {
+    throw new functions.https.HttpsError('permission-denied', 'Admin access is required');
+  }
+
+  const uid = typeof data?.uid === 'string' ? data.uid.trim() : '';
+  if (!uid) {
+    throw new functions.https.HttpsError('invalid-argument', 'User ID is required');
+  }
+
+  try {
+    await admin.auth().deleteUser(uid);
+  } catch (error: any) {
+    // If an earlier attempt removed Auth but not Firestore, finish cleanup.
+    if (error?.code !== 'auth/user-not-found') {
+      console.error('Failed to delete Firebase Auth user:', { uid, code: error?.code });
+      throw new functions.https.HttpsError('internal', 'Failed to delete authentication account');
+    }
+  }
+
+  await firestore.collection('users').doc(uid).delete();
+  return { success: true };
+});
+
 export const sendInviteEmail = functions.https.onCall(async (data, context) => {
   const { email, inviteUrl, locale } = data;
 

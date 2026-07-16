@@ -8,9 +8,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Mail, Lock, User, Eye, EyeOff, MapPin, Phone } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, Phone } from 'lucide-react';
 import toast from 'react-hot-toast';
 import OptimizedImage from '@/components/OptimizedImage';
+import LocationAutocompleteComboSelect from '@/components/get-started/ui/LocationAutocompleteSelector';
 
 const AuthPage = () => {
   const { t } = useTranslation();
@@ -35,6 +36,8 @@ const AuthPage = () => {
   const [formLoading, setFormLoading] = useState(false);
   const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
   const [signupEmail, setSignupEmail] = useState('');
+  const [addressCoordinates, setAddressCoordinates] = useState<{ lat: number; lng: number } | null>(null);
+  const [addressPlaceId, setAddressPlaceId] = useState<string | undefined>();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -42,6 +45,10 @@ const AuthPage = () => {
     address: '',
     phone: ''
   });
+  const passwordTooShort = isSignUp && formData.password.length > 0 && formData.password.length < 6;
+  const passwordLengthMessage = lang === 'he'
+    ? 'הסיסמה חייבת להכיל לפחות 6 תווים'
+    : 'Password must be at least 6 characters';
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -63,6 +70,11 @@ const AuthPage = () => {
       }
       if (!formData.email?.trim()) {
         toast.error('Email is required');
+        setFormLoading(false);
+        return;
+      }
+      if (!formData.address?.trim()) {
+        toast.error(lang === 'he' ? 'יש לבחור כתובת' : 'Please select an address');
         setFormLoading(false);
         return;
       }
@@ -93,7 +105,15 @@ const AuthPage = () => {
         });
         
         // Sign up and directly sign in (email verification disabled)
-        await signUp(formData.email, formData.password, formData.fullName, formData.phone, formData.address);
+        await signUp(
+          formData.email,
+          formData.password,
+          formData.fullName,
+          formData.phone,
+          formData.address,
+          addressCoordinates,
+          addressPlaceId
+        );
         console.log('✅ Signup successful, attempting sign in...');
         
         toast.success(t('pages.AuthPage.accountCreatedSuccess'));
@@ -335,18 +355,18 @@ const AuthPage = () => {
 
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-gray-700">{t('pages.AuthPage.address')}</label>
-                      <div className="relative">
-                        <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                        <Input
-                          name="address"
-                          type="text"
-                          placeholder={t('pages.AuthPage.addressPlaceholder')}
-                          value={formData.address}
-                          onChange={handleInputChange}
-                          required={isSignUp}
-                          className="pl-10 h-12"
-                        />
-                      </div>
+                      <LocationAutocompleteComboSelect
+                        label=""
+                        id="auth-address"
+                        value={formData.address}
+                        placeholder={t('pages.AuthPage.addressPlaceholder')}
+                        onChange={(address) => setFormData((current) => ({ ...current, address }))}
+                        onCoordinatesChange={(coordinates, placeId) => {
+                          setAddressCoordinates(coordinates);
+                          setAddressPlaceId(placeId);
+                        }}
+                        required
+                      />
                     </div>
 
                     <div className="space-y-2">
@@ -394,6 +414,9 @@ const AuthPage = () => {
                       value={formData.password}
                       onChange={handleInputChange}
                       required
+                      minLength={isSignUp ? 6 : undefined}
+                      aria-invalid={passwordTooShort}
+                      aria-describedby={isSignUp ? 'auth-password-requirement' : undefined}
                       className="pl-10 pr-10 h-12"
                     />
                     <button
@@ -404,6 +427,15 @@ const AuthPage = () => {
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
+                  {isSignUp && (
+                    <p
+                      id="auth-password-requirement"
+                      className={`text-sm ${passwordTooShort ? 'text-red-600' : 'text-gray-500'}`}
+                      role={passwordTooShort ? 'alert' : undefined}
+                    >
+                      {passwordLengthMessage}
+                    </p>
+                  )}
                 </div>
 
                 <Button

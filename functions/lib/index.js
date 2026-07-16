@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.shopCallback = exports.sendInviteEmail = void 0;
+exports.shopCallback = exports.sendInviteEmail = exports.deleteUserAccount = void 0;
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const resend_1 = require("resend");
@@ -9,6 +9,33 @@ const firestore = admin.firestore();
 // Get Resend API key from environment variables or fallback to hardcoded (for development)
 const resendApiKey = process.env.RESEND_API_KEY || 're_4B3FSDoU_GjgVXh2vLWks6VzuQvfnvaBf';
 const resend = new resend_1.Resend(resendApiKey);
+exports.deleteUserAccount = functions.https.onCall(async (data, context) => {
+    var _a;
+    if (!context.auth) {
+        throw new functions.https.HttpsError('unauthenticated', 'Authentication is required');
+    }
+    const callerDoc = await firestore.collection('users').doc(context.auth.uid).get();
+    const callerRole = (_a = callerDoc.data()) === null || _a === void 0 ? void 0 : _a.role;
+    if (callerRole !== 'admin' && callerRole !== 'super_admin') {
+        throw new functions.https.HttpsError('permission-denied', 'Admin access is required');
+    }
+    const uid = typeof (data === null || data === void 0 ? void 0 : data.uid) === 'string' ? data.uid.trim() : '';
+    if (!uid) {
+        throw new functions.https.HttpsError('invalid-argument', 'User ID is required');
+    }
+    try {
+        await admin.auth().deleteUser(uid);
+    }
+    catch (error) {
+        // If an earlier attempt removed Auth but not Firestore, finish cleanup.
+        if ((error === null || error === void 0 ? void 0 : error.code) !== 'auth/user-not-found') {
+            console.error('Failed to delete Firebase Auth user:', { uid, code: error === null || error === void 0 ? void 0 : error.code });
+            throw new functions.https.HttpsError('internal', 'Failed to delete authentication account');
+        }
+    }
+    await firestore.collection('users').doc(uid).delete();
+    return { success: true };
+});
 exports.sendInviteEmail = functions.https.onCall(async (data, context) => {
     const { email, inviteUrl, locale } = data;
     // Validate required fields

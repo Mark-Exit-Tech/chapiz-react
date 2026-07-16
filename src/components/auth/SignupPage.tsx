@@ -9,9 +9,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Mail, Lock, User, Eye, EyeOff, MapPin, Phone } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, Phone } from 'lucide-react';
 import toast from 'react-hot-toast';
 import OptimizedImage from '@/components/OptimizedImage';
+import LocationAutocompleteComboSelect from '@/components/get-started/ui/LocationAutocompleteSelector';
 
 const SignupPage = () => {
   const { t } = useTranslation();
@@ -31,6 +32,8 @@ const SignupPage = () => {
   const [formLoading, setFormLoading] = useState(false);
   const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
   const [signupEmail, setSignupEmail] = useState('');
+  const [addressCoordinates, setAddressCoordinates] = useState<{ lat: number; lng: number } | null>(null);
+  const [addressPlaceId, setAddressPlaceId] = useState<string | undefined>();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -38,6 +41,10 @@ const SignupPage = () => {
     address: '',
     phone: ''
   });
+  const passwordTooShort = formData.password.length > 0 && formData.password.length < 6;
+  const passwordLengthMessage = isHebrew
+    ? 'הסיסמה חייבת להכיל לפחות 6 תווים'
+    : 'Password must be at least 6 characters';
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -61,6 +68,11 @@ const SignupPage = () => {
       setFormLoading(false);
       return;
     }
+    if (!formData.address?.trim()) {
+      toast.error(isHebrew ? 'יש לבחור כתובת' : 'Please select an address');
+      setFormLoading(false);
+      return;
+    }
     if (!formData.password || formData.password.length < 6) {
       toast.error('Password must be at least 6 characters');
       setFormLoading(false);
@@ -75,7 +87,15 @@ const SignupPage = () => {
       });
 
       // Sign up
-      await signUp(formData.email, formData.password, formData.fullName, formData.phone, formData.address);
+      await signUp(
+        formData.email,
+        formData.password,
+        formData.fullName,
+        formData.phone,
+        formData.address,
+        addressCoordinates,
+        addressPlaceId
+      );
       console.log('✅ Signup successful');
 
       // Wait for Firebase to process
@@ -302,19 +322,18 @@ const SignupPage = () => {
 
                 <div className="space-y-2">
                   <label className={`text-sm font-medium text-gray-700 ${isHebrew ? 'text-right' : ''}`}>{t('pages.AuthPage.address')}</label>
-                  <div className="relative">
-                    <MapPin className={`absolute top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 ${isHebrew ? 'right-3' : 'left-3'}`} />
-                    <Input
-                      name="address"
-                      type="text"
-                      placeholder={t('pages.AuthPage.addressPlaceholder')}
-                      value={formData.address}
-                      onChange={handleInputChange}
-                      required
-                      className={`h-12 ${isHebrew ? 'pr-10 text-right' : 'pl-10'}`}
-                      dir={isHebrew ? 'rtl' : 'ltr'}
-                    />
-                  </div>
+                  <LocationAutocompleteComboSelect
+                    label=""
+                    id="signup-address"
+                    value={formData.address}
+                    placeholder={t('pages.AuthPage.addressPlaceholder')}
+                    onChange={(address) => setFormData((current) => ({ ...current, address }))}
+                    onCoordinatesChange={(coordinates, placeId) => {
+                      setAddressCoordinates(coordinates);
+                      setAddressPlaceId(placeId);
+                    }}
+                    required
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -362,6 +381,9 @@ const SignupPage = () => {
                       value={formData.password}
                       onChange={handleInputChange}
                       required
+                      minLength={6}
+                      aria-invalid={passwordTooShort}
+                      aria-describedby="signup-password-requirement"
                       className={`h-12 ${isHebrew ? 'pr-10 pl-10 text-right' : 'pl-10 pr-10'}`}
                       dir={isHebrew ? 'rtl' : 'ltr'}
                     />
@@ -373,6 +395,13 @@ const SignupPage = () => {
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
+                  <p
+                    id="signup-password-requirement"
+                    className={`text-sm ${passwordTooShort ? 'text-red-600' : 'text-gray-500'} ${isHebrew ? 'text-right' : 'text-left'}`}
+                    role={passwordTooShort ? 'alert' : undefined}
+                  >
+                    {passwordLengthMessage}
+                  </p>
                 </div>
 
                 <Button

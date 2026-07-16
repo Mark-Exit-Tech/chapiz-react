@@ -24,7 +24,15 @@ interface AuthContextType {
   dbUser: DBUser | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, fullName: string, phone?: string, address?: string) => Promise<void>;
+  signUp: (
+    email: string,
+    password: string,
+    fullName: string,
+    phone?: string,
+    address?: string,
+    coordinates?: { lat: number; lng: number } | null,
+    placeId?: string
+  ) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -125,7 +133,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
-  const signUp = async (email: string, password: string, fullName: string, phone?: string, address?: string) => {
+  const signUp = async (
+    email: string,
+    password: string,
+    fullName: string,
+    phone?: string,
+    address?: string,
+    coordinates?: { lat: number; lng: number } | null,
+    placeId?: string
+  ) => {
     try {
       console.log('🔍 Starting Firebase signup:', { email, fullName });
       
@@ -139,10 +155,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       await upsertUser({
         uid: firebaseUser.uid,
         email: email.trim().toLowerCase(),
+        displayName: fullName,
         full_name: fullName,
         display_name: fullName,
         phone: phone || '',
         address: address || '',
+        ...(coordinates ? { coordinates } : {}),
+        ...(placeId ? { placeId } : {}),
         role: userRole,
         language: 'en',
         accept_cookies: cookiePreference,

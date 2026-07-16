@@ -27,6 +27,9 @@ import { useAuth } from '@/contexts/FirebaseAuthContext';
 import AdminAddPetDialog from '@/components/admin/AdminAddPetDialog';
 import { Link } from 'react-router-dom';
 
+const getUserDisplayName = (user: User) =>
+  user.full_name || user.display_name || user.displayName || '-';
+
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -263,7 +266,7 @@ export default function AdminUsersPage() {
                               <>
                                 <img 
                                   src={user.profileImage || user.profile_image} 
-                                  alt={user.displayName || user.display_name || text.user}
+                                  alt={getUserDisplayName(user) || text.user}
                                   className="w-8 h-8 rounded-full object-cover"
                                   onError={(e) => {
                                     // Hide broken image
@@ -287,7 +290,7 @@ export default function AdminUsersPage() {
                               </div>
                             )}
                           </div>
-                          <span>{user.displayName || user.display_name || user.full_name || '-'}</span>
+                          <span>{getUserDisplayName(user)}</span>
                         </div>
                       </TableCell>
                       <TableCell className={isHebrew ? 'text-right' : ''}>{user.email}</TableCell>
@@ -338,7 +341,7 @@ export default function AdminUsersPage() {
                     <>
                       <img 
                         src={selectedUser.profileImage || selectedUser.profile_image} 
-                        alt={selectedUser.displayName || text.user}
+                        alt={getUserDisplayName(selectedUser) || text.user}
                         className="w-16 h-16 rounded-full object-cover"
                         onError={(e) => {
                           // Hide broken image
@@ -363,7 +366,7 @@ export default function AdminUsersPage() {
                   )}
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold">{selectedUser.displayName || selectedUser.display_name || '-'}</h3>
+                  <h3 className="text-xl font-semibold">{getUserDisplayName(selectedUser)}</h3>
                   <p className="text-gray-600">{selectedUser.email}</p>
                   {selectedUser.phone && <p className="text-gray-500 text-sm">{selectedUser.phone}</p>}
                 </div>

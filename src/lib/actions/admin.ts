@@ -183,8 +183,18 @@ export async function updateUser(id: string, data: any) {
 
 export async function deleteUser(id: string) {
   try {
-    const { deleteUser: deleteUserFromDB } = await import('@/lib/firebase/database/users');
-    await deleteUserFromDB(id);
+    const [{ getFunctions, httpsCallable }, { app }] = await Promise.all([
+      import('firebase/functions'),
+      import('@/lib/firebase/client')
+    ]);
+    const deleteUserAccount = httpsCallable<{ uid: string }, { success: boolean }>(
+      getFunctions(app),
+      'deleteUserAccount'
+    );
+    const response = await deleteUserAccount({ uid: id });
+    if (!response.data.success) {
+      throw new Error('Account deletion failed');
+    }
     return { success: true, error: undefined };
   } catch (error) {
     console.error('Error deleting user:', error);
@@ -1131,7 +1141,7 @@ export async function getRecentActivity() {
       .slice(0, 10)
       .map(u => ({
         uid: u.uid,
-        fullName: u.displayName || u.display_name || u.full_name || u.email.split('@')[0], // Use actual Firestore field names
+        fullName: u.full_name || u.display_name || u.displayName || u.email.split('@')[0],
         email: u.email,
         createdAt: u.createdAt || u.created_at // Dashboard expects createdAt, not joined
       }));
