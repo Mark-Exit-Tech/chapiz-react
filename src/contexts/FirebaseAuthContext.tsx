@@ -85,6 +85,23 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       clearTimeout(authTimeout); // Cancel timeout since we got a response
       console.log('🔍 Firebase auth state changed:', firebaseUser?.email || 'No user');
 
+      const isEmailPasswordUser = firebaseUser?.providerData.some(
+        (provider) => provider.providerId === 'password'
+      );
+
+      // Email/password users must verify their address. Google users are
+      // already verified by Google and must not enter this flow.
+      const isAuthRoute = typeof window !== 'undefined' &&
+        /^\/(?:en|he)\/(?:login|signup|auth)(?:\/|$)/.test(window.location.pathname);
+
+      if (firebaseUser && isEmailPasswordUser && !firebaseUser.emailVerified && !isAuthRoute) {
+        setUser(null);
+        setDbUser(null);
+        await firebaseSignOut();
+        setLoading(false);
+        return;
+      }
+
       setUser(firebaseUser);
 
       if (firebaseUser) {
@@ -127,9 +144,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       console.log('🔍 Starting Firebase sign in:', { email });
       const firebaseUser = await signInWithEmail(email, password);
-      const userData = await getUserByUid(firebaseUser.uid);
+      const isEmailPasswordUser = firebaseUser.providerData.some(
+        (provider) => provider.providerId === 'password'
+      );
 
-      if (userData?.requiresEmailVerification && !firebaseUser.emailVerified) {
+      if (isEmailPasswordUser && !firebaseUser.emailVerified) {
         await sendVerificationEmail(firebaseUser);
         await firebaseSignOut();
         throw new Error('Please verify your email. A new verification link has been sent.');
