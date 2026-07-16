@@ -6,9 +6,6 @@ const admin = require("firebase-admin");
 const resend_1 = require("resend");
 admin.initializeApp();
 const firestore = admin.firestore();
-// Get Resend API key from environment variables or fallback to hardcoded (for development)
-const resendApiKey = process.env.RESEND_API_KEY || 're_4B3FSDoU_GjgVXh2vLWks6VzuQvfnvaBf';
-const resend = new resend_1.Resend(resendApiKey);
 exports.deleteUserAccount = functions.https.onCall(async (data, context) => {
     var _a;
     if (!context.auth) {
@@ -36,7 +33,14 @@ exports.deleteUserAccount = functions.https.onCall(async (data, context) => {
     await firestore.collection('users').doc(uid).delete();
     return { success: true };
 });
-exports.sendInviteEmail = functions.https.onCall(async (data, context) => {
+exports.sendInviteEmail = functions
+    .runWith({ secrets: ['RESEND_API_KEY'] })
+    .https.onCall(async (data, context) => {
+    const resendApiKey = process.env.RESEND_API_KEY;
+    if (!resendApiKey) {
+        throw new functions.https.HttpsError('failed-precondition', 'Email service is not configured');
+    }
+    const resend = new resend_1.Resend(resendApiKey);
     const { email, inviteUrl, locale } = data;
     // Validate required fields
     if (!email) {

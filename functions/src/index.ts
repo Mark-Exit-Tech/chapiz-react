@@ -5,10 +5,6 @@ import { Resend } from 'resend';
 admin.initializeApp();
 const firestore = admin.firestore();
 
-// Get Resend API key from environment variables or fallback to hardcoded (for development)
-const resendApiKey = process.env.RESEND_API_KEY || 're_4B3FSDoU_GjgVXh2vLWks6VzuQvfnvaBf';
-const resend = new Resend(resendApiKey);
-
 export const deleteUserAccount = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'Authentication is required');
@@ -39,7 +35,15 @@ export const deleteUserAccount = functions.https.onCall(async (data, context) =>
   return { success: true };
 });
 
-export const sendInviteEmail = functions.https.onCall(async (data, context) => {
+export const sendInviteEmail = functions
+  .runWith({ secrets: ['RESEND_API_KEY'] })
+  .https.onCall(async (data, context) => {
+  const resendApiKey = process.env.RESEND_API_KEY;
+  if (!resendApiKey) {
+    throw new functions.https.HttpsError('failed-precondition', 'Email service is not configured');
+  }
+  const resend = new Resend(resendApiKey);
+
   const { email, inviteUrl, locale } = data;
 
   // Validate required fields
@@ -121,7 +125,7 @@ export const sendInviteEmail = functions.https.onCall(async (data, context) => {
     const errorMessage = error?.message || 'Failed to send email. Please check Resend configuration and verify the sender email is verified.';
     throw new functions.https.HttpsError('internal', errorMessage);
   }
-});
+  });
 
 /**
  * Server-side shop callback — awards points when called via HTTP GET.
